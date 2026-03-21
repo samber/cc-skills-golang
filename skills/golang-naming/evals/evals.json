@@ -1,0 +1,404 @@
+[
+  {
+    "id": 1,
+    "name": "new-constructor-naming",
+    "description": "New() constructor for single primary type, error strings with package prefix, isConnected bool field",
+    "prompt": "Create a Go package called `apiclient` that provides an HTTP client for a REST API. The package should include:\n\n1. A main client struct with fields for base URL, timeout, max retries, and an http.Client\n2. A constructor with functional options for port, timeout, and logger\n3. Exported constants for default timeout (30s), max retries (3), and default port (8080)\n4. Getter and setter methods for the base URL and timeout\n5. Sentinel errors for 'not found', 'unauthorized', and 'rate limited' cases\n6. A custom error type for API errors that includes status code and response body\n7. A method on the client to fetch a user by ID, returning a User struct\n8. A boolean field on the client tracking whether it's connected\n\nPut everything in a single file `apiclient.go`. Use proper Go conventions throughout.",
+    "trap": "Model uses NewClient() instead of New(), bare error strings without package prefix, or mixed-case acronyms (Http, Url, Api, Id)",
+    "assertions": [
+      {
+        "id": "1.1",
+        "text": "Constructor is named New() not NewClient(), because Client is the single primary type in the apiclient package — callers write apiclient.New(), avoiding redundancy"
+      },
+      {
+        "id": "1.2",
+        "text": "Sentinel error strings include the package name as prefix (e.g., 'apiclient: not found' or 'apiclient: resource not found'), not bare strings like 'not found' or 'resource not found'"
+      },
+      {
+        "id": "1.3",
+        "text": "Acronyms are all-caps or all-lower, never mixed (URL not Url, HTTP not Http, API not Api, ID not Id in struct fields and method names)"
+      },
+      {
+        "id": "1.4",
+        "text": "The unexported boolean field uses an is/has prefix (isConnected) rather than a bare adjective (connected), and the exported method uses IsConnected()"
+      },
+      {
+        "id": "1.5",
+        "text": "Getter methods omit the Get prefix (e.g., BaseURL() and Timeout() rather than GetBaseURL() and GetTimeout())"
+      },
+      {
+        "id": "1.6",
+        "text": "Functional option functions use With prefix (WithPort, WithTimeout, WithLogger) and option type is singular (Option or ClientOption, not Options)"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "must-prefix-enum-iota",
+    "description": "New() constructor, Status not PoolStatus (anti-stutter), IsHealthy() bool, type-prefixed enums",
+    "prompt": "I'm building a Go package called `dbpool` for managing database connection pools. Please write the code for `pool.go` with:\n\n1. A ConnectionState enum with values: idle, active, closed, errored\n2. An interface that any database driver must implement, with methods for Connect, Ping, Close, and a method that returns whether the connection is healthy\n3. A Pool struct with fields for maximum connections, current count, and the database DSN (data source name)\n4. A constructor that accepts a DSN string and functional options\n5. Methods to get a connection from the pool and return it\n6. A method that returns the pool's current status as a JSON-serializable struct\n7. Error variables for pool exhausted, connection failed, and invalid DSN\n8. A helper that must successfully parse the DSN or panic\n9. Constants for the default pool size (10) and the max idle timeout (5 minutes)\n\nMake sure to follow Go naming best practices.",
+    "trap": "Model uses NewPool() instead of New(), PoolStatus (stutter), bare Healthy() bool without Is prefix, Idle/Active enum values without type prefix, or bare error strings",
+    "assertions": [
+      {
+        "id": "2.1",
+        "text": "Constructor is named New() not NewPool(), because Pool is the single primary type in the dbpool package — callers write dbpool.New()"
+      },
+      {
+        "id": "2.2",
+        "text": "The JSON-serializable status struct is named Status (not PoolStatus) since the package is already dbpool — avoids stuttering at call site (dbpool.Status not dbpool.PoolStatus)"
+      },
+      {
+        "id": "2.3",
+        "text": "The health-check method on the interface uses IsHealthy() bool with Is prefix — not bare Healthy() bool. The Is prefix signals a boolean predicate (same pattern as reflect.Type.IsVariadic, net.IP.IsLoopback)"
+      },
+      {
+        "id": "2.4",
+        "text": "The panic-on-error DSN parser uses the Must prefix (MustParseDSN) to signal that failure panics, not just ParseDSN or ParseDSNOrDie"
+      },
+      {
+        "id": "2.5",
+        "text": "Enum values are prefixed with the type name (e.g., ConnectionStateIdle, ConnectionStateActive) rather than bare Idle/Active, and include a zero-value sentinel (Unknown or similar at iota position 0)"
+      },
+      {
+        "id": "2.6",
+        "text": "Sentinel error strings include the package name as prefix (e.g., 'dbpool: pool exhausted'), not bare strings like 'pool exhausted'"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "error-string-lowercase-acronyms",
+    "description": "Lowercase error strings and test names including acronyms, isConsuming bool, consistent receivers",
+    "prompt": "Write a Go file `consumer.go` in package `msgqueue` and its corresponding test file `consumer_test.go`. The consumer should:\n\n1. A Consumer struct that wraps a connection URL, a boolean tracking if it's currently consuming, and a maximum batch size constant (100)\n2. A constructor accepting a URL and options\n3. Methods: one to consume the next batch of messages, one to acknowledge a message by ID, one to get the consumer's URL, and one to check if the consumer is currently running\n4. A Processor interface with a single method for processing a message\n5. Sentinel errors for: queue empty, message already acknowledged, invalid message ID\n6. A custom error type for deserialization failures that wraps the original error\n\nFor the test file, write table-driven tests for the acknowledge method covering: valid ID, empty ID, already acknowledged ID, and invalid format ID. Use proper Go test naming conventions with subtests.\n\nFollow idiomatic Go naming throughout both files.",
+    "trap": "Model capitalizes acronyms in error strings ('invalid message ID' instead of 'invalid message id') and subtest names ('valid ID' instead of 'valid id'), or uses a bare boolean field (consuming) instead of isConsuming",
+    "assertions": [
+      {
+        "id": "3.1",
+        "text": "Error strings are fully lowercase including acronyms — 'invalid message id' not 'invalid message ID'. Go error convention: lowercase, no punctuation, even for acronyms that would normally be capitalized in identifiers"
+      },
+      {
+        "id": "3.2",
+        "text": "Subtest names in t.Run are fully lowercase — 'valid id', 'empty id' not 'valid ID', 'empty ID'. Acronyms in test case descriptions follow the lowercase error string convention"
+      },
+      {
+        "id": "3.3",
+        "text": "The unexported boolean field uses an is prefix (isConsuming or isRunning) rather than a bare adjective (consuming or running), and the exported method uses IsRunning() or IsConsuming()"
+      },
+      {
+        "id": "3.4",
+        "text": "All Consumer methods use the same 1-2 letter receiver name (e.g., 'c' consistently) rather than mixing names or using 'self'/'this'"
+      },
+      {
+        "id": "3.5",
+        "text": "Sentinel errors use Err prefix (ErrQueueEmpty, ErrAlreadyAcknowledged, ErrInvalidMessageID) and the custom error type uses Error suffix (DeserializationError)"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "name": "package-naming-anti-patterns",
+    "description": "Tests that generic package names (util, helper, common, base) are avoided and packages use singular, lowercase, single-word names",
+    "prompt": "I'm refactoring a Go project and need to organize some shared code. I have:\n\n1. A function that validates email addresses\n2. A function that hashes passwords with bcrypt\n3. A function that generates random UUIDs\n4. A function that formats timestamps for display\n5. A function that converts between different currency amounts\n6. Helper functions for reading/writing JSON files\n\nCurrently all of these live in a single package called `utils`. Suggest how to reorganize them into proper Go packages with appropriate names. Write the package declarations and function signatures (no implementations needed).",
+    "trap": "Model keeps the utils package or creates similarly generic names like helpers, common, shared, or base. May also use plural package names or MixedCaps/underscores in package names.",
+    "assertions": [
+      {
+        "id": "4.1",
+        "text": "Does NOT use generic package names like util, utils, helper, helpers, common, shared, base, or model — each package has a specific, purposeful name"
+      },
+      {
+        "id": "4.2",
+        "text": "Package names are singular, not plural (e.g., 'currency' not 'currencies', 'email' not 'emails')"
+      },
+      {
+        "id": "4.3",
+        "text": "Package names are lowercase single words with no underscores or MixedCaps (e.g., 'email' not 'email_validator' or 'emailValidator')"
+      },
+      {
+        "id": "4.4",
+        "text": "Functions do NOT stutter with their package name (e.g., email.Validate not email.ValidateEmail, currency.Convert not currency.ConvertCurrency)"
+      },
+      {
+        "id": "4.5",
+        "text": "The JSON file I/O functions are placed in a specific package (e.g., jsonfile, storage) not left in a generic helpers package"
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "name": "scope-based-variable-naming",
+    "description": "Tests that variable name length is proportional to scope — short names for tiny scopes, longer names for package-level",
+    "prompt": "Review and improve the naming in this Go function. The code works correctly but the naming may need adjustment:\n\n```go\npackage analytics\n\nvar t = &http.Transport{MaxIdleConns: 100}\n\nfunc ProcessUserEvents(eventList []Event) map[string]int {\n    resultMap := make(map[string]int)\n    for userIndex, currentEvent := range eventList {\n        if currentEvent.IsValid() {\n            temporaryKey := currentEvent.Type\n            resultMap[temporaryKey]++\n            _ = userIndex\n        }\n    }\n    return resultMap\n}\n```\n\nFix the variable naming to follow Go conventions. Explain each change.",
+    "trap": "Model may not recognize the inverted naming problem: the package-level variable `t` is too short (should be descriptive) while the loop variables `userIndex`, `currentEvent`, `temporaryKey`, `resultMap`, `eventList` are too long for their scope.",
+    "assertions": [
+      {
+        "id": "5.1",
+        "text": "Renames the package-level variable `t` to something more descriptive like `defaultTransport` or `defaultHTTPTransport` — single-letter names are too cryptic at package scope"
+      },
+      {
+        "id": "5.2",
+        "text": "Shortens the loop variable `currentEvent` to something like `e` or `ev` — the 3-line loop scope makes a long name unnecessary noise"
+      },
+      {
+        "id": "5.3",
+        "text": "Shortens the loop index `userIndex` to `i` or similar — loop indices in small scopes should be single letters"
+      },
+      {
+        "id": "5.4",
+        "text": "Renames `resultMap` and/or `eventList` to shorter names that don't encode the type (e.g., `counts` instead of `resultMap`, `events` instead of `eventList`)"
+      },
+      {
+        "id": "5.5",
+        "text": "Explains the principle: name length should be proportional to scope size — short names for small scopes, descriptive names for package-level variables"
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "name": "avoid-type-in-variable-name",
+    "description": "Tests that variable names describe what a value represents, not its Go type",
+    "prompt": "I have these variable declarations in a Go function. Are the names idiomatic?\n\n```go\nuserSlice := fetchUsers()\ncountInt := len(userSlice)\nnameString := user.FullName()\nerrorValue := validate(input)\nchannelChan := make(chan Event, 10)\ncontextCtx := context.Background()\nresultBool := isValid(token)\ntimeoutDuration := 30 * time.Second\n```\n\nSuggest better names for each.",
+    "trap": "Model may fix only the most obvious ones (like countInt) but miss that ALL type-encoded names should be changed, including channelChan, contextCtx, resultBool, timeoutDuration.",
+    "assertions": [
+      {
+        "id": "6.1",
+        "text": "Renames `userSlice` to `users` — the name should describe what the value holds, not the Go type"
+      },
+      {
+        "id": "6.2",
+        "text": "Renames `countInt` to `count` or `n` — dropping the type suffix"
+      },
+      {
+        "id": "6.3",
+        "text": "Renames `channelChan` to `events` or similar — not encoding the channel type in the name"
+      },
+      {
+        "id": "6.4",
+        "text": "Renames `contextCtx` to `ctx` — the standard Go convention for context.Context"
+      },
+      {
+        "id": "6.5",
+        "text": "Renames `timeoutDuration` to `timeout` — Duration is the type, not the purpose"
+      },
+      {
+        "id": "6.6",
+        "text": "Renames `resultBool` to something like `valid` or `ok` — removing the type suffix"
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "name": "interface-naming-canonical-methods",
+    "description": "Tests -er suffix for single-method interfaces, canonical method names, and multi-method interface naming",
+    "prompt": "I'm designing interfaces for a Go storage library. Create interfaces for these behaviors:\n\n1. Something that can serialize data to bytes\n2. Something that can validate itself\n3. Something that can both read and write key-value pairs (a full store)\n4. Something that provides a human-readable string representation\n5. Something that can close/release resources\n6. Something that can handle HTTP requests\n\nWrite the interface definitions with proper method signatures.",
+    "trap": "Model invents non-canonical method names like ToString() instead of String(), Serialize() instead of Marshal(), or names single-method interfaces without the -er suffix (e.g., Validation instead of Validator).",
+    "assertions": [
+      {
+        "id": "7.1",
+        "text": "Single-method interfaces use the -er suffix pattern (e.g., Marshaler or Serializer, Validator, Closer) following the io.Reader/io.Writer convention"
+      },
+      {
+        "id": "7.2",
+        "text": "The string representation method is named String() returning string (matching fmt.Stringer), NOT ToString() or Stringify()"
+      },
+      {
+        "id": "7.3",
+        "text": "The resource release method is named Close() returning error (matching io.Closer), NOT Destroy(), Release(), or Cleanup()"
+      },
+      {
+        "id": "7.4",
+        "text": "The HTTP handler method is named ServeHTTP(http.ResponseWriter, *http.Request) matching http.Handler — NOT HandleHTTP or HandleRequest"
+      },
+      {
+        "id": "7.5",
+        "text": "Multi-method interface (the key-value store) uses a descriptive noun name like Store or ReadWriter, NOT a compound -er name like ReaderWriter"
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "name": "constants-role-not-value",
+    "description": "Tests that constants are named by purpose/role, not by their literal value, and use MixedCaps",
+    "prompt": "Define Go constants for a web server configuration package. I need constants for:\n\n1. The default HTTP port (8080)\n2. Maximum number of retries (3)\n3. Request timeout (30 seconds)\n4. Maximum upload size (10 MB)\n5. Rate limit (100 requests per minute)\n6. Maximum header size (8192 bytes)\n\nWrite proper Go constant declarations.",
+    "trap": "Model uses ALL_CAPS (MAX_RETRIES, DEFAULT_PORT) or names constants by their value (Port8080, ThreeRetries, Size8192) instead of by their role.",
+    "assertions": [
+      {
+        "id": "8.1",
+        "text": "Constants use MixedCaps (DefaultPort, MaxRetries) NOT ALL_CAPS (DEFAULT_PORT, MAX_RETRIES) — Go reserves casing for visibility, not emphasis"
+      },
+      {
+        "id": "8.2",
+        "text": "Constants are named by role/purpose, not by value (e.g., DefaultPort not Port8080, MaxRetries not ThreeRetries, MaxHeaderSize not Size8192)"
+      },
+      {
+        "id": "8.3",
+        "text": "Time-based constants use time.Duration type (e.g., 30 * time.Second) rather than raw integers (e.g., const RequestTimeout = 30)"
+      },
+      {
+        "id": "8.4",
+        "text": "Size-based constants use descriptive names and clear units (e.g., MaxUploadSize = 10 << 20 or 10 * 1024 * 1024) not ambiguous raw numbers"
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "name": "named-returns-and-bare-returns",
+    "description": "Tests that named returns are used only for documentation purposes and bare returns are avoided",
+    "prompt": "Review these Go function signatures and tell me which use named returns correctly and which don't. Fix any problems:\n\n```go\nfunc ParseConfig(data []byte) (config Config, err error) {\n    // ... 40 lines of parsing logic ...\n    return\n}\n\nfunc Divide(a, b float64) (result float64, err error) {\n    if b == 0 {\n        return 0, errors.New(\"division by zero\")\n    }\n    return a / b, nil\n}\n\nfunc ScanRecord(data []byte, atEOF bool) (advance int, token []byte, err error) {\n    // ... complex scanning logic ...\n    return advance, token, nil\n}\n\nfunc Write(p []byte) (n int, e error) {\n    // ... write logic ...\n    return\n}\n```",
+    "trap": "Model approves bare returns in the 40-line ParseConfig or doesn't flag 'e' as a non-standard error name in Write. May also miss that Divide's named returns add no documentary value since the types already clarify.",
+    "assertions": [
+      {
+        "id": "9.1",
+        "text": "Flags the bare return in ParseConfig as problematic — bare returns hurt readability in long functions where the reader must scroll to find what's being returned"
+      },
+      {
+        "id": "9.2",
+        "text": "Identifies ScanRecord as a correct use of named returns — the names clarify which int is which and serve as documentation for the caller"
+      },
+      {
+        "id": "9.3",
+        "text": "Flags 'e' as a non-standard error variable name in Write — the convention is 'err', and 'e' adds no clarity"
+      },
+      {
+        "id": "9.4",
+        "text": "Notes that Divide's named returns add little value since there's only one float64 and one error — unnamed returns would be equally clear"
+      },
+      {
+        "id": "9.5",
+        "text": "Flags the bare return in Write as problematic — should explicitly return the values"
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "name": "format-function-f-suffix",
+    "description": "Tests that functions accepting format strings use the f suffix convention",
+    "prompt": "I'm building a custom logging and error-wrapping library in Go. Design the public API with these functions:\n\n1. A function that creates a new error from a format string and arguments\n2. A function that wraps an existing error with additional context using a format string\n3. A function that logs at info level with a format string\n4. A function that logs at info level with a plain message (no formatting)\n5. A function that creates a new error from a plain string\n6. A function that panics with a formatted message\n\nWrite the function signatures (no implementations). Make sure the naming clearly signals which functions accept format strings.",
+    "trap": "Model creates WrapError or LogInfo for format-string variants instead of using the f suffix (Wrapf, Infof). May also not distinguish between plain-string and format-string versions.",
+    "assertions": [
+      {
+        "id": "10.1",
+        "text": "Format-string error creation uses the f suffix (Errorf) — not Error or NewError with format args"
+      },
+      {
+        "id": "10.2",
+        "text": "Format-string error wrapping uses the f suffix (Wrapf) — not WrapError or Wrap with format args"
+      },
+      {
+        "id": "10.3",
+        "text": "Format-string logging uses the f suffix (Infof or Logf) — not Info or LogInfo with format args"
+      },
+      {
+        "id": "10.4",
+        "text": "Plain-string variants do NOT have the f suffix (e.g., Info vs Infof, New vs Errorf) — clear distinction between format and plain versions"
+      },
+      {
+        "id": "10.5",
+        "text": "The panic function with format string uses the f suffix (Panicf or Fatalf) — not Panic with format args"
+      }
+    ]
+  },
+  {
+    "id": 11,
+    "name": "context-variant-and-in-place-suffixes",
+    "description": "Tests WithContext suffix for context variants and In suffix for in-place mutations",
+    "prompt": "I have a Go data processing library. I need to add variants to existing functions:\n\n1. `Fetch(key string) ([]byte, error)` needs a variant that accepts a context.Context\n2. `Sort(items []Item) []Item` (returns a new sorted slice) needs an in-place variant that modifies the slice directly\n3. `ParseConfig(path string) (*Config, error)` needs a variant that panics instead of returning an error\n4. `Reverse(s string) string` (returns a new string) needs an in-place variant for byte slices\n5. `Query(sql string) (*Rows, error)` needs a context-aware variant\n\nWhat should the variant function names be? Write the signatures.",
+    "trap": "Model uses FetchCtx/FetchWithCtx instead of FetchWithContext, SortMut/SortSlice instead of SortIn, or ParseConfigOrPanic instead of MustParseConfig.",
+    "assertions": [
+      {
+        "id": "11.1",
+        "text": "Context-accepting variants use WithContext suffix (FetchWithContext, QueryWithContext or QueryContext) — NOT FetchCtx, FetchWithCtx, or CtxFetch"
+      },
+      {
+        "id": "11.2",
+        "text": "In-place mutation variants use the In suffix (SortIn, ReverseIn) — NOT SortMut, SortInPlace, SortSlice, or MutateSort"
+      },
+      {
+        "id": "11.3",
+        "text": "Panic-on-error variant uses Must prefix (MustParseConfig) — NOT ParseConfigOrPanic, ParseConfigOrDie, or ParseConfigMust"
+      },
+      {
+        "id": "11.4",
+        "text": "All variants follow their respective conventions consistently (With* for context, In for mutation, Must for panic)"
+      }
+    ]
+  },
+  {
+    "id": 12,
+    "name": "import-aliasing-only-on-collision",
+    "description": "Tests that import aliases are only used when there's a name collision, not gratuitously",
+    "prompt": "Review these Go imports and tell me which aliases are needed and which should be removed:\n\n```go\nimport (\n    f \"fmt\"\n    h \"net/http\"\n    j \"encoding/json\"\n    \"crypto/rand\"\n    mrand \"math/rand\"\n    \"github.com/go-chi/chi/v5\"\n    chiMiddleware \"github.com/go-chi/chi/v5/middleware\"\n    pb \"myapp/proto/userpb\"\n    str \"strings\"\n    mylog \"log/slog\"\n    \"io\"\n    ioutil \"io/ioutil\"\n)\n```\n\nWhich aliases are justified? Which should be removed? Explain why.",
+    "trap": "Model may accept unnecessary aliases like mylog for log/slog or str for strings. May not recognize that pb for proto and mrand for math/rand are conventionally justified.",
+    "assertions": [
+      {
+        "id": "12.1",
+        "text": "Flags f, h, j, str, mylog, and ioutil aliases as unnecessary — these add cognitive load without resolving any collision"
+      },
+      {
+        "id": "12.2",
+        "text": "Keeps mrand alias for math/rand as justified — it collides with crypto/rand in the same import block"
+      },
+      {
+        "id": "12.3",
+        "text": "Keeps pb alias for proto-generated code as conventionally justified (generated code convention)"
+      },
+      {
+        "id": "12.4",
+        "text": "Explains the principle: aliases add cognitive load because readers must remember the mapping — only alias on actual name collision"
+      }
+    ]
+  },
+  {
+    "id": 13,
+    "name": "consistent-concept-naming",
+    "description": "Tests that the same domain concept uses the same name throughout the codebase",
+    "prompt": "I have a Go service with these function signatures across different files. Are there any naming consistency issues?\n\n```go\n// user_service.go\nfunc CreateUser(user *User) error\nfunc UpdateAccount(acct *User) error\nfunc RemovePerson(id string) error\nfunc GetUserByID(userID string) (*User, error)\n\n// order_service.go  \nfunc PlaceOrder(order *Order) error\nfunc ModifyPurchase(purchase *Order) error\nfunc CancelOrder(orderId string) error\nfunc FetchOrder(oid string) (*Order, error)\n```\n\nReview and fix the naming.",
+    "trap": "Model may fix only the obvious GetUserByID→UserByID but miss the inconsistent synonyms (user/account/person, order/purchase) and the inconsistent parameter naming (userID/id/orderId/oid).",
+    "assertions": [
+      {
+        "id": "13.1",
+        "text": "Identifies that user/account/person are inconsistent synonyms for the same concept and standardizes on one name (user)"
+      },
+      {
+        "id": "13.2",
+        "text": "Identifies that order/purchase are inconsistent synonyms and standardizes on one name (order)"
+      },
+      {
+        "id": "13.3",
+        "text": "Standardizes the ID parameter naming — uses one consistent name (e.g., userID, orderID) instead of mixing id/userID/orderId/oid"
+      },
+      {
+        "id": "13.4",
+        "text": "Fixes the acronym casing: orderId should be orderID (ID is an acronym, must be all caps)"
+      },
+      {
+        "id": "13.5",
+        "text": "Standardizes the verb pattern across CRUD operations (e.g., Create/Update/Delete or Create/Modify/Cancel — not Create/Update/Remove mixed with Place/Modify/Cancel)"
+      }
+    ]
+  },
+  {
+    "id": 14,
+    "name": "boolean-getter-vs-richer-return",
+    "description": "Tests the distinction between Is*/Has* bool predicates and value getters that happen to return status-like values",
+    "prompt": "A Go struct Server has these fields:\n\n```go\ntype Server struct {\n    port      int\n    healthy   bool\n    ready     bool\n    status    HealthStatus\n    connected bool\n}\n```\n\nWrite getter methods for all five fields following Go conventions. HealthStatus is a custom enum type.",
+    "trap": "Model uses GetPort() or drops the Is prefix on boolean getters (Healthy() bool). May also incorrectly add Is prefix to the HealthStatus getter (IsStatus() instead of Status()).",
+    "assertions": [
+      {
+        "id": "14.1",
+        "text": "The port getter is named Port() not GetPort() — Go omits the Get prefix on value getters"
+      },
+      {
+        "id": "14.2",
+        "text": "Boolean getters use Is prefix: IsHealthy() bool, IsReady() bool, IsConnected() bool — NOT bare Healthy(), Ready(), Connected()"
+      },
+      {
+        "id": "14.3",
+        "text": "The HealthStatus getter is named Status() not GetStatus() and does NOT use Is prefix (IsStatus) — Is/Has is only for bool return types"
+      },
+      {
+        "id": "14.4",
+        "text": "All methods use the same 1-2 letter receiver name consistently (e.g., 's' for Server)"
+      }
+    ]
+  }
+]

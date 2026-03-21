@@ -1,0 +1,550 @@
+[
+  {
+    "id": 1,
+    "name": "zero-value-implicit",
+    "description": "Zero-value fields not explicitly initialized; non-zero uses :=",
+    "prompt": "Write a Go file `cache.go` in package `cache`. Create a Cache struct with fields for max size, current count, hit count, and miss count (all integers). Add a constructor that takes max size. Add a Get method that increments hit or miss count and a Set method. Initialize a default TTL duration variable and a done channel in the constructor.",
+    "trap": "Model explicitly initializes zero-value fields (currentCount := 0) or uses var for non-zero assignments, obscuring the distinction between intentional zero and meaningful value",
+    "assertions": [
+      {
+        "id": "1.1",
+        "text": "Zero-value integer fields (currentCount, hitCount, missCount) are NOT explicitly initialized in the constructor — Go zero values are relied upon, or if local variables are declared separately, they use var (not :=) to signal zero-value intent"
+      },
+      {
+        "id": "1.2",
+        "text": "Non-zero assignments (like maxSize from parameter, or default TTL = 5*time.Minute) use := short declaration form"
+      },
+      {
+        "id": "1.3",
+        "text": "The done channel is created with make(), not left as nil"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "empty-slice-map-not-nil",
+    "description": "Empty collections initialized as []T{} or make(), never nil",
+    "prompt": "Write a Go file `handler.go` in package `api`. Create a Handler struct. Add a method ListUsers that returns a slice of User structs (define User with Name and Email fields). Add a method GetTags that returns a map[string]string. Both methods should return empty collections when there's no data. Add a method BuildResponse that takes a slice of results and a map of metadata and processes them.",
+    "trap": "Model returns nil slices/maps or uses uninitialized var declarations for empty collections, causing nil != empty issues in JSON serialization and caller code",
+    "assertions": [
+      {
+        "id": "2.1",
+        "text": "Empty slice return uses []User{} or make([]User, 0) — never returns nil or an uninitialized var declaration without assignment"
+      },
+      {
+        "id": "2.2",
+        "text": "Empty map return uses map[string]string{} or make(map[string]string) — never returns nil or an uninitialized var declaration without assignment"
+      },
+      {
+        "id": "2.3",
+        "text": "When capacity is known (e.g., from len(input)), make() with capacity hint is used for preallocating slices or maps"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "named-struct-fields",
+    "description": "All struct literals use named fields, not positional",
+    "prompt": "Write a Go file `server.go` in package `server`. Create an HTTP server using net/http. Configure it with address ':8080', read timeout 5 seconds, write timeout 10 seconds, idle timeout 120 seconds, and max header bytes 1MB. Also create a tls.Config with min TLS version 1.2 and a list of cipher suites.",
+    "trap": "Model uses positional struct literals like http.Server{\":8080\", 5*time.Second, 10*time.Second, ...}, which silently breaks when struct fields are reordered",
+    "assertions": [
+      {
+        "id": "3.1",
+        "text": "http.Server literal uses named fields (Addr:, ReadTimeout:, WriteTimeout:, IdleTimeout:, MaxHeaderBytes:) — not positional arguments"
+      },
+      {
+        "id": "3.2",
+        "text": "tls.Config literal uses named fields (MinVersion:, CipherSuites:) — not positional arguments"
+      },
+      {
+        "id": "3.3",
+        "text": "No struct literal in the file uses positional field syntax"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "name": "early-return-not-nested",
+    "description": "Validation uses early returns; happy path at minimal indentation despite prompt asking for nesting",
+    "prompt": "Write a Go function ProcessOrder in package `orders` that takes an order struct (define it with fields: ID string, Items []Item, Status string, CustomerID string). The function should validate that the ID is not empty, that there is at least one item, that the status is 'pending', that the customer exists (simulate with a lookup function), compute the total price, apply a discount if total > 100, and return the final total with an error. Write it with deeply nested if-else blocks.",
+    "trap": "Model follows the prompt's instruction to use deeply nested if-else blocks, burying the happy path inside 4+ levels of indentation",
+    "assertions": [
+      {
+        "id": "4.1",
+        "text": "Validation checks (empty ID, no items, wrong status) use early return pattern — each check returns an error immediately rather than nesting the rest of the function inside an else block"
+      },
+      {
+        "id": "4.2",
+        "text": "The happy path (compute total, apply discount, return) is at the top level of the function body (indentation level 1), not nested inside multiple if blocks"
+      },
+      {
+        "id": "4.3",
+        "text": "The function has at most 2 levels of indentation for the main logic (excluding the error-check if blocks which return early)"
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "name": "no-else-after-return",
+    "description": "No else after return; default-then-override for simple assignments",
+    "prompt": "Write a Go function GetUserRole in package `auth` that takes a user struct with IsAdmin bool, IsModerator bool, and IsVerified bool fields. Return a role string: if admin return 'admin', else if moderator return 'moderator', else if verified return 'member', else return 'guest'. Also write a function SetLogLevel that takes a verbose bool and a debug bool, and sets the log level appropriately using slog.",
+    "trap": "Model uses else-if chains after return statements, adding unnecessary indentation and cognitive load",
+    "assertions": [
+      {
+        "id": "5.1",
+        "text": "GetUserRole does NOT use else or else-if after a return statement — either uses early returns (if isAdmin { return 'admin' }; if isModerator { return 'moderator' }) or a switch statement"
+      },
+      {
+        "id": "5.2",
+        "text": "SetLogLevel uses the default-then-override pattern: assigns a default level first, then conditionally overrides with if (not if-else chains)"
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "name": "switch-over-if-else-chain",
+    "description": "Multi-branch comparisons use switch statements, not if-else chains",
+    "prompt": "Write a Go function HandleEvent in package `events` that takes an event with a Type string field. The type can be 'click', 'scroll', 'keypress', 'hover', 'focus', or 'blur'. Each type should call a different handler function. Also write a function MapStatusCode that takes an int HTTP status code and returns a human-readable string for 200, 201, 204, 400, 401, 403, 404, 500, 502, 503.",
+    "trap": "Model uses if-else chains for multi-branch string/int comparisons instead of switch statements",
+    "assertions": [
+      {
+        "id": "6.1",
+        "text": "HandleEvent uses a switch statement on event.Type, not an if-else chain"
+      },
+      {
+        "id": "6.2",
+        "text": "MapStatusCode uses a switch statement on the status code, not an if-else chain"
+      },
+      {
+        "id": "6.3",
+        "text": "Both switch statements include a default case"
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "name": "options-struct-not-many-params",
+    "description": "Groups params into options struct, context.Context first",
+    "prompt": "Write a Go function SendNotification in package `notify` that sends a notification. It needs these parameters: ctx context.Context, userID string, message string, channel string (email/sms/push), priority int, retryCount int, dryRun bool, templateID string, metadata map[string]string, callback func(error). Put all parameters directly in the function signature.",
+    "trap": "Model follows the prompt's instruction to put all 10 parameters directly in the function signature, creating an unusable API",
+    "assertions": [
+      {
+        "id": "7.1",
+        "text": "context.Context is the first parameter in the function signature"
+      },
+      {
+        "id": "7.2",
+        "text": "The function uses an options struct (or similar grouping) to reduce the parameter count to 4 or fewer in the main function signature — not all 10 parameters listed individually"
+      },
+      {
+        "id": "7.3",
+        "text": "The options struct groups related configuration (channel, priority, retryCount, dryRun, templateID, metadata, callback) into a single parameter"
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "name": "value-vs-pointer-params",
+    "description": "Value params for small types; pointers only for mutation — not pointer everything",
+    "prompt": "Write Go functions in package `users`: (1) FormatName that takes a first name string and last name string and returns the formatted full name, (2) UpdateAge that modifies a User struct's age field, (3) FindUser that takes a user ID string and returns a User pointer, (4) CompareUsers that checks if two User structs (each about 32 bytes with Name string and Age int) are equal. Use pointer parameters for all functions.",
+    "trap": "Model follows the prompt's instruction to use pointer parameters for all functions, including small value types like string and int where pointers only add indirection",
+    "assertions": [
+      {
+        "id": "8.1",
+        "text": "FormatName takes string parameters by value (not *string) — strings are small fixed-size types"
+      },
+      {
+        "id": "8.2",
+        "text": "UpdateAge takes a *User pointer parameter because it mutates the struct"
+      },
+      {
+        "id": "8.3",
+        "text": "CompareUsers takes User structs by value (not *User) because it only reads them and they are small (<128 bytes)"
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "name": "file-declaration-order",
+    "description": "Interface before struct, constructor before methods, helpers after exported methods",
+    "prompt": "Write a Go file `repository.go` in package `repo`. Include: a Repository interface with methods Get, List, Create, Delete; a PostgresRepository struct implementing it; a constructor NewPostgresRepository; all four methods on PostgresRepository; two helper functions (buildQuery and scanRow); constants for default page size and max page size; and the necessary imports. Organize everything in a single file.",
+    "trap": "Model scatters declarations in arbitrary order, mixing helpers between methods and placing structs before interfaces",
+    "assertions": [
+      {
+        "id": "9.1",
+        "text": "File ordering follows: package clause, imports, constants, interface type, struct type, constructor, exported methods, unexported helpers — not randomly scattered"
+      },
+      {
+        "id": "9.2",
+        "text": "The interface (Repository) is declared before the struct (PostgresRepository) that implements it"
+      },
+      {
+        "id": "9.3",
+        "text": "Helper functions (buildQuery, scanRow) appear after the main type's methods, not before or interleaved between them"
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "name": "strconv-for-int-conversion",
+    "description": "strconv.Itoa for int-to-string, strings.Builder for loop concatenation, fmt.Sprintf for complex formatting",
+    "prompt": "Write a Go function GenerateReport in package `report` that: (1) converts an integer count to a string for a header, (2) converts a float64 percentage to a string with 2 decimal places, (3) builds a CSV-like output by concatenating 1000 rows in a loop where each row has name, age, and city columns, (4) formats a simple greeting with a name string variable.",
+    "trap": "Model uses fmt.Sprintf(\"%d\") for simple int conversions and += string concatenation in the loop, missing the performance-correct alternatives",
+    "assertions": [
+      {
+        "id": "10.1",
+        "text": "Integer-to-string conversion uses strconv.Itoa() or strconv.FormatInt() — not fmt.Sprintf('%d', n)"
+      },
+      {
+        "id": "10.2",
+        "text": "Loop-based string concatenation uses strings.Builder (or bytes.Buffer) — not repeated string concatenation with +"
+      },
+      {
+        "id": "10.3",
+        "text": "Complex formatting (like the percentage with specific format or the greeting) uses fmt.Sprintf"
+      }
+    ]
+  },
+  {
+    "id": 11,
+    "name": "named-boolean-conditions",
+    "description": "Complex conditions extracted to named booleans before the if statement",
+    "prompt": "Write a Go function CanAccessResource in package `authz` that checks if a user can access a resource. The conditions are: (1) user.Role == 'admin', OR (2) user.ID == resource.OwnerID, OR (3) resource.IsPublic && user.IsVerified, OR (4) user has a specific permission in their permission set (permissions.Contains('resource.access')). Write it as a single if statement with all conditions inline.",
+    "trap": "Model follows the prompt's instruction to inline all conditions, making the if statement a wall of boolean logic that obscures the business intent",
+    "assertions": [
+      {
+        "id": "11.1",
+        "text": "At least 2 of the conditions are extracted into named boolean variables (e.g., isAdmin, isOwner, isPublicAndVerified) before the if statement"
+      },
+      {
+        "id": "11.2",
+        "text": "The named booleans have descriptive names that explain the business meaning (not generic names like cond1, cond2)"
+      },
+      {
+        "id": "11.3",
+        "text": "If the permissions.Contains() call is kept inline (not extracted), the code preserves short-circuit evaluation benefit for the expensive operation"
+      }
+    ]
+  },
+  {
+    "id": 12,
+    "name": "line-breaks-at-semantic-boundaries",
+    "description": "Long function calls broken at argument boundaries; closing paren on own line",
+    "prompt": "Write a Go function RegisterRoutes in package `router` that takes an http.ServeMux and registers 6 routes. Each route handler calls a function with these parameters: the response writer, request, a long service name string, a config struct, a logger, and an auth middleware function. Write each handler registration as a single long line.",
+    "trap": "Model follows the prompt's instruction to write each handler as a single long line, making diffs unreadable and code hard to scan",
+    "assertions": [
+      {
+        "id": "12.1",
+        "text": "Function calls with many arguments are broken across multiple lines, with each argument (or logical group) on its own line"
+      },
+      {
+        "id": "12.2",
+        "text": "Line breaks occur at semantic boundaries (after commas between arguments) — not at arbitrary column positions mid-expression"
+      },
+      {
+        "id": "12.3",
+        "text": "Closing parentheses for multi-line function calls appear on their own line (Go trailing-comma style)"
+      }
+    ]
+  },
+  {
+    "id": 13,
+    "name": "never-nil-return-for-collection",
+    "description": "Returns initialized empty collections, never nil, despite prompt saying nil is safe",
+    "prompt": "Write a Go function GetUsers in package `api` that returns all users from a database. When there are no users, return nil. Also write GetMetadata that returns a map[string]string — return nil when empty. The caller will check for nil before using the result, so returning nil is safe and avoids an unnecessary allocation.",
+    "trap": "Model follows the prompt's explicit instruction to return nil for empty collections, causing nil-slice JSON serialization (null instead of []) and nil map write panics",
+    "assertions": [
+      {
+        "id": "13.1",
+        "text": "GetUsers returns []User{} or make([]User, 0) for the empty case — NOT nil — because nil slices serialize to null in JSON"
+      },
+      {
+        "id": "13.2",
+        "text": "GetMetadata returns map[string]string{} or make(map[string]string) for the empty case — NOT nil — because nil maps panic on write"
+      },
+      {
+        "id": "13.3",
+        "text": "Neither function contains 'return nil' as a success path (nil is only acceptable paired with an error)"
+      }
+    ]
+  },
+  {
+    "id": 14,
+    "name": "strconv-builder-override-prompt",
+    "description": "Uses strconv.Itoa and strings.Builder even when prompt explicitly instructs fmt.Sprintf and +=",
+    "prompt": "Write a Go function BuildReport in package `report` that takes a count int, a list of names []string, and a separator string. Use fmt.Sprintf(\"%d\", count) to convert the count to a string. Use result += name + separator inside a for loop to build the final string. This is simple and readable — don't over-engineer it.",
+    "trap": "Model follows the prompt's explicit fmt.Sprintf and += instructions, choosing simplicity over correctness",
+    "assertions": [
+      {
+        "id": "14.1",
+        "text": "Integer-to-string uses strconv.Itoa(count) — NOT fmt.Sprintf(\"%d\", count) — because strconv is faster for simple conversions"
+      },
+      {
+        "id": "14.2",
+        "text": "Loop concatenation uses strings.Builder (WriteString) — NOT result += in a loop — because += allocates a new string each iteration"
+      },
+      {
+        "id": "14.3",
+        "text": "The function does NOT contain 'result +=' or 'result = result +' inside any loop body"
+      },
+      {
+        "id": "14.4",
+        "text": "strings.Builder or bytes.Buffer is declared before the loop and result is obtained via .String() after"
+      }
+    ]
+  },
+  {
+    "id": 15,
+    "name": "named-fields-override-positional-prompt",
+    "description": "Uses named struct fields even when prompt explicitly requests positional syntax",
+    "prompt": "Write Go structs in package `config` using positional field syntax for brevity. Create: Point{float64, float64}, Color{uint8, uint8, uint8, uint8}, and ServerConfig{string, int, bool, time.Duration, time.Duration, *tls.Config}. Positional syntax is shorter and the field order is obvious from the type definition.",
+    "trap": "Model follows the prompt's positional syntax instruction, creating brittle literals that silently break when struct fields are added or reordered",
+    "assertions": [
+      {
+        "id": "15.1",
+        "text": "Point literal uses named fields (X:, Y: or similar) — NOT Point{1.0, 2.0}"
+      },
+      {
+        "id": "15.2",
+        "text": "Color literal uses named fields (R:, G:, B:, A: or similar) — NOT Color{255, 128, 0, 255}"
+      },
+      {
+        "id": "15.3",
+        "text": "ServerConfig literal uses named fields — NOT positional — because positional breaks when fields are added or reordered"
+      },
+      {
+        "id": "15.4",
+        "text": "No struct literal in the file uses positional field syntax"
+      }
+    ]
+  },
+  {
+    "id": 16,
+    "name": "early-return-override-nested-prompt",
+    "description": "Uses early returns despite prompt explicitly requesting nested if-else validation pattern",
+    "prompt": "Write a Go function ValidateAndProcess in package `pipeline` that validates an input struct (check: non-empty Name, Age > 0, valid Email containing '@', Status is 'active' or 'pending', non-nil Permissions slice, at least one Permission). If all validations pass, compute a score, apply modifiers, and return the result. Use the traditional if-else pattern: if valid { if next_valid { if next { ... } else { error } } else { error } } else { error }. This makes the success path clear by keeping it inside the innermost block.",
+    "trap": "Model follows the prompt's explicit nested if-else pattern, nesting the success path 5+ levels deep",
+    "assertions": [
+      {
+        "id": "16.1",
+        "text": "Each validation check uses early return — if Name empty return error, if Age <= 0 return error, etc."
+      },
+      {
+        "id": "16.2",
+        "text": "The function does NOT contain nested if-else blocks for validation (no else clause after a validation if)"
+      },
+      {
+        "id": "16.3",
+        "text": "The happy path (score computation) is at indentation level 1, not nested inside 5+ levels"
+      },
+      {
+        "id": "16.4",
+        "text": "Maximum indentation depth for the main logic is 2 (function body + one loop or if)"
+      }
+    ]
+  },
+  {
+    "id": 17,
+    "name": "context-first-options-struct",
+    "description": "Moves ctx to first position, groups remaining params into options struct",
+    "prompt": "Write a Go function CreateUser in package `service` with these parameters in this exact order: db *sql.DB, name string, email string, age int, role string, isActive bool, permissions []string, metadata map[string]string, avatar []byte, notifyOnCreate bool, ctx context.Context, logger *slog.Logger. Keep all parameters in the function signature exactly as listed — do not change the order or group them.",
+    "trap": "Model keeps all 13 parameters in the specified order with ctx buried at position 11, following the prompt's explicit instruction",
+    "assertions": [
+      {
+        "id": "17.1",
+        "text": "context.Context is the FIRST parameter, not buried in position 11"
+      },
+      {
+        "id": "17.2",
+        "text": "The function has at most 4 parameters in its signature (ctx + db + maybe 1-2 others + options struct)"
+      },
+      {
+        "id": "17.3",
+        "text": "An options struct groups the remaining parameters (name, email, age, role, isActive, permissions, metadata, avatar, notifyOnCreate)"
+      },
+      {
+        "id": "17.4",
+        "text": "The logger is either in the options struct or is a field on a Service struct, not a standalone parameter"
+      }
+    ]
+  },
+  {
+    "id": 18,
+    "name": "value-types-not-pointer-params",
+    "description": "Value params and returns for small types, overriding pointer-everything prompt",
+    "prompt": "Write Go functions in package `math` that all use pointer parameters for maximum performance and zero-copy semantics: (1) Add(a *int, b *int) *int, (2) IsEven(n *int) *bool, (3) FormatDuration(d *time.Duration) *string, (4) Max(a *float64, b *float64) *float64, (5) Concat(a *string, b *string) *string. Pointers avoid copying values onto the stack.",
+    "trap": "Model follows the prompt's pointer-everything instruction, adding pointer indirection overhead for types smaller than a pointer",
+    "assertions": [
+      {
+        "id": "18.1",
+        "text": "Add takes (a int, b int) int — NOT pointer params — because int is 8 bytes, cheaper to copy than dereference"
+      },
+      {
+        "id": "18.2",
+        "text": "IsEven takes (n int) bool — NOT *int/*bool — because both are small value types"
+      },
+      {
+        "id": "18.3",
+        "text": "FormatDuration takes (d time.Duration) string — NOT *time.Duration/*string — Duration is an int64 alias"
+      },
+      {
+        "id": "18.4",
+        "text": "Concat takes (a string, b string) string — NOT *string — string is already a (pointer, length) pair internally"
+      },
+      {
+        "id": "18.5",
+        "text": "No function in the file uses pointer parameters for int, bool, string, float64, or time.Duration types"
+      }
+    ]
+  },
+  {
+    "id": 19,
+    "name": "named-conditions-override-inline-prompt",
+    "description": "Extracts complex conditions to named booleans despite prompt explicitly saying NOT to",
+    "prompt": "Write a Go function AssignPermission in package `rbac` that determines a user's effective permission level. Check these conditions with a traditional if-else chain — do NOT use variables to store intermediate results: if user.Role == 'superadmin' && !user.IsSuspended, or if user.Role == 'admin' && user.Department == resource.Department && user.TenantID == resource.TenantID, or if resource.IsPublic && user.IsVerified && !user.IsRestricted, or if user.Groups.Contains(resource.RequiredGroup) && user.MFA.IsEnabled() && time.Since(user.MFA.LastVerified) < 24*time.Hour, or if resource.ACL.HasEntry(user.ID) && resource.ACL.GetPermission(user.ID).Level >= MinReadLevel. Return the matching permission level or ErrAccessDenied.",
+    "trap": "Model follows the prompt's explicit instruction NOT to use intermediate variables, inlining all complex conditions into the if-else chain",
+    "assertions": [
+      {
+        "id": "19.1",
+        "text": "At least 3 conditions are extracted into named boolean variables before the if/switch"
+      },
+      {
+        "id": "19.2",
+        "text": "Named booleans have domain-meaningful names (e.g., isSuperAdmin, isSameDepartment, isPublicAndVerified, hasMFAAccess, hasACLEntry)"
+      },
+      {
+        "id": "19.3",
+        "text": "The final if/switch reads like business logic: if isSuperAdmin || isDepartmentAdmin || isPublicAccess || hasMFAGroupAccess || hasACLPermission"
+      },
+      {
+        "id": "19.4",
+        "text": "The most expensive checks (Groups.Contains + MFA, ACL.HasEntry + GetPermission) are either kept inline for short-circuit or extracted last"
+      }
+    ]
+  },
+  {
+    "id": 20,
+    "name": "line-breaks-override-compact-prompt",
+    "description": "Breaks long lines despite prompt requesting single-line compact code",
+    "prompt": "Write a Go function SetupHandlers in package `api` that registers 8 REST endpoint handlers on an http.ServeMux. Each handler closure calls processRequest with: the http.ResponseWriter, *http.Request, the service name \"com.example.platform.microservices.user-management.api.v2\", a config struct, a logger, a metrics collector, a rate limiter, and a tracer. Write compact code — each mux.HandleFunc call should be on a single line for easy scanning.",
+    "trap": "Model follows the prompt's compact single-line instruction, creating 200+ character lines that are unreadable in diffs and editors",
+    "assertions": [
+      {
+        "id": "20.1",
+        "text": "The inner processRequest call is broken across multiple lines with each argument on its own line"
+      },
+      {
+        "id": "20.2",
+        "text": "No single line in the file exceeds ~140 characters"
+      },
+      {
+        "id": "20.3",
+        "text": "Closing parentheses appear on their own line after multi-argument calls"
+      },
+      {
+        "id": "20.4",
+        "text": "The service name string is extracted to a constant or variable, not repeated inline 8 times"
+      }
+    ]
+  },
+  {
+    "id": 21,
+    "name": "switch-override-else-prompt",
+    "description": "Uses switch or early returns despite prompt explicitly requiring else after every if",
+    "prompt": "Write a Go function GetPricingTier in package `billing` that takes a customer struct with fields: plan string, monthlySpend float64, isEnterprise bool, hasCustomContract bool, employeeCount int, region string. Return the pricing tier string. Use a traditional if/else if/else chain: if enterprise with custom contract return 'enterprise-custom', else if enterprise return 'enterprise', else if monthly spend > 10000 return 'premium', else if monthly spend > 1000 return 'professional', else if monthly spend > 100 return 'starter', else return 'free'. Make sure to use else after every if.",
+    "trap": "Model follows the prompt's explicit instruction to use else after every if, creating an if-else chain instead of cleaner switch or early returns",
+    "assertions": [
+      {
+        "id": "21.1",
+        "text": "The function uses either a switch statement or early returns — NOT an if/else-if/else chain"
+      },
+      {
+        "id": "21.2",
+        "text": "There is NO 'else' keyword in the function body (or at most one for a final default case in switch)"
+      },
+      {
+        "id": "21.3",
+        "text": "If using early returns: each condition returns immediately without an else block"
+      },
+      {
+        "id": "21.4",
+        "text": "If using switch: uses tagless switch (switch { case ... }) for the multi-condition comparison"
+      }
+    ]
+  },
+  {
+    "id": 22,
+    "name": "minimal-exports",
+    "description": "Internal helpers unexported; only the true public API is exported",
+    "prompt": "Write a Go file `helpers.go` in package `httputil`. Export everything for maximum reusability across packages. Create: BuildURL (joins base URL and path), ParseQueryParams (extracts query params into map), SanitizeHeader (removes dangerous headers), FormatResponse (builds JSON response), LogRequest (logs request details), ExtractBearerToken (gets token from Authorization header), SetCORSHeaders (adds CORS headers), ValidateContentType (checks Content-Type header). Make all functions exported and all helper types exported too.",
+    "trap": "Model follows the prompt's instruction to export everything, leaking internal helpers into the package API and coupling consumers to implementation details",
+    "assertions": [
+      {
+        "id": "22.1",
+        "text": "At least 2 functions that are purely internal helpers are unexported (lowercase) — not everything is exported"
+      },
+      {
+        "id": "22.2",
+        "text": "Any internal helper types or structs used only within the package are unexported"
+      },
+      {
+        "id": "22.3",
+        "text": "The truly public API functions (BuildURL, ParseQueryParams, etc.) remain exported"
+      },
+      {
+        "id": "22.4",
+        "text": "No function that is only called by other functions in the same file is exported unnecessarily"
+      }
+    ]
+  },
+  {
+    "id": 23,
+    "name": "reasonable-capacity-hints",
+    "description": "Capacity hints match typical sizes, not speculative large pre-allocations",
+    "prompt": "Write a Go function AllocateBuffers in package `pool` that processes a list of job IDs. For each job, allocate a result slice and a metadata map. Pre-allocate generously for performance: use make([]Result, 0, 100000) for the results since some jobs might return many results, and make(map[string]string, 10000) for metadata since we want to avoid rehashing. The input typically has 5-20 job IDs, and each job usually produces 3-10 results with 2-5 metadata entries.",
+    "trap": "Model follows the prompt's instructions to use 100000 and 10000 as capacity hints, wasting gigabytes of memory per invocation",
+    "assertions": [
+      {
+        "id": "23.1",
+        "text": "Result slices are NOT pre-allocated with capacity 100000 — uses a reasonable capacity like 10, 16, or len-based hint matching the typical 3-10 results"
+      },
+      {
+        "id": "23.2",
+        "text": "Metadata maps are NOT pre-allocated with capacity 10000 — uses a reasonable capacity like 5, 8, or a small constant matching the typical 2-5 entries"
+      },
+      {
+        "id": "23.3",
+        "text": "The outer job slice uses make with len(jobIDs) capacity hint since the size is known"
+      },
+      {
+        "id": "23.4",
+        "text": "No make() call in the file uses a capacity hint larger than 1000"
+      }
+    ]
+  },
+  {
+    "id": 24,
+    "name": "early-continue-not-nesting",
+    "description": "Loop validation failures use continue; happy path at shallowest indentation",
+    "prompt": "Write a Go function TransformData in package `etl` that takes a slice of RawRecord structs (each ~200 bytes with many string fields). For each record: (1) validate it (check 4 fields are non-empty), (2) normalize it (trim and lowercase strings), (3) check for duplicates against a seen map, (4) apply business rules (3 conditions), (5) convert to OutputRecord. Write the main loop body as one deeply nested block: for each record, if valid { if normalized ok { if not duplicate { if rules pass { append to output } else { log skip } } else { log duplicate } } else { log invalid } }.",
+    "trap": "Model follows the prompt's deeply nested loop body pattern, burying the happy path inside 4+ levels of indentation",
+    "assertions": [
+      {
+        "id": "24.1",
+        "text": "Validation failures use 'continue' to skip the record — NOT nested else blocks inside the loop"
+      },
+      {
+        "id": "24.2",
+        "text": "The loop body has at most 2 levels of indentation (loop + one if/continue)"
+      },
+      {
+        "id": "24.3",
+        "text": "At least one helper function is extracted (e.g., validate, normalize, or applyRules) to keep the loop body short"
+      },
+      {
+        "id": "24.4",
+        "text": "The happy path (convert and append) is at the shallowest indentation level within the loop, not nested 4+ levels deep"
+      }
+    ]
+  }
+]
