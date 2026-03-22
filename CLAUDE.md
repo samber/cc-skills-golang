@@ -491,9 +491,9 @@ After making changes, suggest the following as next steps for the developer to r
 1. ~~Validate against the spec: `skills-ref validate ./skills/{name}`~~ (disabled — [skills-ref doesn't support `user-invocable` yet](https://github.com/agentskills/agentskills/issues/105))
 2. Reformat markdowns with `npx prettier --write *.md "**/*.md"` — run before measuring tokens, as formatting changes token counts
 3. Measure token counts:
-   - **Description (tok)**: `awk 'NR==1 && /^---$/{found=1; next} found && /^---$/{exit} found && /^description:/{print}' skills/{name}/SKILL.md | npx tiktoken-cli`
-   - **SKILL.md (tok)**: `npx tiktoken-cli skills/{name}/SKILL.md`
-   - **Directory (tok)**: `npm exec -- tiktoken-cli --exclude "evals" skills/{name}/` (exclude `evals/` subdirectory)
+   - **Description (tok)**: `awk 'NR==1 && /^---$/{found=1; next} found && /^---$/{exit} found && /^description:/{print}' skills/{name}/SKILL.md | tiktoken-cli`
+   - **SKILL.md (tok)**: `tiktoken-cli skills/{name}/SKILL.md`
+   - **Directory (tok)**: `tiktoken-cli --exclude "evals" skills/{name}/` (exclude `evals/` subdirectory)
 4. Update the README.md table with the measured token counts, update the total rows, and update the **Error rate gap** column (`Without - With`, expressed as a negative percentage, e.g. `-39%`)
 5. Increment `metadata.version` in the changed SKILL.md and the plugin version in `.claude-plugin/plugin.json`, `.cursor-plugin/plugin.json` and `gemini-extension.json` — all three plugin files MUST have the same version
 6. Run skill evaluation via `/skill-creator`: 10+ evals, run them with and without the skill via parallel subagents, grade with LLM-as-judge (no human in the loop), print results, suggest improvements if needed, and append/update the report to `EVALUATIONS.md` following the format in [Evaluation Reporting](#evaluation-reporting)

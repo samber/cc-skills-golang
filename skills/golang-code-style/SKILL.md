@@ -25,7 +25,7 @@ Style rules that require human judgment — linters handle formatting, this skil
 
 > "Clear is better than clever." — Go Proverbs
 
-To ignore a rule, just add a comment to the code.
+When ignoring a rule, add a comment to the code.
 
 ## Line Length & Breaking
 

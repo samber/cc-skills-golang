@@ -51,7 +51,7 @@ When using observability libraries (Prometheus client, OpenTelemetry SDK, vendor
 
 ## Cross-References
 
-See `samber/cc-skills-golang@golang-error-handling` skill for the single handling rule. See `samber/cc-skills-golang@golang-troubleshooting` skill for using observability signals to diagnose production issues. See `samber/cc-skills-golang@golang-security` skill for protecting pprof endpoints and avoiding PII in logs. See `samber/cc-skills-golang@golang-context` skill for propagating trace context across service boundaries.
+See `samber/cc-skills-golang@golang-error-handling` skill for the single handling rule. See `samber/cc-skills-golang@golang-troubleshooting` skill for using observability signals to diagnose production issues. See `samber/cc-skills-golang@golang-security` skill for protecting pprof endpoints and avoiding PII in logs. See `samber/cc-skills-golang@golang-context` skill for propagating trace context across service boundaries. See `samber/cc-skills@promql-cli` skill for querying and exploring PromQL expressions against Prometheus from the CLI.
 
 ## The Five Signals
 

@@ -184,4 +184,5 @@ If any of these are happening, stop and return to Step 1:
 
 - → See `samber/cc-skills-golang@golang-performance` skill for optimization patterns after identifying bottlenecks
 - → See `samber/cc-skills-golang@golang-observability` skill for metrics, alerting, and Grafana dashboards for Go runtime monitoring
+- → See `samber/cc-skills@promql-cli` skill for querying Prometheus metrics during production incident investigation
 - → See `samber/cc-skills-golang@golang-concurrency`, `samber/cc-skills-golang@golang-safety`, `samber/cc-skills-golang@golang-error-handling` skills

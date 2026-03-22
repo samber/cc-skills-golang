@@ -143,3 +143,4 @@ For full pprof CLI reference (all commands, non-interactive mode, profile interp
 - → See `samber/cc-skills-golang@golang-troubleshooting` skill for pprof setup on running services (enable, secure, capture), Delve debugger, GODEBUG flags, root cause methodology
 - → See `samber/cc-skills-golang@golang-observability` skill for everyday always-on monitoring, continuous profiling (Pyroscope), distributed tracing (OpenTelemetry)
 - → See `samber/cc-skills-golang@golang-testing` skill for general testing practices
+- → See `samber/cc-skills@promql-cli` skill for querying Prometheus runtime metrics in production to validate benchmark findings

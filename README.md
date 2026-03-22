@@ -1,6 +1,6 @@
 # Claude Code Skills for production-ready Golang projects
 
-AI agent skills are reusable instruction sets that extend your coding assistant with domain-specific expertise — loaded on demand so they don't bloat your context. This repository covers **Go-specific** skills only (language, testing, security, observability, etc.); for dev workflow skills (git conventions, CI/CD, PR reviews) you'll want to add a separate skills plugin.
+AI agent skills are reusable instruction sets that extend your coding assistant with domain-specific expertise, loaded on demand so they don't bloat your context. This repository covers **Go-specific** skills only (language, testing, security, observability, etc.); for dev workflow skills (git conventions, CI/CD, PR reviews) you'll want to add a separate skills plugin.
 
 For generic skills, please visit [cc-skills](https://github.com/samber/cc-skills).
 
@@ -8,7 +8,7 @@ For generic skills, please visit [cc-skills](https://github.com/samber/cc-skills
 
 ## 🚀 How to use
 
-**Install with [skills](https://skills.sh/) CLI** (universal — works with any [Agent Skills](https://agentskills.io)-compatible tool):
+**Install with [skills](https://skills.sh/) CLI** (universal, works with any [Agent Skills](https://agentskills.io)-compatible tool):
 
 ```bash
 npx skills add https://github.com/samber/cc-skills-golang
@@ -123,7 +123,7 @@ Update with `cd ~/.antigravity/skills/cc-skills-golang && git pull`.
 
 ## 🧩 Skills
 
-These skills are designed as **atomic, cross-referencing units**. A skill may reference conventions defined in another (e.g. error-handling rules that affect logging live in `golang-error-handling`, not `golang-observability`). Installing only a subset will give you a partial — and potentially inconsistent — view of the guidelines. For best results, install all general-purpose skills together.
+These skills are designed as **atomic, cross-referencing units**. A skill may reference conventions defined in another (e.g. error-handling rules that affect logging live in `golang-error-handling`, not `golang-observability`). Installing only a subset will give you a partial and potentially inconsistent view of the guidelines. For best results, install all general-purpose skills together.
 
 - ⭐️ Recommended
 - ✅ Published
@@ -138,57 +138,57 @@ These skills are designed as **atomic, cross-referencing units**. A skill may re
 
 **General purpose:**
 
-|     | Skill                               | Flags    | Error rate gap | Description (tok) | SKILL.md (tok) | Directory (tok) |
-| --- | ----------------------------------- | -------- | -------------- | ----------------- | -------------- | --------------- |
-| ⭐️   | ✅ `golang-code-style`               | ⚙️        | -40%           | 31                | 2,070          | 2,686           |
-| ⭐️   | ✅ `golang-data-structures`          |          | -39%           | 92                | 2,464          | 6,176           |
-| ⭐️   | ✅ `golang-database`                 | ⚙️        | -38%           | 112               | 2,725          | 7,210           |
-| ⭐️   | ✅ `golang-design-patterns`          | ⚙️        | -37%           | 66                | 2,610          | 9,316           |
-| ⭐️   | ✅ `golang-documentation`            | ⚡ ⚙️      | -53%           | 73                | 2,678          | 10,549          |
-| ⭐️   | ✅ `golang-error-handling`           | ⚙️        | -26%           | 90                | 1,520          | 4,394           |
-| ⭐️   | 👷 `golang-how-to`                   |          | —              | 0                 | 0              | 0               |
-| ⭐️   | ✅ `golang-modernize`                | ⚡        | -61%           | 113               | 2,476          | 7,599           |
-| ⭐️   | ✅ `golang-naming`                   | ⚙️        | -23%           | 158               | 2,865          | 7,233           |
-| ⭐️   | ✅ `golang-safety`                   |          | -58%           | 85                | 2,457          | 5,227           |
-| ⭐️   | ✅ `golang-testing`                  | ⚡ 🧠 ⚙️   | -32%           | 98                | 3,105          | 6,212           |
-| ⭐️   | ✅ `golang-troubleshooting`          | ⚡ 🧠      | -32%           | 106               | 2,709          | 15,875          |
-| ⭐️   | ✅ `golang-security`                 | ⚡ 🧠      | -32%           | 84                | 2,873          | 20,894          |
-|     | ✅ `golang-benchmark`                | ⚡ 🧠      | -50%           | 92                | 2,106          | 29,190          |
-|     | ✅ `golang-cli`                      |          | -43%           | 73                | 2,274          | 6,089           |
-|     | ✅ `golang-concurrency`              | ⚙️        | -39%           | 71                | 1,873          | 6,338           |
-|     | ✅ `golang-context`                  | ⚙️        | -34%           | 41                | 1,144          | 3,940           |
-|     | ✅ `golang-continuous-integration`   | ⚡        | -59%           | 105               | 2,835          | 6,477           |
-|     | ✅ `golang-dependency-injection`     | ⚙️        | -47%           | 104               | 2,842          | 5,113           |
-|     | ✅ `golang-dependency-management`    |          | -54%           | 94                | 1,877          | 4,957           |
-|     | ✅ `golang-structs-interfaces`       | ⚙️        | -35%           | 110               | 2,999          | 2,999           |
-|     | ✅ `golang-linter`                   |          | -41%           | 119               | 1,714          | 5,493           |
-|     | ✅ `golang-observability`            | ⚡ ⚙️      | -37%           | 144               | 2,893          | 18,400          |
-|     | ✅ `golang-performance`              | ⚡ 🧠      | -39%           | 108               | 1,953          | 17,823          |
-|     | ✅ `golang-popular-libraries`        |          | -30%           | 61                | 788            | 4,131           |
-|     | ✅ `golang-project-layout`           | ⚡        | -38%           | 66                | 1,510          | 5,718           |
-|     | ✅ `golang-stay-updated`             |          | -56%           | 43                | 1,916          | 1,916           |
+|  | Skill | Flags | Error rate gap | Description (tok) | SKILL.md (tok) | Directory (tok) |
+| --- | --- | --- | --- | --- | --- | --- |
+| ⭐️ | ✅ `golang-code-style` | ⚙️ | -40% | 31 | 2,069 | 2,685 |
+| ⭐️ | ✅ `golang-data-structures` |  | -39% | 92 | 2,464 | 6,176 |
+| ⭐️ | ✅ `golang-database` | ⚙️ | -38% | 112 | 2,725 | 7,248 |
+| ⭐️ | ✅ `golang-design-patterns` | ⚙️ | -37% | 66 | 2,610 | 9,316 |
+| ⭐️ | ✅ `golang-documentation` | ⚡ ⚙️ | -53% | 73 | 2,678 | 10,549 |
+| ⭐️ | ✅ `golang-error-handling` | ⚙️ | -26% | 90 | 1,520 | 4,394 |
+| ⭐️ | 👷 `golang-how-to` |  | — | 0 | 0 | 0 |
+| ⭐️ | ✅ `golang-modernize` | ⚡ | -61% | 113 | 2,476 | 7,599 |
+| ⭐️ | ✅ `golang-naming` | ⚙️ | -23% | 158 | 2,865 | 7,233 |
+| ⭐️ | ✅ `golang-safety` |  | -58% | 85 | 2,457 | 5,227 |
+| ⭐️ | ✅ `golang-testing` | ⚡ 🧠 ⚙️ | -32% | 98 | 3,105 | 6,212 |
+| ⭐️ | ✅ `golang-troubleshooting` | ⚡ 🧠 | -32% | 106 | 2,735 | 15,901 |
+| ⭐️ | ✅ `golang-security` | ⚡ 🧠 | -32% | 84 | 2,873 | 20,894 |
+|  | ✅ `golang-benchmark` | ⚡ 🧠 | -50% | 92 | 2,135 | 29,248 |
+|  | ✅ `golang-cli` |  | -43% | 73 | 2,274 | 6,089 |
+|  | ✅ `golang-concurrency` | ⚙️ | -39% | 71 | 1,873 | 6,338 |
+|  | ✅ `golang-context` | ⚙️ | -34% | 41 | 1,144 | 3,940 |
+|  | ✅ `golang-continuous-integration` | ⚡ | -59% | 105 | 2,835 | 6,477 |
+|  | ✅ `golang-dependency-injection` | ⚙️ | -47% | 104 | 2,842 | 5,113 |
+|  | ✅ `golang-dependency-management` |  | -54% | 94 | 1,877 | 4,957 |
+|  | ✅ `golang-structs-interfaces` | ⚙️ | -35% | 110 | 2,999 | 2,999 |
+|  | ✅ `golang-linter` |  | -41% | 119 | 1,714 | 5,493 |
+|  | ✅ `golang-observability` | ⚡ ⚙️ | -37% | 144 | 2,921 | 18,453 |
+|  | ✅ `golang-performance` | ⚡ 🧠 | -39% | 108 | 1,953 | 17,855 |
+|  | ✅ `golang-popular-libraries` |  | -30% | 61 | 788 | 4,131 |
+|  | ✅ `golang-project-layout` | ⚡ | -38% | 66 | 1,510 | 5,718 |
+|  | ✅ `golang-stay-updated` |  | -56% | 43 | 1,916 | 1,916 |
 
 **Tools:**
 
-| Skill                         | Flags | Error rate gap | Description (tok) | SKILL.md (tok) | Directory (tok) |
-| ----------------------------- | ----- | -------------- | ----------------- | -------------- | --------------- |
-| ❌ `golang-google-wire`        |       | —              | 0                 | 0              | 0               |
-| ❌ `golang-graphql`            |       | —              | 0                 | 0              | 0               |
-| ✅ `golang-grpc`               |       | -41%           | 69                | 2,149          | 4,965           |
-| ❌ `golang-spf13-cobra`        |       | —              | 0                 | 0              | 0               |
-| ❌ `golang-spf13-viper`        |       | —              | 0                 | 0              | 0               |
-| ❌ `golang-swagger`            |       | —              | 0                 | 0              | 0               |
-| ❌ `golang-uber-dig`           |       | —              | 0                 | 0              | 0               |
-| ❌ `golang-uber-fx`            |       | —              | 0                 | 0              | 0               |
-| ✅ `golang-samber-do`          |       | -81%           | 70                | 1,746          | 3,269           |
-| ❌ `golang-samber-hot`         |       | —              | 0                 | 0              | 0               |
-| ❌ `golang-samber-lo`          |       | —              | 0                 | 0              | 0               |
-| ❌ `golang-samber-mo`          |       | —              | 0                 | 0              | 0               |
-| ✅ `golang-samber-oops`        |       | -59%           | 69                | 2,380          | 2,692           |
-| ❌ `golang-samber-ro`          |       | —              | 0                 | 0              | 0               |
-| ❌ `golang-samber-slog`        |       | —              | 0                 | 0              | 0               |
-| ❌ `golang-temporal`           |       | —              | 0                 | 0              | 0               |
-| ✅ `golang-stretchr-testify`   |       | -47%           | 89                | 1,714          | 2,533           |
+| Skill | Flags | Error rate gap | Description (tok) | SKILL.md (tok) | Directory (tok) |
+| --- | --- | --- | --- | --- | --- |
+| ❌ `golang-google-wire` |  | — | 0 | 0 | 0 |
+| ❌ `golang-graphql` |  | — | 0 | 0 | 0 |
+| ✅ `golang-grpc` |  | -41% | 69 | 2,149 | 4,965 |
+| ❌ `golang-spf13-cobra` |  | — | 0 | 0 | 0 |
+| ❌ `golang-spf13-viper` |  | — | 0 | 0 | 0 |
+| ❌ `golang-swagger` |  | — | 0 | 0 | 0 |
+| ❌ `golang-uber-dig` |  | — | 0 | 0 | 0 |
+| ❌ `golang-uber-fx` |  | — | 0 | 0 | 0 |
+| ✅ `golang-samber-do` |  | -81% | 70 | 1,746 | 3,269 |
+| ✅ `golang-samber-hot` |  | -54% | 118 | 1,843 | 7,273 |
+| ✅ `golang-samber-lo` | 🧠 | -40% | 155 | 2,410 | 10,031 |
+| ✅ `golang-samber-mo` | 🧠 | -48% | 81 | 2,800 | 11,215 |
+| ✅ `golang-samber-oops` |  | -59% | 69 | 2,380 | 2,692 |
+| ✅ `golang-samber-ro` | 🧠 | -50% | 140 | 2,845 | 11,136 |
+| ✅ `golang-samber-slog` |  | -19% | 118 | 2,588 | 9,234 |
+| ❌ `golang-temporal` |  | — | 0 | 0 | 0 |
+| ✅ `golang-stretchr-testify` |  | -47% | 89 | 1,714 | 2,533 |
 
 Token counts are measured with `npm exec -- tiktoken-cli --exclude "evals" skills/{name}/`. Description tokens extracted with:
 
@@ -200,7 +200,7 @@ awk 'NR==1 && /^---$/{found=1; next} found && /^---$/{exit} found && /^descripti
 
 |             | With Skill          | Without Skill       | Delta     |
 | ----------- | ------------------- | ------------------- | --------- |
-| **Overall** | **2823/2895 (97%)** | **1574/2895 (54%)** | **+43pp** |
+| **Overall** | **3065/3141 (98%)** | **1691/3141 (54%)** | **+44pp** |
 
 See [EVALUATIONS.md](./EVALUATIONS.md) for the full per-skill breakdown.
 

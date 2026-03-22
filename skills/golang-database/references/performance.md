@@ -209,4 +209,4 @@ Always present findings as suggestions with data (scan counts, table size), neve
 
 Batch operations SHOULD use 100–1,000 rows per batch — adjust based on row size and database load. Cursor-based pagination MUST replace `OFFSET` for large datasets — the cursor column MUST be chosen based on actual indexes (e.g., `created_at`, `user_id`). NEVER create indexes blindly — check existing indexes, measure with `EXPLAIN ANALYZE`, and present findings as suggestions. N+1 queries MUST be eliminated — use `JOIN` or batch `WHERE id IN (...)`.
 
-→ See `samber/cc-skills-golang@golang-observability` skill for database metrics and query monitoring.
+→ See `samber/cc-skills-golang@golang-observability` skill for database metrics and query monitoring. → See `samber/cc-skills@promql-cli` skill for querying pool metrics (`db_open_connections`, `db_in_use_connections`, `db_idle_connections`) via CLI.

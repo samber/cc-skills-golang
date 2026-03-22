@@ -32,16 +32,23 @@
 | `golang-cli`                    | v1.0.0  | 58         | 95%        | 52%           | +43pp     | 1.83×     |                             |
 | `golang-dependency-injection`   | v1.0.0  | 55         | 98%        | 51%           | +47pp     | 1.92×     |                             |
 | `golang-stretchr-testify`       | v1.0.0  | 47         | 100%       | 53%           | +47pp     | 1.89×     |                             |
+| `golang-samber-mo`              | v1.0.0  | 108        | **88%**    | 40%           | +48pp     | 2.20×     | **Low with-skill score**    |
 | `golang-benchmark`              | v1.0.0  | 356        | 100%       | 50%           | +50pp     | 2.00×     |                             |
+| `golang-samber-ro`              | v1.0.0  | 113        | 100%       | 50%           | +50pp     | 2.00×     |                             |
 | `golang-documentation`          | v1.0.0  | 103        | 90%        | 37%           | +53pp     | 2.43×     |                             |
+| `golang-samber-hot`             | v1.0.0  | 65         | 94%        | 40%           | +54pp     | 2.35×     |                             |
 | `golang-dependency-management`  | v1.0.0  | 52         | 100%       | 46%           | +54pp     | 2.17×     |                             |
 | `golang-stay-updated`           | v1.0.0  | 50         | 92%        | 36%           | +56pp     | 2.56×     |                             |
 | `golang-safety`                 | v1.0.0  | 151        | 99%        | 41%           | +58pp     | 2.41×     |                             |
 | `golang-continuous-integration` | v1.0.0  | 66         | 100%       | 41%           | +59pp     | 2.44×     |                             |
 | `golang-samber-oops`            | v1.0.0  | 52         | 94%        | 35%           | +60pp     | 2.69×     |                             |
 | `golang-modernize`              | v1.0.0  | 76         | 95%        | 34%           | +61pp     | 2.79×     |                             |
+| `golang-samber-slog`            | v1.0.0  | 62         | 92%        | **73%**       | +19pp     | 1.26×     | **Low delta, high without** |
+| `golang-samber-lo`              | v1.0.0  | 86         | 97%        | 57%           | +40pp     | 1.70×     |                             |
 | `golang-samber-do`              | v1.0.0  | 53         | 100%       | 19%           | +81pp     | 5.26×     |                             |
-| **Total (30 skills)**           |         | **2707**   | **98%**    | **54%**       | **+43pp** | **1.81×** |                             |
+| **Total (35 skills)**           |         | **3141**   | **98%**    | **54%**       | **+44pp** | **1.81×** |                             |
+
+
 
 ## `golang-naming` — v1.0.0
 
@@ -3881,6 +3888,607 @@
 | 11.3 | Mentions that testifylint catches assert/require misuse                                                                                  | <span class="g">✓</span>       | <span class="g">✓</span>                                       |
 
 
+
+</details>
+
+## `golang-samber-mo` — v1.0.0
+
+|             | With Skill          | Without Skill       | Delta     |
+| ----------- | ------------------- | ------------------- | --------- |
+| **Overall** | **95/108 (88%)**    | **43/108 (40%)**    | **+48pp** |
+
+<details>
+<summary>Full breakdown (108 assertions)</summary>
+
+**Model:** Claude Opus 4.6 | **Runs:** 23 evals × 2 configs = 46 subagents | **Grading:** Human-as-Judge + LLM-as-judge
+
+| #     | Assertion                                                                          | With                           | Without                                                          |
+| ----- | ---------------------------------------------------------------------------------- | ------------------------------ | ---------------------------------------------------------------- |
+|       | **1. option-vs-pointer-for-nullable-db-field** — Option[T] for nullable DB columns | **<span class="g">5/5</span>** | **<span class="g">5/5</span>**                                  |
+| 1.1   | Uses mo.Option[string] for nullable fields                                         | <span class="g">✓</span>       | <span class="g">✓</span>                                        |
+| 1.2   | Mentions sql.Scanner and driver.Valuer                                             | <span class="g">✓</span>       | <span class="g">✓</span>                                        |
+| 1.3   | Mentions json.Marshaler/Unmarshaler                                                | <span class="g">✓</span>       | <span class="g">✓</span>                                        |
+| 1.4   | Shows row.Scan with Option type                                                    | <span class="g">✓</span>       | <span class="g">✓</span>                                        |
+| 1.5   | Does NOT recommend sql.NullString                                                  | <span class="g">✓</span>       | <span class="g">✓</span>                                        |
+|       | **2. result-vs-tuple-error-boundary** — Result at API boundary vs internal         | **<span class="g">5/5</span>** | **<span class="r">2/5</span>**                                  |
+| 2.1   | Returns (Config, error) at public boundary                                         | <span class="g">✓</span>       | <span class="r">✗</span> returns Result publicly                |
+| 2.2   | Uses Result internally for chaining                                                | <span class="g">✓</span>       | <span class="r">✗</span> uses Result everywhere                 |
+| 2.3   | Shows TupleToResult at boundary                                                    | <span class="g">✓</span>       | <span class="g">✓</span>                                        |
+| 2.4   | Shows .Get() at end for conversion back                                            | <span class="g">✓</span>       | <span class="r">✗</span> returns Result directly                |
+| 2.5   | Explains Result for internal composition                                           | <span class="g">✓</span>       | <span class="g">✓</span>                                        |
+|       | **3. either-vs-result-two-valid-types** — Either for non-error alternatives        | **<span class="g">5/5</span>** | **<span class="r">2/5</span>**                                  |
+| 3.1   | Uses Either[CachedUser, FreshUser]                                                 | <span class="g">✓</span>       | <span class="r">✗</span> uses interface or Result               |
+| 3.2   | Does NOT use Result                                                                | <span class="g">✓</span>       | <span class="r">✗</span> suggests common interface              |
+| 3.3   | Explains Either vs Result                                                          | <span class="g">✓</span>       | <span class="r">✗</span> no distinction made                    |
+| 3.4   | Shows Left/Right constructors                                                      | <span class="g">✓</span>       | <span class="g">✓</span>                                        |
+| 3.5   | Shows Match or IsLeft/IsRight                                                      | <span class="g">✓</span>       | <span class="g">✓</span>                                        |
+|       | **4. sub-package-for-type-changing-map** — Sub-package for type-changing Map        | **<span class="g">5/5</span>** | **<span class="r">1/5</span>**                                  |
+| 4.1   | Uses option.Map from sub-package                                                   | <span class="g">✓</span>       | <span class="r">✗</span> uses nonexistent `mo.Map(opt, fn)`     |
+| 4.2   | Does NOT use .Map for type change                                                  | <span class="g">✓</span>       | <span class="g">✓</span>                                        |
+| 4.3   | Imports mo/option                                                                  | <span class="g">✓</span>       | <span class="r">✗</span> no sub-package import                  |
+| 4.4   | Shows curried form                                                                 | <span class="g">✓</span>       | <span class="r">✗</span> uses `mo.Map(opt, fn)` pattern         |
+| 4.5   | Explains why sub-packages exist                                                    | <span class="g">✓</span>       | <span class="r">✗</span> claims `mo.Map` is package-level       |
+|       | **5. do-notation-for-imperative-monadic** — mo.Do for imperative monadic code      | **<span class="g">5/5</span>** | **<span class="r">0/5</span>**                                  |
+| 5.1   | Suggests mo.Do                                                                     | <span class="g">✓</span>       | <span class="r">✗</span> suggests unwrap-early pattern           |
+| 5.2   | Shows MustGet inside Do                                                            | <span class="g">✓</span>       | <span class="r">✗</span> manual .Get() checks                   |
+| 5.3   | Explains panic catching                                                            | <span class="g">✓</span>       | <span class="r">✗</span> no mention of Do                       |
+| 5.4   | Do returns Result[T]                                                               | <span class="g">✓</span>       | <span class="r">✗</span> no mention of Do                       |
+| 5.5   | Cleaner than FlatMap chains                                                        | <span class="g">✓</span>       | <span class="r">✗</span> no Do alternative                      |
+|       | **6. pipe-composition-multi-step** — Pipe for multi-step type-changing pipelines   | **<span class="g">5/5</span>** | **<span class="r">0/5</span>**                                  |
+| 6.1   | Uses option.Pipe3                                                                  | <span class="g">✓</span>       | <span class="r">✗</span> nests function calls                   |
+| 6.2   | Each step uses option.Map/FlatMap                                                  | <span class="g">✓</span>       | <span class="r">✗</span> manual intermediate vars               |
+| 6.3   | Pipeline reads top-to-bottom                                                       | <span class="g">✓</span>       | <span class="r">✗</span> nested calls                           |
+| 6.4   | Imports mo/option sub-package                                                      | <span class="g">✓</span>       | <span class="r">✗</span> no sub-package awareness               |
+| 6.5   | FlatMap for validation step                                                        | <span class="g">✓</span>       | <span class="r">✗</span> manual if/else                         |
+|       | **7. future-vs-task-eager-vs-lazy** — Future (eager) vs Task (lazy)                | **<span class="g">5/5</span>** | **<span class="r">4/5</span>**                                  |
+| 7.1   | Recommends Task                                                                    | <span class="g">✓</span>       | <span class="g">✓</span>                                        |
+| 7.2   | Future starts immediately                                                          | <span class="g">✓</span>       | <span class="g">✓</span>                                        |
+| 7.3   | Task runs on .Run()                                                                | <span class="g">✓</span>       | <span class="g">✓</span>                                        |
+| 7.4   | Run returns *Future[T]                                                             | <span class="g">✓</span>       | <span class="g">✓</span>                                        |
+| 7.5   | Deferred execution pattern                                                         | <span class="g">✓</span>       | <span class="r">✗</span> wrong constructor signature            |
+|       | **8. tuple-to-result-wrapping-stdlib** — TupleToResult for stdlib wrapping          | **<span class="g">5/5</span>** | **<span class="r">3/5</span>**                                  |
+| 8.1   | Uses TupleToResult(os.ReadFile(path))                                              | <span class="g">✓</span>       | <span class="g">✓</span>                                        |
+| 8.2   | Uses TupleToResult or Try for Atoi                                                 | <span class="g">✓</span>       | <span class="g">✓</span>                                        |
+| 8.3   | Does NOT manually check err                                                        | <span class="g">✓</span>       | <span class="r">✗</span> manually constructs Ok/Err             |
+| 8.4   | Chains results                                                                     | <span class="g">✓</span>       | <span class="g">✓</span>                                        |
+| 8.5   | Explains TupleToResult                                                             | <span class="g">✓</span>       | <span class="r">✗</span> no explanation                         |
+|       | **9. when-not-to-use-monads** — Advises against monads for simple cases            | **<span class="g">4/4</span>** | **<span class="g">3/4</span>**                                  |
+| 9.1   | Advises against Result here                                                        | <span class="g">✓</span>       | <span class="g">✓</span>                                        |
+| 9.2   | Recommends if err != nil                                                           | <span class="g">✓</span>       | <span class="g">✓</span>                                        |
+| 9.3   | Result shines with chains                                                          | <span class="g">✓</span>       | <span class="g">✓</span>                                        |
+| 9.4   | Does NOT over-apply Result                                                         | <span class="g">✓</span>       | <span class="r">✗</span> still wraps in Result                  |
+|       | **10. option-json-serialization** — Option JSON marshaling behavior                | **<span class="g">5/5</span>** | **<span class="r">3/5</span>**                                  |
+| 10.1  | Uses Option[string]                                                                | <span class="g">✓</span>       | <span class="g">✓</span>                                        |
+| 10.2  | Some->value, None->null                                                            | <span class="g">✓</span>       | <span class="g">✓</span>                                        |
+| 10.3  | Mentions omitzero (Go 1.24+)                                                       | <span class="g">✓</span>       | <span class="r">✗</span> no omitzero awareness                  |
+| 10.4  | Shows struct with json tag                                                         | <span class="g">✓</span>       | <span class="g">✓</span>                                        |
+| 10.5  | No custom MarshalJSON needed                                                       | <span class="g">✓</span>       | <span class="r">✗</span> suggests custom marshaler              |
+|       | **11. emptyable-to-option-zero-value** — EmptyableToOption for zero detection      | **<span class="g">4/4</span>** | **<span class="r">0/4</span>**                                  |
+| 11.1  | Uses EmptyableToOption                                                             | <span class="g">✓</span>       | <span class="r">✗</span> manual if/else                         |
+| 11.2  | None for zero, Some for non-zero                                                   | <span class="g">✓</span>       | <span class="r">✗</span> manual construction                    |
+| 11.3  | No manual check                                                                    | <span class="g">✓</span>       | <span class="r">✗</span> uses if/else                           |
+| 11.4  | Works for any comparable type                                                      | <span class="g">✓</span>       | <span class="r">✗</span> only handles string                    |
+|       | **12. pointer-to-option-nil-handling** — PointerToOption for nil conversion         | **<span class="g">3/3</span>** | **<span class="r">1/3</span>**                                  |
+| 12.1  | Uses PointerToOption(ptr)                                                          | <span class="g">✓</span>       | <span class="r">✗</span> manual nil check                       |
+| 12.2  | nil->None, non-nil->Some                                                           | <span class="g">✓</span>       | <span class="g">✓</span>                                        |
+| 12.3  | No manual nil check                                                                | <span class="g">✓</span>       | <span class="r">✗</span> manual check                           |
+|       | **13. result-map-vs-flatmap-choice** — Map vs FlatMap on Result                    | **<span class="g">5/5</span>** | **<span class="r">2/5</span>**                                  |
+| 13.1  | MapValue for infallible uppercase                                                  | <span class="g">✓</span>       | <span class="r">✗</span> uses Map for both                      |
+| 13.2  | FlatMap for fallible parse                                                         | <span class="g">✓</span>       | <span class="g">✓</span>                                        |
+| 13.3  | No FlatMap for uppercase                                                           | <span class="g">✓</span>       | <span class="r">✗</span> uses FlatMap for both                  |
+| 13.4  | Shows chain                                                                        | <span class="g">✓</span>       | <span class="g">✓</span>                                        |
+| 13.5  | Explains distinction                                                               | <span class="g">✓</span>       | <span class="r">✗</span> no distinction explained               |
+|       | **14. option-map-bool-semantics** — Option.Map's (T, bool) return type             | **<span class="g">4/4</span>** | **<span class="r">0/4</span>**                                  |
+| 14.1  | Uses Map with (int, bool) return                                                   | <span class="g">✓</span>       | <span class="r">✗</span> claims Map can't filter                |
+| 14.2  | false converts to None                                                             | <span class="g">✓</span>       | <span class="r">✗</span> doesn't know bool return               |
+| 14.3  | Shows (T, bool) signature                                                          | <span class="g">✓</span>       | <span class="r">✗</span> claims func(T) T                       |
+| 14.4  | No FlatMap for filtering                                                           | <span class="g">✓</span>       | <span class="r">✗</span> uses FlatMap                           |
+|       | **15. foldable-interface-uniform-matching** — Fold across Option/Result/Either      | **<span class="r">0/5</span>** | **<span class="r">0/5</span>**                                  |
+| 15.1  | Uses mo.Fold                                                                       | <span class="r">✗</span> not in skill | <span class="r">✗</span> separate switch blocks           |
+| 15.2  | Shows Foldable interface                                                           | <span class="r">✗</span> not in skill | <span class="r">✗</span> no Foldable awareness            |
+| 15.3  | successFn/failureFn callbacks                                                      | <span class="r">✗</span> not in skill | <span class="r">✗</span> manual matching                  |
+| 15.4  | Single Fold for all types                                                          | <span class="r">✗</span> not in skill | <span class="r">✗</span> separate logic                   |
+| 15.5  | No separate handling per type                                                      | <span class="r">✗</span> not in skill | <span class="r">✗</span> separate blocks                  |
+|       | **16. io-for-testable-side-effects** — IO for deferring side effects               | **<span class="g">4/4</span>** | **<span class="r">0/4</span>**                                  |
+| 16.1  | Uses IO or IOEither                                                                | <span class="g">✓</span>       | <span class="r">✗</span> uses interfaces/DI                     |
+| 16.2  | IO is lazy, runs on Run()                                                          | <span class="g">✓</span>       | <span class="r">✗</span> no IO awareness                        |
+| 16.3  | IO1/IO2 parameterize                                                               | <span class="g">✓</span>       | <span class="r">✗</span> no IO awareness                        |
+| 16.4  | Composability of IO                                                                | <span class="g">✓</span>       | <span class="r">✗</span> no IO awareness                        |
+|       | **17. result-to-either-conversion** — ToEither() conversion                        | **<span class="g">3/3</span>** | **<span class="r">1/3</span>**                                  |
+| 17.1  | Uses result.ToEither()                                                             | <span class="g">✓</span>       | <span class="r">✗</span> manual IsOk + Left/Right               |
+| 17.2  | Ok->Right, Err->Left                                                               | <span class="g">✓</span>       | <span class="g">✓</span>                                        |
+| 17.3  | No manual IsOk check                                                               | <span class="g">✓</span>       | <span class="r">✗</span> manual check                           |
+|       | **18. either3-for-multi-type-union** — Either3+ for n-ary unions                   | **<span class="g">5/5</span>** | **<span class="r">2/5</span>**                                  |
+| 18.1  | Uses Either3                                                                       | <span class="g">✓</span>       | <span class="r">✗</span> uses interface or type switch           |
+| 18.2  | Shows constructors                                                                 | <span class="g">✓</span>       | <span class="r">✗</span> no constructor awareness               |
+| 18.3  | Shows Match                                                                        | <span class="g">✓</span>       | <span class="r">✗</span> type switch                            |
+| 18.4  | No interface{}/any                                                                 | <span class="g">✓</span>       | <span class="g">✓</span>                                        |
+| 18.5  | Mentions Either4/Either5                                                           | <span class="g">✓</span>       | <span class="g">✓</span>                                        |
+|       | **19. option-vs-zero-value-distinction** — When Option adds value vs zero values   | **<span class="g">4/4</span>** | **<span class="g">3/4</span>**                                  |
+| 19.1  | Plain int for count                                                                | <span class="g">✓</span>       | <span class="g">✓</span>                                        |
+| 19.2  | Option[string] for nickname                                                        | <span class="g">✓</span>       | <span class="g">✓</span>                                        |
+| 19.3  | Explains absence vs zero                                                           | <span class="g">✓</span>       | <span class="g">✓</span>                                        |
+| 19.4  | No Option[int] for count                                                           | <span class="g">✓</span>       | <span class="r">✗</span> uses Option for both                   |
+|       | **20. map-lookup-to-option** — TupleToOption for map lookups                       | **<span class="g">4/4</span>** | **<span class="r">1/4</span>**                                  |
+| 20.1  | Uses TupleToOption(m[key])                                                         | <span class="g">✓</span>       | <span class="r">✗</span> manual ok check                        |
+| 20.2  | Chains Map/FlatMap                                                                 | <span class="g">✓</span>       | <span class="g">✓</span>                                        |
+| 20.3  | No manual ok check                                                                 | <span class="g">✓</span>       | <span class="r">✗</span> manual check                           |
+| 20.4  | Complete pattern                                                                   | <span class="g">✓</span>       | <span class="r">✗</span> manual construction                    |
+|       | **21. result-try-catch-panics** — Try for wrapping panicky functions               | **<span class="r">2/4</span>** | **<span class="r">2/4</span>**                                  |
+| 21.1  | Uses mo.Try                                                                        | <span class="g">✓</span>       | <span class="g">✓</span>                                        |
+| 21.2  | Try catches panics                                                                 | <span class="r">✗</span> skill says Do catches panics, not Try | <span class="r">✗</span> claims Try only wraps (T, error) |
+| 21.3  | Shows signature                                                                    | <span class="g">✓</span>       | <span class="g">✓</span>                                        |
+| 21.4  | No separate defer/recover                                                          | <span class="r">✗</span> skill suggests Do for panics | <span class="r">✗</span> adds defer/recover               |
+|       | **22. state-monad-for-accumulation** — State monad for threading state             | **<span class="g">4/4</span>** | **<span class="r">0/4</span>**                                  |
+| 22.1  | Uses State/NewState                                                                | <span class="g">✓</span>       | <span class="r">✗</span> uses mutable struct                    |
+| 22.2  | State params = state + result                                                      | <span class="g">✓</span>       | <span class="r">✗</span> mutable position field                 |
+| 22.3  | Run(initialState)                                                                  | <span class="g">✓</span>       | <span class="r">✗</span> no State awareness                     |
+| 22.4  | State threaded, not mutated                                                        | <span class="g">✓</span>       | <span class="r">✗</span> mutates struct                         |
+|       | **23. result-map-signature** — Result.Map's (T, error) return type                 | **<span class="g">4/4</span>** | **<span class="r">2/4</span>**                                  |
+| 23.1  | Map callback returns (int, error)                                                  | <span class="g">✓</span>       | <span class="g">✓</span>                                        |
+| 23.2  | Does NOT use func(int) int                                                         | <span class="g">✓</span>       | <span class="g">✓</span>                                        |
+| 23.3  | MapValue alternative                                                               | <span class="g">✓</span>       | <span class="r">✗</span> no MapValue mention                    |
+| 23.4  | Map vs MapValue signatures                                                         | <span class="g">✓</span>       | <span class="r">✗</span> no distinction                         |
+
+</details>
+
+## `golang-samber-hot` — v1.0.0
+
+|             | With Skill      | Without Skill   | Delta     |
+| ----------- | --------------- | --------------- | --------- |
+| **Overall** | **61/65 (94%)** | **26/65 (40%)** | **+54pp** |
+
+<details>
+<summary>Full breakdown (65 assertions)</summary>
+
+**Model:** Claude Opus 4.6 | **Runs:** 15 evals × 2 configs = 30 subagents | **Grading:** LLM-as-judge
+
+| #    | Assertion                                                                                    | With                           | Without                                              |
+| ---- | -------------------------------------------------------------------------------------------- | ------------------------------ | ---------------------------------------------------- |
+|      | **1. algorithm-selection-default** — mixed workload, should pick W-TinyLFU over LRU          | **<span class="g">6/6</span>** | **<span class="r">0/6</span>**                       |
+| 1.1  | Uses hot.WTinyLFU as the eviction algorithm (not hot.LRU)                                    | <span class="g">✓</span>       | <span class="r">✗</span> used hot.NewLRU             |
+| 1.2  | Uses hot.NewHotCache constructor with generic type parameters                                | <span class="g">✓</span>       | <span class="r">✗</span> fabricated API              |
+| 1.3  | Chains .WithTTL(10 * time.Minute) or equivalent                                             | <span class="g">✓</span>       | <span class="r">✗</span> positional arg              |
+| 1.4  | Chains .WithJanitor() in the builder                                                         | <span class="g">✓</span>       | <span class="r">✗</span> missing                     |
+| 1.5  | Calls defer cache.StopJanitor() after Build()                                                | <span class="g">✓</span>       | <span class="r">✗</span> missing                     |
+| 1.6  | Calls .Build() to finalize the cache                                                         | <span class="g">✓</span>       | <span class="r">✗</span> no builder pattern          |
+|      | **2. algorithm-selection-frequency** — stable power-law DNS, should pick LFU                  | **<span class="g">4/4</span>** | **<span class="g">4/4</span>**                       |
+| 2.1  | Recommends hot.LFU for stable-frequency workload                                             | <span class="g">✓</span>       | <span class="g">✓</span>                             |
+| 2.2  | Explains why LFU fits: keeps frequently accessed items                                       | <span class="g">✓</span>       | <span class="g">✓</span>                             |
+| 2.3  | Mentions LFU weakness doesn't apply because rankings are stable                              | <span class="g">✓</span>       | <span class="g">✓</span>                             |
+| 2.4  | Does NOT default to LRU                                                                      | <span class="g">✓</span>       | <span class="g">✓</span>                             |
+|      | **3. janitor-required** — simple cache with TTL must include WithJanitor()                   | **<span class="g">4/4</span>** | **<span class="r">1/4</span>**                       |
+| 3.1  | Includes .WithJanitor() in the builder chain                                                 | <span class="g">✓</span>       | <span class="r">✗</span> fabricated config struct    |
+| 3.2  | Includes defer cache.StopJanitor() for cleanup                                               | <span class="g">✓</span>       | <span class="r">✗</span> missing                     |
+| 3.3  | Uses .WithTTL() for expiration                                                               | <span class="g">✓</span>       | <span class="r">✗</span> config struct field         |
+| 3.4  | Does NOT call cache.Janitor() separately after Build()                                       | <span class="g">✓</span>       | <span class="g">✓</span>                             |
+|      | **4. missing-cache-panic-prevention** — SetMissing requires config                           | **<span class="g">4/4</span>** | **<span class="r">0/4</span>**                       |
+| 4.1  | Configures WithMissingCache() or WithMissingSharedCache() in builder                         | <span class="g">✓</span>       | <span class="r">✗</span> stores nil in main cache    |
+| 4.2  | Uses cache.SetMissing() or cache.SetMissingWithTTL()                                         | <span class="g">✓</span>       | <span class="r">✗</span> uses cache.Set(key, nil)    |
+| 4.3  | Missing cache configured BEFORE Build()                                                      | <span class="g">✓</span>       | <span class="r">✗</span> no config                   |
+| 4.4  | Explains SetMissing without config panics                                                    | <span class="g">✓</span>       | <span class="r">✗</span> unaware of SetMissing       |
+|      | **5. loader-pattern-singleflight** — built-in dedup, no manual singleflight                  | **<span class="g">5/5</span>** | **<span class="r">0/5</span>**                       |
+| 5.1  | Uses .WithLoaders() in the builder chain                                                     | <span class="g">✓</span>       | <span class="r">✗</span> manual singleflight         |
+| 5.2  | Explains built-in singleflight deduplication                                                 | <span class="g">✓</span>       | <span class="r">✗</span> suggests external package   |
+| 5.3  | Does NOT implement manual singleflight on top                                                | <span class="g">✓</span>       | <span class="r">✗</span> uses x/sync/singleflight    |
+| 5.4  | Loader signature matches func(keys []K) (map[K]V, error)                                    | <span class="g">✓</span>       | <span class="r">✗</span> manual fetch pattern        |
+| 5.5  | Recommends WithJitter() for additional thundering-herd mitigation                            | <span class="g">✓</span>       | <span class="r">✗</span> manual rand jitter          |
+|      | **6. stale-while-revalidate** — two-threshold revalidation pattern                           | **<span class="g">5/5</span>** | **<span class="r">2/5</span>**                       |
+| 6.1  | Uses .WithTTL(5 * time.Minute) for fresh duration                                            | <span class="g">✓</span>       | <span class="g">✓</span>                             |
+| 6.2  | Uses .WithRevalidation(2 * time.Minute, loader)                                              | <span class="g">✓</span>       | <span class="r">✗</span> invented API                |
+| 6.3  | Explains fresh -> stale -> expired model                                                     | <span class="g">✓</span>       | <span class="g">✓</span>                             |
+| 6.4  | Uses WithRevalidationErrorPolicy()                                                           | <span class="g">✓</span>       | <span class="r">✗</span> not mentioned               |
+| 6.5  | Does NOT use a single 7min TTL                                                               | <span class="g">✓</span>       | <span class="g">✓</span>                             |
+|      | **7. sharding-for-concurrency** — WithSharding for lock contention                           | **<span class="g">4/4</span>** | **<span class="r">2/4</span>**                       |
+| 7.1  | Uses .WithSharding() in the builder                                                          | <span class="g">✓</span>       | <span class="r">✗</span> custom sharded wrapper      |
+| 7.2  | Shard count is a power of 2                                                                  | <span class="g">✓</span>       | <span class="g">✓</span>                             |
+| 7.3  | Provides or discusses a hash function of type func(K) uint64                                 | <span class="g">✓</span>       | <span class="g">✓</span>                             |
+| 7.4  | Does NOT recommend WithoutLocking()                                                          | <span class="g">✓</span>       | <span class="g">✓</span>                             |
+|      | **8. copy-on-read-mutable-values** — WithCopyOnRead for pointer safety                      | **<span class="g">4/4</span>** | **<span class="r">2/4</span>**                       |
+| 8.1  | Identifies callers mutating shared cached pointers                                           | <span class="g">✓</span>       | <span class="g">✓</span>                             |
+| 8.2  | Uses .WithCopyOnRead(fn)                                                                     | <span class="g">✓</span>       | <span class="r">✗</span> manual copy wrapper         |
+| 8.3  | Copy function creates shallow or deep copy                                                   | <span class="g">✓</span>       | <span class="g">✓</span>                             |
+| 8.4  | Does NOT suggest only external mutexes as primary solution                                   | <span class="g">✓</span>       | <span class="g">✓</span>                             |
+|      | **9. loader-chain-semantics** — later overwrites earlier, error stops chain                  | **<span class="g">5/5</span>** | **<span class="r">1/5</span>**                       |
+| 9.1  | Later loaders overwrite earlier values (PostgreSQL wins)                                     | <span class="g">✓</span>       | <span class="r">✗</span> says Redis wins             |
+| 9.2  | Any loader error stops the entire chain                                                      | <span class="g">✓</span>       | <span class="r">✗</span> unclear                     |
+| 9.3  | Partial results from earlier loaders discarded on error                                      | <span class="g">✓</span>       | <span class="r">✗</span> not mentioned               |
+| 9.4  | Shows WithLoaders(redisLoader, dbLoader)                                                     | <span class="g">✓</span>       | <span class="r">✗</span> invented API                |
+| 9.5  | Later loaders only receive keys NOT found by previous                                        | <span class="g">✓</span>       | <span class="g">✓</span>                             |
+|      | **10. algorithm-scan-resistance** — LRU scan pollution, switch to scan-resistant             | **<span class="g">4/4</span>** | **<span class="g">4/4</span>**                       |
+| 10.1 | Identifies LRU scan pollution problem                                                        | <span class="g">✓</span>       | <span class="g">✓</span>                             |
+| 10.2 | Recommends scan-resistant algorithm                                                          | <span class="g">✓</span>       | <span class="g">✓</span>                             |
+| 10.3 | Explains why recommended algorithm resists scan pollution                                    | <span class="g">✓</span>       | <span class="g">✓</span>                             |
+| 10.4 | Does NOT suggest only increasing cache size                                                  | <span class="g">✓</span>       | <span class="g">✓</span>                             |
+|      | **11. withoutlocking-janitor-conflict** — mutually exclusive, panics                         | **<span class="g">4/4</span>** | **<span class="r">3/4</span>**                       |
+| 11.1 | Warns WithoutLocking() + WithJanitor() are mutually exclusive                                | <span class="g">✓</span>       | <span class="g">✓</span>                             |
+| 11.2 | Recommends removing one of the two                                                           | <span class="g">✓</span>       | <span class="g">✓</span>                             |
+| 11.3 | Suggests manual cleanup or dropping WithoutLocking()                                         | <span class="g">✓</span>       | <span class="g">✓</span>                             |
+| 11.4 | Does NOT produce code chaining both                                                          | <span class="g">✓</span>       | <span class="r">✗</span> initial code chains both    |
+|      | **12. warmup-before-traffic** — WithWarmUp in builder                                        | **<span class="g">4/4</span>** | **<span class="r">1/4</span>**                       |
+| 12.1 | Uses .WithWarmUp(fn) or .WithWarmUpWithTimeout(timeout, fn)                                  | <span class="g">✓</span>       | <span class="r">✗</span> wrong API guess             |
+| 12.2 | Warm-up function returns (map[K]V, []K, error)                                               | <span class="g">✓</span>       | <span class="r">✗</span> wrong signature             |
+| 12.3 | Warm-up happens before Build() returns                                                       | <span class="g">✓</span>       | <span class="g">✓</span>                             |
+| 12.4 | Does NOT manually loop calling Set()                                                         | <span class="g">✓</span>       | <span class="r">✗</span> loops calling Get()         |
+|      | **13. prometheus-monitoring-setup** — built-in WithPrometheusMetrics                         | **<span class="g">4/4</span>** | **<span class="r">1/4</span>**                       |
+| 13.1 | Uses .WithPrometheusMetrics(cacheName)                                                       | <span class="g">✓</span>       | <span class="r">✗</span> custom counters             |
+| 13.2 | Registers with prometheus.MustRegister(cache)                                                | <span class="g">✓</span>       | <span class="r">✗</span> registers custom metrics    |
+| 13.3 | Mentions hit rate as key metric (target >80%)                                                | <span class="g">✓</span>       | <span class="g">✓</span>                             |
+| 13.4 | Does NOT create custom Prometheus counters                                                   | <span class="g">✓</span>       | <span class="r">✗</span> full custom instrumentation |
+|      | **14. get-error-handling** — three return values (V, bool, error)                            | **<span class="g">4/4</span>** | **<span class="r">2/4</span>**                       |
+| 14.1 | Get() returns (V, bool, error)                                                               | <span class="g">✓</span>       | <span class="r">✗</span> wrong semantics             |
+| 14.2 | Checks error first before bool                                                               | <span class="g">✓</span>       | <span class="g">✓</span>                             |
+| 14.3 | Handles all three cases: err, !found, found                                                  | <span class="g">✓</span>       | <span class="r">✗</span> no not-found handling       |
+| 14.4 | Does NOT ignore error return value                                                           | <span class="g">✓</span>       | <span class="g">✓</span>                             |
+|      | **15. peek-vs-get-distinction** — Peek() for side-effect-free inspection                     | **<span class="g">4/4</span>** | **<span class="r">3/4</span>**                       |
+| 15.1 | Recommends Peek() or PeekMany()                                                             | <span class="g">✓</span>       | <span class="g">✓</span>                             |
+| 15.2 | Explains Peek() does not trigger loaders                                                     | <span class="g">✓</span>       | <span class="g">✓</span>                             |
+| 15.3 | Explains Peek() ignores expiration (returns expired entries)                                 | <span class="g">✓</span>       | <span class="r">✗</span> no expired-entry detail     |
+| 15.4 | Does NOT recommend Get() for inspection                                                      | <span class="g">✓</span>       | <span class="g">✓</span>                             |
+
+</details>
+
+## `golang-samber-lo` — v1.0.0
+
+|             | With Skill      | Without Skill   | Delta     |
+| ----------- | --------------- | --------------- | --------- |
+| **Overall** | **83/86 (97%)** | **49/86 (57%)** | **+40pp** |
+
+<details>
+<summary>Full breakdown (86 assertions)</summary>
+
+**Model:** Claude Opus 4.6 | **Runs:** 17 evals × 2 configs = 34 subagents | **Grading:** LLM-as-judge
+
+| #    | Assertion                                                                                      | With                           | Without                                                |
+| ---- | ---------------------------------------------------------------------------------------------- | ------------------------------ | ------------------------------------------------------ |
+|      | **1. lop-for-io-trap** — Should recommend errgroup over lop for HTTP fan-out                   | **<span class="g">5/5</span>** | **<span class="r">1/5</span>**                         |
+| 1.1  | Recommends errgroup or similar I/O concurrency pattern                                         | <span class="g">✓</span>       | <span class="r">✗</span> used lop.Map as primary       |
+| 1.2  | Explains lop is for CPU-bound parallelism, not I/O                                             | <span class="g">✓</span>       | <span class="r">✗</span>                               |
+| 1.3  | Mentions lack of context cancellation as lop limitation                                        | <span class="g">✓</span>       | <span class="r">✗</span>                               |
+| 1.4  | Does NOT use lop.Map as primary HTTP fan-out solution                                          | <span class="g">✓</span>       | <span class="r">✗</span>                               |
+| 1.5  | Shows working Go code for concurrent fetch                                                     | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+|      | **2. premature-lom-optimization** — Should advise profiling before switching to lom             | **<span class="g">6/6</span>** | **<span class="r">3/6</span>**                         |
+| 2.1  | Recommends profiling (pprof, alloc_objects) before switching                                   | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+| 2.2  | Warns lom mutates input slice (breaks immutability)                                            | <span class="g">✓</span>       | <span class="r">✗</span> claims lom doesn't exist      |
+| 2.3  | Does NOT blindly refactor all lo calls to lom                                                  | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+| 2.4  | Explains performance issue may not be lo allocations                                           | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+| 2.5  | Mentions lom only for hot paths confirmed by profiling                                         | <span class="g">✓</span>       | <span class="r">✗</span> claims lom doesn't exist      |
+| 2.6  | Warns about concurrency safety of mutable ops                                                  | <span class="g">✓</span>       | <span class="r">✗</span>                               |
+|      | **3. stdlib-vs-lo-preference** — Should prefer stdlib for Contains/Sort/Keys                   | **<span class="g">6/6</span>** | **<span class="r">5/6</span>**                         |
+| 3.1  | Recommends slices.Contains from stdlib                                                         | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+| 3.2  | Recommends slices.Sort from stdlib                                                             | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+| 3.3  | Recommends maps.Keys from stdlib                                                               | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+| 3.4  | Mentions Go 1.21+ availability                                                                | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+| 3.5  | Explains rationale: prefer stdlib when available                                               | <span class="g">✓</span>       | <span class="r">✗</span> says "either works fine"      |
+| 3.6  | Acknowledges lo useful for ops stdlib lacks                                                    | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+|      | **4. loi-go-version-constraint** — Should warn lo/it requires Go 1.23+                        | **<span class="g">5/5</span>** | **<span class="r">2/5</span>**                         |
+| 4.1  | Warns loi requires Go 1.23+, not available in Go 1.20                                         | <span class="g">✓</span>       | <span class="r">✗</span> claims lo/it doesn't exist    |
+| 4.2  | Suggests upgrading Go version to 1.23+                                                        | <span class="g">✓</span>       | <span class="r">✗</span>                               |
+| 4.3  | Provides alternative approaches for Go 1.20                                                    | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+| 4.4  | Does NOT provide loi code that won't compile on Go 1.20                                        | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+| 4.5  | Mentions range-over-func as Go 1.23 feature                                                   | <span class="g">✓</span>       | <span class="r">✗</span>                               |
+|      | **5. must-in-production-handler** — Should warn against Must in HTTP handlers                  | **<span class="g">5/5</span>** | **<span class="g">5/5</span>**                         |
+| 5.1  | Warns Must panics on error, dangerous in handlers                                              | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+| 5.2  | Explains Must for tests/init only, not production                                              | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+| 5.3  | Provides refactored version with proper error handling                                         | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+| 5.4  | Shows returning appropriate HTTP error status codes                                            | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+| 5.5  | Does NOT approve Must-based approach for production                                            | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+|      | **6. import-aliases-knowledge** — Should know lop/lom/loi aliases                              | **<span class="g">5/5</span>** | **<span class="r">2/5</span>**                         |
+| 6.1  | Lists lo/parallel with alias lop                                                               | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+| 6.2  | Lists lo/mutable with alias lom                                                                | <span class="g">✓</span>       | <span class="r">✗</span> unaware of mutable pkg        |
+| 6.3  | Lists lo/it with alias loi                                                                     | <span class="g">✓</span>       | <span class="r">✗</span> unaware of iterator pkg       |
+| 6.4  | Mentions lo/it requires Go 1.23+                                                               | <span class="g">✓</span>       | <span class="r">✗</span>                               |
+| 6.5  | Lists core package with alias lo                                                               | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+|      | **7. immutability-trap** — lo.Filter does NOT modify input                                     | **<span class="g">5/5</span>** | **<span class="r">3/5</span>**                         |
+| 7.1  | States lo.Filter returns new slice, doesn't modify input                                       | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+| 7.2  | Correctly says len(users) prints 2                                                             | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+| 7.3  | Explains lo is immutable by default as design principle                                        | <span class="g">✓</span>       | <span class="r">✗</span> no design principle framing   |
+| 7.4  | Points out return value of lo.Filter is discarded                                              | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+| 7.5  | Mentions lom.Filter as alternative for in-place mutation                                       | <span class="g">✓</span>       | <span class="r">✗</span> no mention of lom             |
+|      | **8. error-variant-awareness** — Should recommend lo.MapErr                                    | **<span class="r">4/5</span>** | **<span class="r">1/5</span>**                         |
+| 8.1  | Recommends lo.MapErr as error-aware variant                                                    | <span class="g">✓</span>       | <span class="r">✗</span>                               |
+| 8.2  | Explains MapErr stops on first error, returns (result, error)                                  | <span class="g">✓</span>       | <span class="r">✗</span>                               |
+| 8.3  | Shows MapErr usage example                                                                     | <span class="g">✓</span>       | <span class="r">✗</span>                               |
+| 8.4  | Mentions most lo functions have Err suffixes as pattern                                        | <span class="r">✗</span>       | <span class="r">✗</span>                               |
+| 8.5  | Suggests lo.FilterMap for skipping errors                                                      | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+|      | **9. simd-production-stability** — Should warn simd is experimental                           | **<span class="r">4/5</span>** | **<span class="r">2/5</span>**                         |
+| 9.1  | Warns lo/exp/simd is experimental, API may break                                               | <span class="g">✓</span>       | <span class="r">✗</span> claims simd doesn't exist     |
+| 9.2  | States not covered by semver stability guarantees                                              | <span class="g">✓</span>       | <span class="r">✗</span>                               |
+| 9.3  | Recommends benchmarking first                                                                  | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+| 9.4  | Suggests version pinning if used                                                               | <span class="r">✗</span>       | <span class="r">✗</span>                               |
+| 9.5  | Does NOT unconditionally recommend simd for production                                         | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+|      | **10. streaming-redirect-to-ro** — Should redirect to samber/ro                               | **<span class="g">5/5</span>** | **<span class="r">3/5</span>**                         |
+| 10.1 | Recommends samber/ro for reactive/streaming pipelines                                          | <span class="g">✓</span>       | <span class="r">✗</span> suggests samber/hot instead   |
+| 10.2 | Explains lo is for finite/batch, not infinite streams                                          | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+| 10.3 | Mentions golang-samber-ro skill or samber/ro by name                                           | <span class="g">✓</span>       | <span class="r">✗</span> mentions samber/hot not ro    |
+| 10.4 | Does NOT attempt to use lo for infinite streaming                                              | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+| 10.5 | Explains conceptual difference: lo = batch, ro = reactive                                      | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+|      | **11. lop-small-dataset-trap** — lop.Map wasteful for 10 items                                 | **<span class="g">5/5</span>** | **<span class="g">5/5</span>**                         |
+| 11.1 | Recommends lo.Map instead of lop.Map for 10 items                                              | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+| 11.2 | Explains goroutine overhead exceeds benefit                                                    | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+| 11.3 | Mentions threshold (~1000+ items)                                                              | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+| 11.4 | Notes field access is trivial, no parallelism benefit                                          | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+| 11.5 | Does NOT recommend lop.Map for this case                                                       | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+|      | **12. filtermap-vs-filter-then-map** — Should use lo.FilterMap                                 | **<span class="g">5/5</span>** | **<span class="g">5/5</span>**                         |
+| 12.1 | Recommends lo.FilterMap as single-pass alternative                                             | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+| 12.2 | Shows FilterMap with (R, bool) return signature                                                | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+| 12.3 | Explains avoids intermediate filtered slice                                                    | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+| 12.4 | Provides working code parsing strings to ints                                                  | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+| 12.5 | Does NOT chain Filter+Map as primary solution                                                  | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+|      | **13. channel-dispatcher-strategies** — Should list ChannelDispatcher strategies               | **<span class="g">6/6</span>** | **<span class="g">6/6</span>**                         |
+| 13.1 | Mentions lo.ChannelDispatcher                                                                  | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+| 13.2 | Lists RoundRobin strategy                                                                      | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+| 13.3 | Lists Random strategy                                                                          | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+| 13.4 | Lists WeightedRandom/First/Least/Most                                                         | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+| 13.5 | Explains when to choose different strategies                                                   | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+| 13.6 | Shows code example using ChannelDispatcher                                                     | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+|      | **14. v2-version-trap** — Should state v2 does not exist                                       | **<span class="g">4/4</span>** | **<span class="r">0/4</span>**                         |
+| 14.1 | States samber/lo v2 does not exist                                                             | <span class="g">✓</span>       | <span class="r">✗</span> fabricated v2 migration guide |
+| 14.2 | Mentions v1 follows semver, no breaking changes before v2                                      | <span class="g">✓</span>       | <span class="r">✗</span> fabricated breaking changes   |
+| 14.3 | Provides correct install: go get github.com/samber/lo@v1                                       | <span class="g">✓</span>       | <span class="r">✗</span> shows go get lo/v2            |
+| 14.4 | Does NOT fabricate v2 migration steps                                                          | <span class="g">✓</span>       | <span class="r">✗</span> full fabricated migration     |
+|      | **15. lazy-chain-intermediate-allocations** — Should recommend loi                             | **<span class="g">5/5</span>** | **<span class="r">1/5</span>**                         |
+| 15.1 | Recommends lo/it (loi) for lazy evaluation                                                     | <span class="g">✓</span>       | <span class="r">✗</span> claims loi doesn't exist      |
+| 15.2 | Explains loi processes on-demand without buffering                                             | <span class="g">✓</span>       | <span class="r">✗</span>                               |
+| 15.3 | Mentions Go 1.23+ requirement                                                                  | <span class="g">✓</span>       | <span class="r">✗</span>                               |
+| 15.4 | Shows lazy pipeline using loi functions                                                        | <span class="g">✓</span>       | <span class="r">✗</span>                               |
+| 15.5 | Contrasts eager vs lazy memory allocation                                                      | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+|      | **16. lo-zero-dependencies** — Should state zero external deps                                 | **<span class="g">4/4</span>** | **<span class="r">1/4</span>**                         |
+| 16.1 | States zero external/runtime dependencies                                                      | <span class="g">✓</span>       | <span class="r">✗</span> claims golang.org/x/exp dep   |
+| 16.2 | Mentions relies only on Go stdlib                                                              | <span class="g">✓</span>       | <span class="r">✗</span> mentions x/exp                |
+| 16.3 | Addresses supply chain concern                                                                 | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+| 16.4 | Does NOT claim lo has external dependencies                                                    | <span class="g">✓</span>       | <span class="r">✗</span> claims x/exp dependency       |
+|      | **17. ternary-evaluation-trap** — lo.Ternary evaluates both branches                          | **<span class="g">4/4</span>** | **<span class="g">4/4</span>**                         |
+| 17.1 | Warns lo.Ternary evaluates both arguments                                                      | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+| 17.2 | Recommends lo.TernaryF for lazy evaluation                                                     | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+| 17.3 | Shows TernaryF usage with closures                                                             | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+| 17.4 | Explains expensiveCompute runs even when condition is false                                    | <span class="g">✓</span>       | <span class="g">✓</span>                               |
+
+</details>
+
+## `golang-samber-slog` — v1.0.0
+
+|             | With Skill      | Without Skill   | Delta     |
+| ----------- | --------------- | --------------- | --------- |
+| **Overall** | **57/62 (92%)** | **45/62 (73%)** | **+19pp** |
+
+<details>
+<summary>Full breakdown (62 assertions)</summary>
+
+**Model:** Claude Opus 4.6 | **Runs:** 12 evals × 2 configs = 24 subagents | **Grading:** LLM-as-judge
+
+| #    | Assertion                                                                             | With                           | Without                                                    |
+| ---- | ------------------------------------------------------------------------------------- | ------------------------------ | ---------------------------------------------------------- |
+|      | **1. pipeline-ordering** — sampling + PII + Sentry composition                        | **<span class="g">5/5</span>** | **<span class="r">3/5</span>**                             |
+| 1.1  | Sampling is outermost/first handler in pipeline                                       | <span class="g">✓</span>       | <span class="r">✗</span> PII first, sampling second        |
+| 1.2  | Uses slog-sampling library for sampling                                               | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+| 1.3  | Uses slog-formatter for PII scrubbing                                                 | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+| 1.4  | Uses slogmulti.Router or Fanout for routing                                           | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+| 1.5  | Explains why sampling should be first                                                 | <span class="g">✓</span>       | <span class="r">✗</span> no ordering rationale             |
+|      | **2. fanout-vs-router** — level-based routing to Sentry/Slack/stdout                  | **<span class="g">5/5</span>** | **<span class="g">5/5</span>**                             |
+| 2.1  | Uses slogmulti.Router() for level-based routing                                       | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+| 2.2  | stdout receives all log levels                                                        | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+| 2.3  | Sentry receives only errors                                                           | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+| 2.4  | Slack receives only warnings                                                          | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+| 2.5  | Explains Router vs Fanout distinction                                                 | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+|      | **3. missing-close-batch** — Datadog handler graceful shutdown                        | **<span class="g">5/5</span>** | **<span class="r">4/5</span>**                             |
+| 3.1  | Calls handler.Close() or defer Close()                                                | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+| 3.2  | Uses Option{}.NewDatadogHandler() pattern                                             | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+| 3.3  | Close happens during graceful shutdown                                                | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+| 3.4  | Mentions batching / data loss risk                                                    | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+| 3.5  | Import path uses versioned module (v2+)                                               | <span class="g">✓</span>       | <span class="r">✗</span> unversioned import                |
+|      | **4. sampling-strategy-selection** — reduce 90% volume, keep errors                   | **<span class="g">5/5</span>** | **<span class="g">5/5</span>**                             |
+| 4.1  | Uses Threshold or Absolute (not Uniform)                                              | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+| 4.2  | Sampling only affects Debug/Info levels                                                | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+| 4.3  | Warn/Error pass through unsampled                                                     | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+| 4.4  | Uses slog-sampling library                                                            | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+| 4.5  | Explains why Uniform is wrong                                                         | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+|      | **5. router-missing-default** — DEBUG logs disappearing                               | **<span class="g">5/5</span>** | **<span class="g">5/5</span>**                             |
+| 5.1  | Identifies missing catch-all handler                                                  | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+| 5.2  | Explains unmatched records silently dropped                                           | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+| 5.3  | Suggests adding default handler or LevelIs(Debug)                                     | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+| 5.4  | Uses slogmulti.Router() API correctly                                                 | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+| 5.5  | Does NOT suggest changing log level as fix                                             | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+|      | **6. http-middleware-filters** — slog-gin with path filters                           | **<span class="g">5/5</span>** | **<span class="g">5/5</span>**                             |
+| 6.1  | Uses sloggin.NewWithConfig()                                                          | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+| 6.2  | Configures IgnorePath for /health and /metrics                                        | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+| 6.3  | Sets WithRequestBody: true                                                            | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+| 6.4  | Config includes level fields                                                          | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+| 6.5  | Uses IgnorePath (not custom filter)                                                   | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+|      | **7. pipe-middleware-chain** — trace injection + email scrubbing                      | **<span class="g">5/5</span>** | **<span class="r">4/5</span>**                             |
+| 7.1  | Uses slogmulti.Pipe() for chaining                                                    | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+| 7.2  | Creates middleware for trace_id injection                                              | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+| 7.3  | Creates middleware for email scrubbing                                                 | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+| 7.4  | Pipe wraps the final handler                                                          | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+| 7.5  | Does NOT implement custom slog.Handler struct                                          | <span class="g">✓</span>       | <span class="r">✗</span> full Handler struct               |
+|      | **8. failover-handler** — Loki fallback to file                                       | **<span class="g">5/5</span>** | **<span class="r">4/5</span>**                             |
+| 8.1  | Uses slogmulti.Failover()                                                             | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+| 8.2  | Loki is primary handler                                                               | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+| 8.3  | File handler is fallback                                                              | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+| 8.4  | Does NOT implement custom retry logic                                                 | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+| 8.5  | Uses slog-loki library                                                                | <span class="g">✓</span>       | <span class="r">✗</span> placeholder function              |
+|      | **9. pool-vs-fanout-latency** — fix sequential Fanout latency                         | **<span class="r">2/5</span>** | **<span class="r">2/5</span>**                             |
+| 9.1  | Identifies sequential Fanout as root cause                                            | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+| 9.2  | Recommends slogmulti.Pool()                                                           | <span class="r">✗</span> custom goroutines | <span class="r">✗</span> misuses Pool            |
+| 9.3  | Explains latency reduction (sum to max)                                               | <span class="g">✓</span>       | <span class="r">✗</span> claims 0ms latency               |
+| 9.4  | Does NOT suggest raw goroutines as primary                                             | <span class="r">✗</span>       | <span class="g">✓</span>                                   |
+| 9.5  | Shows code change from Fanout to Pool                                                 | <span class="r">✗</span>       | <span class="r">✗</span>                                   |
+|      | **10. formatter-pii-scrubbing** — cross-cutting PII protection                        | **<span class="g">5/5</span>** | **<span class="r">3/5</span>**                             |
+| 10.1 | Uses slog-formatter library                                                           | <span class="g">✓</span>       | <span class="r">✗</span> custom middleware                 |
+| 10.2 | Uses PIIFormatter and/or IPAddressFormatter                                           | <span class="g">✓</span>       | <span class="r">✗</span> custom regex                      |
+| 10.3 | Applied as Pipe middleware wrapping all handlers                                       | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+| 10.4 | Applied once before Router/Fanout                                                     | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+| 10.5 | Does NOT implement custom per-handler PII logic                                       | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+|      | **11. backend-option-pattern** — Sentry + Loki setup                                  | **<span class="g">5/5</span>** | **<span class="r">4/5</span>**                             |
+| 11.1 | Uses slogsentry.Option{}.NewSentryHandler()                                           | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+| 11.2 | Uses slogloki.Option{}.NewLokiHandler()                                               | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+| 11.3 | Uses Router for level-based routing                                                   | <span class="g">✓</span>       | <span class="r">✗</span> uses Fanout                      |
+| 11.4 | Versioned import paths                                                                | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+| 11.5 | Calls Close() on Loki handler                                                         | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+|      | **12. attrfromcontext-without-middleware** — empty request_id diagnosis                | **<span class="g">7/7</span>** | **<span class="r">6/7</span>**                             |
+| 12.1 | Identifies no middleware populating context                                            | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+| 12.2 | Recommends adding HTTP middleware                                                     | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+| 12.3 | Explains middleware injects attributes into context                                   | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+| 12.4 | Does NOT suggest changing context key as primary fix                                   | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+| 12.5 | Shows connection between middleware and AttrFromContext                                | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+| 12.6 | Mentions WithRequestID config option                                                  | <span class="g">✓</span>       | <span class="r">✗</span>                                   |
+| 12.7 | Does NOT blame slog-multi/sentry config                                               | <span class="g">✓</span>       | <span class="g">✓</span>                                   |
+
+</details>
+
+## `golang-samber-ro` — v1.0.0
+
+|             | With Skill        | Without Skill      | Delta     |
+| ----------- | ----------------- | ------------------ | --------- |
+| **Overall** | **113/113 (100%)** | **57/113 (50%)** | **+50pp** |
+
+<details>
+<summary>Full breakdown (113 assertions)</summary>
+
+**Model:** Claude Opus 4.6 | **Runs:** 25 evals × 2 configs = 50 subagents | **Grading:** LLM-as-judge (self-grading subagents)
+
+| #    | Assertion                                                                              | With                           | Without                                              |
+| ---- | -------------------------------------------------------------------------------------- | ------------------------------ | ---------------------------------------------------- |
+|      | **1. typed-pipe-vs-untyped** — chain 3 operators with type safety                      | **<span class="g">4/4</span>** | **<span class="r">3/4</span>**                       |
+| 1.1  | Uses ro.Pipe3 instead of untyped ro.Pipe for compile-time type safety                  | <span class="g">✓</span>       | <span class="r">✗</span> uses untyped Pipe            |
+| 1.2  | Uses ro.Filter with func(int) bool predicate                                           | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+| 1.3  | Uses ro.Map with func(int) string transform                                            | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+| 1.4  | Uses ro.Take[string](5) with correct generic type                                      | <span class="g">✓</span>       | <span class="r">✗</span> omits generic param           |
+|      | **2. lo-vs-ro-boundary** — finite slice should use lo, not ro                          | **<span class="g">4/4</span>** | **<span class="r">0/4</span>**                       |
+| 2.1  | Recommends samber/lo instead of samber/ro                                              | <span class="g">✓</span>       | <span class="r">✗</span> uses ro Observable           |
+| 2.2  | Explains WHY lo is better: synchronous, no stream overhead                             | <span class="g">✓</span>       | <span class="r">✗</span>                              |
+| 2.3  | Does NOT create an Observable pipeline for a slice transform                           | <span class="g">✓</span>       | <span class="r">✗</span> creates Observable           |
+| 2.4  | Uses lo.Filter and lo.Map                                                              | <span class="g">✓</span>       | <span class="r">✗</span> uses ro operators            |
+|      | **3. observer-error-handling** — full observer, not just OnNext                        | **<span class="g">4/4</span>** | **<span class="r">1/4</span>**                       |
+| 3.1  | Uses ro.NewObserver with all 3 callbacks                                               | <span class="g">✓</span>       | <span class="r">✗</span> uses ro.OnNext               |
+| 3.2  | Includes an error handler                                                              | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+| 3.3  | Includes a completion handler                                                          | <span class="g">✓</span>       | <span class="r">✗</span> infinite stream, skipped     |
+| 3.4  | Mentions risk of OnNext alone (silent error dropping)                                  | <span class="g">✓</span>       | <span class="r">✗</span>                              |
+|      | **4. infinite-stream-shutdown** — graceful SIGTERM shutdown                             | **<span class="g">5/5</span>** | **<span class="r">0/5</span>**                       |
+| 4.1  | Uses TakeUntil or context+ThrowOnContextCancel                                         | <span class="g">✓</span>       | <span class="r">✗</span> generic context approach     |
+| 4.2  | Mentions signal plugin (plugins/signal)                                                | <span class="g">✓</span>       | <span class="r">✗</span> uses manual os/signal        |
+| 4.3  | Calls .Wait() to block until shutdown                                                  | <span class="g">✓</span>       | <span class="r">✗</span> doesn't know .Wait()         |
+| 4.4  | Does NOT suggest manual channel/goroutine killing                                      | <span class="g">✓</span>       | <span class="r">✗</span> uses channel-based approach  |
+| 4.5  | Mentions Unsubscribe() as alternative                                                  | <span class="g">✓</span>       | <span class="r">✗</span> not in ro API context        |
+|      | **5. subject-config-store** — BehaviorSubject for config                               | **<span class="g">5/5</span>** | **<span class="r">3/5</span>**                       |
+| 5.1  | Recommends BehaviorSubject                                                             | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+| 5.2  | Explains replay of last value to new subscribers                                       | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+| 5.3  | Shows NewBehaviorSubject[Config](initial) constructor                                  | <span class="g">✓</span>       | <span class="r">✗</span> wrong constructor syntax     |
+| 5.4  | Shows .Send() and .Subscribe()                                                         | <span class="g">✓</span>       | <span class="r">✗</span> uses .Next() from RxJS       |
+| 5.5  | Does NOT recommend PublishSubject                                                      | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+|      | **6. subject-chat-room** — ReplaySubject for chat history                              | **<span class="g">4/4</span>** | **<span class="r">3/4</span>**                       |
+| 6.1  | Recommends ReplaySubject with buffer 50                                                | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+| 6.2  | Shows NewReplaySubject[Message](50) constructor                                        | <span class="g">✓</span>       | <span class="r">✗</span> wrong constructor syntax     |
+| 6.3  | Explains N-value replay for late subscribers                                           | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+| 6.4  | Does NOT recommend BehaviorSubject                                                     | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+|      | **7. share-websocket** — hot observable for shared WebSocket                           | **<span class="g">5/5</span>** | **<span class="g">5/5</span>**                       |
+| 7.1  | Uses Share() or ShareReplay()                                                          | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+| 7.2  | Creates only ONE WebSocket connection                                                  | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+| 7.3  | Does NOT create 3 separate connections                                                 | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+| 7.4  | Shows 3 separate .Subscribe() calls                                                    | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+| 7.5  | Explains cold vs hot distinction                                                       | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+|      | **8. combinelatest-vs-zip** — latest values from different-rate sources                | **<span class="g">6/6</span>** | **<span class="r">5/6</span>**                       |
+| 8.1  | Recommends CombineLatest2                                                              | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+| 8.2  | Explains re-emit on either source update                                               | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+| 8.3  | Explains why NOT Zip                                                                   | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+| 8.4  | Explains why NOT Merge                                                                 | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+| 8.5  | Shows lo.Tuple2 return type                                                            | <span class="g">✓</span>       | <span class="r">✗</span> generic tuple                 |
+| 8.6  | Uses Map to compute product                                                            | <span class="g">✓</span>       | <span class="r">✗</span> generic combiner function    |
+|      | **9. retry-with-backoff** — RetryWithConfig + cached fallback                          | **<span class="g">6/6</span>** | **<span class="r">1/6</span>**                       |
+| 9.1  | Uses RetryWithConfig (not infinite Retry)                                              | <span class="g">✓</span>       | <span class="r">✗</span> uses Retry with count param  |
+| 9.2  | Sets Max: 3                                                                            | <span class="g">✓</span>       | <span class="r">✗</span> wrong API                    |
+| 9.3  | Sets Delay: 500ms and BackoffMultiplier: 2.0                                           | <span class="g">✓</span>       | <span class="r">✗</span> wrong field names             |
+| 9.4  | Sets MaxDelay: 10s                                                                     | <span class="g">✓</span>       | <span class="r">✗</span> field not included            |
+| 9.5  | Chains fallback after RetryWithConfig                                                  | <span class="g">✓</span>       | <span class="r">✗</span> uses RxJS-style naming       |
+| 9.6  | Correct operator order: retry before fallback                                          | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+|      | **10. scan-vs-reduce** — running average for dashboard                                 | **<span class="g">5/5</span>** | **<span class="g">5/5</span>**                       |
+| 10.1 | Recommends Scan                                                                        | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+| 10.2 | Explains intermediate emission                                                         | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+| 10.3 | Explains Reduce only emits final                                                       | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+| 10.4 | Shows accumulator with count/sum                                                       | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+| 10.5 | Notes infinite stream + Reduce = never emits                                           | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+|      | **11. collect-synchronous** — Collect for finite observable to slice                   | **<span class="g">4/4</span>** | **<span class="r">0/4</span>**                       |
+| 11.1 | Uses ro.Collect returning ([]int, error)                                               | <span class="g">✓</span>       | <span class="r">✗</span> manual subscribe+accumulate  |
+| 11.2 | Checks error return value                                                              | <span class="g">✓</span>       | <span class="r">✗</span>                              |
+| 11.3 | Does NOT manually subscribe and accumulate                                             | <span class="g">✓</span>       | <span class="r">✗</span>                              |
+| 11.4 | Mentions Collect blocks until complete                                                 | <span class="g">✓</span>       | <span class="r">✗</span>                              |
+|      | **12. context-propagation** — wire timeout into pipeline                               | **<span class="g">4/4</span>** | **<span class="r">1/4</span>**                       |
+| 12.1 | Uses ContextWithTimeout or ContextReset                                                | <span class="g">✓</span>       | <span class="r">✗</span> passes ctx to Subscribe      |
+| 12.2 | Uses ThrowOnContextCancel                                                              | <span class="g">✓</span>       | <span class="r">✗</span>                              |
+| 12.3 | Chains context operators in pipeline                                                   | <span class="g">✓</span>       | <span class="r">✗</span>                              |
+| 12.4 | Handles cancellation error in onError                                                  | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+|      | **13. plugin-fsnotify** — file watcher with debounce                                   | **<span class="g">5/5</span>** | **<span class="r">3/5</span>**                       |
+| 13.1 | Knows fsnotify plugin (plugins/fsnotify)                                               | <span class="g">✓</span>       | <span class="r">✗</span> uses manual fsnotify         |
+| 13.2 | Uses plugin to create observable                                                       | <span class="g">✓</span>       | <span class="r">✗</span> wraps channel manually       |
+| 13.3 | Uses ThrottleTime for debounce                                                         | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+| 13.4 | Filters for Write events                                                               | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+| 13.5 | Shows Map to reload config                                                             | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+|      | **14. plugin-cron** — daily midnight schedule                                          | **<span class="g">4/4</span>** | **<span class="r">0/4</span>**                       |
+| 14.1 | Knows cron plugin (plugins/cron)                                                       | <span class="g">✓</span>       | <span class="r">✗</span> uses Interval                |
+| 14.2 | Uses cron expression '0 0 * * *'                                                       | <span class="g">✓</span>       | <span class="r">✗</span>                              |
+| 14.3 | Shows correct import path                                                              | <span class="g">✓</span>       | <span class="r">✗</span>                              |
+| 14.4 | Chains with Map/FlatMap for report generation                                          | <span class="g">✓</span>       | <span class="r">✗</span>                              |
+|      | **15. maperr-fallible-transform** — MapErr for JSON parsing                            | **<span class="g">5/5</span>** | **<span class="r">1/5</span>**                       |
+| 15.1 | Uses MapErr (not Map)                                                                  | <span class="g">✓</span>       | <span class="r">✗</span> uses Map                     |
+| 15.2 | Shows func(string) (MyStruct, error) signature                                         | <span class="g">✓</span>       | <span class="r">✗</span>                              |
+| 15.3 | Explains error propagation through pipeline                                            | <span class="g">✓</span>       | <span class="r">✗</span>                              |
+| 15.4 | Does NOT suggest panic/recover pattern                                                 | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+| 15.5 | Mentions JSON encoding plugin as alternative                                           | <span class="g">✓</span>       | <span class="r">✗</span>                              |
+|      | **16. buffer-batching** — BufferWithTimeOrCount for DB writes                          | **<span class="g">4/4</span>** | **<span class="r">3/4</span>**                       |
+| 16.1 | Uses BufferWithTimeOrCount                                                             | <span class="g">✓</span>       | <span class="r">✗</span> generic buffer approach      |
+| 16.2 | Sets count=100, duration=5s                                                            | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+| 16.3 | Chains with Map/MapErr for batch processing                                            | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+| 16.4 | Explains why both conditions matter                                                    | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+|      | **17. unicast-subject-queue** — single-consumer job queue                              | **<span class="g">5/5</span>** | **<span class="r">0/5</span>**                       |
+| 17.1 | Recommends UnicastSubject                                                              | <span class="g">✓</span>       | <span class="r">✗</span> uses channel or PublishSubject|
+| 17.2 | Shows NewUnicastSubject[Task](bufferSize)                                              | <span class="g">✓</span>       | <span class="r">✗</span>                              |
+| 17.3 | Explains exactly one subscriber                                                        | <span class="g">✓</span>       | <span class="r">✗</span>                              |
+| 17.4 | Explains pre-subscribe buffering                                                       | <span class="g">✓</span>       | <span class="r">✗</span>                              |
+| 17.5 | Does NOT recommend PublishSubject                                                      | <span class="g">✓</span>       | <span class="r">✗</span>                              |
+|      | **18. share-vs-sharereplay** — late subscribers missing data                           | **<span class="g">4/4</span>** | **<span class="r">3/4</span>**                       |
+| 18.1 | Recommends ShareReplay(1)                                                              | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+| 18.2 | Explains Share doesn't buffer                                                          | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+| 18.3 | Explains ShareReplay buffers last N                                                    | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+| 18.4 | Shows correct syntax ro.ShareReplay[T](1)                                              | <span class="g">✓</span>       | <span class="r">✗</span> wrong generic syntax         |
+|      | **19. error-recovery-cascade** — retry then fallback then default                      | **<span class="g">5/5</span>** | **<span class="r">1/5</span>**                       |
+| 19.1 | Correct order: RetryWithConfig, Catch, OnErrorReturn                                   | <span class="g">✓</span>       | <span class="r">✗</span> wrong operator names         |
+| 19.2 | Uses RetryWithConfig with Max: 2                                                       | <span class="g">✓</span>       | <span class="r">✗</span> generic retry approach       |
+| 19.3 | Uses Catch for secondary source                                                        | <span class="g">✓</span>       | <span class="r">✗</span> uses RxJS-style naming       |
+| 19.4 | Uses OnErrorReturn for default                                                         | <span class="g">✓</span>       | <span class="r">✗</span> wrong operator name          |
+| 19.5 | Correct Pipe order                                                                     | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+|      | **20. channel-bridge** — FromChannel for legacy chan                                   | **<span class="g">4/4</span>** | **<span class="g">4/4</span>**                       |
+| 20.1 | Uses ro.FromChannel[Event](ch)                                                         | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+| 20.2 | Observable completes when channel closes                                               | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+| 20.3 | Chains standard operators                                                              | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+| 20.4 | Does NOT create custom NewObservable                                                   | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+|      | **21. tap-for-observability** — logging without modifying stream                       | **<span class="g">5/5</span>** | **<span class="r">3/5</span>**                       |
+| 21.1 | Uses Tap/TapOnNext/TapOnError/TapOnComplete                                           | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+| 21.2 | Does NOT use Map with side effect                                                      | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+| 21.3 | Shows TapOnError for error monitoring                                                  | <span class="g">✓</span>       | <span class="r">✗</span> generic Tap only             |
+| 21.4 | Explains Tap/Do observe without altering                                               | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+| 21.5 | Mentions logging plugins (slog, zap, etc.)                                             | <span class="g">✓</span>       | <span class="r">✗</span>                              |
+|      | **22. connectable-precise-control** — wait for all subscribers                         | **<span class="g">5/5</span>** | **<span class="r">4/5</span>**                       |
+| 22.1 | Recommends Connectable                                                                 | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+| 22.2 | Shows ro.Connectable[T](source)                                                        | <span class="g">✓</span>       | <span class="r">✗</span> wrong constructor            |
+| 22.3 | Sets up subscribers before Connect                                                     | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+| 22.4 | Explains Connect() starts execution                                                    | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+| 22.5 | Explains why Share() is wrong                                                          | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+|      | **23. flatmap-vs-map** — flatten Observable[Observable[T]]                             | **<span class="g">4/4</span>** | **<span class="r">3/4</span>**                       |
+| 23.1 | Recommends FlatMap or MergeMap                                                         | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+| 23.2 | Shows FlatMap code                                                                     | <span class="g">✓</span>       | <span class="r">✗</span> wrong generic syntax         |
+| 23.3 | Explains map+flatten behavior                                                          | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+| 23.4 | Does NOT suggest Map+MergeAll as primary                                               | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+|      | **24. async-subject-final** — last value on completion                                 | **<span class="g">5/5</span>** | **<span class="r">4/5</span>**                       |
+| 24.1 | Recommends AsyncSubject                                                                | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+| 24.2 | Shows NewAsyncSubject[T]() constructor                                                 | <span class="g">✓</span>       | <span class="r">✗</span> wrong constructor            |
+| 24.3 | Explains last value only on completion                                                 | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+| 24.4 | Does NOT recommend BehaviorSubject                                                     | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+| 24.5 | Does NOT recommend ReplaySubject(1)                                                    | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+|      | **25. version-stability** — v0 pre-release warnings                                    | **<span class="g">4/4</span>** | **<span class="r">3/4</span>**                       |
+| 25.1 | Mentions v0.x (pre-v1.0.0)                                                             | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+| 25.2 | Warns about breaking changes                                                           | <span class="g">✓</span>       | <span class="g">✓</span>                              |
+| 25.3 | Mentions SemVer                                                                        | <span class="g">✓</span>       | <span class="r">✗</span> not confident about SemVer   |
+| 25.4 | Does NOT present as fully stable                                                       | <span class="g">✓</span>       | <span class="g">✓</span>                              |
 
 </details>
 
