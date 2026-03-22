@@ -137,16 +137,17 @@ record → [Formatter] → [Sampling] → [Sink]
 record → [Sampling] → [Formatter] → [Sink]
 ```
 
-To exempt errors from sampling, use a Router before the sampled path:
+To exempt errors from sampling, use a `FirstMatch` Router so error records match the first route and skip sampling:
 
 ```go
 logger := slog.New(
     slogmulti.Router().
-        Add(sentryHandler, slogmulti.LevelIs(slog.LevelError)).  // errors: no sampling
+        Add(sentryHandler, slogmulti.LevelIs(slog.LevelError)).  // errors: no sampling, first match wins
         Add(slogmulti.                                            // everything else: sampled
             Pipe(samplingMiddleware).
             Handler(lokiHandler),
         ).
+        FirstMatch().  // stop at first matching route — errors won't fall through to sampled path
         Handler(),
 )
 ```

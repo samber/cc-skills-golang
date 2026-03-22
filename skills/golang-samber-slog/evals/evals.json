@@ -34,7 +34,7 @@
     "prompt": "Set up slog to send logs to Datadog using samber/slog-datadog in a Go HTTP server with graceful shutdown. Show the complete main() function.",
     "trap": "Without the skill, the model forgets to close the handler on shutdown, causing buffered logs to be lost",
     "assertions": [
-      {"id": "3.1", "text": "Calls handler.Close() or defer handler.Close() for the Datadog handler"},
+      {"id": "3.1", "text": "Calls handler.Stop(ctx) or defer handler.Stop(ctx) for the Datadog handler (not Close)"},
       {"id": "3.2", "text": "Uses Option{}.NewDatadogHandler() constructor pattern"},
       {"id": "3.3", "text": "Close happens during graceful shutdown (signal handling or defer in main)"},
       {"id": "3.4", "text": "Mentions or demonstrates that Datadog handler batches logs (data loss risk without Close)"},
@@ -119,8 +119,8 @@
     "trap": "Without the skill, the model suggests spawning goroutines per log record or using buffered channels instead of slog-multi's Pool handler",
     "assertions": [
       {"id": "9.1", "text": "Identifies sequential processing in Fanout as the root cause"},
-      {"id": "9.2", "text": "Recommends replacing Fanout with slogmulti.Pool() for concurrent dispatch"},
-      {"id": "9.3", "text": "Explains that Pool reduces latency from sum-of-all to max-of-one handler duration"},
+      {"id": "9.2", "text": "Recommends replacing Fanout with slogmulti.Pool() for concurrent broadcast"},
+      {"id": "9.3", "text": "Explains that Pool dispatches to all handlers concurrently, reducing latency from sum-of-all to max-of-all handler duration"},
       {"id": "9.4", "text": "Does NOT suggest spawning raw goroutines per log record as the primary solution"},
       {"id": "9.5", "text": "Shows the code change from slogmulti.Fanout(handlers...) to slogmulti.Pool()(handlers...)"}
     ]
@@ -150,7 +150,7 @@
       {"id": "11.2", "text": "Uses slogloki.Option{}.NewLokiHandler() constructor pattern"},
       {"id": "11.3", "text": "Uses slogmulti.Router() for level-based routing (errors to Sentry, all to Loki)"},
       {"id": "11.4", "text": "Import paths use versioned modules (github.com/samber/slog-sentry/v2, github.com/samber/slog-loki/v3)"},
-      {"id": "11.5", "text": "Calls Close() or defer Close() on the Loki handler for graceful shutdown"}
+      {"id": "11.5", "text": "Calls lokiClient.Stop() or defer lokiClient.Stop() for graceful shutdown (flush buffered logs)"}
     ]
   },
   {

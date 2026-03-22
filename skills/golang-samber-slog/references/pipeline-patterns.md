@@ -220,16 +220,18 @@ sentryHandler := slogsentry.Option{Level: slog.LevelError}.NewSentryHandler()
 lokiHandler := slogloki.Option{Level: slog.LevelDebug, Client: lokiClient}.NewLokiHandler()
 defer lokiClient.Stop() // flush buffered logs
 
-// 5. Compose
+// 5. Compose — errors bypass sampling, everything else is sampled
 logger := slog.New(
     slogmulti.
-        Pipe(sampling).       // outermost: drop early
-        Pipe(pii).            // scrub PII
+        Pipe(pii).            // scrub PII on all records
         Pipe(recovery).       // catch panics
         Handler(
             slogmulti.Router().
-                Add(sentryHandler, slogmulti.LevelIs(slog.LevelError)).
-                Add(lokiHandler). // catch-all
+                Add(sentryHandler, slogmulti.LevelIs(slog.LevelError)).  // errors: no sampling
+                Add(slogmulti.                                            // everything else: sampled
+                    Pipe(sampling).
+                    Handler(lokiHandler),
+                ).
                 Handler(),
         ),
 )

@@ -54,7 +54,7 @@ go get github.com/samber/lo
 | Parallel            | `github.com/samber/lo/parallel` | `lop` | 1.18+      |
 | Mutable             | `github.com/samber/lo/mutable`  | `lom` | 1.18+      |
 | Iterator            | `github.com/samber/lo/it`       | `loi` | 1.23+      |
-| SIMD (experimental) | `github.com/samber/lo/exp/simd` | —     | 1.25+      |
+| SIMD (experimental) | `github.com/samber/lo/exp/simd` | —     | 1.25+ (amd64 only) |
 
 ## Choose the Right Package
 

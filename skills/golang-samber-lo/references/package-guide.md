@@ -172,4 +172,4 @@ Start with lo.Map/Filter/Reduce (immutable, safe)
 | Input modified | No | No | Yes | No | Varies |
 | Concurrent-safe | Read-safe | Read-safe | Not safe | Read-safe | Varies |
 | API stability | Stable | Stable | Stable | Stable | Experimental |
-| Go version | 1.18+ | 1.18+ | 1.18+ | 1.23+ | 1.18+ |
+| Go version | 1.18+ | 1.18+ | 1.18+ | 1.23+ | 1.25+ |
