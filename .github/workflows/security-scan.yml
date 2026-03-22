@@ -21,3 +21,5 @@ jobs:
 
       - name: Run Snyk Agent Scan
         run: uvx snyk-agent-scan@latest --skills ./skills
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
