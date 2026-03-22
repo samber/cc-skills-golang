@@ -34,9 +34,20 @@ New skills go in `skills/<skill-name>/SKILL.md`. Each SKILL.md has YAML frontmat
 | `description` | Spec-required | 1-1024 chars. Describes what the skill does **and when to use it** — this is the primary triggering mechanism. Be specific and slightly "pushy" to avoid under-triggering. |
 | `license` | Project-required | License name or reference to a bundled license file. Use `MIT` for this project. |
 | `compatibility` | Project-required | 1-500 chars. Describe actual requirements. Base: `Designed for Claude Code or similar AI coding agents.` Extend when needed: add `Requires git`, `Requires internet access`, `Requires Python 3.14+ and uv`, etc. Skills with no special requirements use the base string only. |
-| `metadata` | Project-required | Must include `author` (string) and `version` (semver `a.b.c` string, e.g. `"1.0.0"`). |
+| `metadata` | Project-required | Must include `author` (string), `version` (semver `a.b.c` string, e.g. `"1.0.0"`), and `openclaw` (object — see below). |
 | `user-invocable` | Project-required | Boolean. `true` for skills invocable as slash commands (e.g. `/golang-security`), `false` (default) for contextual skills that auto-trigger. |
 | `allowed-tools` | Project-required | Space-delimited list of pre-approved tools. See "Allowed tools" below. |
+
+### ClawHub metadata (`metadata.openclaw`)
+
+Every skill MUST include a `metadata.openclaw` block for [ClawHub](https://github.com/openclaw/clawhub) discoverability and dependency management. See the [ClawHub skill format specification](https://github.com/openclaw/clawhub/blob/main/docs/skill-format.md) for the full reference. Fields used in this project:
+
+| Field | Required | Description |
+| --- | --- | --- |
+| `emoji` | Yes | Display emoji for the skill (single emoji string) |
+| `homepage` | Yes | URL to the skill's homepage. Use `https://github.com/samber/cc-skills-golang` for this project. |
+| `requires.bins` | Yes | CLI binaries that must be installed. Always includes `go`. Add skill-specific critical bins (e.g. `protoc`, `dlv`). |
+| `install` | Yes | Array of auto-installable dependencies. Use `[]` when no extra deps needed. Supported kinds: `brew`, `go`, `node`, `uv`. Each entry has `kind`, `formula`/`package`, and `bins` fields. |
 
 Example frontmatter:
 
@@ -50,8 +61,34 @@ compatibility: Designed for Claude Code or similar AI coding agents. Requires go
 metadata:
   author: samber
   version: "1.0.0"
+  openclaw:
+    emoji: "🔧"
+    homepage: https://github.com/samber/cc-skills-golang
+    requires:
+      bins:
+        - go
+    install: []
 allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(git:*) Agent
 ---
+```
+
+Example with extra dependencies:
+
+```yaml
+metadata:
+  author: samber
+  version: "1.0.0"
+  openclaw:
+    emoji: "🌐"
+    homepage: https://github.com/samber/cc-skills-golang
+    requires:
+      bins:
+        - go
+        - protoc
+    install:
+      - kind: brew
+        formula: protobuf
+        bins: [protoc]
 ```
 
 **Version discipline:** Versions follow semver (`a.b.c`). New skills start at `1.0.0`. When modifying a skill, the developer must increment its `metadata.version` and the plugin version in `.claude-plugin/plugin.json` before merging. CI enforces both checks on PRs. Do not auto-increment versions — remind the developer as a next step.
