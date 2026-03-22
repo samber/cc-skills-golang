@@ -232,6 +232,7 @@ logger := slog.New(
                     Pipe(sampling).
                     Handler(lokiHandler),
                 ).
+                FirstMatch().  // stop at first matching route — errors won't fall through to sampled path
                 Handler(),
         ),
 )
