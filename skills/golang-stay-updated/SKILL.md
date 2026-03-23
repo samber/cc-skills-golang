@@ -107,7 +107,7 @@ Follow these influential Go developers and contributors:
 | --- | --- | --- | --- | --- |
 | **Carlisia Campos** | carlisia | @carlisia | https://linkedin.com/in/carlisia |  |
 | **Erik St. Martin** | erikstmartin | @erikstmartin |  |  |
-| **Brian Ketelsen** | bketcham | @bketcham |  |  |
+| **Brian Ketelsen** | bketelsen |  |  | @brian.dev |
 
 ### Performance & Optimization Experts
 
