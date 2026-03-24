@@ -1,6 +1,6 @@
 ---
 name: golang-samber-oops
-description: Structured error handling in Golang with samber/oops — error builders, stack traces, error codes, error context, error wrapping, error attributes, user-facing vs developer messages, panic recovery, and logger integration. Apply when using or adopting samber/oops, or when the codebase already imports github.com/samber/oops.
+description: "Structured error handling in Golang with samber/oops — error builders, stack traces, error codes, error context, error wrapping, error attributes, user-facing vs developer messages, panic recovery, and logger integration. Apply when using or adopting samber/oops, or when the codebase already imports github.com/samber/oops."
 user-invocable: false
 license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.

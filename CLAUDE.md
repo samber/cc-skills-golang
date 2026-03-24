@@ -52,7 +52,7 @@ Example frontmatter:
 ```yaml
 ---
 name: golang-example
-description: Golang skill for X. Use when doing Y.
+description: "Golang skill for X. Use when doing Y."
 user-invocable: false
 license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents. Requires go compiler and git.

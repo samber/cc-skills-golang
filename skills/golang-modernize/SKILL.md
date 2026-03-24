@@ -1,6 +1,6 @@
 ---
 name: golang-modernize
-description: Continuously modernize Golang code to use the latest language features, standard library improvements, and idiomatic patterns. Use this skill whenever writing, reviewing, or refactoring Go code to ensure it leverages modern Go idioms. Also use when the user asks about Go upgrades, migration, modernization, deprecation, or when modernize linter reports issues. Also covers tooling modernization: linters, SAST, AI-powered code review in CI, and modern development practices. Trigger this skill proactively when you notice old-style Go patterns that have modern replacements.
+description: "Continuously modernize Golang code to use the latest language features, standard library improvements, and idiomatic patterns. Use this skill whenever writing, reviewing, or refactoring Go code to ensure it leverages modern Go idioms. Also use when the user asks about Go upgrades, migration, modernization, deprecation, or when modernize linter reports issues. Also covers tooling modernization: linters, SAST, AI-powered code review in CI, and modern development practices. Trigger this skill proactively when you notice old-style Go patterns that have modern replacements."
 user-invocable: true
 license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.

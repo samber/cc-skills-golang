@@ -1,6 +1,6 @@
 ---
 name: golang-popular-libraries
-description: Recommends production-ready Golang libraries and frameworks. Apply when the user asks for library suggestions, wants to compare alternatives, or needs to choose a library for a specific task. Also apply when the AI agent is about to add a new dependency — ensures vetted, production-ready libraries are chosen.
+description: "Recommends production-ready Golang libraries and frameworks. Apply when the user asks for library suggestions, wants to compare alternatives, or needs to choose a library for a specific task. Also apply when the AI agent is about to add a new dependency — ensures vetted, production-ready libraries are chosen."
 user-invocable: false
 license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.

@@ -1,6 +1,6 @@
 ---
 name: golang-design-patterns
-description: Idiomatic Golang design patterns — functional options, constructors, error flow and cascading, resource management and lifecycle, graceful shutdown, resilience, architecture, dependency injection, data handling, and streaming. Apply when designing Go APIs, structuring applications, choosing between patterns, making design decisions, architectural choices, or production hardening.
+description: "Idiomatic Golang design patterns — functional options, constructors, error flow and cascading, resource management and lifecycle, graceful shutdown, resilience, architecture, dependency injection, data handling, and streaming. Apply when designing Go APIs, structuring applications, choosing between patterns, making design decisions, architectural choices, or production hardening."
 user-invocable: false
 license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.

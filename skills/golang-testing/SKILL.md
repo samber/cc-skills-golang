@@ -1,6 +1,6 @@
 ---
 name: golang-testing
-description: Provides a comprehensive guide for writing production-ready Golang tests. Covers table-driven tests, test suites with testify, mocks, unit tests, integration tests, benchmarks, code coverage, parallel tests, fuzzing, fixtures, goroutine leak detection with goleak, snapshot testing, memory leaks, CI with GitHub Actions, and idiomatic naming conventions. Use this whenever writing tests, asking about testing patterns or setting up CI for Go projects. Essential for ANY test-related conversation in Go.
+description: "Provides a comprehensive guide for writing production-ready Golang tests. Covers table-driven tests, test suites with testify, mocks, unit tests, integration tests, benchmarks, code coverage, parallel tests, fuzzing, fixtures, goroutine leak detection with goleak, snapshot testing, memory leaks, CI with GitHub Actions, and idiomatic naming conventions. Use this whenever writing tests, asking about testing patterns or setting up CI for Go projects. Essential for ANY test-related conversation in Go."
 user-invocable: true
 license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
