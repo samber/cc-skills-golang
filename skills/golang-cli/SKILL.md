@@ -41,7 +41,7 @@ For trivial single-purpose tools with no subcommands and few flags, stdlib `flag
 | Configuration       | `github.com/spf13/viper`             |
 | Flag parsing        | `github.com/spf13/pflag` (via Cobra) |
 | Colored output      | `github.com/fatih/color`             |
-| Table output        | `github.com/olekukonez/tablewriter`  |
+| Table output        | `github.com/olekukonko/tablewriter`  |
 | Interactive prompts | `github.com/charmbracelet/bubbletea` |
 | Version injection   | `go build -ldflags`                  |
 | Distribution        | `goreleaser`                         |
