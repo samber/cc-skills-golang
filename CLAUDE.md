@@ -412,7 +412,7 @@ The `mcp__context7__*` tools may still be listed in `allowed-tools` frontmatter 
 
 ### Adversarial evaluation design
 
-Run skill evaluation with the pattern recommanded by `/skill-creator`. Use `/tmp/{skill-name}-workspace` as default workspace for ephemeral files.
+Run skill evaluation with the pattern recommended by `/skill-creator`. Use `/tmp/{skill-name}-workspace` as default workspace for ephemeral files.
 
 Evals MUST be adversarial — they test the skill's **unique value**, not common knowledge the model already has. A good eval has a "trap" the model falls into without the skill but avoids with it. Every rules of a skill must have its test.
 
