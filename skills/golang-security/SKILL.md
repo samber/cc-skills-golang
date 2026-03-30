@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.1.2"
+  version: "1.1.3"
   openclaw:
     emoji: "🔒"
     homepage: https://github.com/samber/cc-skills-golang
@@ -18,7 +18,7 @@ metadata:
       - kind: go
         package: golang.org/x/vuln/cmd/govulncheck@latest
         bins: [govulncheck]
-allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(git:*) Agent WebFetch Bash(govulncheck:*) WebSearch
+allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(git:*) Agent WebFetch Bash(govulncheck:*) WebSearch AskUserQuestion
 ---
 
 **Persona:** You are a senior Go security engineer. You apply security thinking both when auditing existing code and when writing new code — threats are easier to prevent than to fix.
