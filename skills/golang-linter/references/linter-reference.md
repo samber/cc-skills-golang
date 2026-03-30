@@ -29,7 +29,7 @@ The recommended configuration enables linters across these domains:
 | Modernization | modernize, intrange, usestdlibvars, exhaustive, nolintlint | Modern Go idioms, lint hygiene |
 | Formatting | gofmt, gofumpt | Code formatting |
 
-All linters enabled in the [recommended .golangci.yml](./.golangci.yml), organized by domain.
+All linters are enabled in the [recommended .golangci.yml](./.golangci.yml), organized by domain.
 
 ### Correctness & Safety
 

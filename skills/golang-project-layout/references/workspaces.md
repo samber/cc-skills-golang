@@ -1,3 +1,5 @@
+<!-- markdownlint-disable ol-prefix -->
+
 # Go Workspaces for Multi-Package Repositories
 
 ## When to Use Workspaces

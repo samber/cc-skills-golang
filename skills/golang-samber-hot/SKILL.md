@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.0.1"
+  version: "1.0.2"
   openclaw:
     emoji: "🔥"
     homepage: https://github.com/samber/cc-skills-golang
@@ -28,7 +28,7 @@ Generic, type-safe in-memory caching library for Go 1.22+ with 9 eviction algori
 - [pkg.go.dev/github.com/samber/hot](https://pkg.go.dev/github.com/samber/hot)
 - [github.com/samber/hot](https://github.com/samber/hot)
 
-This skill is not exhaustive. Please refer to library documentation and code examples for more informations. Context7 can help as a discoverability platform.
+This skill is not exhaustive. Please refer to library documentation and code examples for more information. Context7 can help as a discoverability platform.
 
 ```bash
 go get -u github.com/samber/hot
@@ -124,11 +124,11 @@ For advanced patterns (revalidation, sharding, missing cache, monitoring setup),
 
 For the complete API surface, see [API Reference](./references/api-reference.md).
 
-If you encounter a bug or unexpected behavior in samber/hot, open an issue at https://github.com/samber/hot/issues.
+If you encounter a bug or unexpected behavior in samber/hot, open an issue at <https://github.com/samber/hot/issues>.
 
 ## Cross-References
 
-- -> See `samber/cc-skills-golang@golang-performance` skill for general caching strategy and when to use in-memory cache vs Redis vs CDN
-- -> See `samber/cc-skills-golang@golang-observability` skill for Prometheus metrics integration and monitoring
-- -> See `samber/cc-skills-golang@golang-database` skill for database query patterns that pair with cache loaders
-- -> See `samber/cc-skills@promql-cli` skill for querying Prometheus cache metrics via CLI
+- → See `samber/cc-skills-golang@golang-performance` skill for general caching strategy and when to use in-memory cache vs Redis vs CDN
+- → See `samber/cc-skills-golang@golang-observability` skill for Prometheus metrics integration and monitoring
+- → See `samber/cc-skills-golang@golang-database` skill for database query patterns that pair with cache loaders
+- → See `samber/cc-skills@promql-cli` skill for querying Prometheus cache metrics via CLI

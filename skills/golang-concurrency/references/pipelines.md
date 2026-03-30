@@ -230,7 +230,7 @@ emails, _ := ro.Collect( // ignore error
 
 ```
 
-Use `samber/ro` for sequential data transformations that benefit from a fluent API. It might support parallel processing is needed.
+Use `samber/ro` for sequential data transformations that benefit from a fluent API. It might also support parallel processing if needed.
 
 ## Goroutine Leak Detection
 

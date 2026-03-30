@@ -143,6 +143,8 @@ These skills are designed as **atomic, cross-referencing units**. A skill may re
 
 **General purpose:**
 
+<!-- markdownlint-disable table-column-style -->
+
 |  | Skill | Flags | Error rate gap | Description (tok) | SKILL.md (tok) | Directory (tok) |
 | --- | --- | --- | --- | --- | --- | --- |
 | ⭐️ | ✅ `golang-code-style` | ⚙️ | -40% | 31 | 2,069 | 2,685 |
@@ -205,19 +207,19 @@ See [EVALUATIONS.md](./EVALUATIONS.md) for the full per-skill breakdown.
 
 ## 🎯 Tuning Skill Triggers
 
-If a skill triggers too often or not often enough, please [open an issue](https://github.com/samber/cc-skills-golang/issues) suggesting a description change. The `description` field in SKILL.md frontmatter is the primary triggering mechanism — small wording adjustments can significantly improve trigger accuracy. Some `SKILL.md` might have `When to use` section which is another level of exclusion. Finally, `SKILL.md` are a entrypoint for lazy loading references with deep knowledge located in `references/`.
+If a skill triggers too often or not often enough, please [open an issue](https://github.com/samber/cc-skills-golang/issues) suggesting a description change. The `description` field in SKILL.md frontmatter is the primary triggering mechanism — small wording adjustments can significantly improve trigger accuracy. Some `SKILL.md` files might have a `When to use` section which is another level of exclusion. Finally, `SKILL.md` files are an entrypoint for lazy loading references with deep knowledge located in `references/`.
 
 ## 🔄 Overlap
 
-Claude reports very little overlap between skills in this repo, thanks to cross-reference. I suggest enabling most of the skills and leverage lazy loading. The recommended ⭐️ skills load ~1,100 tokens of descriptions at startup; full skill content is only pulled in when relevant. Note:
+Claude reports very little overlap between skills in this repo, thanks to cross-reference. I suggest enabling most of the skills and leveraging lazy loading. The recommended ⭐️ skills load ~1,100 tokens of descriptions at startup; full skill content is only pulled in when relevant. Note:
 
 - I estimate that 50% of `golang-naming` and `golang-code-style` overlap with linters (golangci-lint).
-- A large part of the security rules in `golang-security` have been distilled from Bearer (SAST) check list. The skill is still useful for methodology.
+- A large part of the security rules in `golang-security` have been distilled from the Bearer (SAST) checklist. The skill is still useful for methodology.
 - If your team has its own conventions, create a company skill and declare the override explicitly near the top of its body: `This skill supersedes samber/cc-skills-golang@golang-naming skill for [company] projects.` Skills marked ⚙️ in the table above support this mechanism.
 
 ## ✍️ Contribute
 
-- **100 tokens per skill description** - what ? when use this skill ?
+- **100 tokens per skill description** - what? when to use this skill?
 - **1.000–2.500 tokens per SKILL.md** — keep the main file focused on essentials
 - **Use secondary markdown files for depth** — reference them from SKILL.md with relative links (e.g., `[Logging](./logging.md)`). Claude reads these on demand when the topic is relevant, so they don't count against the context budget until needed
 - **Up to 10.000 tokens** for full skill and secondary files

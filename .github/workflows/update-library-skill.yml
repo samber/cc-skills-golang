@@ -52,6 +52,7 @@ jobs:
             1. Check the library README, documentation, changelog and released notes for the latest version. If a new version has been released that is not yet covered in the skill, research its changelog and add a new section with modernization opportunities.
             2. Check if any suggestions in the skill have been deprecated or too old to be relevant. Suggest removing them or moving them to a "baseline" note.
             3. Update the README.md if needed.
+            4. Increment skill version + plugin version.
 
             If there are changes to make, open a PR with a clear description of what was updated and why.
           claude_args: |

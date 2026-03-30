@@ -159,7 +159,7 @@
       "prompt": "I need a samber/ro observable that emits an event every day at midnight for a daily report generation job. What plugin should I use and how?",
       "assertions": [
         "Knows about the cron plugin (plugins/cron)",
-        "Uses cron.Schedule or similar with a cron expression like '0 0 * * *'",
+        "Uses cron.Schedule or similar with a cron expression like `0 0 * * *`",
         "Shows the correct import path for the cron plugin",
         "Chains the cron observable with Map or FlatMap to trigger report generation"
       ]
@@ -274,7 +274,7 @@
       "prompt": "I have a long computation that produces intermediate results but I only care about the final result. Which samber/ro Subject captures just the last emitted value and delivers it only after completion?",
       "assertions": [
         "Recommends AsyncSubject",
-        "Shows NewAsyncSubject[T]() constructor",
+        "Shows `NewAsyncSubject[T]()` constructor",
         "Explains that AsyncSubject emits only the last value and only upon completion",
         "Does NOT recommend BehaviorSubject (which emits on every new subscription, not just on complete)",
         "Does NOT recommend ReplaySubject(1) (which replays immediately, not waiting for completion)"

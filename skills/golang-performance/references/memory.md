@@ -215,7 +215,7 @@ type Entry struct { Value int64; Flag struct{} }
 type Entry struct { Flag struct{}; Value int64 }
 ```
 
-Having `struct{}` field in a struct is rare and almost useless.
+Having a `struct{}` field in a struct is rare and almost useless.
 
 ### Pointer receivers for large structs
 

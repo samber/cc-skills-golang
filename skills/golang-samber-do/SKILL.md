@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.1.2"
+  version: "1.1.3"
   openclaw:
     emoji: "💉"
     homepage: https://github.com/samber/cc-skills-golang
@@ -29,7 +29,7 @@ Type-safe dependency injection toolkit for Go based on Go 1.18+ generics.
 - [do.samber.dev](https://do.samber.dev)
 - [github.com/samber/do/v2](https://github.com/samber/do)
 
-This skill is not exhaustive. Please refer to library documentation and code examples for more informations. Context7 can help as a discoverability platform.
+This skill is not exhaustive. Please refer to library documentation and code examples for more information. Context7 can help as a discoverability platform.
 
 DO NOT USE v1 OF THIS LIBRARY. INSTALL v2 INSTEAD:
 
@@ -216,6 +216,6 @@ For testing patterns (cloning, overrides, mocks), see [Testing](./references/tes
 
 ## Cross-References
 
-- -> See `samber/cc-skills-golang@golang-dependency-injection` skill for DI concepts, comparison, and when to adopt a DI library
-- -> See `samber/cc-skills-golang@golang-structs-interfaces` skill for interface design patterns
-- -> See `samber/cc-skills-golang@golang-testing` skill for general testing patterns
+- → See `samber/cc-skills-golang@golang-dependency-injection` skill for DI concepts, comparison, and when to adopt a DI library
+- → See `samber/cc-skills-golang@golang-structs-interfaces` skill for interface design patterns
+- → See `samber/cc-skills-golang@golang-testing` skill for general testing patterns

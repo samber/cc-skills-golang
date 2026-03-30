@@ -23,6 +23,7 @@ Before diving into profiles, set up the environment to collect high-resolution d
    ```
 
 4. **Enable debug logging** via env var if needed — but only on the target instance. Debug logging has significant throughput impact:
+
    ```bash
    kubectl set env deployment/my-service LOG_LEVEL=debug
    kubectl rollout restart deployment/my-service

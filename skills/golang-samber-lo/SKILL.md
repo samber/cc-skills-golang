@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.0.1"
+  version: "1.0.2"
   openclaw:
     emoji: "🧰"
     homepage: https://github.com/samber/cc-skills-golang
@@ -29,7 +29,7 @@ Lodash-inspired, generics-first utility library with 500+ type-safe helpers for 
 - [lo.samber.dev](https://lo.samber.dev)
 - [pkg.go.dev/github.com/samber/lo](https://pkg.go.dev/github.com/samber/lo)
 
-This skill is not exhaustive. Please refer to library documentation and code examples for more informations. Context7 can help as a discoverability platform.
+This skill is not exhaustive. Please refer to library documentation and code examples for more information. Context7 can help as a discoverability platform.
 
 ## Why samber/lo
 

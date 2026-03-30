@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.1.1"
+  version: "1.1.2"
   openclaw:
     emoji: "📝"
     homepage: https://github.com/samber/cc-skills-golang
@@ -50,7 +50,7 @@ Before documenting, determine the project type — it changes what documentation
 
 **Both apply**: function comments, README, CONTRIBUTING, CHANGELOG.
 
-**Architecture docs**: for complex projects, use `docs/` directory and design description docs.
+**Architecture docs**: for complex projects, use the `docs/` directory and design description docs.
 
 ## Step 2: Documentation Checklist
 
@@ -68,11 +68,11 @@ Every Go project needs these (ordered by priority):
 | CHANGELOG.md or GitHub Releases | Recommended | Yes | Yes |
 | Example test functions (`ExampleXxx`) | Recommended | Yes | No |
 | Go Playground demos | Recommended | Yes | No |
-| API docs (eg: OpenAPI) | If applicable | Maybe | Maybe |
+| API docs (e.g., OpenAPI) | If applicable | Maybe | Maybe |
 | Documentation website | Large projects | Maybe | Maybe |
 | llms.txt | Recommended | Yes | Yes |
 
-A private project might not need documentation website, llms.txt, Go Playground demos...
+A private project might not need a documentation website, llms.txt, Go Playground demos...
 
 ## Parallelizing Documentation Work
 

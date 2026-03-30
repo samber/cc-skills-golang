@@ -10,11 +10,11 @@ The Go standard library continues to evolve with v2 packages and experimental fe
 
 ## New Packages (Promoted from x/exp)
 
-**slices** (Go 1.21+) Generic slice operations: BinarySearch, Clone, Compact, Compare, Contains, Delete, Insert, Replace, Reverse, Sort. Reduces need for external libraries.
+**slices** (Go 1.21+) Generic slice operations: BinarySearch, Clone, Compact, Compare, Contains, Delete, Insert, Replace, Reverse, Sort. Reduces the need for external libraries.
 
 **maps** (Go 1.21+) Generic map operations: Clone, Compare, Delete, Equal, Keys, Values. Type-safe map utilities.
 
-**cmp** (Go 1.21+) Comparison utilities: Compare, Or, Ordered. Used with slices/maps package.
+**cmp** (Go 1.21+) Comparison utilities: Compare, Or, Ordered. Used with the slices/maps packages.
 
 **iter** (Go 1.23+) Iterator support for sequences. Enables range-over functions and integrates with slices/maps methods.
 

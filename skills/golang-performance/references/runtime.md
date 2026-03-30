@@ -157,14 +157,19 @@ Go 1.21+ supports PGO — the compiler uses a production CPU profile to make bet
 **Workflow:**
 
 1. Collect a production CPU profile (30+ seconds of representative load):
+
    ```bash
    curl http://localhost:6060/debug/pprof/profile?seconds=60 > cpu.pprof
    ```
+
 2. Place as `default.pgo` in the main package directory:
+
    ```bash
    cp cpu.pprof ./cmd/myapp/default.pgo
    ```
+
 3. Build — `go build` auto-detects `default.pgo`:
+
    ```bash
    go build ./cmd/myapp
    ```

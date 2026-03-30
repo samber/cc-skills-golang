@@ -217,7 +217,7 @@ With batching per stage, total throughput = min(A_throughput, B_throughput, C_th
 1. **Resource saturation is predictable and non-overlapping** — You measured that A saturates one resource (e.g., CPU = 95%), B saturates another (disk I/O = 90%), C saturates a third (network = 85%). Overlapping saturation means concurrency adds no benefit.
 2. **Bottleneck shifts don't hurt latency** — Processing order doesn't matter, or records can flow out-of-order through stages.
 3. **Buffering overhead is acceptable** — Inter-stage channels consume memory. For large records, channel buffers can overflow system limits.
-4. **You've benchmarked the alternative** — Profile both sequential and concurrent versions. Sequential + batching often wins because it simpler and avoids context switching overhead.
+4. **You've benchmarked the alternative** — Profile both sequential and concurrent versions. Sequential + batching often wins because it is simpler and avoids context-switching overhead.
 
 **Avoid concurrent pipelines if:**
 

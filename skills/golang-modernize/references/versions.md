@@ -2,7 +2,7 @@
 
 ## Go 1.21 Modernizations (August 2023)
 
-Changelog: https://go.dev/doc/go1.21
+Changelog: <https://go.dev/doc/go1.21>
 
 ### Use built-in `min`, `max`, `clear` _(Go 1.21+)_
 
@@ -134,7 +134,7 @@ stop := context.AfterFunc(ctx, func() { cleanup() })
 
 ## Go 1.22 Modernizations (February 2024)
 
-Changelog: https://go.dev/doc/go1.22
+Changelog: <https://go.dev/doc/go1.22>
 
 ### SHOULD use `range` over integers _(Go 1.22+)_
 
@@ -245,7 +245,7 @@ var age  sql.Null[int64]
 
 ## Go 1.23 Modernizations (August 2024)
 
-Changelog: https://go.dev/doc/go1.23
+Changelog: <https://go.dev/doc/go1.23>
 
 ### Use iterators (`range` over functions) _(Go 1.23+)_
 
@@ -326,7 +326,7 @@ Remove unnecessary `Stop()` calls in defer patterns where the timer goes out of 
 
 ## Go 1.24 Modernizations (February 2025)
 
-Changelog: https://go.dev/doc/go1.24
+Changelog: <https://go.dev/doc/go1.24>
 
 ### Use generic type aliases _(Go 1.24+)_
 
@@ -479,7 +479,7 @@ buf = fmt.Appendf(buf, "count: %d", n)
 
 ## Go 1.25 Modernizations (August 2025)
 
-Changelog: https://go.dev/doc/go1.25
+Changelog: <https://go.dev/doc/go1.25>
 
 ### Use `sync.WaitGroup.Go` _(Go 1.25+)_
 
@@ -568,7 +568,7 @@ Major JSON revision. **Experimental** — evaluate for new code, don't migrate p
 
 ## Go 1.26 Modernizations (February 2026)
 
-Changelog: https://go.dev/doc/go1.26
+Changelog: <https://go.dev/doc/go1.26>
 
 ### Use `errors.AsType[T]()` _(Go 1.26+)_
 

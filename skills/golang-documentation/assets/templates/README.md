@@ -103,10 +103,10 @@ Please read the [contributing guide](CONTRIBUTING.md) before submitting a PR.
 # Build
 go build -o myapp ./cmd/main.go
 
-# Run unit test
+# Run unit tests
 go test -race ./...
 
-# Run integration test
+# Run integration tests
 go test -race -tags=integration -timeout=300s ./...
 
 # Run linter

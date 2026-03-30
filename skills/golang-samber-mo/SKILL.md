@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.0.1"
+  version: "1.0.2"
   openclaw:
     emoji: "🎭"
     homepage: https://github.com/samber/cc-skills-golang
@@ -262,7 +262,7 @@ str := mo.Fold[error, int, string](
 
 For advanced types (Future, IO, Task, State), see [Advanced Types Reference](./references/advanced-types.md).
 
-If you encounter a bug or unexpected behavior in samber/mo, open an issue at https://github.com/samber/mo/issues.
+If you encounter a bug or unexpected behavior in samber/mo, open an issue at <https://github.com/samber/mo/issues>.
 
 ## Cross-References
 

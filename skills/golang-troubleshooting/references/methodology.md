@@ -125,6 +125,7 @@ Production debugging MUST start with observability data. Before diving into code
 If the information is missing, **ask the user** what monitoring and observability tools they use. Common stacks:
 
 - **Prometheus + Grafana** — Check dashboards for error rate spikes, latency changes, resource saturation. Query examples:
+
   ```promql
   rate(http_requests_total{status=~"5.."}[5m])           # error rate
   histogram_quantile(0.99, rate(http_duration_seconds_bucket[5m]))  # p99 latency
@@ -132,17 +133,22 @@ If the information is missing, **ask the user** what monitoring and observabilit
   go_memstats_alloc_bytes                                 # heap allocations
   rate(go_gc_duration_seconds_sum[5m])                    # GC pressure
   ```
+
 - **Datadog** — Check APM traces, error tracking, and infrastructure metrics. Query examples:
+
   ```
   avg:trace.http.request.duration{service:myapp} by {resource_name}
   sum:trace.http.request.errors{service:myapp}.as_count()
   avg:runtime.go.num_goroutine{service:myapp}
   ```
+
 - **Sentry** — Check for captured exceptions, breadcrumbs, and error grouping. Sentry often captures the full stack trace and context of the first occurrence.
 - **ELK (Elasticsearch + Logstash + Kibana)** — Search structured logs for error patterns:
+
   ```
   level:error AND service:myapp AND @timestamp:[now-1h TO now]
   ```
+
 - **OpenTelemetry / Jaeger / Zipkin** — Check distributed traces for latency breakdowns across services, failed spans, and propagation issues.
 
 If the user has an MCP server for any of these tools (Datadog MCP, Grafana MCP, etc.), suggest using it for interactive queries. Otherwise, suggest manual checks via their web UI or CLI.

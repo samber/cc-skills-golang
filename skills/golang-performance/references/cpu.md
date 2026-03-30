@@ -280,7 +280,7 @@ go build -tags=nosimd -o app-safe .                # Fallback everywhere
 - Auto-vectorization covers the most common cases (simple numeric loops)
 - If your bottleneck is allocations or I/O, SIMD won't help
 
-**Recommendation:** Start with auto-vectorization. For Go 1.26+, evaluate `simd/archsimd` for AMD64-only workloads (remembering it's experimental). Move to runtime detection (option 2 below) if profiling shows a bottleneck and the code needs to run on heterogeneous hardware. Only use compile-time selection (option 3) if you control the deployment environment and can test per-binary variant.
+**Recommendation:** Start with auto-vectorization. For Go 1.26+, evaluate `simd/archsimd` for AMD64-only workloads (remembering it's experimental). Move to runtime detection (option 2 above) if profiling shows a bottleneck and the code needs to run on heterogeneous hardware. Only use compile-time selection (option 3) if you control the deployment environment and can test each per-binary variant.
 
 Only invest in hand-written SIMD when profiling shows a numeric inner loop consuming >20% of CPU and the compiler isn't auto-vectorizing it.
 

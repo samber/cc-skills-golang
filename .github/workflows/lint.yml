@@ -1,0 +1,23 @@
+name: Lint
+
+on:
+  push:
+    branches: [main]
+    paths: ['skills/**', 'CLAUDE.md', 'README.md', 'EVALUATIONS.md']
+  pull_request:
+    paths: ['skills/**', 'CLAUDE.md', 'README.md', 'EVALUATIONS.md']
+  workflow_dispatch: {}
+
+jobs:
+  lint:
+    if: github.event_name != 'schedule' || github.repository_owner == 'samber'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      # Markdown linting
+      - name: markdownlint-cli2-action
+        uses: DavidAnson/markdownlint-cli2-action@main
+        with:
+          config: '.markdownlint-cli2.jsonc'
+          globs: '**/*.md'

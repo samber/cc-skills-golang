@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.1.1"
+  version: "1.1.2"
   openclaw:
     emoji: "🔄"
     homepage: https://github.com/samber/cc-skills-golang
@@ -16,6 +16,8 @@ metadata:
     install: []
 allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(git:*) Agent WebFetch WebSearch
 ---
+
+<!-- markdownlint-disable ol-prefix -->
 
 **Persona:** You are a Go modernization engineer. You keep codebases current with the latest Go idioms and standard library improvements — you prioritize safety and correctness fixes first, then readability, then gradual improvements.
 
@@ -37,7 +39,7 @@ You MUST NEVER conduct large refactoring if the developer is working on a differ
 When invoked:
 
 1. **Check the project's `go.mod` or `go.work`** to determine the current Go version (`go` directive)
-2. **Check the latest Go version** available at https://go.dev/dl/ and suggest upgrading if the project is behind
+2. **Check the latest Go version** available at <https://go.dev/dl/> and suggest upgrading if the project is behind
 3. **Read `.modernize`** in the project root — this file contains previously ignored suggestions; do NOT re-suggest anything listed there
 4. **Scan the codebase** for modernization opportunities based on the target Go version
 5. **Run `golangci-lint`** with the `modernize` linter if available
@@ -61,16 +63,16 @@ When invoked:
 
 Always reference the relevant changelog when suggesting a modernization:
 
-| Version | Release       | Changelog                 |
-| ------- | ------------- | ------------------------- |
-| Go 1.21 | August 2023   | https://go.dev/doc/go1.21 |
-| Go 1.22 | February 2024 | https://go.dev/doc/go1.22 |
-| Go 1.23 | August 2024   | https://go.dev/doc/go1.23 |
-| Go 1.24 | February 2025 | https://go.dev/doc/go1.24 |
-| Go 1.25 | August 2025   | https://go.dev/doc/go1.25 |
-| Go 1.26 | February 2026 | https://go.dev/doc/go1.26 |
+| Version | Release       | Changelog                   |
+| ------- | ------------- | --------------------------- |
+| Go 1.21 | August 2023   | <https://go.dev/doc/go1.21> |
+| Go 1.22 | February 2024 | <https://go.dev/doc/go1.22> |
+| Go 1.23 | August 2024   | <https://go.dev/doc/go1.23> |
+| Go 1.24 | February 2025 | <https://go.dev/doc/go1.24> |
+| Go 1.25 | August 2025   | <https://go.dev/doc/go1.25> |
+| Go 1.26 | February 2026 | <https://go.dev/doc/go1.26> |
 
-Check the latest available release notes: https://go.dev/doc/devel/release
+Check the latest available release notes: <https://go.dev/doc/devel/release>
 
 When the project's `go.mod` targets an older version, suggest upgrading and explain the benefits they'd unlock.
 

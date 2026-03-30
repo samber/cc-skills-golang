@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.1.2"
+  version: "1.1.3"
   openclaw:
     emoji: "📚"
     homepage: https://github.com/samber/cc-skills-golang
@@ -36,9 +36,9 @@ When recommending libraries, prioritize:
 - [Libraries by Category](./references/libraries.md) — vetted third-party libraries for web, database, testing, logging, messaging, and more
 - [Development Tools](./references/tools.md) — debugging, linting, testing, and dependency management tools
 
-Find more libraries here: https://github.com/avelino/awesome-go
+Find more libraries here: <https://github.com/avelino/awesome-go>
 
-This skill is not exhaustive. Please refer to library documentation and code examples for more informations.
+This skill is not exhaustive. Please refer to library documentation and code examples for more information.
 
 ## General Guidelines
 

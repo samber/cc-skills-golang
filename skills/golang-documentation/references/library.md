@@ -43,7 +43,7 @@ Add a `Play:` line in the doc comment:
 func Map[T any, U any](s []T, fn func(T) U) []U {
 ```
 
-When the samber/go-playground-mcp tool is available, use it to create and share playground URLs. Otherwise, create them manually at https://go.dev/play/.
+When the samber/go-playground-mcp tool is available, use it to create and share playground URLs. Otherwise, create them manually at <https://go.dev/play/>.
 
 Guidelines for playground demos:
 
@@ -191,7 +191,7 @@ This is an emerging convention for making projects AI-friendly. Place it alongsi
 
 Make your library findable by AI agents and documentation aggregators:
 
-- **Context7** — https://context7.com — submit your library for inclusion in AI-accessible documentation
-- **DeepWiki** — https://deepwiki.com — auto-generates wiki-style docs from GitHub repos
-- **OpenDeep** — https://opendeep.wiki — open documentation platform for AI consumption
-- **zRead** — https://zread.ai — developer documentation reader
+- **Context7** — <https://context7.com> — submit your library for inclusion in AI-accessible documentation
+- **DeepWiki** — <https://deepwiki.com> — auto-generates wiki-style docs from GitHub repos
+- **OpenDeep** — <https://opendeep.wiki> — open documentation platform for AI consumption
+- **zRead** — <https://zread.ai> — developer documentation reader
