@@ -30,9 +30,6 @@ To check whether a large dependency is actually linked into your binary (vs. onl
 `govulncheck` reports known vulnerabilities that affect your code. It uses static analysis to narrow reports to vulnerabilities in code paths your project actually calls — unlike generic CVE scanners that flag every dependency regardless of usage.
 
 ```bash
-# Install
-go install golang.org/x/vuln/cmd/govulncheck@latest
-
 # Scan source code (most common)
 govulncheck ./...
 
@@ -52,10 +49,9 @@ For CI pipeline integration, see the `samber/cc-skills-golang@golang-continuous-
 
 ## Tracking Outdated Dependencies with go-mod-outdated
 
-```bash
-# Install
-go install github.com/psampaz/go-mod-outdated@latest
+Use `psampaz/go-mod-outdated`.
 
+```bash
 # Show outdated direct dependencies with available updates
 go list -u -m -json all | go-mod-outdated -update -direct
 
@@ -70,18 +66,14 @@ Output columns: MODULE, CURRENT version, WANTED (latest minor/patch), LATEST (la
 
 ## Analyzing Dependency Size with goweight
 
+Use `jondot/goweight`.
+
+`goweight` lists every package linked into the binary sorted by size contribution. Use it to identify bloated dependencies and evaluate whether a lighter alternative exists.
+
 ```bash
-# Install
-go install github.com/jondot/goweight@latest
-
-# Run in your project directory
-goweight
-
-# JSON output for CI tracking
-goweight --json
+goweight          # Sort by size
+goweight --json   # JSON output for CI tracking
 ```
-
-Output lists every package linked into the binary sorted by size contribution. Use this to identify bloated dependencies and evaluate whether a lighter alternative exists.
 
 **Modern alternative**: [go-size-analyzer](https://github.com/Zxilly/go-size-analyzer) (`gsa`) supports ELF, Mach-O, PE, and WebAssembly formats with interactive HTML/SVG visualization:
 

@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.1.2"
+  version: "1.1.3"
   openclaw:
     emoji: "📦"
     homepage: https://github.com/samber/cc-skills-golang
@@ -29,14 +29,12 @@ allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(g
 
 **Before running `go get` to add any new dependency, AI agents MUST ask the user for confirmation.** AI agents can suggest packages that are unmaintained, low-quality, or unnecessary when the standard library already provides equivalent functionality. Using `go get -u` to upgrade an existing dependency is safe.
 
-Before proposing a dependency, present:
+Before proposing a dependency, evaluate:
 
-- Package name and import path
-- What it does and why it's needed
-- Whether the standard library covers the use case
-- GitHub stars, last commit date, and maintenance status (check via `gh repo view`)
-- License compatibility
-- Known alternatives
+- Does the standard library already cover the use case?
+- Is the license compatible?
+- Are there well-known alternatives?
+- What it does and why it's needed?
 
 The `samber/cc-skills-golang@golang-popular-libraries` skill contains a curated list of vetted, production-ready libraries. Prefer recommending packages from that list. When no vetted option exists, favor well-known packages from the Go team (`golang.org/x/...`) or established organizations over obscure alternatives.
 

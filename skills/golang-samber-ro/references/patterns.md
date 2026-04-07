@@ -2,13 +2,13 @@
 
 Real-world patterns for building production reactive pipelines with samber/ro.
 
-## Pattern 1: API Call with Retry and Timeout
+## Pattern 1: Remote Call with Retry and Timeout
 
-Fetch data with automatic retry, exponential backoff, timeout, and fallback.
+Wrap a remote call (HTTP, gRPC, database) with automatic retry, exponential backoff, timeout, and fallback.
 
 ```go
 result := ro.Pipe3(
-    rohttp.GetJSON[User](apiURL),
+    fetchUser(userID),  // ro.Observable[User] — wraps your remote call
     ro.Timeout[User](5*time.Second),
     ro.RetryWithConfig[User](ro.RetryConfig{
         Max:               3,
@@ -17,7 +17,7 @@ result := ro.Pipe3(
         MaxDelay:          5 * time.Second,
     }),
     ro.Catch[User](func(err error) ro.Observable[User] {
-        log.Printf("API failed after retries: %v, using cache", err)
+        log.Printf("remote call failed after retries: %v, using cache", err)
         return getCachedUser(userID)
     }),
 )
@@ -25,32 +25,27 @@ result := ro.Pipe3(
 user, err := ro.Collect(result)
 ```
 
-**Why ro over plain HTTP:** declarative retry + timeout + fallback in 10 lines vs manual for-loops with sleep, context, and error tracking.
+**Why ro over plain calls:** declarative retry + timeout + fallback in 10 lines vs manual for-loops with sleep, context, and error tracking.
 
-## Pattern 2: WebSocket Event Stream (Hot Observable)
+## Pattern 2: Continuous Event Stream (Hot Observable)
 
-Share a single WebSocket connection across multiple consumers.
+Share a single long-lived connection (WebSocket, SSE, message queue) across multiple consumers.
 
 ```go
-// Cold observable wrapping WebSocket
-wsMessages := ro.NewObservable[TickerEvent](func(ctx context.Context, obs ro.Observer[TickerEvent]) error {
-    conn, _, err := websocket.Dial(ctx, wsURL, nil)
-    if err != nil {
-        return err
-    }
-    defer conn.Close(websocket.StatusNormalClosure, "done")
-
+// Cold observable wrapping any event stream source
+eventStream := ro.NewObservable[TickerEvent](func(ctx context.Context, obs ro.Observer[TickerEvent]) error {
+    // connect to your stream source (WebSocket, NATS, Kafka, etc.)
     for {
-        var event TickerEvent
-        if err := wsjson.Read(ctx, conn, &event); err != nil {
+        event, err := streamSource.Read(ctx)
+        if err != nil {
             return err
         }
         obs.Next(event)
     }
 })
 
-// Share: one WebSocket connection, multiple consumers
-shared := ro.Pipe1(wsMessages, ro.Share[TickerEvent]())
+// Share: one connection, multiple consumers
+shared := ro.Pipe1(eventStream, ro.Share[TickerEvent]())
 
 // Consumer 1: update UI
 shared.Subscribe(ro.OnNext(func(e TickerEvent) {
@@ -68,6 +63,8 @@ ro.Pipe1(shared, ro.Filter(func(e TickerEvent) bool {
 })).Subscribe(ro.OnNext(sendAlert))
 ```
 
+The `rohttp` plugin provides WebSocket and HTTP streaming observables (see [Plugin Ecosystem](./plugin-ecosystem.md)).
+
 ## Pattern 3: Fan-In from Multiple Sources
 
 Merge events from multiple independent sources, batch, and process.
@@ -75,8 +72,8 @@ Merge events from multiple independent sources, batch, and process.
 ```go
 combined := ro.Pipe2(
     ro.Merge(
-        httpEventStream,
-        websocketStream,
+        apiStream,
+        pushStream,
         cronScheduleStream,
     ),
     ro.Distinct[Event](),

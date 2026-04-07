@@ -24,8 +24,9 @@ Shows the shortest import path from your code to the module — useful for under
 
 ## Generate a Graph Image with modgraphviz
 
+Use `modgraphviz` from stdlib.
+
 ```bash
-go install golang.org/x/exp/cmd/modgraphviz@latest
 go mod graph | modgraphviz | dot -Tpng -o deps.png
 ```
 
@@ -33,18 +34,13 @@ Green nodes represent versions selected by MVS (in the final build list). Grey n
 
 ## Interactive Visualization with go-mod-graph
 
-[go-mod-graph](https://github.com/samber/go-mod-graph) provides a web-based interactive dependency explorer at [go-mod-graph.samber.dev](https://go-mod-graph.samber.dev):
-
-- Zoomable, navigable dependency graph
-- Module weight display with color-coded size indicators
-- Searchable module list
-- Direct links to pkg.go.dev documentation
-- MVS algorithm visualization
+`go-mod-graph` (samber/go-mod-graph) is a web-based interactive dependency explorer with zoomable graph, module weight indicators, searchable module list, and MVS algorithm visualization.
 
 ## Complementary Analysis
 
+Use `digraph` from stdlib.
+
 ```bash
 # General graph queries on go mod graph output
-go install golang.org/x/tools/cmd/digraph@latest
-go mod graph | digraph reverse github.com/some/module
+go mod graph | digraph reverse example.com/some/module
 ```

@@ -57,7 +57,8 @@ Before optimizing Go code, verify the bottleneck is in your process — if 90% o
 4. **Diagnose** — use the **Diagnose** lines in each deep-dive section to pick the right tool
 5. **Improve** — apply ONE optimization at a time with an explanatory comment
 6. **Compare** — `benchstat /tmp/report-1.txt /tmp/report-2.txt` to confirm statistical significance
-7. **Repeat** — increment report number, tackle next bottleneck
+7. **Commit** — paste the benchstat output in the commit body so reviewers and future readers see the exact improvement; follow the `perf(scope): summary` commit type
+8. **Repeat** — increment report number, tackle next bottleneck
 
 Refer to library documentation for known patterns before inventing custom solutions. Keep all `/tmp/report-*.txt` files as an audit trail.
 

@@ -39,7 +39,7 @@ You MUST NEVER conduct large refactoring if the developer is working on a differ
 When invoked:
 
 1. **Check the project's `go.mod` or `go.work`** to determine the current Go version (`go` directive)
-2. **Check the latest Go version** available at <https://go.dev/dl/> and suggest upgrading if the project is behind
+2. **Check the latest Go version** using the Go Version Changelogs table below and suggest upgrading if the project's `go.mod` is behind
 3. **Read `.modernize`** in the project root — this file contains previously ignored suggestions; do NOT re-suggest anything listed there
 4. **Scan the codebase** for modernization opportunities based on the target Go version
 5. **Run `golangci-lint`** with the `modernize` linter if available
@@ -47,7 +47,7 @@ When invoked:
    - If the developer is actively coding, **only suggest improvements related to the code they are currently working on**. Do not refactor unrelated files. Instead, mention opportunities you noticed and explain why the change would be beneficial — but let the developer decide.
    - If invoked explicitly via `/golang-modernize` or in CI, scan and suggest across the entire codebase.
 7. **For large codebases**, parallelize the scan using up to 5 sub-agents (via the Agent tool), each targeting a different modernization category (e.g. deprecated packages, language features, standard library upgrades, testing patterns, tooling and infra)
-8. **Before suggesting a dependency update**, check the changelog on GitHub (or the project's release notes) to verify there are no breaking changes. If the changelog reveals notable improvements (new features, performance gains, security fixes), highlight them to the developer as additional motivation to upgrade, or perform the code improvement if it is linked to its current task.
+8. **Before suggesting a dependency update**, run `go mod tidy` and the test suite to verify compatibility. Ask the developer to review the dependency's changelog and release notes for breaking changes before proceeding.
 9. **If the developer explicitly ignores a suggestion**, write a short memo to `.modernize` in the project root so it is not suggested again. Format: one line per ignored suggestion, with a short description.
 
 ### `.modernize` file format
@@ -61,7 +61,7 @@ When invoked:
 
 ## Go Version Changelogs
 
-Always reference the relevant changelog when suggesting a modernization:
+Reference the relevant changelog when suggesting a modernization:
 
 | Version | Release       | Changelog                   |
 | ------- | ------------- | --------------------------- |
@@ -72,7 +72,7 @@ Always reference the relevant changelog when suggesting a modernization:
 | Go 1.25 | August 2025   | <https://go.dev/doc/go1.25> |
 | Go 1.26 | February 2026 | <https://go.dev/doc/go1.26> |
 
-Check the latest available release notes: <https://go.dev/doc/devel/release>
+For versions newer than Go 1.26, consult the official Go release notes.
 
 When the project's `go.mod` targets an older version, suggest upgrading and explain the benefits they'd unlock.
 

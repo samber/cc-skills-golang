@@ -56,20 +56,6 @@ daily := rocron.Schedule("0 0 * * *")
 | FSNotify | `plugins/fsnotify` | File system change events                |
 
 ```go
-import rohttp "github.com/samber/ro/plugins/http"
-
-// HTTP GET returning parsed JSON
-response := rohttp.GetJSON[User]("https://api.example.com/user/123")
-
-// With retry and timeout
-result := ro.Pipe2(
-    rohttp.GetJSON[User](url),
-    ro.Timeout[User](5*time.Second),
-    ro.RetryWithConfig[User](ro.RetryConfig{Max: 3, Delay: time.Second}),
-)
-```
-
-```go
 import rofsnotify "github.com/samber/ro/plugins/fsnotify"
 
 // Watch directory for changes

@@ -23,12 +23,12 @@ Automate minor/patch dependency updates to reduce maintenance burden and stay cu
 
 For workflow configuration files (dependabot.yml, renovate.json, auto-merge workflows), see the `samber/cc-skills-golang@golang-continuous-integration` skill.
 
-## AI-driven Updates
+## Update Verification
 
-When an AI agent performs updates, verify before committing:
+Before committing a dependency update:
 
-1. Check changelog for breaking changes and new features
-2. Suggest improvements to your project code based on changelog features and best practices
-3. Run `go test ./...` and `go build ./...`
-4. Scan with `govulncheck ./...`
-5. For major versions, read the migration guide and test thoroughly
+0. Suggest improvements to your project based on changelog features.
+1. Run `go test ./...` and `go build ./...`
+2. Scan with `govulncheck ./...`
+3. Major version upgrades may contain breaking changes — the package's changelog documents them
+4. Adopt new APIs or patterns introduced in the updated version where they improve the codebase

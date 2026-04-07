@@ -29,7 +29,7 @@ allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(g
 
 **Modes:**
 
-- **Setup** — adding CI to a project for the first time: start with the Quick Reference table, then generate workflows in this order: test → lint → security → release. Always check latest action versions before writing YAML.
+- **Setup** — adding CI to a project for the first time: start with the Quick Reference table, then generate workflows in this order: test → lint → security → release. Prefer the latest stable major version for each GitHub Action.
 - **Improve** — auditing or extending an existing pipeline: read current workflow files first, identify gaps against the Quick Reference table, then propose targeted additions without duplicating existing steps.
 
 # Go Continuous Integration
@@ -38,7 +38,7 @@ Set up production-grade CI/CD pipelines for Go projects using GitHub Actions.
 
 ## Action Versions
 
-The versions shown in the examples below are reference versions that may be outdated. Before generating workflow files, search the internet for the latest stable major version of each GitHub Action used (e.g., `actions/checkout`, `actions/setup-go`, `golangci/golangci-lint-action`, `codecov/codecov-action`, `goreleaser/goreleaser-action`, etc.). Use the latest version you find, not the one hardcoded in the examples.
+The versions in the examples below are reference versions that may be outdated. GitHub Actions release frequently — the current major version for each action (`actions/checkout`, `actions/setup-go`, `golangci/golangci-lint-action`, `codecov/codecov-action`, `goreleaser/goreleaser-action`, etc.) may differ from what is shown here.
 
 ## Quick Reference
 

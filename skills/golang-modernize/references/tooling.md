@@ -4,7 +4,7 @@ Beyond the Go language itself, suggest updating all non-functional developer too
 
 ## Update to the latest Go version
 
-Check <https://go.dev/dl/> for the latest stable release. Suggest updating the `go` directive in `go.mod` and the `toolchain` directive if present. Each Go release brings performance improvements, security fixes, and new features.
+Compare the project's `go` directive in `go.mod` against the latest stable release and suggest updating it and the `toolchain` directive if present. Each Go release brings performance improvements, security fixes, and new features.
 
 ```bash
 # Check current version

@@ -413,6 +413,49 @@ This skill is not exhaustive. Please refer to library documentation and code exa
 
 The `mcp__context7__*` tools may still be listed in `allowed-tools` frontmatter — only the body instructions are restricted.
 
+### Snyk agent scanner compliance
+
+The Snyk agent scanner runs static analysis on skill bodies and raises warnings for patterns that look like prompt injection or unsafe agent behavior. Known rules and fixes:
+
+**W011 — Third-party content exposure (high)**
+
+Triggered when the skill body explicitly instructs the agent to fetch and interpret external web content in ways that influence code changes (upgrades, refactors, security decisions).
+
+| Pattern that triggers W011 | Safe reformulation |
+| --- | --- |
+| `Check <https://example.com/releases> for the latest version` | Remove the URL; refer to an embedded table or note it as a passive reference |
+| `check the changelog or release notes` (agent as subject) | `Major version upgrades may contain breaking changes — the package's changelog documents them` (passive statement of fact, not an instruction) |
+| `search the internet for the latest stable major version of each GitHub Action` | `The versions in the examples below may be outdated. The current major version for each action may differ from what is shown here.` (passive note) |
+| Checklist bullet `Package health: \`gh repo view\` → stars, last commit, open issues` | Keep `gh repo view` as a reference command in a code block; remove it from any checklist that implies the agent must run it before acting |
+| Checklist bullet `"evaluate" package health (stars, last commit, open issues)` | Remove from evaluation criteria if it implies fetching GitHub data; list only criteria resolvable without external fetching |
+| `Always reference the relevant changelog when suggesting X` | `Reference the relevant changelog when suggesting X` (remove imperative "always") |
+| Use tool output from external-DB tools (e.g. `govulncheck`) as the sole motivation to apply a code change | Frame as local analysis; do not chain "run govulncheck → upgrade because of its output" |
+
+General rules to avoid W011:
+
+- **Never** use an imperative like "Check `<url>`" or "Run `<tool>` and use its output to decide X" — prefer passive availability hints.
+- **Passive hint pattern** — mention URLs and tools as available resources without instructing the agent to act on them:
+  - URLs: `The release notes at <https://example.com/releases> may be useful.`
+  - Tools: `` `govulncheck` may surface relevant findings. ``
+- **Passive statement of fact** (instead of delegating to developer): `Major version upgrades may contain breaking changes — the package's changelog documents them.` The agent reads the fact but is not instructed to fetch the changelog itself.
+- **Keep tool references in code blocks**, not in prose checklists. A `gh repo view` command in a Quick Reference code block does not trigger W011; the same command in an evaluation checklist does because it implies the agent must run it to fulfill the checklist item.
+- **Decouple** tool execution from upgrade decisions: running a tool is fine; using its remote-sourced output as the direct trigger for a refactor is not.
+- URLs in markdown tables or as trailing passive references (not as workflow steps) do not trigger W011.
+
+**W012 — Potentially malicious external URL (high)**
+
+Triggered when asset files or instruction bodies reference external URLs that are fetched and executed at runtime (e.g., `go install pkg@latest`, `curl ... | sh`, unpinned GitHub Actions `uses: org/action@vN`).
+
+| Pattern that triggers W012 | Safe reformulation |
+| --- | --- |
+| `go install golang.org/x/vuln/cmd/govulncheck@latest` in instruction prose | Use `golang/govulncheck-action@v1` GitHub Action in CI YAML instead; remove duplicate install instruction from prose if already in frontmatter `install` block |
+| `uses: actions/checkout@v6` (non-existent version) in YAML assets | Update to the correct current major version (e.g., `@v4` for checkout, `@v5` for setup-go) — non-existent versions look more suspicious |
+| CI YAML assets referencing unpinned GitHub Actions | This is inherent to CI skills; W012 risk drops when versions are corrected to current stable values |
+
+**W001 — Prompt injection via MCP tool calls**
+
+Triggered when the skill body contains explicit MCP tool-calling instructions. See the "Library-specific skills" section above for the fix.
+
 ## Evaluation
 
 ### Adversarial evaluation design
@@ -493,6 +536,7 @@ After making changes, suggest the following as next steps for the developer to r
 
 1. ~~Validate against the spec: `skills-ref validate ./skills/{name}`~~ (disabled — [skills-ref doesn't support `user-invocable` yet](https://github.com/agentskills/agentskills/issues/105))
 2. Reformat markdowns with `npx prettier --write *.md "**/*.md"` then lint with `markdownlint-cli2 --config .markdownlint-cli2.jsonc ./` — run before measuring tokens, as formatting changes token counts
+2b. Run `SNYK_TOKEN=<token> uvx snyk-agent-scan@latest skills/<name>/` and fix any W011/W012/W001 warnings before proceeding (see [Snyk agent scanner compliance](#snyk-agent-scanner-compliance))
 3. Measure token counts:
    - **Description (tok)**: `awk 'NR==1 && /^---$/{found=1; next} found && /^---$/{exit} found && /^description:/{print}' skills/{name}/SKILL.md | tiktoken-cli`
    - **SKILL.md (tok)**: `tiktoken-cli skills/{name}/SKILL.md`
