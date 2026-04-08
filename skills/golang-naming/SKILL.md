@@ -33,7 +33,7 @@ To ignore a rule, just add a comment to the code.
 
 | Element | Convention | Example |
 | --- | --- | --- |
-| Package | lowercase, single word | `json`, `http`, `tabwriter` |
+| Package | lowercase, single word, _test suffix OK for test files | `json`, `http`, `tabwriter`, `http_test` |
 | File | lowercase, underscores OK | `user_handler.go` |
 | Exported name | UpperCamelCase | `ReadAll`, `HTTPClient` |
 | Unexported | lowerCamelCase | `parseToken`, `userCount` |
