@@ -67,8 +67,6 @@ if ve, ok := errors.AsType[*ValidationError](err); ok {
 }
 ```
 
-
-
 ## Combining Errors with `errors.Join`
 
 `errors.Join` (Go 1.20+) combines multiple independent errors into one. The combined error works with `errors.Is` and `errors.As` — each inner error is inspectable.
