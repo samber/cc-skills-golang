@@ -19,7 +19,7 @@ go get toolchain@latest
 
 ## golangci-lint v2 _(golangci-lint v2.0.0+, March 2025)_
 
-Upgrade to golangci-lint v2. **Migration**: Run `golangci-lint migrate` to convert v1 config to v2. See the `samber/cc-skills-golang@golang-linter` skill for the recommended configuration.
+Upgrade to golangci-lint v2. **Migration**: Run `golangci-lint migrate` to convert v1 config to v2. See the `samber/cc-skills-golang@golang-lint` skill for the recommended configuration.
 
 ## govulncheck _(works best with Go 1.22+)_
 

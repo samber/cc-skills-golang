@@ -29,7 +29,7 @@
 | `golang-performance`            | v1.0.0  | 272        | 100%       | 61%           | +39pp     | 1.64×     |                             |
 | `golang-concurrency`            | v1.0.0  | 62         | 100%       | 61%           | +39pp     | 1.64×     |                             |
 | `golang-code-style`             | v1.0.0  | 83         | **80%**    | 40%           | +40pp     | 2.00×     | **Low with-skill score**    |
-| `golang-linter`                 | v1.0.0  | 51         | 96%        | 55%           | +41pp     | 1.75×     |                             |
+| `golang-lint`                 | v1.0.0  | 51         | 96%        | 55%           | +41pp     | 1.75×     |                             |
 | `golang-grpc`                   | v1.0.0  | 55         | 96%        | 55%           | +42pp     | 1.75×     |                             |
 | `golang-cli`                    | v1.0.0  | 58         | 95%        | 52%           | +43pp     | 1.83×     |                             |
 | `golang-dependency-injection`   | v1.0.0  | 55         | 98%        | 51%           | +47pp     | 1.92×     |                             |
@@ -3072,7 +3072,7 @@
 
 </details>
 
-## `golang-linter` — v1.0.0
+## `golang-lint` — v1.0.0
 
 |             | With Skill      | Without Skill   | Delta     |
 | ----------- | --------------- | --------------- | --------- |

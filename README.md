@@ -168,7 +168,7 @@ These skills are designed as **atomic, cross-referencing units**. A skill may re
 |  | ✅ `golang-dependency-injection` | ⚡ ⚙️ | -47% | 104 | 2,842 | 5,113 |
 |  | ✅ `golang-dependency-management` | ⚡ | -54% | 94 | 1,877 | 4,957 |
 |  | ✅ `golang-structs-interfaces` | ⚡ ⚙️ | -35% | 110 | 2,999 | 2,999 |
-|  | ✅ `golang-linter` | ⚡ | -41% | 119 | 1,714 | 5,493 |
+|  | ✅ `golang-lint` | ⚡ | -41% | 119 | 1,714 | 5,493 |
 |  | ✅ `golang-observability` | ⚡ ⚙️ | -37% | 144 | 2,921 | 18,453 |
 |  | ✅ `golang-performance` | ⚡ 🧠 | -39% | 108 | 1,953 | 17,855 |
 |  | ✅ `golang-popular-libraries` | ⚡ | -30% | 61 | 788 | 4,131 |

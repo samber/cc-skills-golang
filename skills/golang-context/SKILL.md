@@ -80,4 +80,4 @@ func (s *OrderService) Create(ctx context.Context, order Order) error {
 
 ## Enforce with Linters
 
-Many context pitfalls are caught automatically by linters: `govet`, `staticcheck`. → See the `samber/cc-skills-golang@golang-linter` skill for configuration and usage.
+Many context pitfalls are caught automatically by linters: `govet`, `staticcheck`. → See the `samber/cc-skills-golang@golang-lint` skill for configuration and usage.

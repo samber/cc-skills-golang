@@ -187,9 +187,9 @@ Suite methods like `s.Equal()` behave like `assert`. For require: `s.Require().N
 
 ## Linters
 
-Use `testifylint` to catch wrong argument order, assert/require misuse, and more. See `samber/cc-skills-golang@golang-linter` skill.
+Use `testifylint` to catch wrong argument order, assert/require misuse, and more. See `samber/cc-skills-golang@golang-lint` skill.
 
 ## Cross-References
 
 - → See `samber/cc-skills-golang@golang-testing` skill for general test patterns, table-driven tests, and CI
-- → See `samber/cc-skills-golang@golang-linter` skill for testifylint configuration
+- → See `samber/cc-skills-golang@golang-lint` skill for testifylint configuration
