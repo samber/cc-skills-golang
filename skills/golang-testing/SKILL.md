@@ -67,10 +67,11 @@ package mypackage_test
 ### Naming Conventions
 
 ```go
-func TestAdd(t *testing.T) { ... }              // function test
+func TestAdd(t *testing.T) { ... }               // function test
 func TestMyStruct_MyMethod(t *testing.T) { ... } // method test
 func BenchmarkAdd(b *testing.B) { ... }          // benchmark
 func ExampleAdd() { ... }                        // example
+func FuzzAdd(f *testing.F) { ... }               // fuzz test
 ```
 
 ## Table-Driven Tests
