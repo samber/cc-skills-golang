@@ -185,8 +185,8 @@ These skills are designed as **atomic, cross-referencing units**. A skill may re
 | ❌ `golang-spf13-cobra` |  | — | 0 | 0 | 0 |
 | ❌ `golang-spf13-viper` |  | — | 0 | 0 | 0 |
 | ❌ `golang-swagger` |  | — | 0 | 0 | 0 |
-| ❌ `golang-uber-dig` |  | — | 0 | 0 | 0 |
-| ❌ `golang-uber-fx` |  | — | 0 | 0 | 0 |
+| ✅ `golang-uber-dig` | ⚡ | — | 107 | 3,744 | 6,304 |
+| ✅ `golang-uber-fx` | ⚡ | — | 118 | 4,466 | 7,483 |
 | ✅ `golang-samber-do` | ⚡ | -81% | 70 | 1,746 | 3,269 |
 | ✅ `golang-samber-hot` | ⚡ | -54% | 118 | 1,843 | 7,273 |
 | ✅ `golang-samber-lo` | ⚡ | -40% | 155 | 2,410 | 10,031 |
