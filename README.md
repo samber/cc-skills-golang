@@ -185,8 +185,8 @@ These skills are designed as **atomic, cross-referencing units**. A skill may re
 | ❌ `golang-spf13-cobra` |  | — | 0 | 0 | 0 |
 | ❌ `golang-spf13-viper` |  | — | 0 | 0 | 0 |
 | ❌ `golang-swagger` |  | — | 0 | 0 | 0 |
-| ✅ `golang-uber-dig` | ⚡ | — | 107 | 2,264 | 5,904 |
-| ✅ `golang-uber-fx` | ⚡ | — | 118 | 2,499 | 6,747 |
+| ✅ `golang-uber-dig` | ⚡ | -10% | 107 | 2,264 | 5,904 |
+| ✅ `golang-uber-fx` | ⚡ | -5% | 118 | 2,499 | 6,747 |
 | ✅ `golang-samber-do` | ⚡ | -81% | 70 | 1,746 | 3,269 |
 | ✅ `golang-samber-hot` | ⚡ | -54% | 118 | 1,843 | 7,273 |
 | ✅ `golang-samber-lo` | ⚡ | -40% | 155 | 2,410 | 10,031 |
@@ -201,7 +201,7 @@ These skills are designed as **atomic, cross-referencing units**. A skill may re
 
 |             | With Skill          | Without Skill       | Delta     |
 | ----------- | ------------------- | ------------------- | --------- |
-| **Overall** | **3065/3141 (98%)** | **1691/3141 (54%)** | **+44pp** |
+| **Overall** | **3106/3182 (98%)** | **1729/3182 (54%)** | **+44pp** |
 
 See [EVALUATIONS.md](./EVALUATIONS.md) for the full per-skill breakdown.
 

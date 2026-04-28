@@ -47,8 +47,10 @@
 | `golang-modernize`              | v1.0.0  | 76         | 95%        | 34%           | +61pp     | 2.79×     |                             |
 | `golang-samber-slog`            | v1.0.0  | 62         | 92%        | **73%**       | +19pp     | 1.26×     | **Low delta, high without** |
 | `golang-samber-lo`              | v1.0.0  | 86         | 97%        | 57%           | +40pp     | 1.70×     |                             |
+| `golang-uber-fx`                | v1.0.0  | 21         | 100%       | **95%**       | +5pp      | 1.05×     | **Low delta, high without** |
+| `golang-uber-dig`               | v1.0.0  | 20         | 100%       | **90%**       | +10pp     | 1.11×     | **Low delta, high without** |
 | `golang-samber-do`              | v1.0.0  | 53         | 100%       | 19%           | +81pp     | 5.26×     |                             |
-| **Total (35 skills)**           |         | **3141**   | **98%**    | **54%**       | **+44pp** | **1.81×** |                             |
+| **Total (37 skills)**           |         | **3182**   | **98%**    | **55%**       | **+43pp** | **1.78×** |                             |
 
 ## `golang-naming` — v1.0.0
 
@@ -4407,6 +4409,95 @@
 | 25.2 | Warns about breaking changes                                            | <span class="g">✓</span>       | <span class="g">✓</span>                                |
 | 25.3 | Mentions SemVer                                                         | <span class="g">✓</span>       | <span class="r">✗</span> not confident about SemVer     |
 | 25.4 | Does NOT present as fully stable                                        | <span class="g">✓</span>       | <span class="g">✓</span>                                |
+
+</details>
+
+## `golang-uber-dig` — v1.0.0
+
+|             | With Skill         | Without Skill       | Delta     |
+| ----------- | ------------------ | ------------------- | --------- |
+| **Overall** | **20/20 (100%)**   | **18/20 (90%)**     | **+10pp** |
+
+<details>
+<summary>Full breakdown (20 assertions)</summary>
+
+**Model:** Claude Opus 4.7 | **Runs:** 4 evals × 2 configs = 8 subagents | **Grading:** human (assertion-by-assertion)
+
+> **Note:** Preliminary subset of the 11-eval suite in `skills/golang-uber-dig/evals/evals.json` (53 assertions total). The remaining 7 evals cover named values, dig.As, scopes for request-locals, DryRun graph validation, RecoverFromPanics, group flatten, and the fx-vs-dig recommendation. Re-run the full suite via `/skill-creator` for a complete report.
+
+| #    | Assertion                                                                        | With                           | Without                                          |
+| ---- | -------------------------------------------------------------------------------- | ------------------------------ | ------------------------------------------------ |
+|      | **1. param-objects-many-deps** — dig.In for 4+ deps                              | **<span class="g">5/5</span>** | **<span class="g">5/5</span>**                   |
+| 1.1  | Embeds dig.In in the parameter struct                                            | <span class="g">✓</span>       | <span class="g">✓</span>                         |
+| 1.2  | Constructor takes the params struct as a single argument                         | <span class="g">✓</span>       | <span class="g">✓</span>                         |
+| 1.3  | Does NOT keep the long parameter list                                            | <span class="g">✓</span>       | <span class="g">✓</span>                         |
+| 1.4  | Does NOT use a plain struct without dig.In                                       | <span class="g">✓</span>       | <span class="g">✓</span>                         |
+| 1.5  | Mentions readability/maintainability benefit                                     | <span class="g">✓</span>       | <span class="g">✓</span>                         |
+|      | **2. value-groups-for-handlers** — group:"routes"                                | **<span class="g">5/5</span>** | **<span class="g">5/5</span>**                   |
+| 2.1  | Each handler returns dig.Out tagged group:"routes"                               | <span class="g">✓</span>       | <span class="g">✓</span>                         |
+| 2.2  | NewRouter consumes dig.In with []slice tagged group:"routes"                     | <span class="g">✓</span>       | <span class="g">✓</span>                         |
+| 2.3  | Handlers added with c.Provide; no manual slice in main()                         | <span class="g">✓</span>       | <span class="g">✓</span>                         |
+| 2.4  | Does NOT manually assemble the handler slice                                     | <span class="g">✓</span>       | <span class="g">✓</span>                         |
+| 2.5  | Mentions group order is not guaranteed                                           | <span class="g">✓</span>       | <span class="g">✓</span>                         |
+|      | **6. container-not-passed-around** — composition-root only                       | **<span class="g">5/5</span>** | **<span class="g">5/5</span>**                   |
+| 6.1  | Advises against passing *dig.Container into business code                        | <span class="g">✓</span>       | <span class="g">✓</span>                         |
+| 6.2  | Container only at composition root (main / startup)                              | <span class="g">✓</span>       | <span class="g">✓</span>                         |
+| 6.3  | UserHandler takes typed dependencies as constructor parameters                   | <span class="g">✓</span>       | <span class="g">✓</span>                         |
+| 6.4  | Mentions service locator anti-pattern OR explains downside                       | <span class="g">✓</span>       | <span class="g">✓</span>                         |
+| 6.5  | Does NOT show example with container injected into handler                       | <span class="g">✓</span>       | <span class="g">✓</span>                         |
+|      | **8. decorate-not-rewrite** — Decorate vs scope-shadow Provide                   | **<span class="g">5/5</span>** | **<span class="r">3/5</span>**                   |
+| 8.1  | Uses Decorate (c.Decorate / scope.Decorate) on *zap.Logger                       | <span class="g">✓</span>       | <span class="r">✗</span> uses scope.Provide override |
+| 8.2  | Decorator returns log.Named("worker")                                            | <span class="g">✓</span>       | <span class="g">✓</span>                         |
+| 8.3  | Decorate at the worker scope/module, not globally                                | <span class="g">✓</span>       | <span class="g">✓</span>                         |
+| 8.4  | Does NOT modify the original NewLogger constructor                               | <span class="g">✓</span>       | <span class="g">✓</span>                         |
+| 8.5  | Mentions decorator scope semantics (applies to scope and descendants)            | <span class="g">✓</span>       | <span class="r">✗</span> describes scope-override semantics instead |
+
+**Analyst pass:** evals 1, 2, and 6 score 5/5 in both configurations — they test knowledge the base model already has, hitting the "common knowledge" anti-pattern flagged in `CLAUDE.md`. Only eval 8 differentiates the skill: the without-skill agent reaches for `scope.Provide` shadowing (which would create a circular dependency at resolution time), while the skill steers to the correct `Decorate` API. Future iterations should redesign evals 1, 2, 6 to target subtler guidance and add cases the model gets wrong without the skill.
+
+</details>
+
+## `golang-uber-fx` — v1.0.0
+
+|             | With Skill         | Without Skill       | Delta     |
+| ----------- | ------------------ | ------------------- | --------- |
+| **Overall** | **21/21 (100%)**   | **20/21 (95%)**     | **+5pp**  |
+
+<details>
+<summary>Full breakdown (21 assertions)</summary>
+
+**Model:** Claude Opus 4.7 | **Runs:** 4 evals × 2 configs = 8 subagents | **Grading:** human (assertion-by-assertion)
+
+> **Note:** Preliminary subset of the 11-eval suite in `skills/golang-uber-fx/evals/evals.json` (56 assertions total). The remaining 7 evals cover fx.Annotate vs fx.Out, fx.Module organization, fx.Supply, value groups, fxevent.ZapLogger, manual lifecycle for CLI embedding, and the fx-vs-dig recommendation. Re-run the full suite via `/skill-creator` for a complete report.
+
+| #    | Assertion                                                                        | With                           | Without                                          |
+| ---- | -------------------------------------------------------------------------------- | ------------------------------ | ------------------------------------------------ |
+|      | **1. lifecycle-not-init** — OnStart with goroutine                               | **<span class="g">6/6</span>** | **<span class="g">6/6</span>**                   |
+| 1.1  | Injects fx.Lifecycle into NewHTTPServer                                          | <span class="g">✓</span>       | <span class="g">✓</span>                         |
+| 1.2  | lc.Append with fx.Hook (OnStart starts server, OnStop calls Shutdown)            | <span class="g">✓</span>       | <span class="g">✓</span>                         |
+| 1.3  | OnStart launches srv.Serve in a goroutine                                        | <span class="g">✓</span>       | <span class="g">✓</span>                         |
+| 1.4  | Does NOT call srv.Serve directly inside the constructor                          | <span class="g">✓</span>       | <span class="g">✓</span>                         |
+| 1.5  | Does NOT use init() to start the server                                          | <span class="g">✓</span>       | <span class="g">✓</span>                         |
+| 1.6  | OnStop calls srv.Shutdown(ctx) for graceful shutdown                             | <span class="g">✓</span>       | <span class="g">✓</span>                         |
+|      | **5. fxtest-with-populate** — fxtest.New + fx.Populate                           | **<span class="g">5/5</span>** | **<span class="g">5/5</span>**                   |
+| 5.1  | Uses fxtest.New(t, ...) instead of fx.New                                        | <span class="g">✓</span>       | <span class="g">✓</span>                         |
+| 5.2  | Uses fx.Populate(&svc) to extract *UserService                                   | <span class="g">✓</span>       | <span class="g">✓</span>                         |
+| 5.3  | Calls app.RequireStart() and app.RequireStop()                                   | <span class="g">✓</span>       | <span class="g">✓</span>                         |
+| 5.4  | Provides a fake Database (interface, not real DB)                                | <span class="g">✓</span>       | <span class="g">✓</span>                         |
+| 5.5  | Does NOT use fx.Invoke as the primary extraction mechanism                       | <span class="g">✓</span>       | <span class="g">✓</span>                         |
+|      | **6. replace-for-fakes** — fx.Replace with fx.Annotate(fx.As)                    | **<span class="g">5/5</span>** | **<span class="r">4/5</span>**                   |
+| 6.1  | Uses fx.Replace (or fx.Decorate) inside fxtest.New                               | <span class="g">✓</span>       | <span class="g">✓</span> uses fx.Decorate        |
+| 6.2  | Composes ProductionModule alongside the override; module unchanged               | <span class="g">✓</span>       | <span class="g">✓</span>                         |
+| 6.3  | Uses fx.Annotate with fx.As(new(Database)) for interface binding                 | <span class="g">✓</span>       | <span class="r">✗</span> mentions but does not use |
+| 6.4  | Does NOT modify or duplicate the production module                               | <span class="g">✓</span>       | <span class="g">✓</span>                         |
+| 6.5  | Mentions Replace/Decorate is appropriate for tests                               | <span class="g">✓</span>       | <span class="g">✓</span>                         |
+|      | **10. onstart-non-blocking** — long-running work in goroutine                    | **<span class="g">5/5</span>** | **<span class="g">5/5</span>**                   |
+| 10.1 | OnStart launches the long-running method in a goroutine                          | <span class="g">✓</span>       | <span class="g">✓</span>                         |
+| 10.2 | OnStart returns nil quickly without waiting                                      | <span class="g">✓</span>       | <span class="g">✓</span>                         |
+| 10.3 | OnStop signals stop and waits for drain (with timeout)                           | <span class="g">✓</span>       | <span class="g">✓</span>                         |
+| 10.4 | Does NOT call the long-running method synchronously in OnStart                   | <span class="g">✓</span>       | <span class="g">✓</span>                         |
+| 10.5 | Mentions a blocking OnStart hangs the boot                                       | <span class="g">✓</span>       | <span class="g">✓</span>                         |
+
+**Analyst pass:** 3 of 4 evals score equally with and without the skill — the model's baseline knowledge of fx is very strong (lifecycle hooks, fxtest.New, OnStart/goroutine pattern). Only eval 6 differentiates: without the skill the agent picks `fx.Decorate` and skips the `fx.As` interface binding that the production graph requires. This is consistent with a well-known framework where the skill mainly adds value on subtle API choices. Future iterations should target less common patterns: fx.Annotate vs fx.Out trade-offs, fx.Module decorator scoping, fxevent customization, manual lifecycle for CLI embedding.
 
 </details>
 
