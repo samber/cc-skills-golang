@@ -8,7 +8,6 @@ End-to-end examples that go beyond the SKILL.md basics. Each recipe is self-cont
 package main
 
 import (
-    "context"
     "fmt"
     "log"
     "net/http"
@@ -80,7 +79,6 @@ func main() {
     if err != nil {
         log.Fatal(err)
     }
-    _ = context.Background
 }
 
 func must(err error) {
@@ -164,7 +162,7 @@ root := dig.New()
 must(root.Provide(NewLogger))
 must(root.Provide(NewDB))
 
-func handle(req *http.Request, w http.ResponseWriter) {
+func handle(w http.ResponseWriter, req *http.Request) {
     scope := root.Scope("request")
 
     // Request-scoped values
