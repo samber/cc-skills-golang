@@ -104,6 +104,7 @@ func TestProductionGraph(t *testing.T) {
 When you want to assert on lifecycle behavior, route fx events into an in-memory observer:
 
 ```go
+// go.uber.org/zap/zaptest/observer
 core, recorded := observer.New(zap.InfoLevel)
 log := zap.New(core)
 
@@ -137,7 +138,7 @@ func TestNewServer_OnStartFailsBindError(t *testing.T) {
 
     NewHTTPServer(lc, zaptest.NewLogger(t), cfg)
 
-    // Start should fail because the address is already bound.
+    // Use Start directly (not RequireStart) so we can assert the error.
     require.Error(t, lc.Start(context.Background()))
 }
 ```

@@ -120,6 +120,7 @@ if err := app.Stop(stopCtx); err != nil {
 | `fx.StopHook(fn)`                            | Adapt a simple Stop function                  |
 | `fx.StartStopHook(start, stop)`              | Pair of simple Start/Stop functions           |
 | `fx.StartTimeout(d)`, `fx.StopTimeout(d)`    | Override default 15s lifecycle timeouts       |
+| `fx.ErrorHook(h)`                            | Intercept lifecycle errors (e.g. failed OnStart) for alerting or cleanup |
 
 ### Logging & Testing
 

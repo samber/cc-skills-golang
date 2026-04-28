@@ -30,7 +30,11 @@ requestScope.Decorate(func(l *zap.Logger) *zap.Logger {
 })
 ```
 
-By default, providers registered to a scope are private to that scope and its children. Use `dig.Export(true)` if a scope-registered provider must be visible from the root.
+By default, providers registered to a scope are private to that scope and its children. Pass `dig.Export(true)` to `Provide` inside a scope to make the type visible from the parent:
+
+```go
+requestScope.Provide(NewSharedCache, dig.Export(true))
+```
 
 ## Optional Dependencies
 
@@ -85,7 +89,7 @@ _ = dig.Visualize(c, f)
 | `c.Invoke(fn, opts...)`          | Run a function with injected dependencies                |
 | `c.Decorate(fn, opts...)`        | Modify a previously-provided value within a scope        |
 | `c.Scope(name, opts...)`         | Create a child scope (private providers by default)      |
-| `c.String()`                     | Pretty-print the dependency graph for debugging          |
+| `c.String()`                     | Human-readable text summary of providers (not DOT; use `dig.Visualize` for DOT) |
 
 ### Provide options
 

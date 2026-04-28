@@ -161,6 +161,7 @@ A child scope inherits its parent's providers but adds request-local ones:
 root := dig.New()
 must(root.Provide(NewLogger))
 must(root.Provide(NewDB))
+must(root.Provide(NewHandler)) // *Handler is shared; the scope inherits it
 
 func handle(w http.ResponseWriter, req *http.Request) {
     scope := root.Scope("request")
