@@ -127,7 +127,8 @@ If a constructor returns a value *and* registers a hook, you often want to test 
 ```go
 func TestNewServer_OnStartFailsBindError(t *testing.T) {
     // Bind a port so :0 is unavailable... no, simpler: pre-bind and pass that addr
-    listener, _ := net.Listen("tcp", "127.0.0.1:0")
+    listener, err := net.Listen("tcp", "127.0.0.1:0")
+    require.NoError(t, err)
     defer listener.Close()
     addr := listener.Addr().String()
 

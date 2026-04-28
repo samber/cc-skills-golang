@@ -40,7 +40,11 @@ func NewUserRoute(repo *UserRepo) RouteResult {
     return RouteResult{Route: Route{
         Pattern: "/users",
         Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-            users, _ := repo.List(r.Context())
+            users, err := repo.List(r.Context())
+            if err != nil {
+                http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+                return
+            }
             fmt.Fprintf(w, "%d users", len(users))
         }),
     }}
