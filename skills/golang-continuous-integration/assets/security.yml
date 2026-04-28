@@ -35,7 +35,13 @@ jobs:
       - name: Run gosec
         uses: securego/gosec@v2
         with:
-          args: ./...
+          args: -no-fail -fmt sarif -out gosec-results.sarif ./...
+
+      - name: Upload gosec results
+        if: always()
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: gosec-results.sarif
 
   codeql:
     name: CodeQL
@@ -65,3 +71,12 @@ jobs:
 
       - name: Bearer Security Scan
         uses: bearer/bearer-action@v2
+        with:
+          format: sarif
+          output: bearer-results.sarif
+
+      - name: Upload Bearer results
+        if: always()
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: bearer-results.sarif

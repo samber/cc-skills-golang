@@ -8,6 +8,9 @@ on:
     paths: ['skills/**', 'CLAUDE.md', 'README.md', 'EVALUATIONS.md', '.markdownlint-cli2.jsonc', '.github/workflows/lint.yml']
   workflow_dispatch: {}
 
+permissions:
+  contents: read
+
 jobs:
   lint:
     if: github.event_name != 'schedule' || github.repository_owner == 'samber'

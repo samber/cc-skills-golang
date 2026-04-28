@@ -233,3 +233,4 @@ Many rules are enforced automatically: `gofmt`, `gofumpt`, `goimports`, `gocriti
 - → See the `samber/cc-skills-golang@golang-structs-interfaces` skill for pointer vs value receivers, interface design
 - → See the `samber/cc-skills-golang@golang-design-patterns` skill for functional options, builders, constructors
 - → See the `samber/cc-skills-golang@golang-lint` skill for automated formatting enforcement
+- → See `samber/cc-skills-golang@golang-continuous-integration` skill for automated AI-driven code review in CI using these guidelines

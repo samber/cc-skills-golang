@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.1.3"
+  version: "1.1.4"
   openclaw:
     emoji: "🔒"
     homepage: https://github.com/samber/cc-skills-golang
@@ -170,6 +170,8 @@ See **[Security Architecture](./references/architecture.md)** for detailed anti-
 ## Cross-References
 
 See `samber/cc-skills-golang@golang-database`, `samber/cc-skills-golang@golang-safety`, `samber/cc-skills-golang@golang-observability`, `samber/cc-skills-golang@golang-continuous-integration` skills.
+
+- → See `samber/cc-skills-golang@golang-continuous-integration` skill for automated AI-driven code review in CI using these guidelines
 
 ## Additional Resources
 

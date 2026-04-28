@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.1.3"
+  version: "1.1.4"
   openclaw:
     emoji: "🔄"
     homepage: https://github.com/samber/cc-skills-golang
@@ -143,7 +143,8 @@ When modernizing a codebase, prioritize changes by impact:
 23. Add `govulncheck` to CI pipeline
 24. Set up monthly modernization CI pipeline
 25. Evaluate `encoding/json/v2` for new code _(Go 1.25+, experimental)_
+26. Set up AI-driven code review in CI — loads these skills to guide review per area; see `samber/cc-skills-golang@golang-continuous-integration`
 
 ## Related Skills
 
-See `samber/cc-skills-golang@golang-concurrency`, `samber/cc-skills-golang@golang-testing`, `samber/cc-skills-golang@golang-observability`, `samber/cc-skills-golang@golang-error-handling`, `samber/cc-skills-golang@golang-lint` skills.
+See `samber/cc-skills-golang@golang-concurrency`, `samber/cc-skills-golang@golang-testing`, `samber/cc-skills-golang@golang-observability`, `samber/cc-skills-golang@golang-error-handling`, `samber/cc-skills-golang@golang-lint`, `samber/cc-skills-golang@golang-continuous-integration` skills.

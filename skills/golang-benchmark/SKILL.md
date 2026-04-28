@@ -99,6 +99,37 @@ go test -bench=BenchmarkEncode -benchmem -count=10 ./pkg/... | tee bench.txt
 
 **Output format:** `BenchmarkEncode/size=64-8  5000000  230.5 ns/op  128 B/op  2 allocs/op` — the `-8` suffix is GOMAXPROCS, `ns/op` is time per operation, `B/op` is bytes allocated per op, `allocs/op` is heap allocation count per op.
 
+## Documenting Results in Commits
+
+Paste benchstat output in the commit body when the change has a measurable performance impact. This documents _why_ an optimization was made, prevents future readers from reverting it, and lets reviewers verify the claim without re-running benchmarks.
+
+Commit format:
+
+```
+perf(parser): reduce Parse allocations 50% with sync.Pool
+
+Replace per-call []byte allocation with a pooled buffer.
+
+goos: linux / goarch: amd64 / cpu: AMD Ryzen 9 5950X
+          │    old     │              new               │
+          │  sec/op    │  sec/op     vs base            │
+Parse-32    4.592µ ± 2%  3.041µ ± 1%  -33.78% (p=0.000 n=10)
+
+          │   old    │             new              │
+          │   B/op   │   B/op     vs base           │
+Parse-32   1.024Ki ± 0%  0.512Ki ± 0%  -50.00% (p=0.000 n=10)
+
+          │ old  │            new             │
+          │ allocs/op │ allocs/op  vs base    │
+Parse-32   12.00 ± 0%   6.000 ± 0%  -50.00% (p=0.000 n=10)
+```
+
+**Rules:**
+- Only include benchmarks directly affected by the change — strip unrelated rows
+- Never paste results with `~` (no statistical significance) — the improvement cannot be claimed
+- Include the hardware context line (`goos/goarch/cpu`) so results are reproducible
+- Use `perf(scope):` commit type for performance-only changes
+
 ## Profiling from Benchmarks
 
 Generate profiles directly from benchmark runs — no HTTP server needed:

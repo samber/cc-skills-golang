@@ -540,6 +540,12 @@ Also update the **Summary table** at the top of `EVALUATIONS.md`: add a new row 
 
 ## Workflows
 
+### Working in worktrees
+
+All implementation work MUST happen in a git worktree in `.claude/worktrees/`, never directly on the checked-out branch.
+
+Before starting any task, propose a branch name and ask the developer to confirm. Also run `git worktree list` first — if an existing worktree covers the same skill or a closely related topic, suggest reusing it and let the developer decide.
+
 ### After updating a skill
 
 After making changes, suggest the following as next steps for the developer to run. Do NOT execute these automatically.

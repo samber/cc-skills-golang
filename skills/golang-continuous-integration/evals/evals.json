@@ -181,5 +181,71 @@
       {"id": "13.4", "text": "Configures patch coverage target for new code in PRs"},
       {"id": "13.5", "text": "Coverage upload is conditional on a single matrix entry (e.g., only on stable)"}
     ]
+  },
+  {
+    "id": 14,
+    "name": "ai-review-workflow-setup",
+    "description": "Tests whether the model recommends Claude Code Action or Copilot with skills for AI-driven PR review, rather than generic tools or manual checklists",
+    "prompt": "I want to add AI-powered code review to my Go project's CI pipeline. How do I set it up?",
+    "trap": "Model may suggest generic tools (CodeRabbit, PR-Agent, Reviewdog) or manual checklists instead of Claude Code Action / Copilot with Go skills loaded",
+    "assertions": [
+      {"id": "14.1", "text": "Recommends using anthropics/claude-code-action or GitHub Copilot for AI review"},
+      {"id": "14.2", "text": "Mentions installing Go skills via 'npx skills add' so the agent loads skill-based review guidelines"},
+      {"id": "14.3", "text": "Workflow includes pull-requests: write permission for inline PR comments"},
+      {"id": "14.4", "text": "References review areas mapped to specific Go skills (golang-security, golang-concurrency, etc.)"},
+      {"id": "14.5", "text": "References the claude-code-review.yml or copilot-review-instructions.md asset"}
+    ]
+  },
+  {
+    "id": 15,
+    "name": "ai-review-vs-linting",
+    "description": "Tests whether the model explains that AI review complements linting by catching issues linters cannot detect",
+    "prompt": "I already have golangci-lint, govulncheck, and CodeQL in my CI. Why would I also need AI code review?",
+    "trap": "Model may say linting is sufficient or treat AI review as a luxury, failing to explain the complementary value",
+    "assertions": [
+      {"id": "15.1", "text": "Explains that AI review catches architectural drift and logic bugs that static analysis misses"},
+      {"id": "15.2", "text": "Mentions at least one concrete example: missing error context, goroutine leaks, broken contracts, or design issues"},
+      {"id": "15.3", "text": "Positions AI review as a complement to linting, not a replacement"},
+      {"id": "15.4", "text": "Notes that AI agents loaded with Go skills apply the same expertise as a senior Go reviewer"}
+    ]
+  },
+  {
+    "id": 16,
+    "name": "ai-review-prompt-customization",
+    "description": "Tests whether the model explains how to scope the review prompt and apply the priority guidance",
+    "prompt": "Our Go project CI is slow. We want AI review but only for security and correctness issues — not style or documentation. How do we configure this?",
+    "trap": "Model may keep all 12 review areas or not know about the 4-job structure that can be selectively disabled",
+    "assertions": [
+      {"id": "16.1", "text": "Suggests removing or disabling the 'quality' job (style, naming, documentation) from the workflow"},
+      {"id": "16.2", "text": "Recommends keeping the 'correctness' and 'security' jobs as blocking-first areas"},
+      {"id": "16.3", "text": "Mentions the depth vs. speed tradeoff: fewer jobs = faster feedback, lower API cost"},
+      {"id": "16.4", "text": "References the priority guidance: Security, Code safety, Error handling, Concurrency are blocking-first"}
+    ]
+  },
+  {
+    "id": 17,
+    "name": "ai-review-claude-vs-copilot",
+    "description": "Tests whether the model clearly differentiates Claude Code Action (GitHub Actions workflow) from Copilot (copilot-instructions.md) and their respective setups",
+    "prompt": "We use both GitHub Copilot and Claude Code in our team. Can we use both for CI code review? What's the difference?",
+    "trap": "Model may conflate the two setups, not know about copilot-instructions.md, or miss that Claude uses /golang-* syntax while Copilot uses golang-* without slash",
+    "assertions": [
+      {"id": "17.1", "text": "Explains Claude Code review runs as a GitHub Actions workflow using anthropics/claude-code-action"},
+      {"id": "17.2", "text": "Explains Copilot review uses .github/copilot-instructions.md to configure the review prompt"},
+      {"id": "17.3", "text": "Notes that both require installing Go skills so the AI loads skill-based guidelines"},
+      {"id": "17.4", "text": "Correctly describes that both can coexist — they run independently and complement each other"}
+    ]
+  },
+  {
+    "id": 18,
+    "name": "ai-review-permissions-security",
+    "description": "Tests whether the model correctly identifies required permissions and security implications of the AI review workflow",
+    "prompt": "Our security team is concerned about giving an AI workflow write access to pull requests. What permissions does the Claude Code review workflow actually need and why?",
+    "trap": "Model may not know the minimal permission set, may suggest contents: write (too broad), or may not warn about fork PR risks",
+    "assertions": [
+      {"id": "18.1", "text": "Identifies pull-requests: write as required for posting inline review comments"},
+      {"id": "18.2", "text": "Identifies contents: read as sufficient for reading the repository code"},
+      {"id": "18.3", "text": "Does NOT suggest contents: write (that would be excessive for a review-only workflow)"},
+      {"id": "18.4", "text": "Warns about fork PR security: untrusted code in forks can access the ANTHROPIC_API_KEY secret if the workflow triggers on pull_request_target without careful guards"}
+    ]
   }
 ]

@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.1.1"
+  version: "1.1.2"
   openclaw:
     emoji: "⚠️"
     homepage: https://github.com/samber/cc-skills-golang
@@ -73,6 +73,7 @@ When auditing error handling across a large codebase, use up to 5 parallel sub-a
 - → See `samber/cc-skills-golang@golang-observability` for structured logging setup, log levels, and request logging middleware
 - → See `samber/cc-skills-golang@golang-safety` for nil interface trap and nil error comparison pitfalls
 - → See `samber/cc-skills-golang@golang-naming` for error naming conventions (ErrNotFound, PathError)
+- → See `samber/cc-skills-golang@golang-continuous-integration` skill for automated AI-driven code review in CI using these guidelines
 
 ## References
 

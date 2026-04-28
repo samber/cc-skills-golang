@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.1.1"
+  version: "1.1.2"
   openclaw:
     emoji: "🛡️"
     homepage: https://github.com/samber/cc-skills-golang
@@ -265,3 +265,7 @@ Many safety pitfalls are caught automatically by linters: `errcheck`, `forcetype
 | Returning internal slice/map reference | Callers can mutate your struct's internals through the shared backing array. Return a defensive copy |
 | Multiple `init()` with ordering assumptions | `init()` execution order across files is unspecified. → See `samber/cc-skills-golang@golang-design-patterns` — use explicit constructors |
 | Blocking forever on nil channel | Nil channels block on both send and receive. Always initialize before use |
+
+## Cross-References
+
+- → See `samber/cc-skills-golang@golang-continuous-integration` skill for automated AI-driven code review in CI using these guidelines

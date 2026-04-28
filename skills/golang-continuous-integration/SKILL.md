@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.1.2"
+  version: "1.2.0"
   openclaw:
     emoji: "🚀"
     homepage: https://github.com/samber/cc-skills-golang
@@ -53,6 +53,7 @@ The versions in the examples below are reference versions that may be outdated. 
 | **Docker**    | `docker/build-push-action`  | Multi-platform image builds   |
 | **Deps**      | Dependabot / Renovate       | Automated dependency updates  |
 | **Release**   | GoReleaser                  | Automated binary releases     |
+| **AI Review** | Claude Code / Copilot       | AI-powered PR review          |
 
 ---
 
@@ -210,6 +211,40 @@ After creating workflow files, ALWAYS tell the developer to configure GitHub rep
 
 ---
 
+## AI-Driven Code Review
+
+Add AI agents as PR reviewers alongside traditional static analysis. When loaded with this skill plugin, the agent applies the relevant Go skills per review area — catching architectural drift, logic bugs, missing error context, and concurrency hazards that linters cannot detect.
+
+> **Cost note:** AI review agents run concurrently per PR. For cost control, remove jobs you don't need or raise the PR trigger filter to specific branches only.
+
+### Claude Code
+
+`.github/workflows/ai-review.yml` — see [claude-code-review.yml](./assets/claude-code-review.yml)
+
+The workflow runs parallel jobs, each scoped to a set of review areas and priority level:
+
+| Job             | Areas                                              | Priority         |
+| --------------- | -------------------------------------------------- | ---------------- |
+| `quality`       | Code style, Naming, Documentation, Design patterns | Suggestion-first |
+| `correctness`   | Error handling, Code safety, Concurrency           | Blocking-first   |
+| `security`      | Security, Dependencies                             | Blocking-first   |
+| `quality-depth` | Tests, Performance, Observability, Modernize       | Mixed            |
+
+Depending on your project, also load: `golang-cli`, `golang-context`, `golang-data-structures`, `golang-database`, `golang-dependency-injection`, or any library-specific skill.
+
+Run `/install-github-app` in Claude Code to connect to the Claude API and configure the required secrets.
+
+### GitHub Copilot
+
+Copy skills into your repo, then append [copilot-review-instructions.md](./assets/copilot-review-instructions.md) to `.github/copilot-instructions.md`:
+
+```bash
+npx skills add https://github.com/samber/cc-skills-golang --agent github-copilot --skill '*' -y --copy
+ln -s .agents .copilot
+```
+
+---
+
 ## Common Mistakes
 
 | Mistake | Fix |
@@ -222,7 +257,8 @@ After creating workflow files, ALWAYS tell the developer to configure GitHub rep
 | Not pinning action versions | GitHub Actions MUST use pinned major versions (e.g. `@vN`, not `@master`) |
 | No `permissions` block | Follow least-privilege per job |
 | Ignoring govulncheck findings | Fix or suppress with justification |
+| No AI review in CI | Add Claude Code or Copilot review — catches logic, security, and architectural issues that static analysis misses |
 
 ## Related Skills
 
-See `samber/cc-skills-golang@golang-lint`, `samber/cc-skills-golang@golang-security`, `samber/cc-skills-golang@golang-testing`, `samber/cc-skills-golang@golang-dependency-management` skills.
+See `samber/cc-skills-golang@golang-lint`, `samber/cc-skills-golang@golang-security`, `samber/cc-skills-golang@golang-testing`, `samber/cc-skills-golang@golang-dependency-management`, `samber/cc-skills-golang@golang-modernize` skills.
