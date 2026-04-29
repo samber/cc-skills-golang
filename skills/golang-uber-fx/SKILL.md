@@ -206,7 +206,6 @@ Use `go.uber.org/fx/fxtest` to integrate fx with `*testing.T` (failures call `t.
 - → See `samber/cc-skills-golang@golang-uber-dig` skill for the underlying container, `dig.In`/`dig.Out`, and DI without lifecycle
 - → See `samber/cc-skills-golang@golang-dependency-injection` skill for DI concepts and library comparison
 - → See `samber/cc-skills-golang@golang-samber-do` skill for a generics-based alternative without reflection
-- → See `samber/cc-skills-golang@golang-google-wire` skill for compile-time DI (no runtime container)
 - → See `samber/cc-skills-golang@golang-structs-interfaces` skill for interface design patterns
 - → See `samber/cc-skills-golang@golang-context` skill for context propagation in OnStart/OnStop hooks
 - → See `samber/cc-skills-golang@golang-testing` skill for general testing patterns

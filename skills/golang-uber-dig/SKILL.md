@@ -201,7 +201,6 @@ dig containers are cheap — build a fresh one per test, override providers with
 - → See `samber/cc-skills-golang@golang-uber-fx` skill for application lifecycle, modules, and signal-aware Run() built on top of dig
 - → See `samber/cc-skills-golang@golang-dependency-injection` skill for DI concepts and library comparison
 - → See `samber/cc-skills-golang@golang-samber-do` skill for a generics-based alternative without reflection
-- → See `samber/cc-skills-golang@golang-google-wire` skill for compile-time DI (no runtime container)
 - → See `samber/cc-skills-golang@golang-structs-interfaces` skill for interface design patterns
 - → See `samber/cc-skills-golang@golang-testing` skill for general testing patterns
 
