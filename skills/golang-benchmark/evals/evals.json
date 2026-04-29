@@ -290,15 +290,15 @@
   },
   {
     "id": 22,
-    "name": "memory-leak-detection-with-base",
-    "description": "Tests the workflow for detecting memory leaks using pprof -base comparison",
-    "prompt": "I suspect my Go HTTP service has a memory leak — RSS keeps growing over hours. How do I identify what's leaking?",
-    "trap": "Without the skill, the model may suggest only looking at a single heap snapshot instead of comparing two snapshots over time",
+    "name": "alloc-space-cumulative-trap-for-leak",
+    "description": "Tests that alloc_space is cumulative (includes freed objects) and therefore wrong for leak detection",
+    "prompt": "My Go service's memory keeps growing. I captured a heap profile with:\n\ngo tool pprof -alloc_space http://localhost:6060/debug/pprof/heap\n\nThe top functions show my database layer allocating hundreds of MBs. But when I check the actual process RSS, most of that memory has already been freed. Am I reading this profile correctly?",
+    "trap": "Without the skill, the model validates the use of alloc_space for leak detection, missing that alloc_space is cumulative since program start and includes objects already freed by GC — inuse_space is the correct choice for leak detection",
     "assertions": [
-      {"id": "22.1", "text": "Recommends taking two heap snapshots separated by time (minutes to hours)"},
-      {"id": "22.2", "text": "Uses pprof -base to diff the two snapshots, showing only what grew"},
-      {"id": "22.3", "text": "Specifically recommends -inuse_space profile type for leak detection (not alloc_space)"},
-      {"id": "22.4", "text": "Explains that alloc_space is cumulative since program start and includes freed objects"},
+      {"id": "22.1", "text": "Explains that alloc_space is cumulative since program start — it counts ALL allocations including those already freed by GC"},
+      {"id": "22.2", "text": "Identifies that alloc_space is the wrong profile type for leak detection because freed memory still appears"},
+      {"id": "22.3", "text": "Recommends inuse_space instead — it shows only currently live heap objects, making leaked objects visible"},
+      {"id": "22.4", "text": "Explains the correct leak detection workflow: take two inuse_space snapshots separated by time and compare with pprof -base"},
       {"id": "22.5", "text": "Mentions common leak causes: unbounded caches, maps that never shrink, goroutine leaks holding references"}
     ]
   },
@@ -372,15 +372,16 @@
   },
   {
     "id": 28,
-    "name": "godebug-gctrace-runtime-diagnostics",
-    "description": "Tests knowledge of GODEBUG environment variables for runtime diagnostics",
-    "prompt": "I want to understand my Go service's GC behavior without adding any code or recompiling. Is there a way to get GC diagnostics at runtime?",
-    "trap": "Without the skill, the model may suggest adding runtime.ReadMemStats calls or pprof endpoints requiring code changes",
+    "name": "godebug-gctrace-output-interpretation",
+    "description": "Tests ability to read and interpret a GODEBUG=gctrace=1 output line",
+    "prompt": "I ran my Go service with GODEBUG=gctrace=1 and see lines like:\n\ngc 14 @5.234s 2%: 0.13+1.4+0.21 ms clock, 0.53+0.43/1.1/0+0.85 ms cpu, 24->27->13 MB, 24 MB goal, 0 MB stacks, 0 MB globals, 4 P\n\nWhat does each field mean? Is this GC behavior healthy?",
+    "trap": "Without the skill, the model knows GODEBUG=gctrace exists but cannot interpret the specific output format fields — it guesses or gives vague descriptions",
     "assertions": [
-      {"id": "28.1", "text": "Recommends GODEBUG=gctrace=1 to get GC cycle information without recompiling"},
-      {"id": "28.2", "text": "Describes what gctrace shows: GC frequency, pause times, heap sizes, CPU%"},
-      {"id": "28.3", "text": "Mentions other GODEBUG options like schedtrace for scheduler diagnostics"},
-      {"id": "28.4", "text": "Notes that these are configured via environment variables — no recompile needed"}
+      {"id": "28.1", "text": "Identifies 'gc 14' as the GC cycle number"},
+      {"id": "28.2", "text": "Identifies '@5.234s 2%' as time since program start and CPU percentage spent in GC"},
+      {"id": "28.3", "text": "Identifies '24->27->13 MB' as heap size before GC, heap size at GC trigger, and live heap after GC"},
+      {"id": "28.4", "text": "Identifies '24 MB goal' as the target heap size for the next GC cycle based on the GC pacing algorithm"},
+      {"id": "28.5", "text": "Assesses health: 2% CPU in GC is acceptable (generally <5% is fine); 13MB live vs 24MB goal means 46% overhead headroom"}
     ]
   },
   {
@@ -399,16 +400,16 @@
   },
   {
     "id": 30,
-    "name": "runtime-memmove-diagnosis",
-    "description": "Tests interpretation of runtime.memmove appearing high in CPU profile",
-    "prompt": "Pprof shows `runtime.memmove` taking 20% of CPU. What's causing this and how should I investigate?",
-    "trap": "Without the skill, the model may suggest generic optimization without identifying the specific causes",
+    "name": "top-cum-for-application-callsites",
+    "description": "Tests that top -cum is the correct command to find application code when runtime symbols dominate flat profile",
+    "prompt": "I ran `go tool pprof cpu.prof` and typed `top`. The output is dominated by runtime functions:\n\n1. runtime.memmove  18%\n2. runtime.mallocgc  14%\n3. runtime.gcWriteBarrier  9%\n\nNone of my application code appears in the top 10. My CPU overhead is high. What pprof command should I run next?",
+    "trap": "Without the skill, the model suggests using `web` for the graph view, `list` on a runtime function, or other commands — missing that `top -cum` reveals the application callers who are responsible",
     "assertions": [
-      {"id": "30.1", "text": "Identifies runtime.memmove as large memory copies"},
-      {"id": "30.2", "text": "Lists common causes: slice append growing beyond capacity, copy() of large slices, string-to-byte conversions"},
-      {"id": "30.3", "text": "Recommends pre-allocating slices to final capacity"},
-      {"id": "30.4", "text": "Suggests reusing buffers or working with []byte directly"},
-      {"id": "30.5", "text": "Recommends using top -cum to find the application functions that trigger these memmoves"}
+      {"id": "30.1", "text": "Recommends running `top -cum` (cumulative mode) as the immediate next command"},
+      {"id": "30.2", "text": "Explains that flat time shows where CPU is spent directly; cumulative time shows which application functions called into the expensive runtime functions"},
+      {"id": "30.3", "text": "Explains that runtime.memmove, mallocgc, gcWriteBarrier are symptoms — the application code that triggers them will have high cumulative time"},
+      {"id": "30.4", "text": "Suggests using `list FunctionName` on the top cumulative callers to see the exact lines triggering the expensive runtime calls"},
+      {"id": "30.5", "text": "Does NOT suggest trying to optimize the runtime functions directly"}
     ]
   },
   {
@@ -482,15 +483,16 @@
   },
   {
     "id": 36,
-    "name": "pprof-web-ui-flamegraph",
-    "description": "Tests knowledge of the pprof web UI as an alternative to CLI",
-    "prompt": "I have a CPU profile and the text-based `top` output is hard to navigate for an unfamiliar codebase. Is there a more visual way to explore pprof profiles?",
-    "trap": "Without the skill, the model may only suggest the SVG graph output",
+    "name": "pprof-labels-tagfocus-multitenant",
+    "description": "Tests knowledge of pprof.Do() custom labels and tagfocus for isolating a specific request type in a mixed-workload profile",
+    "prompt": "My Go service handles both API requests and batch jobs in the same process. CPU profiles mix both workloads together so I can't tell if API or batch is causing GC pressure. How can I profile only the API request code path?",
+    "trap": "Without the skill, the model suggests running a separate dedicated process for each workload, or using separate profiles — missing pprof.Do() labels with -tagfocus filtering which solves this in a single profile",
     "assertions": [
-      {"id": "36.1", "text": "Recommends `go tool pprof -http=:8080 cpu.prof` to open the interactive web UI"},
-      {"id": "36.2", "text": "Mentions the flamegraph view as the most intuitive visualization"},
-      {"id": "36.3", "text": "Lists other web UI views: Graph, Top, Source, Disassembly, Peek"},
-      {"id": "36.4", "text": "Notes that filters can be pre-applied with -focus flag when opening the web UI"}
+      {"id": "36.1", "text": "Recommends using pprof.Do() with pprof.Labels() to tag goroutines with a request_type label"},
+      {"id": "36.2", "text": "Shows the pattern: pprof.Do(ctx, pprof.Labels(\"request_type\", \"api\"), func(ctx context.Context) { ... })"},
+      {"id": "36.3", "text": "Shows using -tagfocus=request_type=api when analyzing the profile to filter to only API samples"},
+      {"id": "36.4", "text": "Explains that labels are inherited by the goroutine's profile samples — no need for separate processes"},
+      {"id": "36.5", "text": "Mentions the tags command in pprof interactive mode to see all label keys and their value distributions"}
     ]
   },
   {
@@ -562,15 +564,15 @@
   },
   {
     "id": 42,
-    "name": "assembly-output-heap-allocation-detection",
-    "description": "Tests using assembly output to verify heap allocations in hot paths",
-    "prompt": "I optimized a function to avoid heap allocations but want to verify at the assembly level that no calls to runtime.makeslice or runtime.newobject remain. How?",
-    "trap": "Without the skill, the model may suggest only escape analysis instead of the more definitive assembly inspection",
+    "name": "noinlines-inlined-function-attribution",
+    "description": "Tests that noinlines aggregates inlined function costs to the outer non-inlined caller",
+    "prompt": "My pprof call graph is cluttered. A single hot function has been inlined into 6 different callers, so its cost is split across 6 separate nodes in the graph. I want to see the aggregated cost in one place. What pprof option should I use?",
+    "trap": "Without the skill, the model suggests using show/hide filters or focus (which change display but not cost aggregation) or ignoring inlined nodes — missing the noinlines option which correctly attributes inlined function costs to their first out-of-line caller",
     "assertions": [
-      {"id": "42.1", "text": "Uses `go build -gcflags=\"-S\"` to generate assembly output"},
-      {"id": "42.2", "text": "Shows grepping for CALL runtime.makeslice, runtime.newobject, or runtime.growslice"},
-      {"id": "42.3", "text": "Mentions `go tool objdump` as an alternative for disassembling compiled binaries"},
-      {"id": "42.4", "text": "Mentions `-S` flag for source-interleaved disassembly"}
+      {"id": "42.1", "text": "Recommends the noinlines option (or -noinlines flag)"},
+      {"id": "42.2", "text": "Explains that noinlines attributes inlined function costs to their first out-of-line caller — the inlined nodes are collapsed"},
+      {"id": "42.3", "text": "Shows correct usage: granularity=noinlines in interactive mode or -noinlines as CLI flag"},
+      {"id": "42.4", "text": "Distinguishes noinlines from hide/ignore: hide/ignore only affect display without changing cost attribution"}
     ]
   },
   {
@@ -748,15 +750,16 @@
   },
   {
     "id": 56,
-    "name": "interface-boxing-escape",
-    "description": "Tests understanding of interface boxing as a common escape cause",
-    "prompt": "My escape analysis shows variables escaping to heap at a line where I'm passing a struct to a function that takes an `any` parameter. Why does this cause a heap allocation?",
-    "trap": "Without the skill, the model may not explain the boxing mechanism clearly",
+    "name": "closure-capturing-pointer-escape",
+    "description": "Tests understanding of a subtle escape: a closure capturing a loop variable forces the variable to escape to the heap even when no interface boxing occurs",
+    "prompt": "I have a benchmark and escape analysis shows these local integer variables escaping to the heap:\n\n```go\nfor i := 0; i < 10; i++ {\n    val := computeValue(i)\n    go func() {\n        results[i] = val\n    }()\n}\n```\n\nWhy do `i` and `val` escape to the heap? There are no interface conversions here.",
+    "trap": "Without the skill, the model explains interface boxing (which isn't happening here) or vaguely mentions 'closures cause escapes' without explaining the specific mechanism: the goroutine may outlive the enclosing function, so any variable the closure captures must be heap-allocated to remain accessible",
     "assertions": [
-      {"id": "56.1", "text": "Explains interface boxing: storing a concrete type in interface{}/any allocates a copy on the heap"},
-      {"id": "56.2", "text": "Lists fmt.Sprintf as a common source of interface boxing (arguments boxed into any)"},
-      {"id": "56.3", "text": "Suggests using concrete types instead of interfaces in hot paths to avoid boxing"},
-      {"id": "56.4", "text": "Notes that this is especially impactful in functions called frequently (hot paths)"}
+      {"id": "56.1", "text": "Explains that the goroutine launched with `go func()` may outlive the enclosing function"},
+      {"id": "56.2", "text": "Explains that any variable captured by a closure that escapes (e.g., via goroutine launch or return) must be heap-allocated to remain accessible after the outer function returns"},
+      {"id": "56.3", "text": "Identifies the specific escape cause: `go func()` body references `val` and `i`, so both variables escape via closure capture"},
+      {"id": "56.4", "text": "Distinguishes this from interface boxing — this escape is purely lifetime-based, not type-conversion based"},
+      {"id": "56.5", "text": "Suggests passing variables as arguments to the goroutine function to break the closure capture and avoid escape"}
     ]
   },
   {
@@ -856,15 +859,15 @@
   },
   {
     "id": 64,
-    "name": "benchstat-geomean-interpretation",
-    "description": "Tests understanding of the geomean row in benchstat output",
-    "prompt": "My benchstat output has a 'geomean' row at the bottom showing -15%. What does this row mean and should I trust it?",
-    "trap": "Without the skill, the model may confuse geometric mean with arithmetic mean or misinterpret its purpose",
+    "name": "benchstat-row-col-projection",
+    "description": "Tests knowledge of -row flag to control what appears as rows vs the default grouping",
+    "prompt": "I ran benchmarks for two packages (parser and encoder) with two sub-benchmark parameters each (format=json and format=gob). benchstat mixes everything into one table. I want separate tables per package, with format as columns. What benchstat flags should I use?",
+    "trap": "Without the skill, the model suggests splitting into separate files and running benchstat separately, missing the -table pkg and -col /format flags that combine to produce the desired layout",
     "assertions": [
-      {"id": "64.1", "text": "Explains that geomean is the geometric mean of changes across all benchmarks in the table"},
-      {"id": "64.2", "text": "Notes it represents the overall proportional change"},
-      {"id": "64.3", "text": "States it's useful when comparing many benchmarks at once to get a single summary"},
-      {"id": "64.4", "text": "Cautions that individual benchmarks may differ significantly from the geomean"}
+      {"id": "64.1", "text": "Uses -table pkg to produce a separate table per package"},
+      {"id": "64.2", "text": "Uses -col /format to make format values (json, gob) the column headers"},
+      {"id": "64.3", "text": "Shows the combined command: benchstat -table pkg -col /format bench.txt"},
+      {"id": "64.4", "text": "Explains that -table controls the grouping dimension and -col controls column layout"}
     ]
   },
   {
@@ -882,28 +885,28 @@
   },
   {
     "id": 66,
-    "name": "comparing-across-machines-pitfall",
-    "description": "Tests awareness that benchmark results from different machines are not comparable",
-    "prompt": "I ran benchmarks on my M1 MacBook and my colleague ran them on their AMD desktop. Can we compare these results with benchstat to see who has the faster implementation?",
-    "trap": "Without the skill, the model may proceed with the comparison without warning about incomparability",
+    "name": "benchmark-side-effects-corrupt-results",
+    "description": "Tests awareness that benchmarks with shared mutable state produce non-reproducible and misleading results",
+    "prompt": "I wrote this benchmark to measure LRU cache insertions:\n\n```go\nvar globalCache = NewLRUCache(1000)\n\nfunc BenchmarkCacheInsert(b *testing.B) {\n    for b.Loop() {\n        globalCache.Set(randomKey(), randomValue())\n    }\n}\n```\n\nThe first run shows 45 ns/op. The second run shows 180 ns/op. Why do results vary so much between runs?",
+    "trap": "Without the skill, the model suggests adding b.ResetTimer() or increasing benchtime — missing that shared mutable global state across runs causes the cache to be in different fill states, making each b.N iteration operate on a different cache state (empty, half-full, full with evictions)",
     "assertions": [
-      {"id": "66.1", "text": "Warns that comparing benchmarks across different machines is invalid"},
-      {"id": "66.2", "text": "Explains that different CPUs, memory, OS create incomparable baselines"},
-      {"id": "66.3", "text": "Recommends running both benchmarks on the same machine with the same conditions"},
-      {"id": "66.4", "text": "Notes this as a common benchstat pitfall"}
+      {"id": "66.1", "text": "Identifies that globalCache is mutable shared state — its fill level changes across b.N iterations and across separate runs"},
+      {"id": "66.2", "text": "Explains that early iterations insert into empty slots (fast), while later iterations trigger evictions (slow) — the benchmark measures a mix of two different operations"},
+      {"id": "66.3", "text": "Recommends using b.StopTimer()/b.StartTimer() or b.ResetTimer() with setup per batch, OR pre-filling/resetting the cache state to a known baseline before the benchmark loop"},
+      {"id": "66.4", "text": "Notes that mutable global state in benchmarks produces results that vary by execution order — isolated state inside b.Run sub-benchmarks or per-benchmark setup is the correct pattern"}
     ]
   },
   {
     "id": 67,
-    "name": "b-report-allocs-vs-benchmem",
-    "description": "Tests knowledge of two ways to enable allocation reporting",
-    "prompt": "I want my benchmark to report memory allocations. What are the different ways to enable this?",
-    "trap": "Without the skill, the model may only know one method",
+    "name": "b-reportallocs-only-counts-current-goroutine",
+    "description": "Tests that b.ReportAllocs() only counts allocations on the goroutine running the benchmark, missing allocations from spawned goroutines",
+    "prompt": "I have a benchmark that spawns a goroutine inside the loop to do async work:\n\n```go\nfunc BenchmarkProcess(b *testing.B) {\n    b.ReportAllocs()\n    for b.Loop() {\n        ch := make(chan Result, 1)\n        go worker(ch)  // worker allocates internally\n        <-ch\n    }\n}\n```\n\nThe benchmark reports 1 alloc/op (just the channel). But profiling shows the worker goroutine allocates heavily. Why doesn't ReportAllocs see those?",
+    "trap": "Without the skill, the model says ReportAllocs works correctly or suggests using -benchmem instead — missing that both ReportAllocs and -benchmem only track allocations on the goroutine running the benchmark body, not allocations from child goroutines",
     "assertions": [
-      {"id": "67.1", "text": "Shows b.ReportAllocs() in the benchmark function itself"},
-      {"id": "67.2", "text": "Shows the -benchmem flag on the go test command line"},
-      {"id": "67.3", "text": "Explains that both produce the same B/op and allocs/op output"},
-      {"id": "67.4", "text": "Notes the difference: b.ReportAllocs() is per-benchmark, -benchmem is for all benchmarks in the run"}
+      {"id": "67.1", "text": "Explains that b.ReportAllocs() (and -benchmem) only counts allocations on the goroutine executing the benchmark loop body"},
+      {"id": "67.2", "text": "States that allocations made by the worker goroutine are not attributed to the benchmark goroutine"},
+      {"id": "67.3", "text": "Recommends using a heap profile (-memprofile) to capture all allocations across all goroutines"},
+      {"id": "67.4", "text": "Notes that this is a fundamental limitation of Go's per-goroutine allocation tracking, not a bug in the benchmark infrastructure"}
     ]
   },
   {
@@ -935,15 +938,15 @@
   },
   {
     "id": 70,
-    "name": "cpu-profile-sampling-rate",
-    "description": "Tests knowledge of CPU profile sampling mechanism",
-    "prompt": "How does Go's CPU profiler work under the hood? I'm seeing some fast functions not appear in my profile.",
-    "trap": "Without the skill, the model may not explain the statistical sampling mechanism and its limitations",
+    "name": "cpu-profile-requires-binary-for-symbolization",
+    "description": "Tests knowledge that a CPU profile file captured from a benchmark contains no symbols — the original test binary is required for symbolization",
+    "prompt": "I ran `go test -bench=BenchmarkParse -cpuprofile=cpu.prof ./pkg/parser` on our CI server, then downloaded cpu.prof to my laptop to analyze. When I run `go tool pprof cpu.prof` I see only hex addresses instead of function names. What's missing?",
+    "trap": "Without the skill, the model may suggest rebuilding pprof or using -symbolize=remote — missing that the pprof file is unsymbolized and requires the original compiled test binary (parser.test) to resolve addresses to function names",
     "assertions": [
-      {"id": "70.1", "text": "Explains that CPU profiling uses statistical sampling at 100Hz (100 samples per second)"},
-      {"id": "70.2", "text": "Notes that functions shorter than the sampling interval may not appear in the profile"},
-      {"id": "70.3", "text": "Explains that CPU profiling only captures on-CPU time — off-CPU time (I/O, sleep) is invisible"},
-      {"id": "70.4", "text": "Mentions approximately 5% overhead during CPU profile capture"}
+      {"id": "70.1", "text": "Explains that cpu.prof contains memory addresses, not function names — it requires the compiled test binary for symbolization"},
+      {"id": "70.2", "text": "States that go test -bench also produces a test binary (e.g., parser.test) alongside the profile"},
+      {"id": "70.3", "text": "Shows the correct command: go tool pprof parser.test cpu.prof (pass the binary as the first argument)"},
+      {"id": "70.4", "text": "Recommends downloading both the .prof file AND the corresponding test binary from CI for remote analysis"}
     ]
   },
   {
@@ -961,15 +964,15 @@
   },
   {
     "id": 72,
-    "name": "escape-analysis-fmt-sprintf",
-    "description": "Tests awareness of fmt.Sprintf as a common source of heap allocations",
-    "prompt": "My benchmark shows 3 allocs/op for a function that only formats a string with fmt.Sprintf and returns it. Escape analysis shows heap escapes. Why does a simple string format allocate on the heap?",
-    "trap": "Without the skill, the model may not explain both the interface boxing and string allocation aspects",
+    "name": "gcflags-all-vs-single-package-scope",
+    "description": "Tests understanding of -gcflags=\"all=-m\" vs -gcflags=\"-m\" and when the wider scope matters",
+    "prompt": "I'm investigating unexpected heap allocations in my Go service. I ran `go build -gcflags=\"-m\" ./...` and the escape analysis output only shows my own packages. But I suspect a third-party library function is causing my structs to escape when passed to it. How do I see escape decisions for dependencies too?",
+    "trap": "Without the skill, the model only knows -gcflags=\"-m\" which applies to packages named on the command line, not their dependencies — missing the all= prefix that applies flags to all transitively compiled packages including vendor/module dependencies",
     "assertions": [
-      {"id": "72.1", "text": "Explains that fmt.Sprintf arguments are boxed into any/interface{} (interface boxing)"},
-      {"id": "72.2", "text": "Notes that the result string is also heap-allocated"},
-      {"id": "72.3", "text": "Identifies fmt.Sprintf as a common escape cause in the compiler analysis"},
-      {"id": "72.4", "text": "Suggests alternatives for hot paths: strconv, strings.Builder, or direct byte manipulation"}
+      {"id": "72.1", "text": "Explains that -gcflags=\"-m\" only applies escape analysis to packages explicitly listed on the command line, not their dependencies"},
+      {"id": "72.2", "text": "Shows go build -gcflags=\"all=-m\" ./... to apply escape analysis to ALL compiled packages including dependencies"},
+      {"id": "72.3", "text": "Warns that all=-m produces very verbose output — recommends piping through grep to filter for the specific package or function of interest"},
+      {"id": "72.4", "text": "Notes this is especially useful for diagnosing parameter escapes caused by passing values to functions in external packages that the compiler cannot analyze inline"}
     ]
   },
   {

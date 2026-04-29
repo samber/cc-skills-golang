@@ -30,14 +30,14 @@
   {
     "id": 3,
     "name": "waitgroup-add-placement",
-    "description": "Tests whether wg.Add is called before the go statement, not inside the goroutine",
-    "prompt": "Write a Go function that processes a slice of URLs concurrently and waits for all to complete using sync.WaitGroup. Each goroutine should fetch the URL and store the result.",
-    "trap": "Without the skill, the model might place wg.Add(1) inside the goroutine, creating a race where Wait() returns before Add() runs",
+    "description": "wg.Add before go statement; wg.Add(len(urls)) is preferred over per-goroutine Add(1) when count is known",
+    "prompt": "Review this Go code and identify all WaitGroup issues:\n\n```go\nfunc ProcessURLs(urls []string) []Result {\n    var wg sync.WaitGroup\n    results := make([]Result, len(urls))\n\n    for i, url := range urls {\n        go func(i int, url string) {\n            wg.Add(1)\n            defer wg.Done()\n            results[i] = fetch(url)\n        }(i, url)\n    }\n\n    wg.Wait()\n    return results\n}\n```\n\nFix all issues. Also, is there a more efficient way to add to the WaitGroup when the number of goroutines is known upfront?",
+    "trap": "The most obvious bug (wg.Add inside goroutine) is well-known. The model should also catch the second issue: wg.Add(len(urls)) before the loop is more efficient than N separate wg.Add(1) calls (single atomic update vs N atomic updates). The model likely fixes the placement but may not suggest the batch Add optimization.",
     "assertions": [
-      {"id": "3.1", "text": "Calls wg.Add(1) BEFORE the go statement, not inside the goroutine"},
-      {"id": "3.2", "text": "Calls defer wg.Done() inside the goroutine"},
-      {"id": "3.3", "text": "Calls wg.Wait() after the loop to wait for all goroutines"},
-      {"id": "3.4", "text": "Does not place wg.Add inside the goroutine function body"}
+      {"id": "3.1", "text": "Moves wg.Add(1) BEFORE the go statement — wg.Add inside the goroutine races with wg.Wait(), which can return before all goroutines have registered"},
+      {"id": "3.2", "text": "Suggests using wg.Add(len(urls)) before the loop as a more efficient alternative — a single atomic operation instead of N separate wg.Add(1) calls in the loop"},
+      {"id": "3.3", "text": "Keeps defer wg.Done() inside the goroutine"},
+      {"id": "3.4", "text": "Notes the race condition: wg.Wait() could return before some goroutines have called wg.Add(1), causing ProcessURLs to return with goroutines still running"}
     ]
   },
   {

@@ -5,15 +5,15 @@
       "id": 1,
       "name": "version-constraint-1.21",
       "prompt": "Review this Go code for modernization opportunities. The project targets Go 1.21.\n\n```go\n// go.mod\nmodule example.com/myapp\ngo 1.21\n\n// main.go\npackage main\n\nimport (\n    \"fmt\"\n    \"math/rand\"\n    \"sort\"\n    \"sync\"\n    \"time\"\n)\n\nfunc minInt(a, b int) int {\n    if a < b { return a }\n    return b\n}\n\nfunc maxInt(a, b int) int {\n    if a > b { return a }\n    return b\n}\n\nfunc processItems(items []string) {\n    sort.Strings(items)\n    found := false\n    for _, v := range items {\n        if v == \"target\" { found = true; break }\n    }\n    _ = found\n}\n\nfunc processN(n int) {\n    for i := 0; i < n; i++ {\n        fmt.Println(i)\n    }\n}\n\nfunc startWorkers(items []int) {\n    for _, v := range items {\n        v := v // shadow copy for closure\n        go func() { fmt.Println(v) }()\n    }\n}\n\nvar (\n    once   sync.Once\n    client *int\n)\nfunc getClient() *int {\n    once.Do(func() {\n        c := 42\n        client = &c\n    })\n    return client\n}\n\nfunc main() {\n    rand.Seed(time.Now().UnixNano())\n    n := rand.Intn(100)\n    fmt.Println(minInt(n, 50), maxInt(n, 10))\n    processItems([]string{\"a\", \"b\", \"c\"})\n    processN(10)\n    startWorkers([]int{1, 2, 3})\n}\n```\n\nSuggest all modernization improvements available for this Go version.",
-      "trap": "The project targets Go 1.21. Features like range-over-int (1.22), loop variable fix (1.22), cmp.Or (1.22), and math/rand/v2 (1.22) are NOT available. The skill should only suggest 1.21-compatible changes.",
+      "trap": "The project targets Go 1.21. Features like range-over-int (1.22), loop variable fix (1.22), cmp.Or (1.22), and math/rand/v2 (1.22) are NOT available. The model must only suggest 1.21-compatible changes AND must avoid false positives by staying within version constraints.",
       "assertions": [
         { "id": "1.1", "text": "Suggests min/max builtins to replace minInt/maxInt (available in Go 1.21)" },
         { "id": "1.2", "text": "Suggests slices.Sort or slices.Contains (available in Go 1.21)" },
         { "id": "1.3", "text": "Suggests sync.OnceValue to replace manual sync.Once pattern (available in Go 1.21)" },
-        { "id": "1.4", "text": "Does NOT suggest range-over-int (requires Go 1.22+)" },
-        { "id": "1.5", "text": "Does NOT suggest removing loop variable shadow copy v := v (requires Go 1.22+)" },
-        { "id": "1.6", "text": "Does NOT suggest cmp.Or (requires Go 1.22+)" },
-        { "id": "1.7", "text": "Does NOT suggest math/rand/v2 (requires Go 1.22+)" }
+        { "id": "1.4", "text": "Does NOT suggest range-over-int for processN (requires Go 1.22+)" },
+        { "id": "1.5", "text": "Does NOT suggest removing loop variable shadow copy v := v in startWorkers (requires Go 1.22+)" },
+        { "id": "1.6", "text": "Does NOT suggest math/rand/v2 migration (requires Go 1.22+)" },
+        { "id": "1.7", "text": "Does NOT suggest cmp.Or (requires Go 1.22+)" }
       ]
     },
     {
@@ -74,15 +74,14 @@
     {
       "id": 6,
       "name": "automaxprocs-removal",
-      "prompt": "We just upgraded to Go 1.25. Review our main.go for modernization opportunities.\n\n```go\n// go.mod\nmodule example.com/worker\ngo 1.25\n\nrequire (\n    go.uber.org/automaxprocs v1.5.3\n    go.uber.org/zap v1.27.0\n)\n\n// main.go\npackage main\n\nimport (\n    \"context\"\n    \"fmt\"\n    \"log/slog\"\n    \"sync\"\n\n    _ \"go.uber.org/automaxprocs\"\n)\n\nfunc main() {\n    slog.Info(\"starting worker\")\n\n    var wg sync.WaitGroup\n    items := []string{\"a\", \"b\", \"c\", \"d\", \"e\"}\n\n    for _, item := range items {\n        wg.Add(1)\n        go func() {\n            defer wg.Done()\n            process(item)\n        }()\n    }\n    wg.Wait()\n    slog.Info(\"all items processed\")\n}\n\nfunc process(item string) {\n    fmt.Println(\"processing\", item)\n}\n```\n\nSuggest all modernization improvements.",
-      "trap": "Go 1.25 has built-in container-aware GOMAXPROCS, making uber-go/automaxprocs unnecessary. Also, sync.WaitGroup.Go is available in 1.25.",
+      "prompt": "We just upgraded to Go 1.25. Review our main.go for modernization opportunities.\n\n```go\n// go.mod\nmodule example.com/worker\ngo 1.25\n\nrequire (\n    go.uber.org/automaxprocs v1.5.3\n    go.uber.org/zap v1.27.0\n)\n\n// main.go\npackage main\n\nimport (\n    \"fmt\"\n    \"sync\"\n\n    _ \"go.uber.org/automaxprocs\"\n)\n\nfunc main() {\n    var wg sync.WaitGroup\n    items := []string{\"a\", \"b\", \"c\", \"d\", \"e\"}\n\n    for _, item := range items {\n        wg.Add(1)\n        go func() {\n            defer wg.Done()\n            process(item)\n        }()\n    }\n    wg.Wait()\n}\n\nfunc process(item string) {\n    fmt.Println(\"processing\", item)\n}\n```\n\nSuggest all modernization improvements.",
+      "trap": "Go 1.25 has built-in container-aware GOMAXPROCS, making uber-go/automaxprocs unnecessary. The model must know this Go 1.25 addition — without the skill it will likely treat automaxprocs as still needed and only suggest sync.WaitGroup.Go.",
       "assertions": [
-        { "id": "6.1", "text": "Suggests removing go.uber.org/automaxprocs import" },
-        { "id": "6.2", "text": "Explains that Go 1.25 has built-in container-aware GOMAXPROCS" },
+        { "id": "6.1", "text": "Suggests removing go.uber.org/automaxprocs import and dependency" },
+        { "id": "6.2", "text": "Explains that Go 1.25 has built-in container-aware GOMAXPROCS (or cgroup CPU limits awareness)" },
         { "id": "6.3", "text": "Suggests sync.WaitGroup.Go to replace Add/go func/Done pattern" },
-        { "id": "6.4", "text": "Does NOT suggest keeping the automaxprocs dependency" },
-        { "id": "6.5", "text": "Suggests removing go.uber.org/automaxprocs from go.mod" },
-        { "id": "6.6", "text": "Mentions cgroup CPU limits, container awareness, or Kubernetes context" }
+        { "id": "6.4", "text": "Does NOT suggest keeping the automaxprocs dependency as still necessary" },
+        { "id": "6.5", "text": "Suggests running go mod tidy to remove the dependency from go.sum" }
       ]
     },
     {
@@ -103,24 +102,23 @@
       "id": 8,
       "name": "addcleanup-vs-setfinalizer",
       "prompt": "Review this resource management code for Go 1.24 best practices.\n\n```go\npackage pool\n\nimport (\n    \"database/sql\"\n    \"fmt\"\n    \"runtime\"\n)\n\ntype ManagedConn struct {\n    db   *sql.DB\n    name string\n    dsn  string\n}\n\nfunc NewManagedConn(dsn, name string) (*ManagedConn, error) {\n    db, err := sql.Open(\"postgres\", dsn)\n    if err != nil {\n        return nil, fmt.Errorf(\"opening db: %w\", err)\n    }\n    mc := &ManagedConn{db: db, name: name, dsn: dsn}\n    runtime.SetFinalizer(mc, func(c *ManagedConn) {\n        c.db.Close()\n    })\n    return mc, nil\n}\n\ntype TempFile struct {\n    path string\n    fd   int\n}\n\nfunc NewTempFile(path string, fd int) *TempFile {\n    tf := &TempFile{path: path, fd: fd}\n    runtime.SetFinalizer(tf, func(f *TempFile) {\n        syscallClose(f.fd)\n        osRemove(f.path)\n    })\n    return tf\n}\n\nfunc syscallClose(fd int) {}\nfunc osRemove(path string) {}\n```\n\nModernize the cleanup pattern. Explain why the current approach has problems.",
-      "trap": "runtime.SetFinalizer is deprecated since Go 1.24 in favor of runtime.AddCleanup. SetFinalizer has cycle restrictions and passes the whole object to the finalizer (preventing GC of referenced fields). AddCleanup accepts the resource separately. Without the skill, the model will likely keep SetFinalizer or not know about AddCleanup.",
+      "trap": "runtime.SetFinalizer is deprecated since Go 1.24 in favor of runtime.AddCleanup. The key API difference: AddCleanup takes the resource as a separate argument (not the whole object). Without the skill the model is unlikely to know AddCleanup exists or that SetFinalizer's cycle restriction is the main problem.",
       "assertions": [
         { "id": "8.1", "text": "Replaces runtime.SetFinalizer with runtime.AddCleanup" },
-        { "id": "8.2", "text": "AddCleanup cleanup function receives the resource (db/*sql.DB or fd/int), NOT the wrapper struct" },
-        { "id": "8.3", "text": "Mentions SetFinalizer cycle restriction or deprecation" },
-        { "id": "8.4", "text": "Does NOT pass the whole ManagedConn/TempFile to the cleanup function" },
-        { "id": "8.5", "text": "Correctly attributes runtime.AddCleanup to Go 1.24" },
-        { "id": "8.6", "text": "Handles TempFile cleanup with two separate AddCleanup calls or a struct capturing both resources" }
+        { "id": "8.2", "text": "AddCleanup cleanup function receives the resource (db/*sql.DB or fd/int) as a separate argument, NOT the whole wrapper struct" },
+        { "id": "8.3", "text": "Explains that SetFinalizer prevents GC when the object holds a reference to itself or another object with a finalizer (cycle restriction)" },
+        { "id": "8.4", "text": "Does NOT pass ManagedConn or TempFile directly as the resource to AddCleanup" },
+        { "id": "8.5", "text": "Correctly attributes runtime.AddCleanup to Go 1.24 (or notes it is the modern replacement)" }
       ]
     },
     {
       "id": 9,
       "name": "http-mux-migration",
-      "prompt": "We want to remove our gorilla/mux dependency. Migrate this REST API router to stdlib. We're on Go 1.22.\n\n```go\npackage api\n\nimport (\n    \"encoding/json\"\n    \"net/http\"\n\n    \"github.com/gorilla/mux\"\n)\n\nfunc SetupRouter() *mux.Router {\n    r := mux.NewRouter()\n    r.HandleFunc(\"/api/users\", listUsers).Methods(\"GET\")\n    r.HandleFunc(\"/api/users\", createUser).Methods(\"POST\")\n    r.HandleFunc(\"/api/users/{id}\", getUser).Methods(\"GET\")\n    r.HandleFunc(\"/api/users/{id}\", updateUser).Methods(\"PUT\")\n    r.HandleFunc(\"/api/users/{id}\", deleteUser).Methods(\"DELETE\")\n    r.HandleFunc(\"/api/health\", healthCheck).Methods(\"GET\")\n    return r\n}\n\nfunc getUser(w http.ResponseWriter, r *http.Request) {\n    vars := mux.Vars(r)\n    id := vars[\"id\"]\n    json.NewEncoder(w).Encode(map[string]string{\"id\": id})\n}\n\nfunc listUsers(w http.ResponseWriter, r *http.Request) {\n    json.NewEncoder(w).Encode([]string{\"user1\", \"user2\"})\n}\n\nfunc createUser(w http.ResponseWriter, r *http.Request)  { w.WriteHeader(http.StatusCreated) }\nfunc updateUser(w http.ResponseWriter, r *http.Request)  { w.WriteHeader(http.StatusOK) }\nfunc deleteUser(w http.ResponseWriter, r *http.Request)  { w.WriteHeader(http.StatusNoContent) }\nfunc healthCheck(w http.ResponseWriter, r *http.Request) { w.WriteHeader(http.StatusOK) }\n```\n\nProvide the complete migrated code.",
+      "prompt": "We want to remove our gorilla/mux dependency. Migrate this REST API router to stdlib. We're on Go 1.22.\n\n```go\npackage api\n\nimport (\n    \"encoding/json\"\n    \"net/http\"\n\n    \"github.com/gorilla/mux\"\n)\n\nfunc SetupRouter() *mux.Router {\n    r := mux.NewRouter()\n    r.HandleFunc(\"/api/users\", listUsers).Methods(\"GET\")\n    r.HandleFunc(\"/api/users\", createUser).Methods(\"POST\")\n    r.HandleFunc(\"/api/users/{id}\", getUser).Methods(\"GET\")\n    r.HandleFunc(\"/api/users/{id}\", updateUser).Methods(\"PUT\")\n    r.HandleFunc(\"/api/users/{id}\", deleteUser).Methods(\"DELETE\")\n    r.HandleFunc(\"/api/health\", healthCheck).Methods(\"GET\")\n    return r\n}\n\nfunc getUser(w http.ResponseWriter, r *http.Request) {\n    vars := mux.Vars(r)\n    id := vars[\"id\"]\n    json.NewEncoder(w).Encode(map[string]string{\"id\": id})\n}\n\nfunc listUsers(w http.ResponseWriter, r *http.Request)  { json.NewEncoder(w).Encode([]string{\"user1\", \"user2\"}) }\nfunc createUser(w http.ResponseWriter, r *http.Request)  { w.WriteHeader(http.StatusCreated) }\nfunc updateUser(w http.ResponseWriter, r *http.Request)  { w.WriteHeader(http.StatusOK) }\nfunc deleteUser(w http.ResponseWriter, r *http.Request)  { w.WriteHeader(http.StatusNoContent) }\nfunc healthCheck(w http.ResponseWriter, r *http.Request) { w.WriteHeader(http.StatusOK) }\n```\n\nProvide the complete migrated code.",
       "trap": "Go 1.22 added method+path pattern routing to net/http. The exact syntax is 'METHOD /path/{param}' as the pattern string. mux.Vars(r) becomes r.PathValue('id'). Without the skill, the model might not use the correct syntax or might suggest a different third-party router.",
       "assertions": [
         { "id": "9.1", "text": "Uses http.NewServeMux() instead of mux.NewRouter()" },
-        { "id": "9.2", "text": "Uses method prefix in patterns like GET /api/users/{id}" },
+        { "id": "9.2", "text": "Uses method prefix in patterns like 'GET /api/users/{id}'" },
         { "id": "9.3", "text": "Uses r.PathValue(\"id\") instead of mux.Vars(r)" },
         { "id": "9.4", "text": "All 6 routes migrated with correct method prefixes (GET, POST, PUT, DELETE)" },
         { "id": "9.5", "text": "No gorilla/mux import remains" },

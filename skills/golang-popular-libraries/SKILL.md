@@ -1,12 +1,12 @@
 ---
 name: golang-popular-libraries
-description: "Recommends production-ready Golang libraries and frameworks. Apply when the user asks for library suggestions, wants to compare alternatives, or needs to choose a library for a specific task. Also apply when the AI agent is about to add a new dependency — ensures vetted, production-ready libraries are chosen."
+description: "Recommends production-ready Golang libraries and frameworks. Apply when the user explicitly asks for library suggestions, wants to compare alternatives, needs to choose a library for a specific task, or when a new dependency is being added to the project."
 user-invocable: true
 license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.1.4"
+  version: "1.1.5"
   openclaw:
     emoji: "📚"
     homepage: https://github.com/samber/cc-skills-golang

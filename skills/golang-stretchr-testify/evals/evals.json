@@ -136,13 +136,13 @@
   {
     "id": 11,
     "name": "testifylint-recommendation",
-    "description": "Tests whether the model recommends testifylint for catching common testify mistakes",
-    "prompt": "What linters should I enable for a Go project that heavily uses testify? I want to catch common testify mistakes automatically.",
-    "trap": "Model may only recommend generic Go linters and miss testifylint which is specifically designed for testify",
+    "description": "testifylint catches testify-specific mistakes that generic linters miss; model should recommend it over manual code review for testify patterns",
+    "prompt": "Our team's test code review keeps catching the same testify mistakes:\n\n1. `assert.Equal(t, err, ErrNotFound)` instead of `assert.ErrorIs(t, err, ErrNotFound)`\n2. `assert.Equal(t, got, want)` where expected/actual are swapped\n3. Using `assert.NoError(t, err)` instead of `require.NoError(t, err)` before dereferencing a pointer\n4. `assert.Equal(t, true, someCondition)` instead of `assert.True(t, someCondition)`\n\nOur lead says: 'These are all discipline issues — we should just review more carefully and add examples to our style guide.' Is there a better automated solution?",
+    "trap": "The lead's position (careful review + style guide) sounds reasonable for a small team. The model should recognize that testifylint catches all four of these patterns automatically, making manual review for them unnecessary. Without the skill, the model may agree with the lead or only suggest generic linters like staticcheck.",
     "assertions": [
-      {"id": "11.1", "text": "Recommends testifylint as a linter for testify-specific issues"},
-      {"id": "11.2", "text": "Mentions that testifylint catches wrong argument order"},
-      {"id": "11.3", "text": "Mentions that testifylint catches assert/require misuse"}
+      {"id": "11.1", "text": "Recommends testifylint specifically — explains that it is designed to catch exactly the patterns described (not just generic Go linters like staticcheck or golangci-lint defaults)"},
+      {"id": "11.2", "text": "Pushes back on the lead's 'review more carefully' approach — automated linting is more reliable than manual discipline for mechanical patterns"},
+      {"id": "11.3", "text": "Confirms testifylint catches at least two of the four described patterns: wrong argument order (expected/actual swap) and assert/require misuse (using assert before pointer dereference)"}
     ]
   }
 ]

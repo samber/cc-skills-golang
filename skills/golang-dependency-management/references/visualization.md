@@ -24,7 +24,7 @@ Shows the shortest import path from your code to the module — useful for under
 
 ## Generate a Graph Image with modgraphviz
 
-Use `modgraphviz` from stdlib.
+Use `modgraphviz` from Go toolchain.
 
 ```bash
 go mod graph | modgraphviz | dot -Tpng -o deps.png

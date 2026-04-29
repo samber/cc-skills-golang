@@ -85,14 +85,14 @@
   {
     "id": 7,
     "name": "type-assertion-comma-ok",
-    "description": "Tests whether the model uses the comma-ok form for type assertions",
-    "prompt": "I have a Go interface value `val interface{}` and I need to check if it's a string. Write the type assertion.",
-    "trap": "Without the skill, the model may write `s := val.(string)` which panics on wrong type. The skill says type assertions MUST use comma-ok form.",
+    "description": "Bare type assertions panic on wrong type; comma-ok is required even when the type 'should always' be correct",
+    "prompt": "Review this Go event dispatcher and fix any issues:\n\n```go\ntype Event struct {\n    Type    string\n    Payload any\n}\n\nfunc Dispatch(e Event) error {\n    switch e.Type {\n    case \"user.created\":\n        payload := e.Payload.(*UserCreated)\n        return handleUserCreated(payload)\n    case \"order.placed\":\n        payload := e.Payload.(*OrderPlaced)\n        return handleOrderPlaced(payload)\n    case \"payment.failed\":\n        payload := e.Payload.(*PaymentFailed)\n        return handlePaymentFailed(payload)\n    default:\n        return fmt.Errorf(\"unknown event type: %s\", e.Type)\n    }\n}\n```\n\nA teammate says: 'The bare type assertions are fine here — we always put the right payload type for each event type, and we control all the callers. The comma-ok form just adds noise and extra if-checks.' Is the teammate correct? Fix the code if needed.",
+    "trap": "The teammate's argument sounds reasonable — the caller controls event construction and should always set the correct payload type. But bare type assertions panic at runtime on any mismatch (future code, deserialized events, tests with wrong setup). The model should reject the teammate's argument and use comma-ok form.",
     "assertions": [
-      {"id": "7.1", "text": "Uses the comma-ok form: s, ok := val.(string)"},
-      {"id": "7.2", "text": "Checks the ok value before using s"},
-      {"id": "7.3", "text": "Warns against bare type assertion (s := val.(string)) because it panics"},
-      {"id": "7.4", "text": "Handles the !ok case explicitly"}
+      {"id": "7.1", "text": "Rejects the teammate's argument — bare type assertions panic at runtime on any type mismatch, regardless of how controlled the callers seem"},
+      {"id": "7.2", "text": "Uses comma-ok form for all three type assertions: payload, ok := e.Payload.(*UserCreated)"},
+      {"id": "7.3", "text": "Handles the !ok case by returning an error (not panicking) — e.g., 'unexpected payload type for user.created'"},
+      {"id": "7.4", "text": "Explains the failure mode: future code, deserialized events from external sources, or tests with wrong fixture setup will cause unrecoverable panics with bare assertions"}
     ]
   },
   {

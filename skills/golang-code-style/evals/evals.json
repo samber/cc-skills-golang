@@ -1,22 +1,26 @@
 [
   {
     "id": 1,
-    "name": "zero-value-implicit",
-    "description": "Zero-value fields not explicitly initialized; non-zero uses :=",
-    "prompt": "Write a Go file `cache.go` in package `cache`. Create a Cache struct with fields for max size, current count, hit count, and miss count (all integers). Add a constructor that takes max size. Add a Get method that increments hit or miss count and a Set method. Initialize a default TTL duration variable and a done channel in the constructor.",
-    "trap": "Model explicitly initializes zero-value fields (currentCount := 0) or uses var for non-zero assignments, obscuring the distinction between intentional zero and meaningful value",
+    "name": "zero-value-intent-signal",
+    "description": "var vs := signals intent: var for zero-value start, := for non-zero — even when the zero value IS the business default",
+    "prompt": "Write a Go file `session.go` in package `session`. Create a Session struct with fields: userID string, requestCount int, isAuthenticated bool, lastError error, startedAt time.Time, tags []string. Add a constructor NewSession(userID string) that initializes the struct. In the constructor, requestCount starts at zero (it will be incremented on each use), isAuthenticated starts false (it must be explicitly set after login), lastError starts nil, startedAt is set to time.Now(), and tags is initialized as an empty slice. Also add a local variable inside a method Describe() that builds a description string from a fixed prefix 'session:'.",
+    "trap": "Model uses := for all fields including zero-value ones (requestCount := 0, isAuthenticated := false) or uses var for non-zero assignments like startedAt, obscuring intent",
     "assertions": [
       {
         "id": "1.1",
-        "text": "Zero-value integer fields (currentCount, hitCount, missCount) are NOT explicitly initialized in the constructor — Go zero values are relied upon, or if local variables are declared separately, they use var (not :=) to signal zero-value intent"
+        "text": "requestCount is NOT explicitly initialized to 0 in the constructor — the zero value is relied upon via var or struct literal without that field, not via requestCount := 0"
       },
       {
         "id": "1.2",
-        "text": "Non-zero assignments (like maxSize from parameter, or default TTL = 5*time.Minute) use := short declaration form"
+        "text": "startedAt uses := assignment (startedAt := time.Now() or field assignment) — NOT var startedAt time.Time followed by assignment — because it has a non-zero meaningful value"
       },
       {
         "id": "1.3",
-        "text": "The done channel is created with make(), not left as nil"
+        "text": "The fixed prefix string variable in Describe() uses := (prefix := 'session:') — not var prefix string = 'session:'"
+      },
+      {
+        "id": "1.4",
+        "text": "tags is initialized with []string{} or make([]string, 0) — never nil — because nil slices serialize to null in JSON"
       }
     ]
   },
@@ -43,21 +47,25 @@
   },
   {
     "id": 3,
-    "name": "named-struct-fields",
-    "description": "All struct literals use named fields, not positional",
-    "prompt": "Write a Go file `server.go` in package `server`. Create an HTTP server using net/http. Configure it with address ':8080', read timeout 5 seconds, write timeout 10 seconds, idle timeout 120 seconds, and max header bytes 1MB. Also create a tls.Config with min TLS version 1.2 and a list of cipher suites.",
-    "trap": "Model uses positional struct literals like http.Server{\":8080\", 5*time.Second, 10*time.Second, ...}, which silently breaks when struct fields are reordered",
+    "name": "named-struct-fields-nested",
+    "description": "All struct literals use named fields, including nested and anonymous structs",
+    "prompt": "Write a Go file `middleware.go` in package `middleware`. Create a RateLimiter struct with fields: windowSize time.Duration, maxRequests int, perIP bool. Create a middleware chain config using a struct literal with nested structs: a TimeoutConfig containing duration and errorMessage, a RetryConfig containing maxAttempts int and backoff time.Duration, and a CircuitBreakerConfig containing threshold float64 and resetAfter time.Duration. Instantiate each of these structs as part of a larger MiddlewareConfig struct. Also create a tls.Config with MinVersion and a list of cipher suites.",
+    "trap": "Model uses positional struct literals for the nested configs since they have few fields — e.g., TimeoutConfig{5*time.Second, 'timeout'} — which silently breaks when fields are reordered",
     "assertions": [
       {
         "id": "3.1",
-        "text": "http.Server literal uses named fields (Addr:, ReadTimeout:, WriteTimeout:, IdleTimeout:, MaxHeaderBytes:) — not positional arguments"
+        "text": "RateLimiter literal uses named fields (WindowSize:, MaxRequests:, PerIP:) — not positional"
       },
       {
         "id": "3.2",
-        "text": "tls.Config literal uses named fields (MinVersion:, CipherSuites:) — not positional arguments"
+        "text": "TimeoutConfig, RetryConfig, and CircuitBreakerConfig literals all use named fields — not positional — even though each has only 2-3 fields"
       },
       {
         "id": "3.3",
+        "text": "tls.Config literal uses named fields (MinVersion:, CipherSuites:)"
+      },
+      {
+        "id": "3.4",
         "text": "No struct literal in the file uses positional field syntax"
       }
     ]
@@ -165,77 +173,85 @@
   },
   {
     "id": 9,
-    "name": "file-declaration-order",
-    "description": "Interface before struct, constructor before methods, helpers after exported methods",
-    "prompt": "Write a Go file `repository.go` in package `repo`. Include: a Repository interface with methods Get, List, Create, Delete; a PostgresRepository struct implementing it; a constructor NewPostgresRepository; all four methods on PostgresRepository; two helper functions (buildQuery and scanRow); constants for default page size and max page size; and the necessary imports. Organize everything in a single file.",
-    "trap": "Model scatters declarations in arbitrary order, mixing helpers between methods and placing structs before interfaces",
+    "name": "unexported-internal-helpers",
+    "description": "Helper functions called only within the same package stay unexported; exporting is a commitment",
+    "prompt": "Write a Go file `parser.go` in package `config`. Include: an exported ParseConfig function that reads a file path and returns a *Config struct; an exported ValidateConfig function that checks required fields; a helper function that tokenizes a raw config string (used only by ParseConfig); a helper function that resolves environment variable references in values (used by ParseConfig and ValidateConfig); a helper function that formats a field path for error messages (used only in error messages inside ValidateConfig). Make all functions exported for potential future reuse from other packages.",
+    "trap": "Model follows the prompt's instruction to export all functions, leaking tokenizer, env resolver, and error formatter as public API — any future change to them becomes a breaking change",
     "assertions": [
       {
         "id": "9.1",
-        "text": "File ordering follows: package clause, imports, constants, interface type, struct type, constructor, exported methods, unexported helpers — not randomly scattered"
+        "text": "The tokenizer helper (used only by ParseConfig) is unexported (lowercase name)"
       },
       {
         "id": "9.2",
-        "text": "The interface (Repository) is declared before the struct (PostgresRepository) that implements it"
+        "text": "The error message formatter (used only inside ValidateConfig) is unexported (lowercase name)"
       },
       {
         "id": "9.3",
-        "text": "Helper functions (buildQuery, scanRow) appear after the main type's methods, not before or interleaved between them"
+        "text": "ParseConfig and ValidateConfig remain exported — they are the true public API"
+      },
+      {
+        "id": "9.4",
+        "text": "The env variable resolver may be exported OR unexported — both are defensible since it's used by two functions, but the model should NOT export all helpers blindly"
       }
     ]
   },
   {
     "id": 10,
-    "name": "strconv-for-int-conversion",
-    "description": "strconv.Itoa for int-to-string, strings.Builder for loop concatenation, fmt.Sprintf for complex formatting",
-    "prompt": "Write a Go function GenerateReport in package `report` that: (1) converts an integer count to a string for a header, (2) converts a float64 percentage to a string with 2 decimal places, (3) builds a CSV-like output by concatenating 1000 rows in a loop where each row has name, age, and city columns, (4) formats a simple greeting with a name string variable.",
-    "trap": "Model uses fmt.Sprintf(\"%d\") for simple int conversions and += string concatenation in the loop, missing the performance-correct alternatives",
+    "name": "strings-join-not-builder-for-known-slice",
+    "description": "strings.Join for joining a known slice; strings.Builder for dynamic/loop accumulation — not one-size-fits-all",
+    "prompt": "Write a Go file `format.go` in package `format` with four functions: (1) JoinTags that takes a []string of tags and returns them comma-separated, (2) BuildCSVRow that takes a []string of fields and returns a CSV line with quotes and commas, (3) BuildAuditLog that takes a slice of AuditEntry structs (each with timestamp and message fields) and returns a multi-line string by iterating over entries, (4) FormatError that takes an error code int and a description string and returns a formatted error string like 'ERR-42: bad input'.",
+    "trap": "Model uses strings.Builder for everything including JoinTags (which should use strings.Join) and fmt.Sprintf for the int conversion in FormatError instead of strconv",
     "assertions": [
       {
         "id": "10.1",
-        "text": "Integer-to-string conversion uses strconv.Itoa() or strconv.FormatInt() — not fmt.Sprintf('%d', n)"
+        "text": "JoinTags uses strings.Join(tags, ',') — not a manual loop or strings.Builder — because the input is already a complete slice"
       },
       {
         "id": "10.2",
-        "text": "Loop-based string concatenation uses strings.Builder (or bytes.Buffer) — not repeated string concatenation with +"
+        "text": "BuildAuditLog uses strings.Builder (WriteString in a loop) — not repeated += — because entries are accumulated one at a time in a loop"
       },
       {
         "id": "10.3",
-        "text": "Complex formatting (like the percentage with specific format or the greeting) uses fmt.Sprintf"
+        "text": "FormatError uses fmt.Sprintf (or strconv.Itoa for the int part) — NOT strings.Builder — because it formats a short fixed-structure message"
+      },
+      {
+        "id": "10.4",
+        "text": "No function uses += string concatenation inside a loop body"
       }
     ]
   },
   {
     "id": 11,
-    "name": "named-boolean-conditions",
-    "description": "Complex conditions extracted to named booleans before the if statement",
-    "prompt": "Write a Go function CanAccessResource in package `authz` that checks if a user can access a resource. The conditions are: (1) user.Role == 'admin', OR (2) user.ID == resource.OwnerID, OR (3) resource.IsPublic && user.IsVerified, OR (4) user has a specific permission in their permission set (permissions.Contains('resource.access')). Write it as a single if statement with all conditions inline.",
-    "trap": "Model follows the prompt's instruction to inline all conditions, making the if statement a wall of boolean logic that obscures the business intent",
+    "name": "named-boolean-conditions-method-calls",
+    "description": "Expensive method calls in complex conditions extracted to named booleans to make intent readable",
+    "prompt": "Write a Go function CanPublish in package `cms` that determines whether a user can publish an article. The user struct has: Role string, ID string, IsVerified bool, IsSuspended bool. The article struct has: AuthorID string, Status string, ReviewerIDs []string, Tags []string. The permission check requires: (user.Role == 'editor' || user.Role == 'admin') AND NOT user.IsSuspended AND user.IsVerified AND (user.ID == article.AuthorID || contains(article.ReviewerIDs, user.ID)) AND article.Status == 'reviewed' AND NOT contains(article.Tags, 'restricted'). Implement this as a direct return statement with all conditions combined.",
+    "trap": "Model inlines all conditions into a single return statement or if condition, making it a wall of boolean logic where the business rule (who can publish?) is buried in implementation details",
     "assertions": [
       {
         "id": "11.1",
-        "text": "At least 2 of the conditions are extracted into named boolean variables (e.g., isAdmin, isOwner, isPublicAndVerified) before the if statement"
+        "text": "At least 3 of the conditions are extracted into named boolean variables before the final if or return"
       },
       {
         "id": "11.2",
-        "text": "The named booleans have descriptive names that explain the business meaning (not generic names like cond1, cond2)"
+        "text": "Named booleans reflect business meaning — names like isEditor, isEligibleAuthor, isArticleReady rather than cond1, checkA"
       },
       {
         "id": "11.3",
-        "text": "If the permissions.Contains() call is kept inline (not extracted), the code preserves short-circuit evaluation benefit for the expensive operation"
+        "text": "The final expression reads like a policy statement: return isEligibleUser && isAuthorOrReviewer && isArticleReady (or similar)"
       }
     ]
   },
   {
     "id": 12,
     "name": "line-breaks-at-semantic-boundaries",
-    "description": "Long function calls broken at argument boundaries; closing paren on own line",
-    "prompt": "Write a Go function RegisterRoutes in package `router` that takes an http.ServeMux and registers 6 routes. Each route handler calls a function with these parameters: the response writer, request, a long service name string, a config struct, a logger, and an auth middleware function. Write each handler registration as a single long line.",
-    "trap": "Model follows the prompt's instruction to write each handler as a single long line, making diffs unreadable and code hard to scan",
+    "description": "Function calls with 4+ arguments broken at argument boundaries; no line over ~120 chars",
+    "prompt": "Write a Go function RegisterRoutes in package `router` that takes an *http.ServeMux and registers 6 API routes. Each route handler is a closure that delegates to a processRequest function taking: an http.ResponseWriter, an *http.Request, a serviceName string constant 'com.example.platform.api', a *Config, a *slog.Logger, and an authMiddleware func. Write idiomatic Go.",
+    "trap": "Model writes each mux.HandleFunc and inner processRequest call as a single long line since that is the most compact and natural first draft",
     "assertions": [
       {
         "id": "12.1",
-        "text": "Function calls with many arguments are broken across multiple lines, with each argument (or logical group) on its own line"
+        "text": "The processRequest call inside each handler is broken across multiple lines — each argument on its own line — because it has 6 arguments"
       },
       {
         "id": "12.2",
@@ -244,52 +260,56 @@
       {
         "id": "12.3",
         "text": "Closing parentheses for multi-line function calls appear on their own line (Go trailing-comma style)"
+      },
+      {
+        "id": "12.4",
+        "text": "No single line in the file exceeds approximately 140 characters"
       }
     ]
   },
   {
     "id": 13,
     "name": "never-nil-return-for-collection",
-    "description": "Returns initialized empty collections, never nil, despite prompt saying nil is safe",
-    "prompt": "Write a Go function GetUsers in package `api` that returns all users from a database. When there are no users, return nil. Also write GetMetadata that returns a map[string]string — return nil when empty. The caller will check for nil before using the result, so returning nil is safe and avoids an unnecessary allocation.",
-    "trap": "Model follows the prompt's explicit instruction to return nil for empty collections, causing nil-slice JSON serialization (null instead of []) and nil map write panics",
+    "description": "Returns initialized empty collections even when no data — nil slices serialize to JSON null; nil maps panic on write",
+    "prompt": "Write a Go HTTP handler ListProducts in package `api` that queries a database for products matching a filter and returns JSON. Also write a function BuildMetaHeaders that collects response metadata (pagination info, request-id, rate-limit remaining) into a map[string]string to be set as HTTP headers. Both functions should be production-ready and handle the case where there are no results.",
+    "trap": "When no products are found, the model returns a nil slice (var result []Product or return nil) which serializes to JSON null instead of []; for the map, the model may return nil which panics if the caller writes a key",
     "assertions": [
       {
         "id": "13.1",
-        "text": "GetUsers returns []User{} or make([]User, 0) for the empty case — NOT nil — because nil slices serialize to null in JSON"
+        "text": "ListProducts initializes the result slice with []Product{} or make([]Product, 0) — NOT var result []Product left nil — so an empty result serializes to [] not null"
       },
       {
         "id": "13.2",
-        "text": "GetMetadata returns map[string]string{} or make(map[string]string) for the empty case — NOT nil — because nil maps panic on write"
+        "text": "BuildMetaHeaders initializes and returns map[string]string{} or make(map[string]string) — NOT nil — because nil maps panic on write"
       },
       {
         "id": "13.3",
-        "text": "Neither function contains 'return nil' as a success path (nil is only acceptable paired with an error)"
+        "text": "Neither function contains 'return nil' as a success/no-data path (nil is only paired with a non-nil error)"
       }
     ]
   },
   {
     "id": 14,
-    "name": "strconv-builder-override-prompt",
-    "description": "Uses strconv.Itoa and strings.Builder even when prompt explicitly instructs fmt.Sprintf and +=",
-    "prompt": "Write a Go function BuildReport in package `report` that takes a count int, a list of names []string, and a separator string. Use fmt.Sprintf(\"%d\", count) to convert the count to a string. Use result += name + separator inside a for loop to build the final string. This is simple and readable — don't over-engineer it.",
-    "trap": "Model follows the prompt's explicit fmt.Sprintf and += instructions, choosing simplicity over correctness",
+    "name": "strconv-and-builder-natural-scenario",
+    "description": "strconv.Itoa for int-to-string; strings.Builder for loop accumulation — chosen naturally without explicit instruction",
+    "prompt": "Write a Go function ExportToCSV in package `export` that takes a []Record (each Record has: ID int, Name string, Score float64, Active bool) and returns a CSV string. The first line should be the header. Each subsequent line is a row. ID must be converted to a string for the CSV. Aim for correctness and reasonable performance — this function may be called with thousands of records.",
+    "trap": "Model converts ID with fmt.Sprintf('%d', r.ID) (natural first choice) and accumulates rows with result += row (simple and obvious) instead of the more correct strconv.Itoa and strings.Builder",
     "assertions": [
       {
         "id": "14.1",
-        "text": "Integer-to-string uses strconv.Itoa(count) — NOT fmt.Sprintf(\"%d\", count) — because strconv is faster for simple conversions"
+        "text": "ID integer-to-string conversion uses strconv.Itoa(r.ID) or strconv.FormatInt — NOT fmt.Sprintf('%d', r.ID)"
       },
       {
         "id": "14.2",
-        "text": "Loop concatenation uses strings.Builder (WriteString) — NOT result += in a loop — because += allocates a new string each iteration"
+        "text": "Row accumulation uses strings.Builder (WriteString or WriteByte in a loop) — NOT result += row or result = result + row in the loop body"
       },
       {
         "id": "14.3",
-        "text": "The function does NOT contain 'result +=' or 'result = result +' inside any loop body"
+        "text": "strings.Builder is declared once before the loop and .String() is called after the loop to produce the final output"
       },
       {
         "id": "14.4",
-        "text": "strings.Builder or bytes.Buffer is declared before the loop and result is obtained via .String() after"
+        "text": "The function does NOT contain '+=' applied to a string variable inside a loop body"
       }
     ]
   },
@@ -346,54 +366,54 @@
   {
     "id": 17,
     "name": "context-first-options-struct",
-    "description": "Moves ctx to first position, groups remaining params into options struct",
-    "prompt": "Write a Go function CreateUser in package `service` with these parameters in this exact order: db *sql.DB, name string, email string, age int, role string, isActive bool, permissions []string, metadata map[string]string, avatar []byte, notifyOnCreate bool, ctx context.Context, logger *slog.Logger. Keep all parameters in the function signature exactly as listed — do not change the order or group them.",
-    "trap": "Model keeps all 13 parameters in the specified order with ctx buried at position 11, following the prompt's explicit instruction",
+    "description": "context.Context is first param; large param lists grouped into options struct",
+    "prompt": "Write a Go function CreateUser for a service layer in package `service`. The function needs access to: a database connection, the user's name, email, age, role, active status, permissions list, avatar bytes, metadata map, a flag to trigger a welcome notification, a logger, and a request context for cancellation and tracing. Implement this function with all inputs needed for the operation.",
+    "trap": "Model puts context.Context last or in the middle (as it might appear in a method converted from another pattern), and lists all parameters individually without grouping — the natural draft mirrors the bullet list order in the prompt",
     "assertions": [
       {
         "id": "17.1",
-        "text": "context.Context is the FIRST parameter, not buried in position 11"
+        "text": "context.Context is the FIRST parameter in the function signature"
       },
       {
         "id": "17.2",
-        "text": "The function has at most 4 parameters in its signature (ctx + db + maybe 1-2 others + options struct)"
+        "text": "The function has at most 4 parameters in its signature (ctx + db/service + maybe 1 other + options struct)"
       },
       {
         "id": "17.3",
-        "text": "An options struct groups the remaining parameters (name, email, age, role, isActive, permissions, metadata, avatar, notifyOnCreate)"
+        "text": "An options struct groups the user data fields (name, email, age, role, isActive, permissions, avatar, metadata, notifyOnCreate)"
       },
       {
         "id": "17.4",
-        "text": "The logger is either in the options struct or is a field on a Service struct, not a standalone parameter"
+        "text": "The logger is either in the options struct or a field on a Service receiver — NOT a standalone function parameter alongside ctx"
       }
     ]
   },
   {
     "id": 18,
-    "name": "value-types-not-pointer-params",
-    "description": "Value params and returns for small types, overriding pointer-everything prompt",
-    "prompt": "Write Go functions in package `math` that all use pointer parameters for maximum performance and zero-copy semantics: (1) Add(a *int, b *int) *int, (2) IsEven(n *int) *bool, (3) FormatDuration(d *time.Duration) *string, (4) Max(a *float64, b *float64) *float64, (5) Concat(a *string, b *string) *string. Pointers avoid copying values onto the stack.",
-    "trap": "Model follows the prompt's pointer-everything instruction, adding pointer indirection overhead for types smaller than a pointer",
+    "name": "pointer-judgment-mixed-types",
+    "description": "Pointer vs value judgment for a mixed set of types — small value types by value, large structs and optional values by pointer",
+    "prompt": "Write Go function signatures in package `inventory` for: (1) ComputeDiscount that takes a price float64 and a discount rate float64 and returns the discounted price, (2) UpdateInventoryItem that modifies an InventoryItem struct (define it with ~10 fields: ID, SKU, Name, Description, Price, Stock, Weight, Category, Tags, UpdatedAt), (3) FindByCategory that takes a category string and returns matching items, (4) MergeConfig that takes two Config structs (small, 3 fields: Timeout time.Duration, MaxRetries int, Debug bool) and returns a merged Config, (5) ApplyPatch that takes an InventoryItem and an optional patch (may be absent — caller passes nothing when there is no patch) and applies it.",
+    "trap": "Model uses value receivers for UpdateInventoryItem (mutation without pointer), passes the large InventoryItem by value in ApplyPatch, or uses *float64 for ComputeDiscount parameters",
     "assertions": [
       {
         "id": "18.1",
-        "text": "Add takes (a int, b int) int — NOT pointer params — because int is 8 bytes, cheaper to copy than dereference"
+        "text": "ComputeDiscount takes (price float64, rate float64) float64 — NOT *float64 — small value types go by value"
       },
       {
         "id": "18.2",
-        "text": "IsEven takes (n int) bool — NOT *int/*bool — because both are small value types"
+        "text": "UpdateInventoryItem takes *InventoryItem (pointer) because it mutates the struct"
       },
       {
         "id": "18.3",
-        "text": "FormatDuration takes (d time.Duration) string — NOT *time.Duration/*string — Duration is an int64 alias"
+        "text": "MergeConfig takes two Config by value (not *Config) — the struct is small (~3 fields) and not mutated"
       },
       {
         "id": "18.4",
-        "text": "Concat takes (a string, b string) string — NOT *string — string is already a (pointer, length) pair internally"
+        "text": "ApplyPatch takes the optional patch as *Patch or *InventoryItem (pointer) to represent the absent/nil case — NOT a value type that cannot be nil"
       },
       {
         "id": "18.5",
-        "text": "No function in the file uses pointer parameters for int, bool, string, float64, or time.Duration types"
+        "text": "FindByCategory takes category string by value — NOT *string"
       }
     ]
   },
@@ -499,26 +519,26 @@
   },
   {
     "id": 23,
-    "name": "reasonable-capacity-hints",
-    "description": "Capacity hints match typical sizes, not speculative large pre-allocations",
-    "prompt": "Write a Go function AllocateBuffers in package `pool` that processes a list of job IDs. For each job, allocate a result slice and a metadata map. Pre-allocate generously for performance: use make([]Result, 0, 100000) for the results since some jobs might return many results, and make(map[string]string, 10000) for metadata since we want to avoid rehashing. The input typically has 5-20 job IDs, and each job usually produces 3-10 results with 2-5 metadata entries.",
-    "trap": "Model follows the prompt's instructions to use 100000 and 10000 as capacity hints, wasting gigabytes of memory per invocation",
+    "name": "capacity-hint-from-input-size",
+    "description": "When filtering or transforming a slice, use len(input) as capacity hint — output is at most that size",
+    "prompt": "Write a Go function FilterActiveUsers in package `users` that takes a []User slice and returns only the users where IsActive is true. Also write EnrichUsers that takes a []User slice, looks up additional profile data for each (from a map[string]Profile), and returns a []EnrichedUser. Write both functions efficiently.",
+    "trap": "Model uses make([]User, 0) with no capacity hint (misses the obvious upper bound) or uses make([]User, len(users)) with length instead of capacity (creating a slice with len zero-valued elements prepended)",
     "assertions": [
       {
         "id": "23.1",
-        "text": "Result slices are NOT pre-allocated with capacity 100000 — uses a reasonable capacity like 10, 16, or len-based hint matching the typical 3-10 results"
+        "text": "FilterActiveUsers preallocates with make([]User, 0, len(users)) — using len(users) as the capacity hint since the output is at most that size"
       },
       {
         "id": "23.2",
-        "text": "Metadata maps are NOT pre-allocated with capacity 10000 — uses a reasonable capacity like 5, 8, or a small constant matching the typical 2-5 entries"
+        "text": "FilterActiveUsers does NOT use make([]User, len(users)) with a length argument — that would prepend len(users) zero-valued elements before any append"
       },
       {
         "id": "23.3",
-        "text": "The outer job slice uses make with len(jobIDs) capacity hint since the size is known"
+        "text": "EnrichUsers preallocates with make([]EnrichedUser, 0, len(users)) since every user produces exactly one enriched user (known output size)"
       },
       {
         "id": "23.4",
-        "text": "No make() call in the file uses a capacity hint larger than 1000"
+        "text": "Neither function uses a speculative large constant (e.g., 1000) as capacity when len(input) is available"
       }
     ]
   },

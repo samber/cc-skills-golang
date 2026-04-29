@@ -17,14 +17,14 @@
   {
     "id": 2,
     "name": "algorithm-selection-frequency",
-    "description": "Tests whether the model picks the right algorithm for frequency-dominated workloads",
-    "prompt": "I'm building a DNS resolver cache in Go with samber/hot. Lookups follow a heavy power-law distribution — a small set of domains (google.com, cloudflare.com) are looked up millions of times, while most domains are rare. The popularity rankings are very stable over time. Which algorithm should I use and why? Show the setup.",
-    "trap": "Without the skill, the model picks LRU or W-TinyLFU. For stable frequency patterns without popularity shifts, LFU is the best fit.",
+    "description": "For stable frequency-dominated workloads, LFU beats W-TinyLFU despite W-TinyLFU being the general default",
+    "prompt": "I'm building a DNS resolver cache in Go with samber/hot. Lookups follow a heavy power-law distribution — a small set of domains (google.com, cloudflare.com) are looked up millions of times, while most domains are rare. The popularity rankings are very stable over time.\n\nA teammate says: 'The docs say W-TinyLFU is the general-purpose default that handles mixed workloads. We should always start with hot.WTinyLFU to avoid bike-shedding — you can always tune later.' Is this good advice for this specific use case? Which algorithm should I actually use?",
+    "trap": "The teammate's advice sounds pragmatic — 'start with the default, tune later' is usually good. But the skill teaches that for stable frequency-dominated workloads (where popularity rankings don't shift), hot.LFU is superior to W-TinyLFU. LFU's known weakness (stale popular items never evict) is irrelevant when rankings are stable. The model should override the default recommendation.",
     "assertions": [
-      {"id": "2.1", "text": "Recommends hot.LFU as the primary algorithm for this stable-frequency workload"},
-      {"id": "2.2", "text": "Explains why LFU fits: keeps frequently accessed items regardless of recency"},
-      {"id": "2.3", "text": "Mentions that LFU's weakness (stale popular items) doesn't apply here because rankings are stable"},
-      {"id": "2.4", "text": "Does NOT default to LRU for this frequency-dominated use case"}
+      {"id": "2.1", "text": "Pushes back on the teammate — does NOT blindly apply hot.WTinyLFU when the workload is clearly stable-frequency-dominated"},
+      {"id": "2.2", "text": "Recommends hot.LFU as the correct algorithm: stable power-law distribution maps exactly to LFU's strength (keeping the most frequently accessed items)"},
+      {"id": "2.3", "text": "Explains why LFU's known weakness (stale popular items stuck in cache) does NOT apply here — popularity rankings are stable, so the stale-items problem doesn't manifest"},
+      {"id": "2.4", "text": "Correctly positions W-TinyLFU as 'general-purpose for unknown/shifting patterns' while LFU is 'optimal for known stable frequency patterns'"}
     ]
   },
   {
@@ -124,14 +124,14 @@
   {
     "id": 10,
     "name": "algorithm-scan-resistance",
-    "description": "Tests algorithm selection for scan-heavy workloads",
-    "prompt": "My Go service using samber/hot has a cache for product data. Periodically, a batch job scans through ALL 500k products sequentially, which causes the cache to evict all the genuinely hot items. Currently using LRU. What algorithm should I switch to?",
-    "trap": "Without the skill, the model might suggest increasing cache size or doesn't know which algorithms are scan-resistant",
+    "description": "SIEVE is the simple scan-resistant alternative to LRU; W-TinyLFU and S3FIFO are valid but heavier",
+    "prompt": "My Go service using samber/hot has a cache for product data. Periodically, a batch job scans through ALL 500k products sequentially, which evicts all the genuinely hot items. Currently using LRU.\n\nA teammate says: 'Switch to hot.WTinyLFU — it's scan-resistant and the general best-practice default.' Another says: 'hot.S3FIFO is specifically designed for scan resistance at high throughput.' My cache is small (5k items) and the access pattern outside the scans is not particularly skewed. Which should I use?",
+    "trap": "Both teammates recommend valid scan-resistant algorithms — W-TinyLFU and S3FIFO are both correct answers to scan pollution. But the skill's table shows: S3FIFO should avoid small caches (<1000 items — but 5k is borderline), and SIEVE is the 'simple scan-resistant LRU alternative' for non-highly-skewed patterns. The model should know SIEVE is the best fit when simplicity matters and access isn't highly skewed.",
     "assertions": [
-      {"id": "10.1", "text": "Identifies LRU's scan pollution problem — sequential scan evicts all hot items"},
-      {"id": "10.2", "text": "Recommends a scan-resistant algorithm: W-TinyLFU, S3FIFO, ARC, TwoQueue, or SIEVE"},
-      {"id": "10.3", "text": "Explains why the recommended algorithm resists scan pollution"},
-      {"id": "10.4", "text": "Does NOT suggest only increasing cache size as the fix"}
+      {"id": "10.1", "text": "Identifies that SIEVE is the most appropriate choice: simple scan-resistant LRU alternative for non-highly-skewed access patterns"},
+      {"id": "10.2", "text": "Acknowledges that W-TinyLFU and S3FIFO are valid but notes one or both have tradeoffs: W-TinyLFU adds complexity, S3FIFO is optimized for high-throughput/larger caches"},
+      {"id": "10.3", "text": "Explains why SIEVE resists scan pollution (items must be visited multiple times before eviction — single-pass scan items get evicted while hot items are retained)"},
+      {"id": "10.4", "text": "Uses hot.SIEVE as the algorithm constant in the implementation"}
     ]
   },
   {

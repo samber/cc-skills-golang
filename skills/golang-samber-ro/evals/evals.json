@@ -71,14 +71,14 @@
     },
     {
       "id": 7,
-      "name": "share-vs-cold-websocket",
-      "prompt": "I have a WebSocket connection that receives stock tickers. Three different parts of my app need to consume these events: a dashboard, a metrics recorder, and an alerting system. Write the samber/ro code.",
+      "name": "share-teardown-on-last-unsubscribe",
+      "prompt": "I have a samber/ro pipeline using Share() to multicast a WebSocket observable to 3 subscribers: a dashboard, a metrics recorder, and an alerting system. The dashboard and metrics recorder are temporary — they unsubscribe after 30 seconds. Only the alerting system stays permanently subscribed. After 30 seconds when the two temporary subscribers unsubscribe, will the WebSocket connection stay alive for the alerting system or will it be torn down?",
       "assertions": [
-        "Uses Share() or ShareReplay() to convert the cold WebSocket observable to hot",
-        "Creates only ONE WebSocket connection shared across all 3 subscribers",
-        "Does NOT create 3 separate WebSocket connections (one per subscriber)",
-        "Shows 3 separate .Subscribe() calls on the shared observable",
-        "Explains cold vs hot: without Share, each subscriber triggers a new connection"
+        "Correctly states that Share() tears down the underlying source when the LAST subscriber unsubscribes",
+        "Identifies that when dashboard and metrics recorder unsubscribe, the alerting system is the last subscriber — connection stays alive",
+        "Explains that Share() uses reference counting: source tears down only when refcount reaches 0",
+        "Warns that if ALL 3 unsubscribed simultaneously, the WebSocket would be torn down and alerting would stop receiving events",
+        "Distinguishes Share() (tears down on last unsubscribe) from a persistent Subject that stays alive regardless of subscriber count"
       ]
     },
     {
@@ -109,14 +109,14 @@
     },
     {
       "id": 10,
-      "name": "scan-vs-reduce",
-      "prompt": "I'm building a real-time dashboard that shows a running average of sensor readings. Every time a new reading arrives, the dashboard should update with the new average. Should I use Scan or Reduce in samber/ro?",
+      "name": "scan-accumulator-state-design",
+      "prompt": "I'm using ro.Scan in samber/ro to compute a running average of sensor readings. My first attempt accumulates a sum but I can't compute the average because I don't know the count inside the Scan callback. Here's my broken code:\n\n```go\nro.Scan(func(acc float64, reading float64) float64 {\n    return acc + reading  // sum grows but can't divide — don't know N\n}, 0.0)\n```\n\nHow do I fix this to emit the correct running average on each new reading?",
       "assertions": [
-        "Recommends Scan (not Reduce)",
-        "Explains WHY: Scan emits every intermediate accumulated value (good for live updates)",
-        "Explains WHY NOT Reduce: Reduce only emits the final value when the stream completes",
-        "Shows Scan with an accumulator that tracks count and sum to compute running average",
-        "Notes that for an infinite sensor stream, Reduce would never emit (stream never completes)"
+        "Identifies that the accumulator must carry both sum AND count as state (not just the running average)",
+        "Changes the accumulator type to a struct (or tuple) holding {sum float64, count int}",
+        "Shows Scan returning the updated struct with incremented count and added sum",
+        "Chains a Map after Scan to compute avg = acc.sum / float64(acc.count) for display",
+        "Does NOT attempt to maintain an external counter variable outside the Scan (would break with concurrent subscribers)"
       ]
     },
     {
@@ -224,13 +224,14 @@
     },
     {
       "id": 20,
-      "name": "observable-creation-channel-bridge",
-      "prompt": "I have a legacy Go service that pushes events into a chan Event. I want to process these events using samber/ro operators. How do I bridge the channel into the reactive world?",
+      "name": "observable-creation-channel-bridge-completion",
+      "prompt": "I'm bridging a legacy Go chan Event into a samber/ro pipeline. I've wrapped it with ro.FromChannel. Now my pipeline's onComplete callback never fires even though I've processed all the events I care about. The channel stays open because the legacy service never closes it. How do I make the pipeline complete cleanly after processing 100 events, without modifying the legacy channel producer?",
       "assertions": [
-        "Uses ro.FromChannel[Event](ch) to wrap the Go channel as an Observable",
-        "The resulting observable completes when the channel is closed",
-        "Chains standard ro operators (Filter, Map, etc.) on the resulting observable",
-        "Does NOT suggest creating a custom NewObservable when FromChannel suffices"
+        "Uses ro.Take(100) to limit the observable to 100 events and trigger completion",
+        "Explains that ro.FromChannel only completes when the source channel is closed",
+        "Does NOT suggest modifying the channel producer or closing the channel externally",
+        "Does NOT suggest polling the channel manually outside the ro pipeline",
+        "Alternatively mentions TakeUntil with a signal or Timeout as other valid completion strategies"
       ]
     },
     {

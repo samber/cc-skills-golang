@@ -15,16 +15,16 @@
   },
   {
     "id": 2,
-    "name": "fanout-vs-router",
-    "description": "Tests whether the model picks Router over Fanout for level-based routing",
-    "prompt": "I want errors to go to Sentry, all logs to go to stdout as JSON, and warnings to go to Slack. Set this up using samber/slog-multi in Go. Which handler composition pattern should I use?",
-    "trap": "Without the skill, the model uses Fanout for everything — Slack receives all records including debug/info, not just warnings",
+    "name": "router-firstmatch-vs-router-all-matches",
+    "description": "Tests whether the model distinguishes Router (all matching) from Router+FirstMatch (first match only)",
+    "prompt": "I have a slog-multi Router with two rules: (1) ERROR and above → PagerDuty, (2) WARN and above → Slack. My problem: ERROR logs are going to BOTH PagerDuty AND Slack. I only want errors in PagerDuty, not duplicated in Slack. How do I fix this with slog-multi?",
+    "trap": "Without the skill, the model adds a LevelIs(slog.LevelWarn) predicate to the Slack handler thinking that fixes it — but WARN and above includes ERROR, so errors still reach Slack. The correct fix is Router().Add(...).FirstMatch() so routing stops at the first matching handler.",
     "assertions": [
-      {"id": "2.1", "text": "Uses slogmulti.Router() for level-based routing (not Fanout for all three)"},
-      {"id": "2.2", "text": "stdout/JSON handler receives all log levels"},
-      {"id": "2.3", "text": "Sentry handler receives only errors (uses LevelIs(slog.LevelError) or equivalent predicate)"},
-      {"id": "2.4", "text": "Slack handler receives only warnings (uses LevelIs(slog.LevelWarn) or equivalent predicate)"},
-      {"id": "2.5", "text": "Explains the distinction between Router (predicate-based) and Fanout (broadcast all)"}
+      {"id": "2.1", "text": "Identifies that the default Router sends to ALL matching handlers (both Slack and PagerDuty match for ERROR)"},
+      {"id": "2.2", "text": "Recommends using .FirstMatch() on the Router to stop at the first matching handler"},
+      {"id": "2.3", "text": "Does NOT suggest just changing Slack's predicate to LevelIs(slog.LevelWarn) as the complete fix (errors still match WARN-and-above)"},
+      {"id": "2.4", "text": "Shows the correct Router().Add(pagerduty, LevelIs(ERROR)).Add(slack, LevelIs(WARN)).FirstMatch().Handler() pattern"},
+      {"id": "2.5", "text": "Explains the semantic difference: Router routes to ALL matches, FirstMatch routes to FIRST match only"}
     ]
   },
   {
@@ -43,44 +43,44 @@
   },
   {
     "id": 4,
-    "name": "sampling-strategy-selection",
-    "description": "Tests whether the model picks the right sampling strategy and exempts errors",
-    "prompt": "My Go service processes 50k requests/sec. Logging costs are $2k/month. I need to reduce log volume by 90% but keep all error and warning logs intact. Which samber/slog-sampling strategy should I use? Show the setup.",
-    "trap": "Without the skill, the model uses UniformSamplingOption which drops errors too, or implements custom sampling logic instead of using the library",
+    "name": "sampling-matcher-grouping",
+    "description": "Tests whether the model understands slog-sampling Matchers for deduplication grouping",
+    "prompt": "I've set up ThresholdSamplingOption in my Go service: log the first 10 per 5s, then sample at 10%. It works, but I notice that 'user not found' (DEBUG) and 'cache miss' (DEBUG) are being counted together in the same bucket. After 10 total DEBUG logs from both messages, both get sampled. I want each distinct log message to have its own counter of 10. How do I fix this with samber/slog-sampling?",
+    "trap": "Without the skill, the model either rebuilds sampling from scratch or suggests separate logger instances per message. The correct fix is to set the Matcher to MatchByLevelAndMessage() (or MatchByMessage()) so each unique message gets its own deduplication bucket instead of all records sharing one bucket.",
     "assertions": [
-      {"id": "4.1", "text": "Uses ThresholdSamplingOption or AbsoluteSamplingOption (not UniformSamplingOption)"},
-      {"id": "4.2", "text": "Configures sampling to only affect Debug/Info levels, not Warn/Error"},
-      {"id": "4.3", "text": "Warn and Error records pass through unsampled (via Router or Custom sampler)"},
-      {"id": "4.4", "text": "Uses samber/slog-sampling library, not custom sampling code"},
-      {"id": "4.5", "text": "Explains why Uniform sampling is wrong for this use case (it drops errors too)"}
+      {"id": "4.1", "text": "Identifies that the default Matcher groups all records into one bucket (regardless of message)"},
+      {"id": "4.2", "text": "Recommends setting the Matcher field on ThresholdSamplingOption to MatchByLevelAndMessage() or MatchByMessage()"},
+      {"id": "4.3", "text": "Explains that each unique message will then have its own independent threshold counter"},
+      {"id": "4.4", "text": "Does NOT suggest creating separate logger instances per message type as the solution"},
+      {"id": "4.5", "text": "Does NOT suggest rewriting custom sampling logic outside of slog-sampling"}
     ]
   },
   {
     "id": 5,
-    "name": "router-missing-default",
-    "description": "Tests whether the model identifies missing catch-all handler in Router",
-    "prompt": "I have a slog-multi Router that routes ERROR to Sentry and INFO to Loki. But my DEBUG logs are disappearing entirely — they don't appear anywhere. Here's my setup:\n\n```go\nlogger := slog.New(\n    slogmulti.Router().\n        Add(sentryHandler, slogmulti.LevelIs(slog.LevelError)).\n        Add(lokiHandler, slogmulti.LevelIs(slog.LevelInfo)).\n        Handler(),\n)\n```\n\nWhat's wrong?",
-    "trap": "Without the skill, the model suggests checking the log level threshold or Loki configuration, not the missing default handler in the Router",
+    "name": "router-warn-level-gap",
+    "description": "Tests whether the model identifies that WARN records are silently dropped in a Router with only ERROR and INFO predicates",
+    "prompt": "I have this slog-multi Router setup. My ERROR logs reach Sentry, my INFO logs reach Loki, but my WARN logs are silently disappearing — they don't reach either handler. My global slog level is set to Debug so filtering isn't the issue. What's wrong?\n\n```go\nlogger := slog.New(\n    slogmulti.Router().\n        Add(sentryHandler, slogmulti.LevelIs(slog.LevelError)).\n        Add(lokiHandler, slogmulti.LevelIs(slog.LevelInfo)).\n        Handler(),\n)\n```",
+    "trap": "Without the skill, the model suspects Loki configuration, slog level filters, or assumes LevelIs(Info) includes Warn. The skill teaches that Router predicates are exact — LevelIs(Info) matches ONLY Info, not Warn or above. WARN records match no predicate and are silently dropped. Fix: add a catch-all handler or use a predicate that covers Warn.",
     "assertions": [
-      {"id": "5.1", "text": "Identifies the missing catch-all/default handler in the Router as the root cause"},
-      {"id": "5.2", "text": "Explains that Router silently drops records matching no predicate"},
-      {"id": "5.3", "text": "Suggests adding a handler without a predicate (catch-all) or adding LevelIs(slog.LevelDebug)"},
-      {"id": "5.4", "text": "Uses slogmulti.Router() API correctly in the fix"},
-      {"id": "5.5", "text": "Does NOT suggest changing the global log level as the primary fix"}
+      {"id": "5.1", "text": "Correctly identifies that LevelIs(slog.LevelInfo) matches ONLY Info level, not Warn"},
+      {"id": "5.2", "text": "Explains that Router silently drops records that match no predicate"},
+      {"id": "5.3", "text": "Does NOT suggest the global slog level or Loki configuration as the root cause"},
+      {"id": "5.4", "text": "Proposes adding a catch-all handler (no predicate) or a LevelIs(slog.LevelWarn) rule to capture WARN records"},
+      {"id": "5.5", "text": "Correctly explains that Router predicates are exact-level matches, not 'level and above'"}
     ]
   },
   {
     "id": 6,
-    "name": "http-middleware-filters",
-    "description": "Tests whether the model uses slog-gin's Config with filters instead of custom middleware",
-    "prompt": "Add request logging to my Gin server using samber/slog-gin. I want to skip logging for /health and /metrics endpoints, and include request bodies for debugging. Show the setup.",
-    "trap": "Without the skill, the model uses a generic custom Gin middleware or manually filters paths instead of using slog-gin's built-in Config and Filters",
+    "name": "http-middleware-error-level-differentiation",
+    "description": "Tests whether the model uses slog-gin Config to log 4xx and 5xx at different levels instead of uniform INFO",
+    "prompt": "I've added sloggin.New(logger) to my Gin server for request logging. My log aggregation tool shows that 404s and 500s both appear as INFO level, making it hard to alert on server errors. How do I make 4xx client errors log at WARN and 5xx server errors log at ERROR, while keeping normal requests at INFO, using samber/slog-gin?",
+    "trap": "Without the skill, the model wraps sloggin in a custom middleware or post-processes log records to change the level. The skill teaches that slog-gin's Config struct has ClientErrorLevel and ServerErrorLevel fields that handle this natively — no custom middleware needed.",
     "assertions": [
-      {"id": "6.1", "text": "Uses sloggin.NewWithConfig() (not just sloggin.New()) to pass configuration"},
-      {"id": "6.2", "text": "Configures Filters with IgnorePath for /health and /metrics"},
-      {"id": "6.3", "text": "Sets WithRequestBody: true in the Config"},
-      {"id": "6.4", "text": "Config includes DefaultLevel, ClientErrorLevel, and/or ServerErrorLevel fields"},
-      {"id": "6.5", "text": "Uses sloggin.IgnorePath or sloggin.IgnorePathPrefix (not a custom filter function)"}
+      {"id": "6.1", "text": "Replaces sloggin.New() with sloggin.NewWithConfig() to pass a Config struct"},
+      {"id": "6.2", "text": "Sets ClientErrorLevel: slog.LevelWarn in the Config for 4xx responses"},
+      {"id": "6.3", "text": "Sets ServerErrorLevel: slog.LevelError in the Config for 5xx responses"},
+      {"id": "6.4", "text": "Sets DefaultLevel: slog.LevelInfo in the Config for 2xx/3xx responses"},
+      {"id": "6.5", "text": "Does NOT implement a custom Gin middleware or post-processing logic to change log levels"}
     ]
   },
   {
@@ -114,15 +114,15 @@
   {
     "id": 9,
     "name": "pool-vs-fanout-latency",
-    "description": "Tests whether the model recommends Pool over Fanout for latency-sensitive pipelines",
-    "prompt": "My slog Fanout to 5 remote handlers is slowing down my HTTP responses. Each handler takes 5-50ms to write. The total latency added per request is 25-250ms because Fanout processes them sequentially. How do I fix this latency problem while keeping all 5 destinations? Show the code change.",
-    "trap": "Without the skill, the model suggests spawning goroutines per log record or using buffered channels instead of slog-multi's Pool handler",
+    "description": "Tests whether the model recommends Pool over Fanout and correctly describes Pool's latency model",
+    "prompt": "I'm replacing slogmulti.Fanout with slogmulti.Pool to reduce log-call latency. I have 4 handlers with these p99 write times: stdout (1ms), Loki (20ms), Datadog (30ms), Sentry (15ms). My current Fanout p99 latency per log call is ~66ms. What will Pool's p99 latency be, and are there any risks I should know about with Pool that don't exist with Fanout?",
+    "trap": "Without the skill, the model says Pool will have ~0ms latency (wrongly treating it as fire-and-forget) or cannot identify the risks. The skill teaches: Pool latency = max of all handlers (30ms, not 66ms); risk = Pool may silently swallow handler errors that Fanout would surface synchronously.",
     "assertions": [
-      {"id": "9.1", "text": "Identifies sequential processing in Fanout as the root cause"},
-      {"id": "9.2", "text": "Recommends replacing Fanout with slogmulti.Pool() for concurrent broadcast"},
-      {"id": "9.3", "text": "Explains that Pool dispatches to all handlers concurrently, reducing latency from sum-of-all to max-of-all handler duration"},
-      {"id": "9.4", "text": "Does NOT suggest spawning raw goroutines per log record as the primary solution"},
-      {"id": "9.5", "text": "Shows the code change from slogmulti.Fanout(handlers...) to slogmulti.Pool()(handlers...)"}
+      {"id": "9.1", "text": "Correctly states Pool p99 latency will be ~30ms (the slowest handler, Datadog) not the sum"},
+      {"id": "9.2", "text": "Explains that Pool dispatches concurrently so latency = max(handler latencies), not sum"},
+      {"id": "9.3", "text": "Identifies at least one risk of Pool vs Fanout (e.g. handler errors may not surface synchronously, or error handling differs)"},
+      {"id": "9.4", "text": "Shows correct Pool syntax: slogmulti.Pool()(handlers...) with the double call"},
+      {"id": "9.5", "text": "Does NOT claim Pool is fully asynchronous/fire-and-forget with zero latency impact"}
     ]
   },
   {

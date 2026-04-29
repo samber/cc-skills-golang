@@ -69,25 +69,25 @@
   {
     "id": 6,
     "name": "map-range-double-lookup",
-    "description": "Tests whether the model catches redundant map lookups in range loops",
-    "prompt": "This Go map transformation function shows up in our profiling with high CPU time. Can you optimize it?\n\n```go\nfunc TransformMap(in map[string]int) map[string]string {\n    result := make(map[string]string, len(in))\n    for k := range in {\n        result[k] = strconv.Itoa(in[k])\n    }\n    return result\n}\n```",
-    "trap": "The pattern 'for k := range m { use(m[k]) }' does two lookups per iteration. The fix is 'for k, v := range m { use(v) }'. This is a subtle optimization that many developers miss.",
+    "description": "Tests whether the model avoids double map lookups when writing new map iteration code",
+    "prompt": "Write a Go function that counts how many values in a map satisfy a threshold. The map is large (1M entries) and the function is called frequently.\n\n```go\nfunc CountAbove(scores map[string]int, threshold int) int {\n    // TODO: implement\n}\n```\n\nWrite the most efficient implementation.",
+    "trap": "The natural/idiomatic instinct when writing map iteration code is to use 'for k := range m { if m[k] > threshold { count++ } }' because it looks clean. This does 2 lookups per iteration. The skill teaches 'for k, v := range m { if v > threshold { count++ } }' for a single lookup. The model will likely write the double-lookup version without the skill prompting it to use the k, v form.",
     "assertions": [
-      {"id": "6.1", "text": "Identifies that for k := range in { in[k] } does two map lookups per iteration"},
-      {"id": "6.2", "text": "Suggests for k, v := range in { result[k] = strconv.Itoa(v) } to do a single lookup"}
+      {"id": "6.1", "text": "Uses 'for k, v := range scores' (capturing the value in range) rather than 'for k := range scores { scores[k] }'"},
+      {"id": "6.2", "text": "Does NOT perform a second lookup into the map inside the loop body (i.e., does not use scores[k] inside the loop)"}
     ]
   },
   {
     "id": 7,
     "name": "sentinel-errors-hot-path",
-    "description": "Tests whether the model recommends preallocated sentinel errors over fmt.Errorf in hot paths",
-    "prompt": "Profiling shows our validation function has high allocation count. It's called millions of times per second in our hot path.\n\n```go\nfunc Validate(x int) error {\n    if x < 0 {\n        return fmt.Errorf(\"value is negative: %d\", x)\n    }\n    if x > 1000 {\n        return fmt.Errorf(\"value exceeds maximum\")\n    }\n    return nil\n}\n```\n\nReduce allocations while keeping useful error messages.",
-    "trap": "The second error (\"value exceeds maximum\") has no dynamic content and can be a preallocated sentinel (errors.New at package level), zero allocations. The first error has dynamic content (%d) so fmt.Errorf is appropriate there. Without the skill, the model may try to optimize both the same way or miss the distinction.",
+    "description": "Tests whether the model avoids fmt.Errorf for static errors in allocation-sensitive hot paths when writing new error-returning code",
+    "prompt": "Write a Go function that parses a configuration value. It must return descriptive errors and will be called thousands of times per second during request processing.\n\n```go\n// parseTimeout parses a timeout string like \"30s\", \"5m\".\n// Returns error if empty, if the unit is unrecognized, or if the value is negative.\nfunc parseTimeout(s string) (time.Duration, error) {\n    // TODO: implement\n}\n```\n\nImplement this function.",
+    "trap": "The natural way to write descriptive errors is to use fmt.Errorf for all cases: fmt.Errorf(\"empty timeout\"), fmt.Errorf(\"unrecognized unit %q\", unit), fmt.Errorf(\"negative timeout: %v\", d). The skill teaches that static, predictable errors (like 'empty timeout') should be preallocated sentinels at package level (errors.New) to avoid allocation on every call. Only errors needing dynamic values should use fmt.Errorf. Without the skill the model writes fmt.Errorf for every error case.",
     "assertions": [
-      {"id": "7.1", "text": "Converts the static error (exceeds maximum) to a preallocated sentinel using errors.New at package level"},
-      {"id": "7.2", "text": "Keeps fmt.Errorf for the dynamic error that includes %d (or uses a similar dynamic approach)"},
-      {"id": "7.3", "text": "Explains that fmt.Errorf allocates on every call, while sentinels allocate once"},
-      {"id": "7.4", "text": "Does NOT convert the dynamic error to a sentinel (it needs the value)"}
+      {"id": "7.1", "text": "Uses errors.New at package level for the static 'empty string' error case (no dynamic content)"},
+      {"id": "7.2", "text": "Uses fmt.Errorf (or errors.New with dynamic content) for error cases that need to embed runtime values like the unrecognized unit"},
+      {"id": "7.3", "text": "Does NOT use fmt.Errorf for error messages that contain no dynamic values"},
+      {"id": "7.4", "text": "Explains that fmt.Errorf allocates on every call while package-level errors.New allocates once"}
     ]
   },
   {
@@ -106,14 +106,14 @@
   {
     "id": 9,
     "name": "backing-array-leak-slice",
-    "description": "Tests whether the model catches backing array retention when returning a small reslice of a large slice",
-    "prompt": "Our Go service reads large messages (1-10MB) and extracts a small header. Memory profiling shows the service retains far more memory than expected. What's wrong?\n\n```go\nfunc ExtractHeader(message []byte) []byte {\n    return message[:32]\n}\n\nfunc ProcessMessage(msg []byte) Header {\n    headerBytes := ExtractHeader(msg)\n    return parseHeader(headerBytes)\n}\n```\n\nThe full message is not used after extracting the header.",
-    "trap": "The reslice message[:32] retains the entire backing array (1-10MB) because it shares the same underlying array. The fix is to copy the 32 bytes to a new slice. Without the skill, the model may not identify this as a memory leak pattern.",
+    "description": "Tests whether the model avoids backing array retention when writing a function that stores subslices long-term",
+    "prompt": "Write a Go function that caches the first 16 bytes of each incoming network packet for later audit logging. Packets are large (up to 64KB) and are pooled via sync.Pool — they get reused after the call returns.\n\n```go\nvar auditLog [][]byte\n\nfunc recordPacketPrefix(pkt []byte) {\n    // TODO: store first 16 bytes of pkt in auditLog\n}\n```\n\nImplement this function.",
+    "trap": "The obvious, idiomatic implementation is 'auditLog = append(auditLog, pkt[:16])' — a simple reslice. This looks correct but retains the entire 64KB backing array per entry because the subslice shares the original buffer. Since packets come from a sync.Pool and are reused, the retained backing arrays also prevent correct pool behavior. The fix is to copy: 'prefix := make([]byte, 16); copy(prefix, pkt[:16]); auditLog = append(auditLog, prefix)'. Without the skill the model writes the reslice version.",
     "assertions": [
-      {"id": "9.1", "text": "Identifies that message[:32] retains the entire backing array (1-10MB)"},
-      {"id": "9.2", "text": "Suggests using copy() to create an independent 32-byte slice"},
-      {"id": "9.3", "text": "Explains that the original large array cannot be GC'd while the reslice exists"},
-      {"id": "9.4", "text": "Provides correct copy-based fix: make([]byte, 32) + copy(header, message[:32])"}
+      {"id": "9.1", "text": "Does NOT use pkt[:16] directly as the stored value (reslice retains the entire backing array)"},
+      {"id": "9.2", "text": "Creates an independent copy using make([]byte, 16) + copy, or equivalent"},
+      {"id": "9.3", "text": "Explains that storing a reslice retains the entire original backing array, preventing GC"},
+      {"id": "9.4", "text": "Notes the interaction with sync.Pool: retained backing arrays prevent buffer reuse or cause data corruption"}
     ]
   },
   {
@@ -131,14 +131,14 @@
   {
     "id": 11,
     "name": "map-never-shrinks",
-    "description": "Tests knowledge that Go maps never release bucket memory and the compact/recreate pattern",
-    "prompt": "Our Go cache stores user sessions. We add entries during peak hours (up to 1M entries) and remove them during off-peak. But memory usage remains high even after deleting most entries. The map goes from 1M to ~1000 entries but memory doesn't decrease.\n\n```go\nvar sessions = make(map[string]*Session)\n\nfunc AddSession(id string, s *Session) { sessions[id] = s }\nfunc RemoveSession(id string)          { delete(sessions, id) }\n```\n\nHow do we reclaim the memory?",
-    "trap": "Go maps grow but never shrink their bucket allocation. Deleting entries doesn't free the underlying memory. The skill teaches the compact/recreate pattern (create a new map and copy entries). Without it, the model may suggest GC tuning or other approaches that don't address the root cause.",
+    "description": "Tests whether the model avoids using a long-lived map for a high-churn cache without addressing bucket retention",
+    "prompt": "Design a Go in-memory rate-limiter that tracks per-IP request counts. Counts reset every minute. At peak there are 500K active IPs, but off-peak only ~200 IPs are active.\n\n```go\ntype RateLimiter struct {\n    mu     sync.Mutex\n    counts map[string]int\n}\n\nfunc NewRateLimiter() *RateLimiter {\n    return &RateLimiter{counts: make(map[string]int)}\n}\n\nfunc (r *RateLimiter) reset() {\n    r.mu.Lock()\n    defer r.mu.Unlock()\n    // TODO: implement the per-minute reset\n}\n```\n\nImplement the reset method.",
+    "trap": "The natural, obvious implementation is to range over the map and delete each key: 'for k := range r.counts { delete(r.counts, k) }'. This looks correct and idiomatic but leaves all 500K bucket slots allocated — the map retains its peak allocation forever. The skill teaches that maps never release bucket memory; the fix is to replace the map entirely: 'r.counts = make(map[string]int)'. Without the skill the model writes the delete-loop version.",
     "assertions": [
-      {"id": "11.1", "text": "Explains that Go maps never release bucket memory when entries are deleted"},
-      {"id": "11.2", "text": "Suggests periodically recreating the map by copying entries to a new map"},
-      {"id": "11.3", "text": "Provides the compact pattern: make(map[K]V, len(old)) + range copy"},
-      {"id": "11.4", "text": "Does NOT suggest that calling runtime.GC() or tuning GOGC will fix this"}
+      {"id": "11.1", "text": "Replaces the map with a fresh allocation (r.counts = make(map[string]int)) rather than deleting keys in a loop"},
+      {"id": "11.2", "text": "Does NOT use 'for k := range r.counts { delete(r.counts, k) }' as the reset strategy"},
+      {"id": "11.3", "text": "Explains that Go maps never release bucket memory when keys are deleted, so delete-loop retains peak allocation"},
+      {"id": "11.4", "text": "Notes that reassigning to a new map allows the old bucket array to be GC'd"}
     ]
   },
   {
@@ -239,14 +239,14 @@
   {
     "id": 19,
     "name": "contiguous-2d-allocation",
-    "description": "Tests knowledge of contiguous 2D allocation for cache-friendly matrix access",
-    "prompt": "We need to allocate a large 2D matrix in Go for numerical computation. What's the most efficient way?\n\n```go\nfunc NewMatrix(rows, cols int) [][]float64 {\n    matrix := make([][]float64, rows)\n    for i := range matrix {\n        matrix[i] = make([]float64, cols)\n    }\n    return matrix\n}\n```\n\nIs there a more cache-friendly approach?",
-    "trap": "Allocating each row separately scatters data across the heap. The skill teaches the contiguous allocation pattern: single make([]float64, rows*cols) backed by one array, then slicing into rows. Without it, the model may suggest minor improvements instead of the fundamentally different allocation strategy.",
+    "description": "Tests whether the model uses contiguous allocation when writing new 2D matrix code for a performance-critical context",
+    "prompt": "Write a Go function that creates an NxM grid of float64 values initialized to zero, for use in a finite-element simulation that iterates row by row over the grid millions of times per second.\n\n```go\nfunc NewGrid(rows, cols int) [][]float64 {\n    // TODO\n}\n```\n\nImplement this function.",
+    "trap": "The standard idiomatic Go way to create a 2D slice is the row-by-row allocation loop: make([][]float64, rows) followed by make([]float64, cols) per row. Every Go tutorial and example uses this pattern. However for performance-critical numeric code the skill teaches a single contiguous allocation (make([]float64, rows*cols)) sliced into row views, which has far better cache locality. Without the skill the model writes the idiomatic per-row allocation.",
     "assertions": [
-      {"id": "19.1", "text": "Identifies that per-row allocation scatters data across the heap"},
-      {"id": "19.2", "text": "Suggests single contiguous allocation: make([]float64, rows*cols)"},
-      {"id": "19.3", "text": "Shows slicing the contiguous array into row views: data[i*cols : (i+1)*cols]"},
-      {"id": "19.4", "text": "Explains that contiguous memory improves cache locality for sequential access"}
+      {"id": "19.1", "text": "Allocates a single contiguous backing slice: make([]float64, rows*cols)"},
+      {"id": "19.2", "text": "Slices it into row views: data[i*cols : (i+1)*cols]"},
+      {"id": "19.3", "text": "Does NOT allocate each row independently with a separate make([]float64, cols) call"},
+      {"id": "19.4", "text": "Explains that contiguous allocation improves cache locality for row-sequential access"}
     ]
   },
   {
@@ -293,14 +293,14 @@
   {
     "id": 23,
     "name": "index-based-tree-cache-locality",
-    "description": "Tests knowledge that index-based data structures beat pointer-based for cache locality",
-    "prompt": "We're implementing a binary tree in Go for a high-performance search workload. Which implementation approach is more cache-friendly?\n\n```go\n// Option A: Pointer-based\ntype NodeA struct {\n    Value int\n    Left  *NodeA\n    Right *NodeA\n}\n\n// Option B: Index-based\ntype Tree struct {\n    Nodes []NodeB\n}\ntype NodeB struct {\n    Value int\n    Left  int // index into Nodes\n    Right int // index into Nodes\n}\n```",
-    "trap": "The skill specifically teaches that index-based structures store nodes in a contiguous array with cache-friendly access, while pointer-based structures scatter nodes across the heap causing random cache misses. Without it, the model may prefer pointers for flexibility without discussing cache effects.",
+    "description": "Tests whether the model uses index-based node storage when implementing a high-performance tree from scratch",
+    "prompt": "Implement a Go binary search tree for a high-throughput in-memory lookup service. The tree will hold ~1M integer keys and be traversed millions of times per second. Write the node and tree type definitions and the Insert method.\n\n```go\n// TODO: define types and implement Insert\n```",
+    "trap": "Every Go tutorial, textbook, and LeetCode solution defines a binary tree with pointer-based nodes: 'type Node struct { Value int; Left, Right *Node }'. This is the universal default. However the skill teaches that pointer-based trees scatter each node across the heap causing random cache misses on every traversal. For high-throughput lookup the correct approach is index-based nodes stored in a contiguous slice: 'type Node struct { Value, Left, Right int }' inside a Tree struct with a Nodes []Node backing array. Without the skill the model writes the pointer-based version.",
     "assertions": [
-      {"id": "23.1", "text": "Recommends Option B (index-based) for better cache locality"},
-      {"id": "23.2", "text": "Explains that pointer-based nodes are scattered across the heap causing cache misses"},
-      {"id": "23.3", "text": "Explains that index-based nodes are stored in a contiguous array"},
-      {"id": "23.4", "text": "Mentions CPU cache lines or memory prefetching as the reason for the difference"}
+      {"id": "23.1", "text": "Stores nodes in a contiguous slice (e.g., Nodes []Node field on the tree struct)"},
+      {"id": "23.2", "text": "Uses integer indices (not pointers) for left/right child references"},
+      {"id": "23.3", "text": "Does NOT define nodes with *Node pointer fields as the primary implementation"},
+      {"id": "23.4", "text": "Explains that index-based nodes stay in contiguous memory, reducing cache misses compared to scattered heap pointers"}
     ]
   },
   {
@@ -333,13 +333,13 @@
   {
     "id": 26,
     "name": "type-switch-vs-repeated-assertions",
-    "description": "Tests knowledge that type switches dispatch in one evaluation vs repeated if-assertions",
-    "prompt": "Optimize this Go function that converts interface values to strings. It's called frequently in our serialization hot path.\n\n```go\nfunc ToString(v any) string {\n    if s, ok := v.(string); ok {\n        return s\n    }\n    if i, ok := v.(int); ok {\n        return strconv.Itoa(i)\n    }\n    if f, ok := v.(float64); ok {\n        return strconv.FormatFloat(f, 'f', -1, 64)\n    }\n    if b, ok := v.(bool); ok {\n        return strconv.FormatBool(b)\n    }\n    return fmt.Sprintf(\"%v\", v)\n}\n```",
-    "trap": "Repeated type assertions evaluate the interface type multiple times. A type switch dispatches in a single evaluation. The skill specifically teaches this pattern.",
+    "description": "Tests whether the model uses a type switch (not repeated assertions) when writing new interface dispatch code for a hot path",
+    "prompt": "Write a Go function that formats any scalar value as a string for a high-throughput metrics labeling system. It must handle string, int, int64, float64, and bool. Called ~500K times/sec.\n\n```go\nfunc FormatLabel(v any) string {\n    // TODO\n}\n```\n\nImplement this function.",
+    "trap": "The natural way many Go developers write multi-type dispatch is a chain of if-assertions: 'if s, ok := v.(string); ok { return s }' etc. — it looks clear and matches the pattern from many examples. A type switch 'switch v := v.(type) { case string: ... }' dispatches in a single evaluation of the interface type and is the correct pattern for hot paths. Without the skill the model may write the if-chain of repeated assertions, evaluating the interface type multiple times.",
     "assertions": [
-      {"id": "26.1", "text": "Suggests replacing repeated type assertions with a type switch"},
-      {"id": "26.2", "text": "Explains that a type switch dispatches in a single evaluation"},
-      {"id": "26.3", "text": "Shows the switch v := v.(type) { case string: ... case int: ... } pattern"}
+      {"id": "26.1", "text": "Uses a type switch (switch v := v.(type)) rather than a chain of individual if-assertions"},
+      {"id": "26.2", "text": "Does NOT use repeated v.(T) comma-ok assertions in separate if-blocks"},
+      {"id": "26.3", "text": "Handles all required types: string, int (or int64), float64, and bool in the switch cases"}
     ]
   },
   {
@@ -359,13 +359,13 @@
   {
     "id": 28,
     "name": "response-body-drain",
-    "description": "Tests knowledge that HTTP connections are only reused when the body is fully read",
-    "prompt": "Our Go service makes HEAD-like requests where we only check the status code. But connection pool metrics show connections aren't being reused.\n\n```go\nfunc CheckAlive(url string) bool {\n    resp, err := client.Get(url)\n    if err != nil {\n        return false\n    }\n    defer resp.Body.Close()\n    return resp.StatusCode == 200\n}\n```\n\nWhy aren't connections being reused?",
-    "trap": "Connections are only returned to the pool when the body is fully read. Even if you don't need the body, you must drain it with io.Copy(io.Discard, resp.Body). Without the skill, the model may focus on the Close() being present and miss the drain requirement.",
+    "description": "Tests whether the model drains the response body when writing a new HTTP health-check function",
+    "prompt": "Write a Go function that polls a list of service endpoints and returns which ones are healthy (HTTP 200). It will run every 5 seconds against ~50 endpoints with a shared http.Client.\n\n```go\nfunc CheckHealthy(client *http.Client, urls []string) []string {\n    // TODO: return URLs that respond with 200\n}\n```\n\nImplement this function.",
+    "trap": "The natural implementation closes the body with 'defer resp.Body.Close()' and reads the status code — which looks correct and complete. Most developers do not know that the transport only returns the connection to the pool after the body is fully consumed. Without draining via 'io.Copy(io.Discard, resp.Body)', each health check creates a new TCP connection and the 50-endpoint poll exhausts the connection pool. Without the skill the model writes the close-only version.",
     "assertions": [
-      {"id": "28.1", "text": "Identifies that the response body is not being fully read/drained"},
-      {"id": "28.2", "text": "Explains that connections are only reused when the body is fully consumed"},
-      {"id": "28.3", "text": "Suggests adding io.Copy(io.Discard, resp.Body) before or after the status check"}
+      {"id": "28.1", "text": "Drains the response body using io.Copy(io.Discard, resp.Body) or io.ReadAll before closing"},
+      {"id": "28.2", "text": "Does NOT only call resp.Body.Close() without first reading/draining the body"},
+      {"id": "28.3", "text": "Explains that connections are only returned to the pool after the body is fully consumed"}
     ]
   },
   {
@@ -423,14 +423,14 @@
   {
     "id": 33,
     "name": "ballast-pattern-obsolete",
-    "description": "Tests that the model recommends GOMEMLIMIT over the ballast pattern",
-    "prompt": "I found this code in our Go service to reduce GC frequency. Is this still a recommended pattern?\n\n```go\nvar ballast [1 << 30]byte // 1 GB ballast to reduce GC frequency\n\nfunc main() {\n    _ = ballast\n    startServer()\n}\n```\n\nWe're running Go 1.22.",
-    "trap": "The ballast pattern is obsolete since Go 1.19. GOMEMLIMIT is strictly better — it provides the same benefit without wasting physical memory. Without the skill, the model may say it's a valid approach or suggest minor improvements.",
+    "description": "Tests whether the model avoids the ballast pattern and uses GOMEMLIMIT when configuring GC for a new service",
+    "prompt": "We're deploying a new Go 1.22 service in a Kubernetes pod with 2GB memory limit. The service is allocation-heavy during bursts and we want to reduce GC frequency to avoid latency spikes. A senior engineer suggested allocating a large byte array at startup to inflate the live heap. How should we configure the runtime?\n\n```go\nfunc main() {\n    // TODO: configure GC behavior\n    startServer()\n}\n```",
+    "trap": "The suggestion to 'allocate a large byte array at startup' is a direct hint toward the ballast pattern, which was the standard advice before Go 1.19. A model without the skill may implement it as suggested: 'var ballast = make([]byte, 1<<30)'. The skill explicitly teaches that the ballast pattern is obsolete since Go 1.19 — GOMEMLIMIT is strictly better because it achieves the same reduction in GC frequency without wasting physical memory. Without the skill the model follows the senior engineer's suggestion and implements the ballast.",
     "assertions": [
-      {"id": "33.1", "text": "Identifies the ballast pattern as obsolete since Go 1.19"},
-      {"id": "33.2", "text": "Recommends GOMEMLIMIT as the replacement"},
-      {"id": "33.3", "text": "Explains that GOMEMLIMIT provides the same benefit without wasting physical memory"},
-      {"id": "33.4", "text": "Shows the GOMEMLIMIT environment variable or debug.SetMemoryLimit call"}
+      {"id": "33.1", "text": "Does NOT implement the ballast pattern (large byte array allocation at startup)"},
+      {"id": "33.2", "text": "Recommends setting GOMEMLIMIT (e.g., GOMEMLIMIT=1800MiB or debug.SetMemoryLimit)"},
+      {"id": "33.3", "text": "Explains that the ballast pattern is obsolete since Go 1.19"},
+      {"id": "33.4", "text": "Explains that GOMEMLIMIT provides the same GC-frequency benefit without wasting physical memory"}
     ]
   },
   {
@@ -489,14 +489,14 @@
   {
     "id": 38,
     "name": "singleflight-cache-stampede",
-    "description": "Tests knowledge of singleflight for cache stampede prevention",
-    "prompt": "Our Go service caches weather data with a 5-minute TTL. Under high traffic (1000 req/s), when the cache entry expires, we see a burst of 200+ concurrent requests all hitting the weather API simultaneously. This overloads the upstream API and causes cascading failures.\n\n```go\nvar cache sync.Map\n\nfunc GetWeather(city string) (string, error) {\n    if val, ok := cache.Load(city); ok {\n        return val.(string), nil\n    }\n    data, err := fetchFromWeatherAPI(city)\n    if err != nil {\n        return \"\", err\n    }\n    cache.Store(city, data)\n    return data, nil\n}\n```\n\nHow do we prevent the thundering herd on cache expiry?",
-    "trap": "This is a cache stampede problem. The skill teaches singleflight.Group to deduplicate concurrent requests for the same key. Without it, the model may suggest mutex locking (which blocks all cities) or probabilistic TTL (which doesn't fully prevent the stampede).",
+    "description": "Tests whether the model uses singleflight (not a mutex) when writing a new cache-with-fetch function serving high concurrency",
+    "prompt": "Write a Go function that fetches and caches country metadata (name, currency, timezone). The cache has a 10-minute TTL. The service handles 2000 req/s with ~50 unique countries. Implement GetCountry.\n\n```go\nvar cache sync.Map\n\nfunc GetCountry(code string) (Country, error) {\n    // TODO: check cache, fetch from API if missing, store result\n}\n\nfunc fetchFromAPI(code string) (Country, error) { /* external call, ~200ms */ }\n```",
+    "trap": "The natural implementation is a simple cache-aside: load from cache, on miss fetch from API, store result. This is what every cache tutorial shows. Under 2000 req/s with 200ms fetch latency, a cache miss for any country causes 400 concurrent goroutines to all call fetchFromAPI for the same key simultaneously — a cache stampede. The fix requires singleflight.Group so only one goroutine fetches per key while others wait and share the result. A mutex would serialize all countries, not just the same one. Without the skill the model writes the naive cache-aside without stampede protection.",
     "assertions": [
-      {"id": "38.1", "text": "Identifies this as a cache stampede problem"},
-      {"id": "38.2", "text": "Recommends golang.org/x/sync/singleflight.Group"},
-      {"id": "38.3", "text": "Shows sf.Do(key, func) pattern where only one goroutine fetches while others wait"},
-      {"id": "38.4", "text": "Does NOT suggest a global mutex as the primary solution (it would block all cities)"}
+      {"id": "38.1", "text": "Uses singleflight.Group (golang.org/x/sync/singleflight) to deduplicate concurrent fetches for the same key"},
+      {"id": "38.2", "text": "Does NOT use a global mutex that would serialize requests for different country codes"},
+      {"id": "38.3", "text": "Shows the sf.Do(code, func) pattern so concurrent requests for the same key share one fetch"},
+      {"id": "38.4", "text": "Explains that without singleflight, a cache miss causes all concurrent waiters to call the API simultaneously"}
     ]
   },
   {
@@ -515,26 +515,26 @@
   {
     "id": 40,
     "name": "early-return-full-scan",
-    "description": "Tests knowledge of early returns to avoid full collection scans",
-    "prompt": "Optimize this Go search function:\n\n```go\nfunc HasExpired(sessions []Session) bool {\n    found := false\n    for _, s := range sessions {\n        if s.ExpiresAt.Before(time.Now()) {\n            found = true\n        }\n    }\n    return found\n}\n```\n\nThe sessions slice typically has 10,000+ entries.",
-    "trap": "The function always iterates the full collection even after finding a match. The skill teaches early return to avoid unnecessary iterations. This is a subtle inefficiency that many miss.",
+    "description": "Tests whether the model uses early return when writing a new existence-check loop over a large collection",
+    "prompt": "Write a Go function that checks whether any order in a large list has been flagged for fraud review. Orders are checked on every API request; the slice typically holds 50,000+ entries.\n\n```go\ntype Order struct {\n    ID         string\n    FraudScore float64\n    // ...\n}\n\nfunc HasFraudulentOrder(orders []Order, threshold float64) bool {\n    // TODO\n}\n```\n\nImplement this function.",
+    "trap": "When asked to write a boolean existence check, many developers reach for the accumulator pattern: 'found := false; for _, o := range orders { if o.FraudScore > threshold { found = true } }; return found'. This always scans all 50K entries even when the very first entry matches. The correct approach returns immediately on the first match. Without the skill explicitly teaching early-return as a performance pattern, the model may write the full-scan accumulator version, especially since it is a common pattern in introductory Go code.",
     "assertions": [
-      {"id": "40.1", "text": "Identifies that the function always scans the full collection even after finding a match"},
-      {"id": "40.2", "text": "Adds an early return (return true) when the first expired session is found"},
-      {"id": "40.3", "text": "Removes the found variable in favor of direct returns"}
+      {"id": "40.1", "text": "Returns true immediately upon finding the first matching order (early return inside the loop)"},
+      {"id": "40.2", "text": "Does NOT use an accumulator variable (found := false) that defers the return until after the full loop"},
+      {"id": "40.3", "text": "Returns false after the loop without having scanned entries unnecessarily past the first match"}
     ]
   },
   {
     "id": 41,
     "name": "iterator-chain-vs-direct-loop",
-    "description": "Tests knowledge that iterator chains create closure overhead vs direct loops",
-    "prompt": "Which approach is more performant in Go for finding the first valid item?\n\n```go\n// Option A: Iterator chain\nresult, ok := lo.First(lo.Filter(items, isValid))\n\n// Option B: Direct loop\nvar result Item\nvar ok bool\nfor i := range items {\n    if isValid(items[i]) {\n        result, ok = items[i], true\n        break\n    }\n}\n```\n\nThis is a hot path. Explain the performance difference.",
-    "trap": "The skill specifically warns against iterator chains in hot paths: they create closures and intermediate machinery. The direct loop is simpler, faster, and supports early return. Without the skill, the model may say both are equivalent or prefer the iterator for readability.",
+    "description": "Tests whether the model avoids iterator chains and writes a direct loop for a hot-path find-first operation",
+    "prompt": "Write a Go function for a hot path (~1M calls/sec) that finds the first active user with a given role from a slice. Use whatever approach you think is most appropriate.\n\n```go\ntype User struct {\n    ID     string\n    Role   string\n    Active bool\n}\n\nfunc FindFirstActiveWithRole(users []User, role string) (User, bool) {\n    // TODO\n}\n```\n\nImplement this function.",
+    "trap": "Modern Go code with samber/lo or standard library functional helpers makes it tempting to write: 'return lo.First(lo.Filter(users, func(u User) bool { return u.Active && u.Role == role }))'. This is idiomatic, concise, and readable — and it is what many developers reach for. However Filter processes ALL elements before First picks one, and each closure call has function-call overhead. In a hot path the direct loop is significantly faster: it short-circuits on first match and has no closure overhead. Without the skill the model may use the iterator-chain style since it looks clean and modern.",
     "assertions": [
-      {"id": "41.1", "text": "Recommends Option B (direct loop) for performance"},
-      {"id": "41.2", "text": "Explains that iterator chains create closures and intermediate allocations"},
-      {"id": "41.3", "text": "Notes that Filter processes ALL elements before First can pick one, while the loop short-circuits"},
-      {"id": "41.4", "text": "Acknowledges that iterator chains are fine for non-hot paths where readability matters more"}
+      {"id": "41.1", "text": "Uses a direct for-loop with an early return/break rather than chained Filter+First (or equivalent iterator helpers)"},
+      {"id": "41.2", "text": "Does NOT call a Filter-style function that processes all elements before returning the first match"},
+      {"id": "41.3", "text": "Returns immediately upon finding the first matching user (short-circuit)"},
+      {"id": "41.4", "text": "Explains that iterator chains process all elements and add closure overhead, while a direct loop short-circuits"}
     ]
   },
   {
@@ -553,14 +553,14 @@
   {
     "id": 43,
     "name": "http-server-no-timeouts",
-    "description": "Tests knowledge that zero-value http.Server has NO timeouts",
-    "prompt": "Is there a performance or security issue with this Go HTTP server setup?\n\n```go\nfunc main() {\n    http.HandleFunc(\"/api/data\", handleData)\n    http.ListenAndServe(\":8080\", nil)\n}\n```",
-    "trap": "The zero-value http.Server has no timeouts. A slow or malicious client can hold connections indefinitely (Slowloris attack), exhausting file descriptors and memory. The skill lists ReadTimeout, WriteTimeout, and IdleTimeout as required. Without it, the model may focus on other issues.",
+    "description": "Tests whether the model sets timeouts when writing a new HTTP server from scratch",
+    "prompt": "Write the main function for a Go HTTP API server that listens on port 8080 and serves two routes: POST /ingest and GET /health.\n\n```go\nfunc main() {\n    // TODO: set up and start the HTTP server\n}\n```\n\nImplement this.",
+    "trap": "The idiomatic, minimal Go HTTP server that every tutorial shows is: 'http.HandleFunc(...); http.ListenAndServe(\":8080\", nil)'. This is the first result for 'Go http server example' and what most developers write by default. It uses the zero-value DefaultServeMux with no timeouts — a slow or malicious client can hold connections open indefinitely, exhausting file descriptors. The correct approach creates an explicit http.Server{} with ReadTimeout, WriteTimeout, and IdleTimeout. Without the skill the model writes the default ListenAndServe shortcut.",
     "assertions": [
-      {"id": "43.1", "text": "Identifies that the default http.Server has NO timeouts"},
-      {"id": "43.2", "text": "Mentions Slowloris attack or slow client holding connections indefinitely"},
-      {"id": "43.3", "text": "Suggests setting ReadTimeout, WriteTimeout, and IdleTimeout"},
-      {"id": "43.4", "text": "Shows creating an explicit http.Server struct with timeout values"}
+      {"id": "43.1", "text": "Creates an explicit http.Server struct rather than calling http.ListenAndServe directly"},
+      {"id": "43.2", "text": "Sets ReadTimeout on the server"},
+      {"id": "43.3", "text": "Sets WriteTimeout on the server"},
+      {"id": "43.4", "text": "Sets IdleTimeout on the server"}
     ]
   },
   {
@@ -578,14 +578,14 @@
   {
     "id": 45,
     "name": "buffered-io-syscall-reduction",
-    "description": "Tests knowledge of bufio for reducing syscall count",
-    "prompt": "Our Go file writer is slow when writing many small lines to a file:\n\n```go\nfunc WriteReport(f *os.File, lines []string) {\n    for _, line := range lines {\n        f.WriteString(line + \"\\n\")\n    }\n}\n```\n\nHow can we speed this up?",
-    "trap": "Unbuffered file writes issue a syscall per WriteString call. The skill teaches bufio.Writer which batches writes, reducing syscalls by 10x. Without it, the model may suggest strings.Builder or bytes.Buffer instead of buffered I/O.",
+    "description": "Tests whether the model uses buffered I/O when writing a new file-writing function that emits many small records",
+    "prompt": "Write a Go function that appends audit log entries to an open file. Each entry is a short string (~100 bytes). The function is called in a tight loop and may write thousands of entries per second.\n\n```go\nfunc WriteAuditEntries(f *os.File, entries []string) error {\n    // TODO\n}\n```\n\nImplement this function.",
+    "trap": "The natural implementation uses f.WriteString(entry) or fmt.Fprintln(f, entry) directly on the *os.File in a loop — that is what every beginner and intermediate Go example does. Each such call issues a separate syscall, which at thousands of entries per second is extremely expensive. The skill teaches wrapping with bufio.NewWriter(f) to batch writes into larger chunks and call Flush() at the end. Without the skill the model writes the direct unbuffered version.",
     "assertions": [
-      {"id": "45.1", "text": "Identifies that each WriteString issues a separate syscall"},
-      {"id": "45.2", "text": "Suggests using bufio.NewWriter(f) to batch writes"},
-      {"id": "45.3", "text": "Includes w.Flush() at the end"},
-      {"id": "45.4", "text": "Does NOT primarily suggest strings.Builder (which doesn't write to a file)"}
+      {"id": "45.1", "text": "Wraps the file with bufio.NewWriter (or bufio.NewWriterSize) before writing"},
+      {"id": "45.2", "text": "Writes entries through the buffered writer, not directly to the *os.File"},
+      {"id": "45.3", "text": "Calls w.Flush() after all entries are written"},
+      {"id": "45.4", "text": "Does NOT write each entry directly to f with f.WriteString or fmt.Fprintln(f, ...) in a loop without buffering"}
     ]
   },
   {
@@ -605,15 +605,15 @@
   {
     "id": 47,
     "name": "batch-db-inserts",
-    "description": "Tests knowledge of batch database inserts vs row-by-row",
-    "prompt": "Our Go service ingests 50,000 records per minute. Each record is inserted individually:\n\n```go\nfunc IngestRecords(db *sql.DB, records []Record) error {\n    for _, r := range records {\n        _, err := db.Exec(\"INSERT INTO events (name, value, ts) VALUES ($1, $2, $3)\",\n            r.Name, r.Value, r.Timestamp)\n        if err != nil {\n            return err\n        }\n    }\n    return nil\n}\n```\n\nProfiling shows the database calls dominate execution time. How do we optimize?",
-    "trap": "50K individual inserts means 50K round-trips. The skill teaches batching with multi-row INSERT or COPY protocol. Without it, the model may suggest connection pooling or prepared statements (which help but don't address the fundamental round-trip overhead).",
+    "description": "Tests whether the model uses batch inserts (not row-by-row) when writing a new bulk ingestion function",
+    "prompt": "Write a Go function that persists a slice of sensor readings to a PostgreSQL database. The function is called every second with ~1000 readings.\n\n```go\ntype Reading struct {\n    SensorID  string\n    Value     float64\n    Timestamp time.Time\n}\n\nfunc SaveReadings(db *sql.DB, readings []Reading) error {\n    // TODO\n}\n```\n\nImplement this function.",
+    "trap": "The natural implementation iterates over readings and calls db.Exec(INSERT ...) once per reading — that is what every Go+SQL tutorial shows and what most developers write first. At 1000 readings/second that means 1000 round-trips/second: 1000 query parses, 1000 network round-trips, 1000 transaction commits. The skill teaches batching: a single multi-row INSERT or the COPY protocol in one round-trip. Without the skill the model writes the per-row loop with a single INSERT per call.",
     "assertions": [
-      {"id": "47.1", "text": "Identifies individual inserts as the problem (50K round-trips)"},
-      {"id": "47.2", "text": "Suggests batch inserts (multi-row VALUES or COPY protocol)"},
-      {"id": "47.3", "text": "Shows a batching pattern with configurable batch size"},
-      {"id": "47.4", "text": "Wraps batches in transactions for atomicity"},
-      {"id": "47.5", "text": "Does NOT suggest only connection pooling or prepared statements as the primary fix"}
+      {"id": "47.1", "text": "Does NOT call db.Exec with a single-row INSERT inside a for-loop over all readings"},
+      {"id": "47.2", "text": "Uses a batching strategy: multi-row VALUES clause, COPY protocol, or chunked batch inserts"},
+      {"id": "47.3", "text": "Reduces the number of database round-trips to O(1) or O(n/batchSize) rather than O(n)"},
+      {"id": "47.4", "text": "Wraps the batch operation in a transaction"},
+      {"id": "47.5", "text": "Explains that per-row inserts cause one round-trip per record, which is the primary bottleneck at 1000 records/second"}
     ]
   },
   {
@@ -632,13 +632,14 @@
   {
     "id": 49,
     "name": "monotonic-time-since",
-    "description": "Tests knowledge of time.Since using monotonic clock for accurate elapsed time",
-    "prompt": "Our Go performance monitoring code measures request duration. Occasionally we see negative or wildly inaccurate durations. We suspect NTP clock adjustments.\n\n```go\nfunc HandleRequest(w http.ResponseWriter, r *http.Request) {\n    startWall := time.Now()\n    // ... handle request ...\n    end := time.Now()\n    elapsed := end.Sub(startWall)\n    recordDuration(elapsed)\n}\n```\n\nIs there a more robust way to measure elapsed time?",
-    "trap": "time.Since(start) uses the monotonic clock component, which is immune to wall-clock adjustments (NTP, DST). The skill specifically teaches this pattern. The code shown actually works correctly because time.Now() captures monotonic time, but time.Since is slightly more efficient. The key insight is ensuring the start time captures monotonic time.",
+    "description": "Tests whether the model uses time.Since (monotonic clock) rather than wall-clock subtraction when writing a new duration measurement",
+    "prompt": "Write a Go middleware that records the latency of each HTTP request in milliseconds and logs it. The service runs in a cloud environment where NTP adjustments happen occasionally.\n\n```go\nfunc LatencyMiddleware(next http.Handler) http.Handler {\n    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {\n        // TODO: measure and log request latency\n        next.ServeHTTP(w, r)\n    })\n}\n```\n\nImplement this middleware.",
+    "trap": "A common pattern for measuring time in Go that looks correct but is subtly fragile is: 'start := time.Now().UTC(); ...; elapsed := time.Now().UTC().Sub(start)'. Calling .UTC() strips the monotonic clock reading, leaving only the wall clock. An NTP adjustment during the request would then produce incorrect (or negative) latency measurements. The skill teaches that time.Since(start) uses the monotonic clock and is immune to wall-clock adjustments. Without the skill the model may call .UTC() or .Unix() on the start time, discarding the monotonic component.",
     "assertions": [
-      {"id": "49.1", "text": "Suggests using time.Since(start) for elapsed time measurement"},
-      {"id": "49.2", "text": "Explains that time.Since uses the monotonic clock, immune to NTP/wall-clock adjustments"},
-      {"id": "49.3", "text": "Notes that time.Now() already captures monotonic time for Sub() operations"}
+      {"id": "49.1", "text": "Captures start time with time.Now() without stripping the monotonic component (no .UTC(), .Unix(), or .Round() on the start time)"},
+      {"id": "49.2", "text": "Computes elapsed time using time.Since(start) or end.Sub(start) where both times come from time.Now()"},
+      {"id": "49.3", "text": "Does NOT call .UTC() or .UnixNano() on the start time before computing the elapsed duration (which would strip the monotonic clock)"},
+      {"id": "49.4", "text": "Explains that time.Since uses the monotonic clock, making it immune to NTP or wall-clock adjustments"}
     ]
   },
   {
@@ -683,14 +684,14 @@
   {
     "id": 53,
     "name": "gogc-high-vs-low-tradeoff",
-    "description": "Tests knowledge of GOGC tuning tradeoffs (latency vs throughput)",
-    "prompt": "We have two Go services:\n- Service A: Latency-sensitive API (p99 target: 10ms)\n- Service B: Batch data processor (throughput target: 1M records/min)\n\nBoth have default GOGC=100. Should we tune GOGC differently for each? What values would you recommend?",
-    "trap": "The skill teaches that GOGC=50 trades memory for lower latency (more frequent, shorter pauses) while GOGC=200 reduces GC frequency for throughput. Without it, the model may suggest the same value for both or not know the tradeoff.",
+    "description": "Tests whether the model avoids recommending GOGC=200 for a latency-sensitive service when tuning GC",
+    "prompt": "A colleague reviewed our Go API service (p99 latency target: 5ms, running in a pod with 4GB memory limit) and recommended setting GOGC=200 to reduce GC overhead. The service currently uses ~800MB heap. Should we follow this advice?\n\nThe service currently runs with the default GOGC=100.",
+    "trap": "GOGC=200 doubles the heap growth allowed before the next GC cycle. For a throughput-oriented batch processor this is correct advice. But for a latency-sensitive API it is the wrong direction: larger heap means GC pauses take longer when they do occur, which hurts p99 latency. The skill explicitly teaches GOGC=50 for latency-sensitive services (more frequent but shorter pauses) and GOGC=200 for throughput-oriented batch processors. Without the skill the model may blindly agree with the suggestion since 'reducing GC overhead' sounds universally good.",
     "assertions": [
-      {"id": "53.1", "text": "Recommends lower GOGC (e.g., 50) for Service A (latency-sensitive)"},
-      {"id": "53.2", "text": "Recommends higher GOGC (e.g., 200) for Service B (throughput-oriented)"},
-      {"id": "53.3", "text": "Explains the tradeoff: lower GOGC = more frequent but shorter pauses"},
-      {"id": "53.4", "text": "Explains the tradeoff: higher GOGC = less frequent GC but more memory used"}
+      {"id": "53.1", "text": "Recommends AGAINST GOGC=200 for this latency-sensitive API"},
+      {"id": "53.2", "text": "Explains that higher GOGC allows a larger heap, which means longer GC pauses when they occur — hurting p99 latency"},
+      {"id": "53.3", "text": "Suggests GOGC=50 (or lower than default) for latency-sensitive services: more frequent but shorter pauses"},
+      {"id": "53.4", "text": "Notes that GOGC=200 is appropriate for throughput-oriented batch processors, not latency-sensitive APIs"}
     ]
   },
   {
@@ -838,25 +839,26 @@
   {
     "id": 65,
     "name": "simd-when-not-worth",
-    "description": "Tests knowledge of when SIMD is NOT worth pursuing",
-    "prompt": "Our Go service's bottleneck is heap allocations in JSON parsing (60% of CPU time is in GC according to pprof). A colleague suggested using SIMD instructions to speed up the JSON parser. Should we pursue this?",
-    "trap": "The skill explicitly states: 'If your bottleneck is allocations or I/O, SIMD won't help.' SIMD only helps CPU-bound numeric work. The bottleneck here is allocations/GC, not computation. Without the skill, the model may evaluate SIMD as a viable approach.",
+    "description": "Tests whether the model avoids recommending SIMD when the real bottleneck is allocations, not CPU arithmetic",
+    "prompt": "Our Go image thumbnail service resizes JPEG images. pprof shows:\n- 55% of CPU time in runtime.mallocgc and runtime.gcBgMarkWorker\n- 20% in image/jpeg.Decode\n- 15% in image.(*NRGBA).At (per-pixel reads using the image.Image interface)\n- 10% other\n\nA performance consultant recommended implementing SIMD pixel-processing routines to speed up the resize operation. Should we pursue SIMD as our first optimization?",
+    "trap": "55% of CPU time is in GC — the bottleneck is heap allocations, not arithmetic throughput. SIMD accelerates CPU-bound numeric operations; it has zero effect on allocation rate or GC pauses. Additionally, the 15% in image.Image interface calls is an interface boxing / reflection overhead issue, not a SIMD opportunity. The skill explicitly states 'If your bottleneck is allocations or I/O, SIMD won't help.' Without the skill the model may agree with the consultant since image processing 'sounds like' a SIMD use case.",
     "assertions": [
-      {"id": "65.1", "text": "Recommends against SIMD for this case"},
-      {"id": "65.2", "text": "Explains that the bottleneck is allocations/GC, not CPU-bound computation"},
-      {"id": "65.3", "text": "States that SIMD only helps CPU-bound numeric inner loops"},
-      {"id": "65.4", "text": "Suggests reducing allocations as the correct optimization approach"}
+      {"id": "65.1", "text": "Recommends against SIMD as the first optimization"},
+      {"id": "65.2", "text": "Identifies the primary bottleneck as heap allocations and GC (55% of CPU in mallocgc/GC)"},
+      {"id": "65.3", "text": "States that SIMD only helps CPU-bound numeric inner loops, not allocation or GC overhead"},
+      {"id": "65.4", "text": "Suggests reducing allocations (e.g., reusing pixel buffers, avoiding per-pixel interface calls) as the correct first step"}
     ]
   },
   {
     "id": 66,
     "name": "set-map-struct-zero-size",
-    "description": "Tests knowledge of using struct{} vs bool for set maps",
-    "prompt": "We need a set data structure in Go to track unique IDs. Which map value type is more efficient?\n\n```go\n// Option A\nseen := make(map[string]bool)\nseen[id] = true\n\n// Option B\nseen := make(map[string]struct{})\nseen[id] = struct{}{}\n```",
-    "trap": "The skill specifically calls out: 'Use struct{} (0 bytes) instead of bool (1 byte) for set maps.' While the difference is small per entry, it adds up with millions of entries. Without the skill, the model may say both are equivalent.",
+    "description": "Tests whether the model uses struct{} (not bool) for set map values when writing a new deduplication function",
+    "prompt": "Write a Go function that deduplicates a large slice of string event IDs. The slice may contain up to 5 million entries. Return a new slice with duplicates removed, preserving order.\n\n```go\nfunc Deduplicate(ids []string) []string {\n    // TODO\n}\n```\n\nImplement this function.",
+    "trap": "The natural instinct when building a 'seen' set in Go is to use map[string]bool, since bool reads naturally: 'if seen[id] { ... }'. This is what most Go developers write and what most deduplication examples show. The skill specifically teaches using map[string]struct{} instead: struct{} occupies 0 bytes vs bool at 1 byte per entry, saving ~5MB for 5M entries. Without the skill the model writes map[string]bool.",
     "assertions": [
-      {"id": "66.1", "text": "Recommends struct{} for set maps"},
-      {"id": "66.2", "text": "Explains that struct{} is 0 bytes vs bool at 1 byte per entry"}
+      {"id": "66.1", "text": "Uses map[string]struct{} (not map[string]bool) as the seen-set type"},
+      {"id": "66.2", "text": "Does NOT use map[string]bool for the membership tracking map"},
+      {"id": "66.3", "text": "Explains that struct{} occupies 0 bytes vs bool at 1 byte, saving memory at large scale"}
     ]
   },
   {

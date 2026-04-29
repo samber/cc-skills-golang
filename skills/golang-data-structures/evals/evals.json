@@ -2,23 +2,23 @@
   {
     "id": 1,
     "name": "buffer-for-io",
-    "description": "RenderAndStream assembles parts and streams to io.Writer",
-    "task": "Write a function `RenderAndStream(w io.Writer, parts []string) error` in package `render`. It assembles all parts into a single output (joining with newlines), then streams the result to the provided io.Writer. Build the output efficiently.",
+    "description": "RenderAndStream must use strings.Builder with Grow pre-allocation, not += or strings.Join",
+    "task": "Write a function `RenderAndStream(w io.Writer, parts []string) error` in package `render`. It assembles all parts into a single output (joining with newlines), then streams the result to the provided io.Writer.\n\nA teammate suggests: 'Just use strings.Join(parts, \"\\n\") — it's one line and idiomatic.' Another says: 'Use bytes.Buffer, it's the standard Go buffer type.' Implement the most efficient approach and explain if either suggestion is correct.",
     "assertions": [
-      { "id": "1.1", "text": "Correct output to io.Writer", "trap": "none — baseline" },
-      { "id": "1.2", "text": "Efficient output assembly with Grow", "trap": "none — baseline" },
-      { "id": "1.3", "text": "No unnecessary intermediate allocation", "trap": "none — baseline" }
+      { "id": "1.1", "text": "Uses strings.Builder (not bytes.Buffer) for string assembly — bytes.Buffer stores []byte and converting to string at the end requires a copy; strings.Builder writes directly to a string", "trap": "Model follows teammate's bytes.Buffer suggestion" },
+      { "id": "1.2", "text": "Calls b.Grow(totalSize) before writing parts — pre-allocating avoids repeated reallocation as the builder grows", "trap": "Model omits Grow even though size is known" },
+      { "id": "1.3", "text": "Does not use strings.Join — it allocates a new string; the goal is to write directly to io.Writer without a redundant intermediate string copy", "trap": "Model accepts the strings.Join suggestion" }
     ]
   },
   {
     "id": 2,
     "name": "sorted-set",
-    "description": "SortedSet[T] with Min/Max/Insert requiring ordered constraint",
-    "task": "Write a `SortedSet[T]` in package `collections` that maintains elements in sorted order. Support Insert(T), Contains(T) bool, Min() (T, bool), Max() (T, bool), and Len() int. Elements must be orderable. Use binary search for efficiency.",
+    "description": "SortedSet[T] must use cmp.Ordered, not a custom Ordered interface or comparable",
+    "task": "Write a `SortedSet[T]` in package `collections` that maintains elements in sorted order. Support Insert(T), Contains(T) bool, Min() (T, bool), Max() (T, bool), and Len() int. Elements must be orderable. Use binary search for efficiency.\n\nA teammate says: 'Define your own `Ordered` interface with a `Less(T) bool` method — it's more flexible and lets users supply custom comparison logic.' Another says: 'Just use `comparable` as the constraint — it works for any type that can be compared.' Which approach is correct?",
     "assertions": [
-      { "id": "2.1", "text": "Uses `cmp.Ordered` constraint", "trap": "Model might use `comparable` (too loose for sorting) or custom interface" },
-      { "id": "2.2", "text": "Binary search for Insert/Contains", "trap": "Model might linear scan" },
-      { "id": "2.3", "text": "Min/Max O(1) from sorted slice ends", "trap": "Model might scan entire slice" }
+      { "id": "2.1", "text": "Uses `cmp.Ordered` constraint (from the cmp package), not `comparable` (too loose — no < operator) and not a custom Ordered interface with Less() method", "trap": "Model accepts teammate's custom interface or comparable suggestion" },
+      { "id": "2.2", "text": "Rejects the comparable suggestion — comparable only ensures == and != but not < or >, which are required for sorting", "trap": "Model uses comparable thinking it's sufficient for ordered operations" },
+      { "id": "2.3", "text": "Binary search for Insert/Contains using slices.BinarySearch or sort.SearchInts or equivalent O(log n) approach", "trap": "Model linear-scans" }
     ]
   },
   {
@@ -79,12 +79,13 @@
   {
     "id": 8,
     "name": "map-memory-diag",
-    "description": "Diagnose 2GB RSS after bulk delete from map — maps never shrink",
-    "task": "A Go service processes events. During traffic spikes, `var eventIndex map[string]*Event` grows to 10M entries. After the spike, events expire and are deleted, leaving ~1000 entries. But RSS memory stays at 2GB. The team added `delete(eventIndex, key)` for every expired event — why doesn't memory decrease? Write a `Diagnose()` comment explaining the root cause, then write a `Compact()` method on an `EventStore` struct that fixes it. Package `events`.",
+    "description": "Maps never shrink — the only fix is rebuilding; GC hints and nil-assignment are insufficient",
+    "task": "A Go service processes events. During traffic spikes, `var eventIndex map[string]*Event` grows to 10M entries. After the spike, events expire and are deleted, leaving ~1000 entries. But RSS memory stays at 2GB. The team added `delete(eventIndex, key)` for every expired event — why doesn't memory decrease?\n\nTwo teammates propose fixes:\n- Alice: 'Call `runtime.GC()` after bulk deletes — it will force the GC to reclaim unused map memory.'\n- Bob: 'Set `eventIndex = nil` and then reassign `eventIndex = make(map[string]*Event)` — that releases the old map to the GC.'\n\nAre either of these correct? Write a `Diagnose()` comment and a `Compact()` method on `EventStore` that correctly fixes the issue. Package `events`.",
     "assertions": [
-      { "id": "8.1", "text": "Diagnoses 'maps never shrink buckets'", "trap": "none — model may or may not know this" },
-      { "id": "8.2", "text": "Compact creates fresh map with `make`", "trap": "none — both approaches implement rebuild" },
-      { "id": "8.3", "text": "Copies surviving entries to new map", "trap": "none — baseline correctness" }
+      { "id": "8.1", "text": "Correctly diagnoses root cause: Go maps never shrink their bucket array — delete() removes entries but the allocated bucket memory is retained, preventing GC of the backing structure" },
+      { "id": "8.2", "text": "Evaluates Bob's nil-reassign approach: correctly identifies this as valid — setting eventIndex = nil releases the old map to GC, and rebuilding with make creates a fresh small map" },
+      { "id": "8.3", "text": "Evaluates Alice's runtime.GC() approach: correctly identifies this as insufficient alone — GC cannot reclaim a live map's bucket array; the map itself must be rebuilt" },
+      { "id": "8.4", "text": "Compact() creates a fresh map with make and copies surviving entries — rebuilding is the only way to reclaim bucket memory from a Go map" }
     ]
   },
   {

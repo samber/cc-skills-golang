@@ -1,30 +1,30 @@
 [
   {
     "id": 1,
-    "name": "summary-vs-histogram-multi-replica",
-    "description": "Tests whether the model recommends Histogram over Summary when multiple replicas need aggregated percentiles",
-    "prompt": "I have a Go microservice running 12 replicas behind a load balancer. I want to track P99 latency of my HTTP endpoints with Prometheus. Should I use prometheus.NewSummary with Objectives map or prometheus.NewHistogram? Show me the metric declaration.",
-    "trap": "Without the skill, the model may suggest Summary since it directly computes quantiles, missing that Summary quantiles cannot be aggregated across instances",
+    "name": "histogram-bucket-misconfiguration-sub-millisecond",
+    "description": "Tests whether the model catches that prometheus.DefBuckets are wrong for sub-millisecond operations",
+    "prompt": "I'm adding a Prometheus histogram for an in-memory cache lookup that typically completes in 50-500 microseconds. Here's my declaration:\n\nvar cacheLookupDuration = promauto.NewHistogram(prometheus.HistogramOpts{\n    Namespace: \"myapp\",\n    Name:      \"cache_lookup_duration_seconds\",\n    Buckets:   prometheus.DefBuckets,\n})\n\nDefBuckets are the default so this should be fine, right?",
+    "trap": "Without the skill, the model validates the code since DefBuckets are the 'recommended default'. The skill teaches that DefBuckets start at 5ms — all sub-millisecond observations land in the first bucket, making P50/P99 meaningless.",
     "assertions": [
-      {"id": "1.1", "text": "Recommends Histogram, not Summary"},
-      {"id": "1.2", "text": "Explains that Summary quantiles cannot be aggregated across multiple instances"},
-      {"id": "1.3", "text": "Shows histogram_quantile() PromQL function for computing percentiles server-side"},
-      {"id": "1.4", "text": "Mentions that Histogram supports server-side aggregation across replicas"},
-      {"id": "1.5", "text": "Uses prometheus.NewHistogramVec (not NewSummary) in the code example"}
+      {"id": "1.1", "text": "Identifies that prometheus.DefBuckets (.005, .01, .025, .05, .1, ... seconds) are wrong for sub-millisecond operations"},
+      {"id": "1.2", "text": "Explains that all 50-500µs observations would land in a single bucket, making histogram_quantile() return inaccurate or meaningless percentiles"},
+      {"id": "1.3", "text": "Recommends custom bucket boundaries in the microsecond range (e.g., 0.0001, 0.0002, 0.0005, 0.001, 0.002 seconds)"},
+      {"id": "1.4", "text": "Shows how to define custom buckets using prometheus.LinearBuckets, prometheus.ExponentialBuckets, or an explicit []float64 slice"},
+      {"id": "1.5", "text": "Explains the general rule: buckets should cover the expected range of values with sufficient resolution around the target percentiles"}
     ]
   },
   {
     "id": 2,
-    "name": "log-and-return-error-trap",
-    "description": "Tests the single handling rule: errors must be logged OR returned, never both",
-    "prompt": "In my Go service, when a database query fails, I want to make sure we have good visibility. Here's my pattern:\n\nif err != nil {\n    slog.Error(\"query failed\", \"error\", err)\n    return fmt.Errorf(\"query: %w\", err)\n}\n\nIs this a good observability pattern? How should I handle errors for maximum visibility?",
-    "trap": "Without the skill, the model may validate the log-and-return pattern since it looks thorough, missing that it causes duplicate logging up the call chain",
+    "name": "promql-comments-convention-discoverability",
+    "description": "Tests the PromQL-as-comments convention above metric variable declarations",
+    "prompt": "My team declares Prometheus metrics scattered across many files. When writing alerts or dashboards, engineers have to grep the codebase to find the metric name and then guess what PromQL to write. How do I make metrics more self-documenting without adding a wiki or external doc?",
+    "trap": "Without the skill, the model suggests external documentation, a README section, or godoc comments with metric descriptions — missing the PromQL-as-comments convention taught by the skill",
     "assertions": [
-      {"id": "2.1", "text": "Identifies the log-and-return pattern as incorrect"},
-      {"id": "2.2", "text": "Explains that the error gets logged multiple times as it propagates up the chain"},
-      {"id": "2.3", "text": "Recommends returning the error with context and logging once at the top level"},
-      {"id": "2.4", "text": "Shows the corrected pattern: return fmt.Errorf with wrapping, no slog call"},
-      {"id": "2.5", "text": "References or explains the single handling rule (errors are either logged OR returned, never both)"}
+      {"id": "2.1", "text": "Recommends placing PromQL queries and alert expressions as comments directly above each metric variable declaration"},
+      {"id": "2.2", "text": "Shows example with Dashboard: and Alert: comment lines containing actual PromQL above the var block"},
+      {"id": "2.3", "text": "Explains that colocating PromQL with the metric declaration means queries are reviewed in PRs alongside metric changes"},
+      {"id": "2.4", "text": "Mentions that when the metric name or labels change, the PromQL comments change in the same commit — preventing stale queries"},
+      {"id": "2.5", "text": "Shows that this enables new team members to understand the metric's purpose and how to query it at a glance"}
     ]
   },
   {
@@ -70,16 +70,16 @@
   },
   {
     "id": 6,
-    "name": "metric-naming-conventions",
-    "description": "Tests Prometheus metric naming conventions: base units, _total suffix, namespace",
-    "prompt": "I'm defining Prometheus metrics for my Go service. Review my metric names:\n\nrequest_count\nhttpDuration\nrequest_duration_ms\nmyapp_request_size_kb\nmyapp_http_get_requests_total\nmyapp_http_post_requests_total",
-    "trap": "Without the skill, the model may only catch some issues, missing base unit requirements or the label embedding anti-pattern",
+    "name": "multi-window-burn-rate-slo-alerting",
+    "description": "Tests knowledge of multi-window burn-rate SLO alerting instead of simple threshold",
+    "prompt": "My Go API has a 99.9% availability SLO. I have this alert:\n\n- alert: HighErrorRate\n  expr: rate(http_requests_total{status=~\"5..\"}[5m]) / rate(http_requests_total[5m]) > 0.001\n  for: 5m\n\nI get too many false positives from brief spikes but also miss slow degradation that stays just under 0.1%. How do I improve my alerting strategy?",
+    "trap": "Without the skill, the model suggests adjusting the threshold or the for: duration, missing the multi-window burn-rate approach that the skill specifically teaches",
     "assertions": [
-      {"id": "6.1", "text": "Flags request_count as missing namespace and unit suffix"},
-      {"id": "6.2", "text": "Flags httpDuration as using camelCase (should be snake_case) and missing unit"},
-      {"id": "6.3", "text": "Flags request_duration_ms — should use _seconds (base unit), not milliseconds"},
-      {"id": "6.4", "text": "Flags myapp_request_size_kb — should use _bytes (base unit), not kilobytes"},
-      {"id": "6.5", "text": "Flags myapp_http_get_requests_total and myapp_http_post_requests_total as embedding label values into metric names — should use a single metric with a method label"}
+      {"id": "6.1", "text": "Recommends multi-window burn-rate alerting to address both false positives and slow burn scenarios"},
+      {"id": "6.2", "text": "Explains error budget and burn rate concepts"},
+      {"id": "6.3", "text": "Shows a fast burn window (e.g., 5m + 1h, ~14x burn rate) for critical/page alerts"},
+      {"id": "6.4", "text": "Shows a slow burn window (e.g., 2h + 24h, 1-2x burn rate) for warning/ticket alerts"},
+      {"id": "6.5", "text": "Explains that ANDing short and long windows eliminates false positives from transient spikes"}
     ]
   },
   {
@@ -164,15 +164,15 @@
   },
   {
     "id": 13,
-    "name": "otelhttp-outgoing-requests",
-    "description": "Tests that outgoing HTTP clients must use otelhttp transport for trace propagation",
-    "prompt": "My Go service calls an external payment API using a standard http.Client. I have OpenTelemetry tracing configured with otelhttp middleware on my server. But traces stop at my service boundary — I don't see the outgoing call to the payment service. How do I fix this?",
-    "trap": "Without the skill, the model may suggest manually injecting trace headers, missing otelhttp.NewTransport",
+    "name": "trace-context-lost-in-background-goroutine",
+    "description": "Tests that a new goroutine spawned inside a span loses trace context unless ctx is explicitly propagated",
+    "prompt": "My Go service sends a notification after processing an order. I want it to be non-blocking so I spawn a goroutine:\n\nfunc (s *OrderService) Process(ctx context.Context, order Order) error {\n    ctx, span := tracer.Start(ctx, \"process-order\")\n    defer span.End()\n\n    // business logic...\n\n    go func() {\n        s.notifier.Send(context.Background(), order.UserID, \"Order confirmed\")\n    }()\n\n    return nil\n}\n\nI have OpenTelemetry configured. Why doesn't the notification span appear as a child of process-order in my traces?",
+    "trap": "Without the skill, the model may suggest the span setup is fine or focus on goroutine lifecycle, missing that context.Background() discards the parent trace context",
     "assertions": [
-      {"id": "13.1", "text": "Recommends wrapping the HTTP client transport with otelhttp.NewTransport"},
-      {"id": "13.2", "text": "Shows the code: client := &http.Client{Transport: otelhttp.NewTransport(http.DefaultTransport)}"},
-      {"id": "13.3", "text": "Explains that this automatically propagates trace context to outgoing requests"},
-      {"id": "13.4", "text": "Mentions that otelhttp creates child spans for outgoing HTTP calls"}
+      {"id": "13.1", "text": "Identifies that context.Background() discards the trace context — the notification has no parent span"},
+      {"id": "13.2", "text": "Explains that the trace context (trace_id, span_id) travels only inside the ctx variable"},
+      {"id": "13.3", "text": "Shows the fix: capture ctx before the goroutine and pass it in (not context.Background())"},
+      {"id": "13.4", "text": "Notes that the notification goroutine may outlive the parent span, but trace propagation still requires passing the original ctx"}
     ]
   },
   {
@@ -329,40 +329,41 @@
   },
   {
     "id": 25,
-    "name": "pii-in-logs-trap",
-    "description": "Tests whether the model catches PII being logged",
-    "prompt": "I'm adding logging to my Go authentication service:\n\nslog.Info(\"user logged in\", \"email\", user.Email, \"ip\", clientIP, \"ssn\", user.SSN)\n\nIs this good structured logging?",
-    "trap": "Without the skill, the model may focus on the structured format being correct, missing the PII issue",
+    "name": "ip-address-pii-in-logs",
+    "description": "Tests whether the model recognizes IP address as PII that requires care in logs",
+    "prompt": "I'm adding observability to my Go authentication service. Here's my access log:\n\nslog.Info(\"login attempt\",\n    \"user_id\", req.UserID,\n    \"ip\", r.RemoteAddr,\n    \"user_agent\", r.UserAgent(),\n    \"success\", success,\n)\n\nThis looks useful for detecting brute-force attacks. Is there a compliance concern?",
+    "trap": "Without the skill, the model validates this as good observability practice since IP addresses are legitimately useful for security. The model knows email/SSN are PII but commonly misses that IP address is also regulated PII under GDPR.",
     "assertions": [
-      {"id": "25.1", "text": "Flags email as PII that should not be logged"},
-      {"id": "25.2", "text": "Flags SSN as PII that should absolutely never be logged"},
-      {"id": "25.3", "text": "Recommends logging identifiers (user_id) instead of PII"},
-      {"id": "25.4", "text": "Shows corrected logging using user.ID instead of email/SSN"}
+      {"id": "25.1", "text": "Identifies IP address (r.RemoteAddr) as PII under GDPR and CCPA"},
+      {"id": "25.2", "text": "Notes that user_agent can also be a fingerprinting vector that combines to uniquely identify a user"},
+      {"id": "25.3", "text": "Recommends a legal/privacy review before logging IP addresses in European services"},
+      {"id": "25.4", "text": "Suggests using hashed, truncated, or anonymized IPs if full IP is not required by the security use case"}
     ]
   },
   {
     "id": 26,
-    "name": "counter-suffix-total-requirement",
-    "description": "Tests that Prometheus counters must use _total suffix",
-    "prompt": "I'm declaring a Prometheus counter for tracking HTTP requests in Go:\n\nvar httpRequests = promauto.NewCounterVec(prometheus.CounterOpts{\n    Namespace: \"myapp\",\n    Name:      \"http_requests\",\n    Help:      \"Number of HTTP requests.\",\n}, []string{\"method\", \"status\"})\n\nDoes this follow Prometheus best practices?",
-    "trap": "Without the skill, the model may approve this since it has a namespace and labels, missing the _total suffix requirement",
+    "name": "gauge-should-not-have-total-suffix",
+    "description": "Tests that Gauge metrics must NOT use _total suffix, and counters MUST",
+    "prompt": "I'm declaring Prometheus metrics for my Go service. Review these declarations:\n\nvar activeConnections = promauto.NewGauge(prometheus.GaugeOpts{\n    Namespace: \"myapp\",\n    Name:      \"connections_active_total\",\n})\n\nvar requestsProcessed = promauto.NewCounter(prometheus.CounterOpts{\n    Namespace: \"myapp\",\n    Name:      \"requests_processed\",\n})\n\nAre these names correct?",
+    "trap": "Without the skill, the model may only flag one issue or swap the corrections. Gauges must NOT use _total; counters MUST use _total. Using _total on a gauge implies it is cumulative when it is not.",
     "assertions": [
-      {"id": "26.1", "text": "Identifies the missing _total suffix — counters MUST end with _total"},
-      {"id": "26.2", "text": "Shows the corrected name: requests_total or http_requests_total"},
-      {"id": "26.3", "text": "Mentions that _total is a required convention for counters in Prometheus"}
+      {"id": "26.1", "text": "Flags connections_active_total as incorrect — Gauges must NOT use _total suffix because _total implies a counter (monotonically increasing cumulative value)"},
+      {"id": "26.2", "text": "Recommends renaming the gauge to myapp_connections_active (no _total)"},
+      {"id": "26.3", "text": "Flags requests_processed as incorrect — Counters MUST end with _total"},
+      {"id": "26.4", "text": "Recommends renaming the counter to myapp_requests_processed_total"}
     ]
   },
   {
     "id": 27,
-    "name": "pprof-security-auth",
-    "description": "Tests that pprof endpoints must be protected with authentication",
-    "prompt": "I want to enable pprof for my Go production service. I'll add:\n\nimport _ \"net/http/pprof\"\ngo http.ListenAndServe(\":6060\", nil)\n\nThis should give me profiling access. Anything else I need?",
-    "trap": "Without the skill, the model may suggest this is fine or only mention firewall rules",
+    "name": "pprof-exposed-on-public-mux",
+    "description": "Tests that importing net/http/pprof registers on the default mux which may serve public traffic",
+    "prompt": "I want to enable pprof for my Go production service. I see that just adding `import _ \"net/http/pprof\"` is enough. My service uses http.ListenAndServe(\":8080\", nil) for its API. Is this safe?",
+    "trap": "Without the skill, the model may warn generically about security but miss the specific mechanism: the blank import registers handlers on http.DefaultServeMux which is the nil mux used by ListenAndServe — pprof is served publicly on port 8080",
     "assertions": [
-      {"id": "27.1", "text": "Warns that pprof endpoints must NOT be exposed publicly without authentication"},
-      {"id": "27.2", "text": "Explains that pprof leaks sensitive runtime information and can be abused for DoS"},
-      {"id": "27.3", "text": "Recommends protecting with basic auth or running on a separate internal port"},
-      {"id": "27.4", "text": "Suggests toggling via environment variable to enable/disable without redeployment"}
+      {"id": "27.1", "text": "Identifies that import _ \"net/http/pprof\" registers /debug/pprof/ routes on http.DefaultServeMux"},
+      {"id": "27.2", "text": "Explains that http.ListenAndServe(\":8080\", nil) uses http.DefaultServeMux as its handler — pprof is publicly accessible on port 8080"},
+      {"id": "27.3", "text": "Recommends serving pprof on a separate internal port (e.g., :6060) using a dedicated ServeMux or http.Server"},
+      {"id": "27.4", "text": "Warns that pprof leaks sensitive runtime information (goroutine stacks, heap profiles, environment) and should never be publicly accessible"}
     ]
   },
   {
@@ -466,15 +467,15 @@
   },
   {
     "id": 35,
-    "name": "slog-with-request-scoped-attrs",
-    "description": "Tests the pattern of using slog.With() for request-scoped attributes in middleware",
-    "prompt": "In my Go HTTP service, I want every log line from a request handler to include the request_id, method, and path without repeating them in every slog call. How do I achieve this?",
-    "trap": "Without the skill, the model may suggest storing attributes in context values and manually extracting them, missing slog.With()",
+    "name": "slog-error-as-attr-not-positional",
+    "description": "Tests whether the model uses slog.Any/slog.Attr correctly for error values vs positional args",
+    "prompt": "I'm logging errors in my Go service using slog. Review this code:\n\nif err != nil {\n    slog.ErrorContext(ctx, \"payment failed\", err, \"order_id\", orderID)\n    return err\n}\n\nDoes this look right?",
+    "trap": "Without the skill, the model may miss that passing err directly as a positional argument (not as a named key-value pair) is incorrect. slog expects alternating key-value pairs; err as a positional arg becomes the key with its string representation, losing structured error metadata.",
     "assertions": [
-      {"id": "35.1", "text": "Recommends using slog.With() to create a child logger with request-scoped attributes"},
-      {"id": "35.2", "text": "Shows middleware pattern that creates the enriched logger"},
-      {"id": "35.3", "text": "Shows storing the enriched logger in context for downstream use"},
-      {"id": "35.4", "text": "Includes request_id, method, and path as the attributes to inject"}
+      {"id": "35.1", "text": "Identifies that err is passed as a positional argument without a key name, which is incorrect for slog"},
+      {"id": "35.2", "text": "Explains that slog expects alternating key-value pairs — passing err without a key makes slog treat it as a mismatched argument or key"},
+      {"id": "35.3", "text": "Shows the corrected form using a named key: slog.ErrorContext(ctx, \"payment failed\", \"error\", err, \"order_id\", orderID)"},
+      {"id": "35.4", "text": "Notes that the correct form preserves the error's structured information (message, type) in the log record"}
     ]
   },
   {

@@ -82,14 +82,14 @@
     {
       "id": 7,
       "name": "modernize-logging",
-      "prompt": "Modernize the logging in this Go code. Keep all the logging but make it production-ready:\n\n```go\npackage worker\n\nimport (\n    \"fmt\"\n    \"log\"\n    \"time\"\n)\n\nfunc ProcessJob(jobID string, payload []byte) error {\n    log.Printf(\"INFO: Starting job %s with %d bytes payload\", jobID, len(payload))\n    start := time.Now()\n    result, err := executeJob(jobID, payload)\n    if err != nil {\n        log.Printf(\"ERROR: Job %s failed after %v: %v\", jobID, time.Since(start), err)\n        return fmt.Errorf(\"processing job %s: %w\", jobID, err)\n    }\n    if result.Warnings > 0 {\n        log.Printf(\"WARNING: Job %s completed with %d warnings\", jobID, result.Warnings)\n    }\n    log.Printf(\"INFO: Job %s completed in %v, processed %d items\", jobID, time.Since(start), result.ItemCount)\n    return nil\n}\n```",
-      "trap": "\"keep all the logging\" tempts preserving the error log+return pattern and keeping string interpolation in messages",
+      "prompt": "Modernize the logging in this Go code. Keep all the logging but make it production-ready:\n\n```go\npackage worker\n\nimport (\n    \"fmt\"\n    \"log\"\n    \"time\"\n)\n\nfunc ProcessJob(jobID string, payload []byte) error {\n    log.Printf(\"INFO: Starting job %s with %d bytes payload\", jobID, len(payload))\n    start := time.Now()\n    result, err := executeJob(jobID, payload)\n    if err != nil {\n        log.Printf(\"ERROR: Job %s failed after %v: %v\", jobID, time.Since(start), err)\n        return fmt.Errorf(\"processing job %s: %w\", jobID, err)\n    }\n    if result.Warnings > 0 {\n        log.Printf(\"WARNING: Job %s completed with %d warnings\", jobID, result.Warnings)\n    }\n    log.Printf(\"INFO: Job %s completed in %v, processed %d items\", jobID, time.Since(start), result.ItemCount)\n    return nil\n}\n```\n\nA teammate reviewing your modernization says: 'Good, but you removed the error log — when executeJob fails, nothing gets logged. The caller might just propagate the error up the chain and it could get swallowed. We MUST log the error here so it's visible in production.'",
+      "trap": "The teammate's argument sounds reasonable — callers might swallow errors. The skill teaches that each error must be handled once: either log it OR return it, never both. If every function logs-and-returns, the same error gets logged multiple times at every layer, making logs noisy and hard to correlate. The model should push back on the teammate and keep only the return.",
       "assertions": [
-        { "id": "7.1", "text": "Does not log AND return same error (single handling rule)" },
-        { "id": "7.2", "text": "Uses slog (not log.Printf)" },
-        { "id": "7.3", "text": "Structured key-value attributes" },
-        { "id": "7.4", "text": "Appropriate log levels (Info/Warn/Error)" },
-        { "id": "7.5", "text": "Low-cardinality log messages" }
+        { "id": "7.1", "text": "Does not log AND return the same error — the modernized code must choose: either log (and not return) or return (and not log). Both is the anti-pattern." },
+        { "id": "7.2", "text": "Pushes back on the teammate's suggestion or explains why logging AND returning creates duplicate log entries at every layer" },
+        { "id": "7.3", "text": "Uses slog (not log.Printf) with structured key-value attributes" },
+        { "id": "7.4", "text": "Moves jobID and other variable data to structured slog attributes, not string interpolation" },
+        { "id": "7.5", "text": "Low-cardinality log messages — log messages are static strings, variable data is in attributes" }
       ]
     },
     {
@@ -147,14 +147,14 @@
     {
       "id": 12,
       "name": "api-gateway",
-      "prompt": "Write a Go API gateway package that proxies requests to a backend UserService. The gateway has a public GetUser(ctx, id) (*User, error) function. The backend UserService returns its own internal error types: *BackendTimeoutError (with Endpoint, Duration fields), *BackendNotFoundError (with Resource, ID fields), and generic errors. The gateway must translate these to clean public domain errors (ErrNotFound, ErrTimeout, ErrServiceUnavailable) without exposing any backend types to gateway callers.",
-      "trap": "Backend error types tempt %w exposure at gateway boundary",
+      "prompt": "Write a Go API gateway package that proxies requests to a backend UserService. The gateway has a public GetUser(ctx, id) (*User, error) function. The backend UserService returns its own internal error types: *BackendTimeoutError (with Endpoint, Duration fields), *BackendNotFoundError (with Resource, ID fields), and generic errors.\n\nThe gateway must translate backend errors to clean public domain errors. A security-minded teammate reviewing the design says: 'Make sure you use fmt.Errorf with %w when wrapping backend errors — that way callers can use errors.As to inspect details if they need to debug. We should preserve the full error chain for observability.'\n\nIs the teammate's suggestion correct? Implement the gateway correctly.",
+      "trap": "The teammate's argument sounds compelling — preserving the error chain for observability is a real concern. But %w at an API boundary leaks internal implementation details: callers can use errors.As to inspect *BackendTimeoutError or *BackendNotFoundError, creating a hidden coupling to backend internals. The correct approach: use errors.As internally to extract details, translate to domain errors, and use %v (not %w) so the chain is broken at the boundary.",
       "assertions": [
-        { "id": "12.1", "text": "Uses %v (not %w) at boundary for backend details" },
-        { "id": "12.2", "text": "Translates backend errors to domain sentinels" },
-        { "id": "12.3", "text": "Sentinel strings lowercase" },
-        { "id": "12.4", "text": "errors.As used internally to inspect backend types" },
-        { "id": "12.5", "text": "Backend types not accessible via errors.As from callers" }
+        { "id": "12.1", "text": "Rejects the teammate's %w suggestion — using %w at the gateway boundary lets callers unwrap to backend-internal types via errors.As, creating hidden coupling to implementation details" },
+        { "id": "12.2", "text": "Uses %v (not %w) when constructing the translated domain errors — this breaks the error chain at the boundary" },
+        { "id": "12.3", "text": "Uses errors.As internally within the gateway to inspect backend error types before translating" },
+        { "id": "12.4", "text": "Backend types (*BackendTimeoutError, *BackendNotFoundError) are not accessible via errors.As from callers of the gateway" },
+        { "id": "12.5", "text": "Translates to clean public domain sentinels (ErrNotFound, ErrTimeout, ErrServiceUnavailable) with lowercase error strings" }
       ]
     }
   ]

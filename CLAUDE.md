@@ -481,10 +481,15 @@ Store your evaluation scenarios in `skills/{name}/evals/evals.json`.
 
 - **Never test common knowledge.** If the model passes both with and without the skill, the eval is useless. Avoid testing well-known patterns (e.g. `bufio.Scanner` for file reading, `strings.Builder` for concatenation, basic `make` preallocation).
 - **Test the skill's unique guidance.** Identify what the skill teaches that the model wouldn't do by default — subtle tradeoffs, non-obvious stdlib choices, Go-specific gotchas.
-- **Create traps.** Frame the task so the natural/default approach is wrong. The skill should steer toward the correct approach.
+- **Create traps — natural wrong defaults, not explicit wrong instructions.** A trap makes the obvious/lazy approach incorrect: the task looks like a normal request where the natural implementation is subtly wrong. If the task explicitly instructs the model to use a specific wrong approach, the model follows that instruction regardless of the skill. The skill shifts defaults; it cannot override direct instructions. Good trap: "implement a shared counter for a web handler" (tempts a race condition). Bad trap: "implement a counter using a global int without synchronization".
 - **Test judgment, not API knowledge.** Ask "which data structure?" not "how to use data structure X?". The model knows APIs; the skill adds architectural judgment.
-- **Avoid leading prompts.** Don't mention the correct approach in the task description (e.g. don't say "use container/list" — say "implement LRU cache"). Don't hint at the answer.
+- **Avoid leading prompts.** Don't mention the correct approach in the task description (e.g. don't say "use container/list" — say "implement LRU cache"). Don't hint at the answer. Don't name the rule, alert type, or problem category — if the prompt labels the issue, the model can reason to the fix without the skill.
 - **Stress-test edge cases.** The skill's common-mistakes tables and "when NOT to use" guidance are high-value targets.
+- **Pre-flight every candidate eval without the skill.** If the model passes, cut it or redesign it before adding it to the suite. This is the cheapest quality gate.
+- **Prefer positive trigger tests over negative ones.** Testing "don't do X when not applicable" is weak — models have a strong prior of not acting when uncertain. Every eval should test the model _doing_ something correctly, not refraining.
+- **Target rules that are saturated in training data last.** Widely-documented patterns, standard stdlib idioms, and common Go conventions appear in countless guides and produce little or no delta. Focus first on rules that are counterintuitive, library-specific, or unique to the skill's domain.
+- **Don't let prompt context substitute for skill knowledge.** If the eval describes the problem with enough specificity that the model can reason to the correct answer, the skill becomes redundant. Present the problem as an opaque or misleading scenario where the skill's rule resolves an ambiguity the model would otherwise get wrong.
+- **Keep assertions within a group homogeneous.** Mixing common-knowledge assertions with skill-specific ones in the same eval group produces a partial score that masks both problems — some assertions pass in both conditions (common knowledge), others fail in both (coverage gap). Each eval group should test a single, skill-specific behavior.
 - **Isolate the evaluated skill.** When running "without" evals, do NOT load any skill that covers overlapping content — a colliding skill would give the model guidance it shouldn't have, inflating the "without" score and masking the evaluated skill's true uplift. When running "with" evals, load only the skill under test (and its explicit cross-references if needed). For example, when evaluating `golang-error-handling`, do not load `golang-code-style` or `golang-safety` — they contain overlapping error-handling advice that would contaminate the baseline.
 
 **Anti-patterns to avoid:**
@@ -493,7 +498,12 @@ Store your evaluation scenarios in `skills/{name}/evals/evals.json`.
 - Testing `make([]T, 0, n)` when the task obviously needs preallocation → model knows this
 - Testing `bufio.Scanner` for file reading → model knows this
 - Testing `container/heap` when the task says "priority queue" → model knows this
-- Any eval where both with/without score 100% → eval is too easy, redesign it
+- Any eval group where both with/without score 100% → tests common knowledge, not skill uplift; redesign it
+- Any eval group where both with/without score 0% and the task explicitly requests the wrong approach → tests instruction-following, not skill guidance; remove the explicit wrong instruction and make that approach merely the natural default
+- Any eval group where both with/without score 0% and the task is neutral → the skill has a coverage gap for this case; fix the skill or remove the eval
+- Any eval group where both with/without score identically at a partial value → mixed common-knowledge and coverage-gap assertions; split and redesign each
+- Naming an eval "model already knows this" and keeping it — if you know it's common knowledge, cut it
+- Testing general best practices (widely-known Go idioms, standard stdlib patterns) instead of the skill's specific, non-obvious rules
 
 #### Evaluation Reporting
 
@@ -530,13 +540,18 @@ Also update the **Summary table** at the top of `EVALUATIONS.md`: add a new row 
 
 ## Workflows
 
+### Working in worktrees
+
+All implementation work MUST happen in a git worktree in `.claude/worktrees/`, never directly on the checked-out branch.
+
+Before starting any task, propose a branch name and ask the developer to confirm. Also run `git worktree list` first — if an existing worktree covers the same skill or a closely related topic, suggest reusing it and let the developer decide.
+
 ### After updating a skill
 
 After making changes, suggest the following as next steps for the developer to run. Do NOT execute these automatically.
 
 1. ~~Validate against the spec: `skills-ref validate ./skills/{name}`~~ (disabled — [skills-ref doesn't support `user-invocable` yet](https://github.com/agentskills/agentskills/issues/105))
-2. Reformat markdowns with `npx prettier --write *.md "**/*.md"` then lint with `markdownlint-cli2 --config .markdownlint-cli2.jsonc ./` — run before measuring tokens, as formatting changes token counts
-2b. Run `SNYK_TOKEN=<token> uvx snyk-agent-scan@latest skills/<name>/` and fix any W011/W012/W001 warnings before proceeding (see [Snyk agent scanner compliance](#snyk-agent-scanner-compliance))
+2. Reformat markdowns with `npx prettier --write *.md "**/*.md"` then lint with `markdownlint-cli2 --config .markdownlint-cli2.jsonc ./` — run before measuring tokens, as formatting changes token counts 2b. Run `SNYK_TOKEN=<token> uvx snyk-agent-scan@latest skills/<name>/` and fix any W011/W012/W001 warnings before proceeding (see [Snyk agent scanner compliance](#snyk-agent-scanner-compliance))
 3. Measure token counts:
    - **Description (tok)**: `awk 'NR==1 && /^---$/{found=1; next} found && /^---$/{exit} found && /^description:/{print}' skills/{name}/SKILL.md | tiktoken-cli`
    - **SKILL.md (tok)**: `tiktoken-cli skills/{name}/SKILL.md`

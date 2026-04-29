@@ -2,33 +2,29 @@
   {
     "id": 1,
     "name": "new-constructor-naming",
-    "description": "New() constructor for single primary type, error strings with package prefix, isConnected bool field",
-    "prompt": "Create a Go package called `apiclient` that provides an HTTP client for a REST API. The package should include:\n\n1. A main client struct with fields for base URL, timeout, max retries, and an http.Client\n2. A constructor with functional options for port, timeout, and logger\n3. Exported constants for default timeout (30s), max retries (3), and default port (8080)\n4. Getter and setter methods for the base URL and timeout\n5. Sentinel errors for 'not found', 'unauthorized', and 'rate limited' cases\n6. A custom error type for API errors that includes status code and response body\n7. A method on the client to fetch a user by ID, returning a User struct\n8. A boolean field on the client tracking whether it's connected\n\nPut everything in a single file `apiclient.go`. Use proper Go conventions throughout.",
-    "trap": "Model uses NewClient() instead of New(), bare error strings without package prefix, or mixed-case acronyms (Http, Url, Api, Id)",
+    "description": "New() constructor for single primary type; error strings with package prefix; bool field is-prefix",
+    "prompt": "Create a Go package called `apiclient` that provides an HTTP client for a REST API. The package exports a single primary type — the client struct — along with functional options, sentinel errors, and a custom error type. Include:\n\n1. The client struct with base URL, timeout, http.Client, and a boolean tracking connection state\n2. A constructor accepting a DSN-like connection string and functional options\n3. Sentinel errors for 'not found' and 'unauthorized'\n4. A custom error type wrapping the HTTP status code\n5. A method to fetch a resource by ID\n\nWrite `apiclient.go` with proper Go naming throughout.",
+    "trap": "Model names the constructor NewClient() because the package name is apiclient and 'client' is prominent — anti-stutter means the primary type should use New(). Also likely to write 'not found' error strings without 'apiclient:' prefix, and use bare `connected bool` instead of `isConnected bool`.",
     "assertions": [
       {
         "id": "1.1",
-        "text": "Constructor is named New() not NewClient(), because Client is the single primary type in the apiclient package — callers write apiclient.New(), avoiding redundancy"
+        "text": "Constructor is named New() not NewClient() or NewAPIClient() — the package is already called apiclient, so New() is unambiguous and avoids reading 'client' twice at the call site (apiclient.New())"
       },
       {
         "id": "1.2",
-        "text": "Sentinel error strings include the package name as prefix (e.g., 'apiclient: not found' or 'apiclient: resource not found'), not bare strings like 'not found' or 'resource not found'"
+        "text": "Sentinel error strings include the package name as prefix (e.g., 'apiclient: not found', 'apiclient: unauthorized') — bare strings like 'not found' lose origin when wrapped with fmt.Errorf"
       },
       {
         "id": "1.3",
-        "text": "Acronyms are all-caps or all-lower, never mixed (URL not Url, HTTP not Http, API not Api, ID not Id in struct fields and method names)"
+        "text": "The unexported boolean field uses an is/has prefix (isConnected, hasConnection) not a bare adjective (connected) — the is prefix makes it readable as a question"
       },
       {
         "id": "1.4",
-        "text": "The unexported boolean field uses an is/has prefix (isConnected) rather than a bare adjective (connected), and the exported method uses IsConnected()"
+        "text": "Acronyms in exported identifiers are all-caps (URL not Url, HTTP not Http, ID not Id) — e.g., FetchByID() not FetchById(), BaseURL not BaseUrl"
       },
       {
         "id": "1.5",
-        "text": "Getter methods omit the Get prefix (e.g., BaseURL() and Timeout() rather than GetBaseURL() and GetTimeout())"
-      },
-      {
-        "id": "1.6",
-        "text": "Functional option functions use With prefix (WithPort, WithTimeout, WithLogger) and option type is singular (Option or ClientOption, not Options)"
+        "text": "The custom error type uses the Error suffix (e.g., APIError, ResponseError) and NOT a prefix like ErrAPIResponse"
       }
     ]
   },
@@ -68,29 +64,29 @@
   {
     "id": 3,
     "name": "error-string-lowercase-acronyms",
-    "description": "Lowercase error strings and test names including acronyms, isConsuming bool, consistent receivers",
-    "prompt": "Write a Go file `consumer.go` in package `msgqueue` and its corresponding test file `consumer_test.go`. The consumer should:\n\n1. A Consumer struct that wraps a connection URL, a boolean tracking if it's currently consuming, and a maximum batch size constant (100)\n2. A constructor accepting a URL and options\n3. Methods: one to consume the next batch of messages, one to acknowledge a message by ID, one to get the consumer's URL, and one to check if the consumer is currently running\n4. A Processor interface with a single method for processing a message\n5. Sentinel errors for: queue empty, message already acknowledged, invalid message ID\n6. A custom error type for deserialization failures that wraps the original error\n\nFor the test file, write table-driven tests for the acknowledge method covering: valid ID, empty ID, already acknowledged ID, and invalid format ID. Use proper Go test naming conventions with subtests.\n\nFollow idiomatic Go naming throughout both files.",
-    "trap": "Model capitalizes acronyms in error strings ('invalid message ID' instead of 'invalid message id') and subtest names ('valid ID' instead of 'valid id'), or uses a bare boolean field (consuming) instead of isConsuming",
+    "description": "Error strings and test subtest names must be fully lowercase including acronyms like ID, URL, HTTP",
+    "prompt": "Write a Go file `handler.go` in package `webhook` and its test file `handler_test.go`. The webhook handler should:\n\n1. A Handler struct with a secret key (for HMAC validation), a base URL for callbacks, and a boolean tracking if it's processing\n2. A method to validate an incoming webhook payload — it must verify the HMAC signature and the source URL\n3. Sentinel errors for: invalid HMAC signature, invalid source URL, missing request ID\n4. A Processor interface with a single method Process(ctx context.Context, payload []byte) error\n\nFor the test file, write table-driven tests for the validate method covering: valid request, invalid HMAC, invalid URL, missing request ID, empty payload. Use proper Go test naming conventions.",
+    "trap": "Model capitalizes acronyms in error strings ('invalid source URL', 'missing request ID') and in subtest names ('invalid URL', 'missing request ID') — but Go's convention requires fully lowercase error strings and subtest names, including acronyms. Also likely to write bare boolean field (processing) without is prefix.",
     "assertions": [
       {
         "id": "3.1",
-        "text": "Error strings are fully lowercase including acronyms — 'invalid message id' not 'invalid message ID'. Go error convention: lowercase, no punctuation, even for acronyms that would normally be capitalized in identifiers"
+        "text": "Error strings are fully lowercase including acronyms — 'invalid source url' not 'invalid source URL', 'missing request id' not 'missing request ID'. Acronyms that are capitalized in identifiers are lowercase in error strings"
       },
       {
         "id": "3.2",
-        "text": "Subtest names in t.Run are fully lowercase — 'valid id', 'empty id' not 'valid ID', 'empty ID'. Acronyms in test case descriptions follow the lowercase error string convention"
+        "text": "Subtest names passed to t.Run() are fully lowercase — 'invalid url' not 'invalid URL', 'missing request id' not 'missing request ID'. The same lowercase-for-acronyms rule applies to t.Run() subtest names"
       },
       {
         "id": "3.3",
-        "text": "The unexported boolean field uses an is prefix (isConsuming or isRunning) rather than a bare adjective (consuming or running), and the exported method uses IsRunning() or IsConsuming()"
+        "text": "The unexported boolean field uses an is prefix (isProcessing) rather than a bare adjective (processing), and the exported method uses IsProcessing()"
       },
       {
         "id": "3.4",
-        "text": "All Consumer methods use the same 1-2 letter receiver name (e.g., 'c' consistently) rather than mixing names or using 'self'/'this'"
+        "text": "All Handler methods use the same 1-2 letter receiver name consistently (e.g., 'h') rather than mixing names or using 'self'/'this'"
       },
       {
         "id": "3.5",
-        "text": "Sentinel errors use Err prefix (ErrQueueEmpty, ErrAlreadyAcknowledged, ErrInvalidMessageID) and the custom error type uses Error suffix (DeserializationError)"
+        "text": "Sentinel errors use Err prefix (ErrInvalidSignature, ErrInvalidSourceURL, ErrMissingRequestID) matching the Go convention — note the capitalized acronyms in error variable names contrast with lowercase in error string values"
       }
     ]
   },
@@ -187,55 +183,55 @@
   },
   {
     "id": 7,
-    "name": "interface-naming-canonical-methods",
-    "description": "Tests -er suffix for single-method interfaces, canonical method names, and multi-method interface naming",
-    "prompt": "I'm designing interfaces for a Go storage library. Create interfaces for these behaviors:\n\n1. Something that can serialize data to bytes\n2. Something that can validate itself\n3. Something that can both read and write key-value pairs (a full store)\n4. Something that provides a human-readable string representation\n5. Something that can close/release resources\n6. Something that can handle HTTP requests\n\nWrite the interface definitions with proper method signatures.",
-    "trap": "Model invents non-canonical method names like ToString() instead of String(), Serialize() instead of Marshal(), or names single-method interfaces without the -er suffix (e.g., Validation instead of Validator).",
+    "name": "interface-naming-multi-method-noun",
+    "description": "Multi-method interfaces use a descriptive noun, not a compound -er; canonical method names must not be invented",
+    "prompt": "I'm designing a Go storage abstraction for a key-value store. A teammate has drafted these interface definitions:\n\n```go\ntype KeyGetter interface {\n    GetKey(key string) ([]byte, error)\n}\n\ntype KeySetter interface {\n    SetKey(key string, value []byte) error\n}\n\ntype KeyDeleter interface {\n    DeleteKey(key string) error\n}\n\ntype GetterSetter interface {\n    KeyGetter\n    KeySetter\n}\n\ntype FullStorer interface {\n    KeyGetter\n    KeySetter\n    KeyDeleter\n    Stringify() string\n    Release() error\n}\n```\n\nReview the interface and method naming. What problems do you see, and how would you fix them?",
+    "trap": "Model may accept GetterSetter as a reasonable compound name, keep Stringify() and Release() without flagging them as non-canonical, or not recognize that FullStorer should be a noun. The skill teaches: multi-method interfaces use descriptive nouns (Store, not FullStorer or GetterSetter), canonical method names (String() not Stringify(), Close() not Release()), and single-method -er interfaces should embed rather than compound.",
     "assertions": [
       {
         "id": "7.1",
-        "text": "Single-method interfaces use the -er suffix pattern (e.g., Marshaler or Serializer, Validator, Closer) following the io.Reader/io.Writer convention"
+        "text": "Flags GetterSetter as a poor compound -er name for a multi-method interface and suggests a descriptive noun (e.g., ReadWriter, or more specifically, a noun like Store)"
       },
       {
         "id": "7.2",
-        "text": "The string representation method is named String() returning string (matching fmt.Stringer), NOT ToString() or Stringify()"
+        "text": "Flags Stringify() as non-canonical — the correct method name is String() returning string to satisfy fmt.Stringer"
       },
       {
         "id": "7.3",
-        "text": "The resource release method is named Close() returning error (matching io.Closer), NOT Destroy(), Release(), or Cleanup()"
+        "text": "Flags Release() as non-canonical — the correct method name is Close() returning error to satisfy io.Closer"
       },
       {
         "id": "7.4",
-        "text": "The HTTP handler method is named ServeHTTP(http.ResponseWriter, *http.Request) matching http.Handler — NOT HandleHTTP or HandleRequest"
+        "text": "Suggests renaming FullStorer to a descriptive noun (e.g., Store) rather than a compound -er — multi-method interfaces use nouns, not method-name-plus-er patterns"
       },
       {
         "id": "7.5",
-        "text": "Multi-method interface (the key-value store) uses a descriptive noun name like Store or ReadWriter, NOT a compound -er name like ReaderWriter"
+        "text": "Flags GetKey/SetKey/DeleteKey method names as stuttering (key is already in the interface context) and suggests Get/Set/Delete to avoid repeating the concept"
       }
     ]
   },
   {
     "id": 8,
-    "name": "constants-role-not-value",
-    "description": "Tests that constants are named by purpose/role, not by their literal value, and use MixedCaps",
-    "prompt": "Define Go constants for a web server configuration package. I need constants for:\n\n1. The default HTTP port (8080)\n2. Maximum number of retries (3)\n3. Request timeout (30 seconds)\n4. Maximum upload size (10 MB)\n5. Rate limit (100 requests per minute)\n6. Maximum header size (8192 bytes)\n\nWrite proper Go constant declarations.",
-    "trap": "Model uses ALL_CAPS (MAX_RETRIES, DEFAULT_PORT) or names constants by their value (Port8080, ThreeRetries, Size8192) instead of by their role.",
+    "name": "enum-zero-value-protection",
+    "description": "Enum zero value must be an Unknown/Invalid sentinel to catch uninitialized variables; type-prefixed enum values",
+    "prompt": "I'm writing a task scheduler in Go. Define the enum types for task state and priority. Here's my first attempt:\n\n```go\ntype TaskState int\n\nconst (\n    TaskStatePending TaskState = iota\n    TaskStateRunning\n    TaskStateDone\n    TaskStateFailed\n)\n\ntype Priority int\n\nconst (\n    PriorityLow Priority = iota + 1\n    PriorityMedium\n    PriorityHigh\n    PriorityCritical\n)\n```\n\nIs this correct? Are there any naming or design issues?",
+    "trap": "TaskStatePending at iota 0 looks reasonable — Pending seems like a natural initial state. But the skill teaches that zero value must be an Unknown/Invalid sentinel to catch uninitialized variables. A var t Task will silently have TaskStatePending, making it look like a task was deliberately queued when it wasn't. Priority uses iota+1 to skip zero, which is one valid approach — the model should recognize this as intentional zero-value protection.",
     "assertions": [
       {
         "id": "8.1",
-        "text": "Constants use MixedCaps (DefaultPort, MaxRetries) NOT ALL_CAPS (DEFAULT_PORT, MAX_RETRIES) — Go reserves casing for visibility, not emphasis"
+        "text": "Flags TaskStatePending at iota 0 as a bug: a zero-value TaskState will silently appear as Pending, making uninitialized task structs look like they have been queued"
       },
       {
         "id": "8.2",
-        "text": "Constants are named by role/purpose, not by value (e.g., DefaultPort not Port8080, MaxRetries not ThreeRetries, MaxHeaderSize not Size8192)"
+        "text": "Suggests placing an explicit Unknown/Invalid sentinel at iota 0 (e.g., TaskStateUnknown or TaskStateInvalid) so that uninitialized values are detectable"
       },
       {
         "id": "8.3",
-        "text": "Time-based constants use time.Duration type (e.g., 30 * time.Second) rather than raw integers (e.g., const RequestTimeout = 30)"
+        "text": "Recognizes that Priority using iota+1 (skipping zero) is a valid approach to zero-value protection — does NOT flag it as wrong"
       },
       {
         "id": "8.4",
-        "text": "Size-based constants use descriptive names and clear units (e.g., MaxUploadSize = 10 << 20 or 10 * 1024 * 1024) not ambiguous raw numbers"
+        "text": "Confirms that enum values are correctly prefixed with the type name (TaskStatePending, PriorityLow) — this is correct and should be kept"
       }
     ]
   },
@@ -324,26 +320,30 @@
   },
   {
     "id": 12,
-    "name": "import-aliasing-only-on-collision",
-    "description": "Tests that import aliases are only used when there's a name collision, not gratuitously",
-    "prompt": "Review these Go imports and tell me which aliases are needed and which should be removed:\n\n```go\nimport (\n    f \"fmt\"\n    h \"net/http\"\n    j \"encoding/json\"\n    \"crypto/rand\"\n    mrand \"math/rand\"\n    \"github.com/go-chi/chi/v5\"\n    chiMiddleware \"github.com/go-chi/chi/v5/middleware\"\n    pb \"myapp/proto/userpb\"\n    str \"strings\"\n    mylog \"log/slog\"\n    \"io\"\n    ioutil \"io/ioutil\"\n)\n```\n\nWhich aliases are justified? Which should be removed? Explain why.",
-    "trap": "Model may accept unnecessary aliases like mylog for log/slog or str for strings. May not recognize that pb for proto and mrand for math/rand are conventionally justified.",
+    "name": "import-aliasing-collision-only",
+    "description": "Import aliases are only justified when two packages have the same final path segment; aliases for readability are wrong",
+    "prompt": "A teammate wrote this Go file. Review the import aliases:\n\n```go\npackage main\n\nimport (\n    \"context\"\n    \"encoding/json\"\n    httputil \"net/http\"\n    stdfmt \"fmt\"\n    \"crypto/rand\"\n    mrand \"math/rand/v2\"\n    apiv1 \"myapp/api/v1\"\n    apiv2 \"myapp/api/v2\"\n    \"strings\"\n    strutil \"golang.org/x/text/unicode/norm\"\n    \"github.com/rs/zerolog\"\n    zlog \"github.com/rs/zerolog/log\"\n)\n```\n\nWhich aliases are justified? Which should be removed? For each removal, explain why. For each kept alias, explain why it's necessary.",
+    "trap": "Model may approve httputil (net/http is verbose), stdfmt (explicit about stdlib origin), strutil (long package name), apiv1/apiv2 (disambiguation) and zlog (explicit about subpackage). The skill teaches: alias ONLY on actual name collision — the default package name is already the last path segment. apiv1/apiv2 are justified because both would collide as 'v2'/'v1'. mrand is justified. httputil, stdfmt, strutil, zlog are NOT justified — they add cognitive load without resolving a collision.",
     "assertions": [
       {
         "id": "12.1",
-        "text": "Flags f, h, j, str, mylog, and ioutil aliases as unnecessary — these add cognitive load without resolving any collision"
+        "text": "Flags httputil as unjustified — net/http's default package name is 'http', there is no collision. 'httputil' adds a mapping readers must remember"
       },
       {
         "id": "12.2",
-        "text": "Keeps mrand alias for math/rand as justified — it collides with crypto/rand in the same import block"
+        "text": "Flags stdfmt as unjustified — 'fmt' is already the package name. 'stdfmt' just adds a prefix with no collision to resolve"
       },
       {
         "id": "12.3",
-        "text": "Keeps pb alias for proto-generated code as conventionally justified (generated code convention)"
+        "text": "Keeps mrand as justified — it collides with crypto/rand (both would be 'rand' without aliases)"
       },
       {
         "id": "12.4",
-        "text": "Explains the principle: aliases add cognitive load because readers must remember the mapping — only alias on actual name collision"
+        "text": "Keeps apiv1 and apiv2 as justified — both myapp/api/v1 and myapp/api/v2 would default to 'v2'/'v1' but the numeric suffixes are ambiguous; aliasing to apiv1/apiv2 disambiguates"
+      },
+      {
+        "id": "12.5",
+        "text": "Flags strutil or zlog as unjustified — the package already has a clear default name (norm or log); renaming it to strutil or zlog adds cognitive load without resolving a collision"
       }
     ]
   },

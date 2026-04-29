@@ -100,15 +100,15 @@
   {
     "id": 8,
     "name": "db-context-variants",
-    "description": "Tests that the model uses *Context database method variants instead of non-context ones",
-    "prompt": "Write a Go repository layer for a User CRUD. Implement Create, GetByID, Update, and Delete methods using database/sql. Each method receives a context from the service layer. The repository should respect request cancellation — if the client disconnects, long-running queries should be cancelled.",
-    "trap": "Model might use db.Query, db.Exec, db.QueryRow instead of their *Context variants (QueryContext, ExecContext, QueryRowContext), silently ignoring the context",
+    "description": "db.BeginTx (not db.Begin) is required for cancellable transactions; context must flow to every db call including transaction start",
+    "prompt": "Review this Go repository method and identify all context-related issues:\n\n```go\nfunc (r *UserRepository) TransferCredits(ctx context.Context, fromID, toID string, amount int) error {\n    tx, err := r.db.Begin()\n    if err != nil {\n        return fmt.Errorf(\"begin tx: %w\", err)\n    }\n    defer tx.Rollback()\n\n    _, err = tx.ExecContext(ctx, \"UPDATE users SET credits = credits - $1 WHERE id = $2\", amount, fromID)\n    if err != nil {\n        return fmt.Errorf(\"debit: %w\", err)\n    }\n\n    _, err = tx.ExecContext(ctx, \"UPDATE users SET credits = credits + $1 WHERE id = $2\", amount, toID)\n    if err != nil {\n        return fmt.Errorf(\"credit: %w\", err)\n    }\n\n    return tx.Commit()\n}\n```\n\nWhat is wrong with how context is used? Fix it.",
+    "trap": "The model sees ExecContext being used and may think context usage is correct. The bug: db.Begin() starts the transaction without a context — if ctx is already cancelled when Begin() is called, the transaction still starts. Also, tx.Commit() should be tx.CommitContext(ctx) if available, but the main issue is db.BeginTx(ctx, nil) instead of db.Begin().",
     "assertions": [
-      {"id": "8.1", "text": "Uses db.QueryRowContext (not db.QueryRow) for GetByID"},
-      {"id": "8.2", "text": "Uses db.ExecContext (not db.Exec) for Create, Update, and Delete"},
-      {"id": "8.3", "text": "Passes the ctx parameter to every database call"},
-      {"id": "8.4", "text": "Does NOT ignore the ctx parameter by calling non-context database methods"},
-      {"id": "8.5", "text": "Each method accepts ctx context.Context as its first parameter"}
+      {"id": "8.1", "text": "Identifies db.Begin() as the bug — it starts a transaction ignoring the context; if ctx is cancelled before Begin() returns, the transaction still starts"},
+      {"id": "8.2", "text": "Replaces db.Begin() with db.BeginTx(ctx, nil) — BeginTx respects context cancellation and won't start a transaction if ctx is already done"},
+      {"id": "8.3", "text": "Keeps ExecContext calls passing ctx — these are already correct"},
+      {"id": "8.4", "text": "Does not add a redundant ctx check before Begin() as the fix — the correct fix is BeginTx, not a manual ctx.Err() guard"},
+      {"id": "8.5", "text": "Each method accepts ctx context.Context as its first parameter and it flows through all DB operations"}
     ]
   },
   {

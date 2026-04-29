@@ -405,26 +405,26 @@
   },
   {
     "id": 17,
-    "name": "guard-float-division-by-zero",
-    "description": "Guards against zero total to prevent NaN/Inf from float division",
-    "prompt": "In package `stats`, write a function `SuccessRate(success, total int) float64` that returns the success rate as a percentage (0.0 to 100.0). Keep it simple — one-liner math is fine.",
-    "trap": "Model computes `float64(success) / float64(total) * 100` without checking total == 0, returning NaN (0/0) or +Inf (n/0) silently",
+    "name": "nan-propagation-float-division",
+    "description": "NaN from float division propagates silently through computations — not a panic, a silent bug",
+    "prompt": "In package `monitor`, write a function `Threshold(baseRate, currentRate float64) bool` that returns true if `currentRate` is at least 90% of `baseRate`. Formula: `currentRate / baseRate >= 0.9`. This is called to decide whether to trigger an alert — if it returns false, we page the on-call team.",
+    "trap": "Model guards against integer division panic but ignores the float case. When baseRate is 0.0, `currentRate / 0.0` produces +Inf or NaN — NaN comparisons always return false, so Threshold(0, 5) silently returns false and triggers a false alert. The model may not check for zero because float division doesn't panic.",
     "assertions": [
       {
         "id": "17.1",
-        "text": "Guards against zero total — `float64(success) / float64(total)` produces NaN (0/0) or +Inf (n/0); must check total == 0 first"
+        "text": "Guards against zero baseRate — float division by zero produces +Inf or NaN, not a panic. NaN >= 0.9 is always false, causing Threshold(0, 5) to silently return false and trigger a false alert"
       },
       {
         "id": "17.2",
-        "text": "Returns 0.0 (not NaN or panic) when total is zero"
+        "text": "Returns a defined value (true or false with documented semantics) when baseRate is 0, not NaN or +Inf silently propagating"
       },
       {
         "id": "17.3",
-        "text": "Converts to float64 before division to avoid integer truncation"
+        "text": "Does not rely on the caller to ensure baseRate is non-zero — the function itself is defensive"
       },
       {
         "id": "17.4",
-        "text": "Result is in range 0.0 to 100.0 for valid inputs"
+        "text": "Comparison uses the correct threshold (>= 0.9) for the 90% check"
       }
     ]
   },
@@ -455,26 +455,26 @@
   },
   {
     "id": 19,
-    "name": "lazy-init-map-on-first-write",
-    "description": "Constructor or AddWidget initializes map before first write to prevent panic",
-    "prompt": "In package `dashboard`, write a struct `Dashboard` with fields `name string`, `widgets map[string]Widget`, and `layout []string`. Widget is a struct with `Title string`. Write a constructor `New(name string) *Dashboard` — just set the name, keep it minimal. Add a method `AddWidget(id string, w Widget)` that stores the widget and appends its id to layout.",
-    "trap": "Model follows 'keep it minimal' instruction, setting only name in the constructor and leaving widgets nil — AddWidget panics on first call when writing to nil map",
+    "name": "zero-value-design-usable-without-constructor",
+    "description": "Types should be usable at zero value; map fields that are written to cannot be nil",
+    "prompt": "In package `registry`, write a struct `Registry` with a `handlers map[string]http.HandlerFunc` field and a `Register(name string, h http.HandlerFunc)` method. A teammate says: 'We don't need a constructor — the zero value should just work. Users can do `var r registry.Registry` and call Register immediately.'\n\nImplement Registry following the teammate's suggestion. The zero value must be usable.",
+    "trap": "Model follows the teammate's suggestion literally and writes `type Registry struct { handlers map[string]http.HandlerFunc }` with `func (r *Registry) Register(...)  { r.handlers[name] = h }` — writing to a nil map panics. The teammate is right that zero values should work, but the implementation needs lazy init. The model must recognize that a nil map panics on write and add lazy init inside Register.",
     "assertions": [
       {
         "id": "19.1",
-        "text": "Map initialized before write — either in the constructor or via lazy-init in Handle; writing to a nil map panics"
+        "text": "Register does NOT panic when called on a zero-value Registry — `var r Registry; r.Register(\"x\", h)` must work without calling a constructor first"
       },
       {
         "id": "19.2",
-        "text": "Dashboard is immediately usable after New() — AddWidget must not panic on first call"
+        "text": "Uses lazy initialization inside Register: `if r.handlers == nil { r.handlers = make(map[string]http.HandlerFunc) }` — writing to nil map panics; lazy init is the idiomatic pattern for zero-value-safe types"
       },
       {
         "id": "19.3",
-        "text": "AddWidget correctly stores widget and appends id to layout in a single call"
+        "text": "Does NOT require users to call a constructor — the design follows the teammate's suggestion that the zero value is usable"
       },
       {
         "id": "19.4",
-        "text": "Layout slice growth via append is safe (nil slice append works in Go)"
+        "text": "Confirms the teammate's goal is valid: sync.Mutex and bytes.Buffer are examples of zero-value-usable types in the stdlib"
       }
     ]
   },
@@ -580,26 +580,26 @@
   },
   {
     "id": 24,
-    "name": "safe-in-place-slice-deletion",
-    "description": "Uses backward iteration, write-pointer, or slices.DeleteFunc instead of forward-delete that skips elements",
-    "prompt": "In package `filter`, write a function `RemoveEmpty(items []string) []string` that removes empty strings from the slice in-place and returns the modified slice. Do not allocate a new slice — modify the existing one. Use a range loop.",
-    "trap": "Model uses `append(items[:i], items[i+1:]...)` inside a forward range loop — after each deletion, remaining elements shift left and the range index advances past the element that moved into position i",
+    "name": "append-aliasing-caller-slice-corruption",
+    "description": "Appending to a caller-supplied slice with spare capacity silently mutates the caller's backing array",
+    "prompt": "In package `pipeline`, write a function `AppendDefaults(tags []string) []string` that ensures the tags slice contains `\"env:prod\"`, `\"region:us-east\"`, and `\"service:api\"`. If a tag is already present, don't add a duplicate. Return the resulting slice.\n\nHere is a caller that will use this function:\n\n```go\ntags := make([]string, 2, 10)  // len=2, cap=10\ntags[0] = \"team:backend\"\ntags[1] = \"version:1.2\"\n\nresult := pipeline.AppendDefaults(tags)\nfmt.Println(tags[2])  // what does this print?\n```\n\nWrite the AppendDefaults function. Is there a safety concern the caller should know about?",
+    "trap": "Model writes `tags = append(tags, missing...)` and returns the modified slice without copying first. Since make([]string, 2, 10) has capacity 10, append reuses the backing array — `tags[2]` in the caller now reads 'env:prod' even though the caller never wrote to it. The model likely misses this shared-memory aliasing.",
     "assertions": [
       {
         "id": "24.1",
-        "text": "Uses safe deletion pattern — forward iteration with `append(items[:i], items[i+1:]...)` skips the next element after each delete; must use backward iteration, write-pointer compaction, or slices.DeleteFunc"
+        "text": "Identifies the aliasing hazard: the caller's make([]string, 2, 10) has spare capacity, so appending into the parameter slice writes into memory the caller still owns"
       },
       {
         "id": "24.2",
-        "text": "Does not lose elements — the pattern `items = append(items[:i], items[i+1:]...)` inside `for i, v := range items` shifts remaining elements left, causing the range to skip index i+1"
+        "text": "Uses full-slice expression `tags[:len(tags):len(tags)]`, `slices.Clone(tags)`, or equivalent before appending — this forces a new allocation and prevents writing into the caller's backing array"
       },
       {
         "id": "24.3",
-        "text": "Preserves original slice capacity semantics — in-place modification should return items[:n] or equivalent, not allocate a new slice"
+        "text": "Does not add duplicate tags — checks for presence before appending each default"
       },
       {
         "id": "24.4",
-        "text": "Handles edge cases: all-empty input, no-empty input, consecutive empty strings"
+        "text": "Explains or demonstrates that `tags[2]` in the caller would be silently overwritten without the fix"
       }
     ]
   },

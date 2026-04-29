@@ -57,15 +57,15 @@
     },
     {
       "id": 5,
-      "name": "must-in-production-handler",
-      "prompt": "I'm writing an HTTP handler in Go that parses JSON and transforms data using samber/lo. Here's my approach:\n\nfunc HandleRequest(w http.ResponseWriter, r *http.Request) {\n    var input InputData\n    lo.Must0(json.NewDecoder(r.Body).Decode(&input))\n    results := lo.Must(processData(input))\n    json.NewEncoder(w).Encode(results)\n}\n\nIs this good?",
-      "expected_output": "Should warn against using Must in production HTTP handlers because it panics on error. Should recommend proper error handling.",
+      "name": "must-init-scope-boundary",
+      "prompt": "I'm setting up a Go application. I use lo.Must in two places: (1) in main() to parse a required config file at startup, and (2) in an HTTP handler to parse each incoming request body. A teammate says both uses are wrong. Is that right?",
+      "expected_output": "Should distinguish: lo.Must is acceptable in main()/init() for startup failures where panicking is appropriate (app can't run without valid config). It is NOT acceptable in HTTP handlers where panics crash the request and potentially the server. The teammate is wrong about the init use case.",
       "assertions": [
-        {"text": "Warns that lo.Must/lo.Must0 panics on error, which is dangerous in HTTP handlers", "type": "semantic"},
-        {"text": "Explains that Must should only be used in tests and init functions, not production request paths", "type": "semantic"},
-        {"text": "Provides a refactored version with proper error handling (if err != nil pattern)", "type": "semantic"},
-        {"text": "Shows returning appropriate HTTP error status codes instead of panicking", "type": "semantic"},
-        {"text": "Does NOT approve the Must-based approach for production use", "type": "semantic"}
+        {"text": "Correctly identifies that lo.Must in main() for startup config parsing IS acceptable", "type": "semantic"},
+        {"text": "Correctly identifies that lo.Must in the HTTP handler is NOT acceptable (panics on each bad request)", "type": "semantic"},
+        {"text": "Does NOT blanket-reject all uses of Must — init/startup usage is valid", "type": "semantic"},
+        {"text": "Explains the reasoning: startup panics are appropriate failure modes; request panics are not", "type": "semantic"},
+        {"text": "Shows proper error handling in the HTTP handler (if err != nil with http.Error response)", "type": "semantic"}
       ]
     },
     {
@@ -135,42 +135,42 @@
     },
     {
       "id": 11,
-      "name": "lop-small-dataset-trap",
-      "prompt": "I have a slice of 10 user structs and I want to extract their email addresses. Should I use lop.Map for better performance since it runs in parallel?",
-      "expected_output": "Should advise against lop for 10 items. Goroutine overhead far exceeds the benefit for such a small dataset. Use lo.Map instead.",
+      "name": "lop-threshold-cpu-vs-io",
+      "prompt": "I have two use cases in my Go service both using samber/lo. (A) I'm resizing 20 images in memory — each resize takes ~200ms of CPU. (B) I'm extracting the 'name' field from 50 user structs in memory. My teammate says I should switch both to lop for better performance. What do you think?",
+      "expected_output": "Case A (image resizing): lop is appropriate — CPU-bound work, substantial per-item cost, enough items to justify goroutine overhead. Case B (field extraction): lop is wrong — trivially cheap operation on a small dataset; goroutine overhead exceeds benefit. The teammate is only right about case A.",
       "assertions": [
-        {"text": "Recommends lo.Map instead of lop.Map for 10 items", "type": "semantic"},
-        {"text": "Explains that goroutine creation overhead exceeds any performance benefit for small datasets", "type": "semantic"},
-        {"text": "Mentions a rough threshold (e.g., lop benefits start around 1000+ items for CPU-bound work)", "type": "semantic"},
-        {"text": "Notes that field access (extracting email) is trivial and doesn't benefit from parallelism", "type": "semantic"},
-        {"text": "Does NOT recommend lop.Map for this use case", "type": "semantic"}
+        {"text": "Approves lop.Map for case A (CPU-bound image resizing with ~200ms per item)", "type": "semantic"},
+        {"text": "Rejects lop.Map for case B (trivial field extraction on 50 items)", "type": "semantic"},
+        {"text": "Distinguishes CPU-bound work (lop appropriate) from trivial/cheap operations (lo sufficient)", "type": "semantic"},
+        {"text": "Mentions that lop overhead only pays off for CPU-bound work on datasets of ~1000+ items OR expensive per-item operations", "type": "semantic"},
+        {"text": "Does NOT recommend lop for both use cases indiscriminately", "type": "semantic"}
       ]
     },
     {
       "id": 12,
-      "name": "filtermap-vs-filter-then-map",
-      "prompt": "I need to parse a slice of string IDs into integers, but some strings are invalid. I want to skip invalid ones and get a []int of the valid parsed values. I'm using samber/lo. Should I chain lo.Filter then lo.Map?",
-      "expected_output": "Should recommend lo.FilterMap which does both in one pass, returning (value, bool). More efficient than chaining Filter+Map.",
+      "name": "filtermap-vs-maperr-for-partial-failures",
+      "prompt": "I have a []string of user-supplied date strings. I need to parse each one with time.Parse, keep the successfully parsed dates, and silently discard parse failures (not stop on first error). I'm using samber/lo. What's the right approach?",
+      "expected_output": "Should recommend lo.FilterMap (not lo.MapErr which stops on first error, and not lo.Filter+lo.Map which creates an intermediate slice). FilterMap maps and keeps only successful results in a single pass. The key trap is that MapErr stops on the first error, which is the opposite of what's wanted here.",
       "assertions": [
-        {"text": "Recommends lo.FilterMap as the single-pass alternative to Filter+Map chain", "type": "semantic"},
-        {"text": "Shows FilterMap usage with the (R, bool) return signature", "type": "semantic"},
-        {"text": "Explains that FilterMap avoids creating an intermediate filtered slice", "type": "semantic"},
-        {"text": "Provides working code that parses strings to ints using FilterMap", "type": "semantic"},
-        {"text": "Does NOT just chain lo.Filter followed by lo.Map as the primary solution", "type": "semantic"}
+        {"text": "Recommends lo.FilterMap for map-and-discard-failures in a single pass", "type": "semantic"},
+        {"text": "Does NOT recommend lo.MapErr (which stops on first error, not what's wanted)", "type": "semantic"},
+        {"text": "Shows FilterMap with a (time.Time, bool) return where bool is false on parse failure", "type": "semantic"},
+        {"text": "Explains that FilterMap silently discards items where the bool is false", "type": "semantic"},
+        {"text": "Does NOT chain lo.Filter + lo.Map as the primary solution (creates intermediate slice)", "type": "semantic"}
       ]
     },
     {
       "id": 13,
-      "name": "channel-dispatcher-strategies",
-      "prompt": "I need to distribute work from a single Go channel to multiple worker channels. I'm using samber/lo. What strategies are available for distributing the work, and when should I use each one?",
-      "expected_output": "Should list ChannelDispatcher strategies: RoundRobin, Random, WeightedRandom, First, Least, Most with use cases.",
+      "name": "channel-dispatcher-load-balancing-strategy",
+      "prompt": "I have a Go service that distributes tasks to 4 worker goroutines via channels. Workers have different processing speeds — some tasks go to a fast worker (handles 3x more), others to slower workers. I'm using samber/lo and already know about lo.ChannelDispatcher. Which dispatch strategy should I use so that faster workers receive proportionally more tasks?",
+      "expected_output": "Should recommend WeightedRandom strategy. RoundRobin ignores worker speed. Random is uniform. WeightedRandom lets you assign relative weights matching worker capacity. Should show how to configure weights.",
       "assertions": [
-        {"text": "Mentions lo.ChannelDispatcher as the function to use", "type": "semantic"},
-        {"text": "Lists RoundRobin strategy with description", "type": "semantic"},
-        {"text": "Lists Random strategy with description", "type": "semantic"},
-        {"text": "Lists at least one of: WeightedRandom, First, Least, Most strategies", "type": "semantic"},
-        {"text": "Explains when to choose different strategies (e.g., RoundRobin for even distribution, Least for load balancing)", "type": "semantic"},
-        {"text": "Shows a code example using ChannelDispatcher", "type": "semantic"}
+        {"text": "Recommends the WeightedRandom dispatch strategy (not RoundRobin or Random)", "type": "semantic"},
+        {"text": "Explains that RoundRobin distributes evenly regardless of worker capacity", "type": "semantic"},
+        {"text": "Explains that WeightedRandom allows assigning proportional weights to each output channel", "type": "semantic"},
+        {"text": "Shows lo.ChannelDispatcher usage with the WeightedRandom strategy and weights", "type": "semantic"},
+        {"text": "Does NOT recommend RoundRobin as the primary solution for unequal-capacity workers", "type": "semantic"},
+        {"text": "Shows or describes setting weights where the fast worker gets 3x the weight of slow workers", "type": "semantic"}
       ]
     },
     {
@@ -212,14 +212,14 @@
     },
     {
       "id": 17,
-      "name": "ternary-evaluation-trap",
-      "prompt": "I'm using lo.Ternary in Go to conditionally call an expensive function:\n\nresult := lo.Ternary(condition, expensiveCompute(), cheapDefault())\n\nIs there a performance issue with this?",
-      "expected_output": "Should warn that lo.Ternary evaluates BOTH branches (it's not lazy). Should recommend lo.TernaryF for lazy evaluation.",
+      "name": "ternary-side-effect-ordering",
+      "prompt": "I'm refactoring a Go function to use samber/lo for conciseness. I have this code:\n\n```go\nvar label string\nif isAdmin {\n    label = formatAdminLabel(user) // calls DB, expensive\n} else {\n    label = user.Name\n}\n```\n\nI rewrote it as:\n\n```go\nlabel := lo.Ternary(isAdmin, formatAdminLabel(user), user.Name)\n```\n\nMy colleague says this is a bug. Are they right?",
+      "expected_output": "Yes, the colleague is right. lo.Ternary is a regular Go function call — both arguments are evaluated before the function is called. formatAdminLabel(user) runs unconditionally even when isAdmin is false. Should recommend lo.TernaryF with closures so only the winning branch executes.",
       "assertions": [
-        {"text": "Warns that lo.Ternary evaluates both arguments regardless of the condition", "type": "semantic"},
-        {"text": "Recommends lo.TernaryF for lazy evaluation where only the winning branch is called", "type": "semantic"},
-        {"text": "Shows TernaryF usage with function closures", "type": "semantic"},
-        {"text": "Explains the performance implication: expensiveCompute() runs even when condition is false", "type": "semantic"}
+        {"text": "Confirms the colleague is correct — this is indeed a bug", "type": "semantic"},
+        {"text": "Explains that lo.Ternary evaluates BOTH branches before the function is called (Go's eager argument evaluation)", "type": "semantic"},
+        {"text": "Identifies that formatAdminLabel(user) runs even when isAdmin is false", "type": "semantic"},
+        {"text": "Recommends lo.TernaryF with closures: lo.TernaryF(isAdmin, func() string { return formatAdminLabel(user) }, func() string { return user.Name })", "type": "semantic"}
       ]
     }
   ]

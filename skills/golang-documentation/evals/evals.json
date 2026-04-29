@@ -82,14 +82,14 @@
     {
       "id": 7,
       "name": "security-fix-miscategorized",
-      "prompt": "Review this CHANGELOG entry and tell me if anything should be changed:\n\n```markdown\n# Changelog\n\n## [1.5.0] - 2026-03-15\n\n### Added\n- WebSocket support for real-time updates\n\n### Fixed\n- Race condition in connection pool under high load\n- JWT token validation bypass that could allow expired tokens (CVE-2026-1234)\n- Memory leak in long-running connections\n\n### Changed\n- Minimum Go version is now 1.22\n```\n\nIs this structured correctly?",
-      "trap": "The JWT vulnerability is listed under Fixed, but per Keep a Changelog format it should be under a separate Security category. Model without skill may say it looks fine or make minor suggestions without moving the CVE to Security",
+      "prompt": "We use Keep a Changelog format. A junior developer wrote this CHANGELOG entry for our new release. Is it correct?\n\n```markdown\n## [2.3.0] - 2026-04-10\n\n### Added\n- New streaming API for large file transfers\n- Support for HTTP/3\n\n### Fixed\n- Null pointer dereference when config is missing\n- Deserialization flaw allowing arbitrary code execution via malformed input (GHSA-xxxx-yyyy-zzzz)\n- Off-by-one error in retry backoff calculation\n\n### Changed\n- Connection pool default size increased to 50\n```",
+      "trap": "The GHSA vulnerability is listed under Fixed. Per Keep a Changelog format, security fixes belong in a dedicated ### Security section. A model without skill knowledge treats all bug fixes as Fixed and has no reason to split them. The model must know that Keep a Changelog defines Security as its own top-level category.",
       "assertions": [
-        { "id": "7.1", "text": "Identifies that the JWT/CVE fix should be moved to a separate Security section" },
-        { "id": "7.2", "text": "Creates or recommends a ### Security subsection distinct from ### Fixed" },
-        { "id": "7.3", "text": "Keeps the race condition and memory leak under Fixed (they are bugs, not security issues)" },
-        { "id": "7.4", "text": "Recommends adding comparison links at the bottom ([1.5.0]: https://...)" },
-        { "id": "7.5", "text": "Recommends adding the Keep a Changelog / Semantic Versioning reference in the header" }
+        { "id": "7.1", "text": "Identifies that the GHSA/deserialization fix belongs in a dedicated ### Security section, not ### Fixed" },
+        { "id": "7.2", "text": "Recommends creating a ### Security subsection that is separate from ### Fixed" },
+        { "id": "7.3", "text": "Keeps the null pointer and off-by-one fixes under ### Fixed — they are bugs, not vulnerabilities" },
+        { "id": "7.4", "text": "Does not move non-security bugs into the Security section" },
+        { "id": "7.5", "text": "Notes that the Security category exists as its own top-level changelog category, not a subcategory of Fixed" }
       ]
     },
     {
@@ -121,27 +121,27 @@
     {
       "id": 10,
       "name": "review-restating-comments",
-      "prompt": "Review these doc comments. My team says our documentation is solid. Do you see any issues?\n\n```go\npackage cache\n\n// Get gets a value from the cache.\nfunc (c *Cache) Get(key string) (interface{}, bool) { ... }\n\n// Set sets a value in the cache.\nfunc (c *Cache) Set(key string, value interface{}) { ... }\n\n// Delete deletes a value from the cache.\nfunc (c *Cache) Delete(key string) { ... }\n\n// Size returns the size of the cache.\nfunc (c *Cache) Size() int { ... }\n\n// Clear clears the cache.\nfunc (c *Cache) Clear() { ... }\n```",
-      "trap": "Team says docs are 'solid', creating social pressure to agree. All comments just restate the code ('Get gets', 'Set sets', 'Delete deletes'). Without skill, model might agree or make minor tweaks. With skill, model should identify these as BAD — they restate the code instead of explaining why/when/constraints",
+      "prompt": "Review these doc comments. My team says our documentation is solid. Do you see any issues?\n\n```go\npackage cache\n\n// Get gets a value from the cache by key.\n// Returns the value and true if found, zero value and false if not.\nfunc (c *Cache) Get(key string) (interface{}, bool) { ... }\n\n// Set sets a value in the cache for the given key.\nfunc (c *Cache) Set(key string, value interface{}) { ... }\n\n// Delete deletes a value from the cache by key.\nfunc (c *Cache) Delete(key string) { ... }\n\n// Size returns the number of items currently in the cache.\nfunc (c *Cache) Size() int { ... }\n\n// Clear clears all items from the cache.\nfunc (c *Cache) Clear() { ... }\n```",
+      "trap": "Team says docs are 'solid', creating social pressure to agree. All comments describe what the code does but not why/when/constraints — they omit thread safety, TTL/eviction behavior, and cache miss semantics. The skill requires comments to explain WHY and WHEN, not just WHAT.",
       "assertions": [
-        { "id": "10.1", "text": "Identifies the comments as problematic — they restate the code rather than explaining why/when/constraints" },
-        { "id": "10.2", "text": "Rewrites Get to explain what happens on cache miss (the bool return), expiry behavior, or thread safety" },
-        { "id": "10.3", "text": "Rewrites Set to document TTL behavior, eviction policy, or what happens if key already exists" },
-        { "id": "10.4", "text": "Documents thread safety (whether methods are safe for concurrent use)" },
-        { "id": "10.5", "text": "At least one rewritten comment includes error cases, edge cases, or usage constraints" }
+        { "id": "10.1", "text": "Identifies that the comments describe WHAT the code does but fail to explain WHY, WHEN, or any constraints" },
+        { "id": "10.2", "text": "Points out that Get is missing thread-safety documentation (is it safe for concurrent use?)" },
+        { "id": "10.3", "text": "Points out that Set is missing documentation on what happens if the key already exists and whether there is a TTL or capacity limit" },
+        { "id": "10.4", "text": "Rewrites at least one comment to include constraints, edge cases, or concurrent-use guarantees" },
+        { "id": "10.5", "text": "Does NOT simply agree that the docs are solid without identifying the missing context" }
       ]
     },
     {
       "id": 11,
       "name": "skip-test-func-comments",
-      "prompt": "I'm adding doc comments to every function in my Go project for better documentation coverage. Please add appropriate doc comments to these test functions:\n\n```go\npackage auth_test\n\nfunc TestValidateToken(t *testing.T) { ... }\nfunc TestValidateToken_expired(t *testing.T) { ... }\nfunc TestValidateToken_invalidSignature(t *testing.T) { ... }\nfunc BenchmarkValidateToken(b *testing.B) { ... }\nfunc TestHashPassword(t *testing.T) { ... }\nfunc TestComparePassword(t *testing.T) { ... }\n```",
-      "trap": "User explicitly asks to add doc comments to test functions. Without skill, model complies and writes comments for each test. With skill, model should advise against it — the skill's 'What to Document' table explicitly says 'Test functions: No'",
+      "prompt": "I'm adding doc comments to every function in my Go project to reach 100% documentation coverage. Please add appropriate doc comments to these test functions:\n\n```go\npackage auth_test\n\nfunc TestValidateToken(t *testing.T) { ... }\nfunc TestValidateToken_expired(t *testing.T) { ... }\nfunc TestValidateToken_invalidSignature(t *testing.T) { ... }\nfunc BenchmarkValidateToken(b *testing.B) { ... }\nfunc TestHashPassword(t *testing.T) { ... }\nfunc TestComparePassword(t *testing.T) { ... }\n```",
+      "trap": "User explicitly asks to add doc comments to test functions citing '100% documentation coverage'. Without skill, model complies and writes comments for each test. The skill's 'What to Document' table explicitly says 'Test functions: No' and the model should push back on this request.",
       "assertions": [
-        { "id": "11.1", "text": "Advises against or discourages adding doc comments to test functions" },
-        { "id": "11.2", "text": "Explains that test function names should be self-descriptive (the name IS the documentation)" },
-        { "id": "11.3", "text": "Does NOT produce doc comments for the test functions (or explicitly says not to)" },
-        { "id": "11.4", "text": "May suggest that test helpers or complex setup deserve comments, but not standard Test/Benchmark functions" },
-        { "id": "11.5", "text": "References godoc convention or mentions that test comments don't appear in godoc output" }
+        { "id": "11.1", "text": "Advises against or actively discourages adding doc comments to test functions" },
+        { "id": "11.2", "text": "Explains that test function names are designed to be self-descriptive — the name IS the documentation" },
+        { "id": "11.3", "text": "Does NOT produce doc comments for any of the standard Test/Benchmark functions listed" },
+        { "id": "11.4", "text": "Clarifies that '100% documentation coverage' tools do not count unexported or test functions — this goal does not apply here" },
+        { "id": "11.5", "text": "May suggest that complex test setup helpers warrant comments, but not the standard TestXxx/BenchmarkXxx functions themselves" }
       ]
     },
     {
@@ -173,14 +173,14 @@
     {
       "id": 14,
       "name": "grpc-api-docs",
-      "prompt": "I have a Go gRPC service for user management. Currently the proto file has no comments. What's the best approach for documenting the gRPC API? Should I use swaggo/swag like I do for my REST APIs?",
-      "trap": "User suggests using swaggo/swag for gRPC. Without skill, model might suggest a REST-centric approach or a separate doc. With skill, model should say proto files ARE the docs, use buf for linting, and recommend grpc-gateway for REST+gRPC",
+      "prompt": "I have a Go gRPC service for user management. The proto file currently has no comments at all. A teammate says I should use swaggo/swag since we already use it for our REST API. What's the right way to document a gRPC API?",
+      "trap": "Teammate explicitly suggests swaggo/swag for gRPC. The model must know that swaggo/swag generates OpenAPI from Go HTTP annotations — it has no concept of protobufs. Without skill knowledge, the model might go along with the suggestion or give a vague answer. With skill, the model knows proto files are the source of truth and buf is the right tool.",
       "assertions": [
-        { "id": "14.1", "text": "Says protobuf files themselves serve as both code contracts AND documentation — swaggo/swag is not the right tool for gRPC" },
-        { "id": "14.2", "text": "Recommends adding comments to proto messages, services, and RPCs directly" },
-        { "id": "14.3", "text": "Recommends buf for linting and breaking change detection" },
-        { "id": "14.4", "text": "Shows example proto comments on service and rpc definitions" },
-        { "id": "14.5", "text": "Mentions grpc-gateway for projects that need both REST and gRPC from the same proto definition" }
+        { "id": "14.1", "text": "Clearly states that swaggo/swag is NOT the right tool for gRPC — it generates OpenAPI for REST APIs, not protobuf documentation" },
+        { "id": "14.2", "text": "States that proto files themselves serve as the API contract AND documentation — add comments there" },
+        { "id": "14.3", "text": "Recommends adding comments directly to proto messages, services, and RPCs" },
+        { "id": "14.4", "text": "Recommends buf for proto linting and breaking change detection" },
+        { "id": "14.5", "text": "Mentions grpc-gateway as an option for projects needing both REST and gRPC from the same proto" }
       ]
     },
     {
@@ -212,14 +212,14 @@
     {
       "id": 17,
       "name": "play-link-doc-comment",
-      "prompt": "I maintain a public Go library. Write a comprehensive doc comment for this function. Include a Go Playground link — use a placeholder URL like `https://go.dev/play/p/PLACEHOLDER` since you can't generate a real one right now:\n\n```go\npackage sliceutil\n\nfunc Filter[T any](s []T, predicate func(T) bool) []T {\n    var result []T\n    for _, v := range s {\n        if predicate(v) {\n            result = append(result, v)\n        }\n    }\n    return result\n}\n```",
-      "trap": "Explicitly allows placeholder URL to avoid MCP tool dependency. Without skill, model might write a normal doc comment without the Play: line format. With skill, model uses the specific '// Play: https://...' format and includes Parameters/Returns/Example sections",
+      "prompt": "I maintain a public Go library. Write a comprehensive doc comment for this function. I need it to show up well on pkg.go.dev — include everything users need to understand it at a glance:\n\n```go\npackage sliceutil\n\nfunc Filter[T any](s []T, predicate func(T) bool) []T {\n    var result []T\n    for _, v := range s {\n        if predicate(v) {\n            result = append(result, v)\n        }\n    }\n    return result\n}\n```",
+      "trap": "Model may write a thorough doc comment but omit the Play: line entirely — it's a niche convention the skill specifically teaches. The Play: line with its exact format (// Play: https://...) is a skill-specific pattern not commonly known.",
       "assertions": [
-        { "id": "17.1", "text": "Includes a `// Play:` line with a URL (placeholder or real)" },
-        { "id": "17.2", "text": "Comment starts with 'Filter' followed by a verb phrase" },
-        { "id": "17.3", "text": "Includes an inline code Example section (tab-indented)" },
-        { "id": "17.4", "text": "Documents that a new slice is returned (original is not modified)" },
-        { "id": "17.5", "text": "Documents the predicate parameter behavior" }
+        { "id": "17.1", "text": "Includes a `// Play:` line with a URL pointing to a Go Playground demo" },
+        { "id": "17.2", "text": "The Play: line uses the exact format `// Play: https://go.dev/play/p/...` (not inline, not as a different label)" },
+        { "id": "17.3", "text": "Comment starts with 'Filter' followed by a verb phrase" },
+        { "id": "17.4", "text": "Includes an inline code Example section (tab-indented)" },
+        { "id": "17.5", "text": "Documents that a new slice is returned (original is not modified)" }
       ]
     },
     {
@@ -238,12 +238,12 @@
     {
       "id": 19,
       "name": "example-method-naming",
-      "prompt": "Write Example test functions for this Go type and its methods. I need examples for: creating a new client, making a GET request, making a POST request with a body, and setting custom headers.\n\n```go\npackage httpclient\n\ntype Client struct { ... }\nfunc New(opts ...Option) *Client { ... }\nfunc (c *Client) Get(ctx context.Context, url string) (*Response, error) { ... }\nfunc (c *Client) Post(ctx context.Context, url string, body io.Reader) (*Response, error) { ... }\nfunc (c *Client) SetHeader(key, value string) { ... }\n```",
-      "trap": "Model might use wrong naming for method examples. Skill teaches: ExampleTypeName() for type, ExampleTypeName_MethodName() for methods, ExampleFuncName_suffix() for multiple examples of same function. The method convention (ExampleClient_Get, ExampleClient_Post) is less well known",
+      "prompt": "Write Example test functions for this Go type and its methods. Cover: creating a new client, making a GET request, making a POST request with a body, and setting custom headers.\n\n```go\npackage httpclient\n\ntype Client struct { ... }\nfunc New(opts ...Option) *Client { ... }\nfunc (c *Client) Get(ctx context.Context, url string) (*Response, error) { ... }\nfunc (c *Client) Post(ctx context.Context, url string, body io.Reader) (*Response, error) { ... }\nfunc (c *Client) SetHeader(key, value string) { ... }\n```",
+      "trap": "The method example naming convention (ExampleClient_Get, ExampleClient_Post) is less well known than the function convention. Without the skill, the model may write ExampleGetRequest, ExamplePost, ExampleClient_GetRequest (mixing conventions), or use capitalized suffixes. The exact pattern is TypeName_MethodName.",
       "assertions": [
-        { "id": "19.1", "text": "Uses ExampleNew or ExampleClient for the constructor example (not ExampleNewClient)" },
-        { "id": "19.2", "text": "Uses ExampleClient_Get for the GET request example (TypeName_MethodName convention)" },
-        { "id": "19.3", "text": "Uses ExampleClient_Post for the POST request example" },
+        { "id": "19.1", "text": "Uses ExampleNew or ExampleClient for the constructor example — NOT ExampleNewClient (which stutters) or ExampleNew_client" },
+        { "id": "19.2", "text": "Uses ExampleClient_Get for the GET request example (TypeName_MethodName convention with capital method name)" },
+        { "id": "19.3", "text": "Uses ExampleClient_Post for the POST request example (same TypeName_MethodName pattern)" },
         { "id": "19.4", "text": "Every example includes an // Output: comment" },
         { "id": "19.5", "text": "Uses external test package (package httpclient_test)" }
       ]
@@ -252,13 +252,13 @@
       "id": 20,
       "name": "discoverability-registration",
       "prompt": "I just published my Go library on GitHub (public repo, MIT license, tagged v1.0.0). I have a good README, doc comments, ExampleXxx tests, and a CHANGELOG. What else should I do to make sure developers and AI tools can find and use my library?",
-      "trap": "Model might suggest generic promotion (blog posts, social media, Hacker News). Skill teaches specific discoverability platforms: Context7, DeepWiki, OpenDeep, zRead, plus llms.txt and Go Playground demos",
+      "trap": "Model without skill knowledge of the specific platforms will give generic answers: 'share on social media', 'write a blog post', 'submit to HackerNews'. The skill teaches specific discoverability platforms: Context7, DeepWiki, OpenDeep, zRead — names the model won't know without the skill.",
       "assertions": [
-        { "id": "20.1", "text": "Recommends registering on Context7 (context7.com) for AI-accessible documentation" },
-        { "id": "20.2", "text": "Recommends registering on DeepWiki (deepwiki.com)" },
-        { "id": "20.3", "text": "Recommends adding an llms.txt file at the repo root" },
-        { "id": "20.4", "text": "Recommends adding Go Playground demos linked from doc comments with // Play: URLs" },
-        { "id": "20.5", "text": "Mentions at least 3 specific discoverability platforms by name (Context7, DeepWiki, OpenDeep, or zRead)" }
+        { "id": "20.1", "text": "Recommends registering with Context7 (context7.com) specifically for AI-accessible documentation" },
+        { "id": "20.2", "text": "Recommends registering with DeepWiki (deepwiki.com) specifically" },
+        { "id": "20.3", "text": "Recommends adding an llms.txt file at the repository root" },
+        { "id": "20.4", "text": "Recommends adding Go Playground demos linked from doc comments with the // Play: format" },
+        { "id": "20.5", "text": "Names at least 3 specific discoverability platforms (from: Context7, DeepWiki, OpenDeep, zRead) — not generic promotion advice" }
       ]
     },
     {

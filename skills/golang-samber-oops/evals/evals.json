@@ -141,13 +141,14 @@
   {
     "id": 11,
     "name": "oops-configuration",
-    "description": "Tests knowledge of oops global configuration options",
-    "prompt": "I'm using samber/oops in my Go application and the stack traces are too deep (50+ frames). Also, I want error timestamps to show in US Eastern timezone. How do I configure this?",
-    "trap": "Model may not know about oops global configuration variables and suggest post-processing the stack traces",
+    "description": "oops global config variables (StackTraceMaxDepth, Local, SourceFragmentsHidden) must be set at init time; model should not suggest post-processing or custom wrappers",
+    "prompt": "I'm using samber/oops in my Go application. Three problems:\n1. Stack traces are 50+ frames deep — too noisy for our logging system\n2. Error timestamps show in UTC but our ops team wants US Eastern time\n3. Source code fragments in error output leak internal code to our error tracking SaaS — we want to disable them\n\nA teammate suggests: 'Write a wrapper around oops.Wrapf that post-processes the OopsError to trim the stack and remove fragments.' Is that the right approach? How should these actually be configured?",
+    "trap": "The teammate's wrapper suggestion seems reasonable — it encapsulates the behavior. But oops provides direct global configuration variables for all three needs. The model should know these specific variable names: oops.StackTraceMaxDepth, oops.Local, oops.SourceFragmentsHidden. Without the skill docs, the model will likely guess wrong names or accept the wrapper approach.",
     "assertions": [
-      {"id": "11.1", "text": "Uses oops.StackTraceMaxDepth to control stack trace depth"},
-      {"id": "11.2", "text": "Uses oops.Local with time.LoadLocation for timezone configuration"},
-      {"id": "11.3", "text": "Mentions oops.SourceFragmentsHidden as another available configuration option"}
+      {"id": "11.1", "text": "Rejects the wrapper approach — oops has built-in global configuration for all three requirements; a wrapper adds complexity for no benefit"},
+      {"id": "11.2", "text": "Uses oops.StackTraceMaxDepth (the exact variable name) to control stack trace depth — not a method call or wrapper"},
+      {"id": "11.3", "text": "Uses oops.Local with time.LoadLocation('America/New_York') for timezone — not post-processing timestamps"},
+      {"id": "11.4", "text": "Uses oops.SourceFragmentsHidden = true to disable source code fragments in error output"}
     ]
   }
 ]

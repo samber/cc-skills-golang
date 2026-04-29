@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.1.1"
+  version: "1.1.2"
   openclaw:
     emoji: "🧹"
     homepage: https://github.com/samber/cc-skills-golang
@@ -148,3 +148,4 @@ When adopting linting on a legacy codebase, use up to 5 parallel sub-agents (via
 - → See `samber/cc-skills-golang@golang-continuous-integration` skill for CI pipeline with golangci-lint-action
 - → See `samber/cc-skills-golang@golang-code-style` skill for style rules that linters enforce
 - → See `samber/cc-skills-golang@golang-security` skill for SAST tools beyond linting (gosec, govulncheck)
+- → See `samber/cc-skills-golang@golang-continuous-integration` skill for automated AI-driven code review in CI using these guidelines
