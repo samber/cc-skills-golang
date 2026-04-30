@@ -1,0 +1,149 @@
+{
+  "skill_name": "golang-swagger",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I've already run `swag init` and the docs/ folder was generated. Now wire up the Swagger UI in my Gin server so the docs actually show up at /swagger/index.html. Here's my main.go:\n\n```go\npackage main\n\nimport \"github.com/gin-gonic/gin\"\n\nfunc main() {\n    r := gin.Default()\n    r.GET(\"/api/users\", getUsers)\n    r.Run(\":8080\")\n}\n```",
+      "expected_output": "Adds the blank import `_ \"yourmodule/docs\"` AND wires the ginSwagger endpoint. The blank import is the trap — without it the UI loads empty even if the route is registered.",
+      "assertions": [
+        "Adds a blank import of the docs package (e.g., `_ \"<module>/docs\"`)",
+        "Imports github.com/swaggo/gin-swagger",
+        "Imports github.com/swaggo/files",
+        "Registers a GET route matching /swagger/*any using ginSwagger.WrapHandler",
+        "Does not suggest running swag init again (it was already done)"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Add a POST /users endpoint annotation. The endpoint accepts a username and email in the request body as plain strings.",
+      "expected_output": "Defines a named request struct and uses it as the body param type. The trap is using a primitive type like `string` for body — swag cannot derive a schema from primitives and generation fails.",
+      "assertions": [
+        "Defines a named struct (e.g., CreateUserRequest) with username and email fields",
+        "Uses the struct type in @Param body annotation, not a primitive like string",
+        "@Param annotation has `body` as the location",
+        "@Param annotation marks the body as required (true)",
+        "@Success annotation references a response type"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Document this Go struct for Swagger. We need the docs to look correct:\n\n```go\ntype AuditRecord struct {\n    CreatedAt time.Time\n    UpdatedAt time.Time\n    Payload   []byte\n}\n```",
+      "expected_output": "Uses swaggertype tag to override time.Time (which becomes an object by default) and []byte (which becomes a base64 string). Without the skill the model leaves the types as-is, producing wrong schemas.",
+      "assertions": [
+        "Adds swaggertype tag to CreatedAt field (e.g., `swaggertype:\"string\"` with format:\"date-time\" or `swaggertype:\"primitive,integer\"`)",
+        "Adds swaggertype tag to UpdatedAt field with the same treatment",
+        "Adds swaggertype:\"string\" and format:\"base64\" to the Payload []byte field",
+        "Preserves the json tags (does not remove them)",
+        "Does not leave time.Time fields without any swaggertype override"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Set up the Swagger UI for a Chi HTTP router. The swagger files are already generated.",
+      "expected_output": "Uses github.com/swaggo/http-swagger (not a chi-specific package). The trap is looking for a chi-swagger package that doesn't exist, or using the Gin adapter incorrectly.",
+      "assertions": [
+        "Imports github.com/swaggo/http-swagger",
+        "Uses r.Get (chi method) to register the swagger route",
+        "Route pattern uses wildcard to match all swagger sub-paths (e.g., /swagger/*)",
+        "Handler is httpSwagger.Handler or httpSwagger.WrapHandler — not ginSwagger or echoSwagger",
+        "Includes the blank docs import"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "This endpoint requires BOTH an API key AND basic authentication — not one or the other. Both must be present. Show me the @Security annotation for this.",
+      "expected_output": "Uses the && syntax on a single @Security line. Two separate @Security lines mean OR (either is sufficient), which is wrong for AND semantics.",
+      "assertions": [
+        "Uses && between security schemes on a single @Security annotation line",
+        "Does NOT write two separate @Security lines for AND semantics",
+        "References valid security definition names (ApiKeyAuth, BasicAuth, or similar)",
+        "Explains or implies that two separate @Security lines would mean OR, not AND",
+        "@Security line appears inside the handler doc comment block"
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "Our general API info annotations (@title, @version, @host, @BasePath) are in internal/server/api.go, not in main.go. When I run `swag init`, the generated spec has no title or host. How do I fix it?",
+      "expected_output": "Uses swag init -g flag to point to the file containing the general info. Without the skill the model might suggest moving the annotations to main.go or doesn't know about -g.",
+      "assertions": [
+        "Uses the -g flag with swag init",
+        "The -g flag value points to internal/server/api.go (or the correct file path)",
+        "Does not require moving the annotations to main.go",
+        "Command shown is a complete swag init invocation",
+        "Does not suggest adding duplicate annotations in main.go"
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "Add swagger annotations to this handler and make sure `swag fmt` formats them correctly:\n\n```go\nfunc CreateOrder(c *gin.Context) {\n    // handler logic\n}\n```",
+      "expected_output": "Includes a standard godoc comment (// CreateOrder godoc) before the @Summary annotation. Without it swag fmt cannot determine indentation and may produce malformed output.",
+      "assertions": [
+        "Adds `// CreateOrder godoc` as the first line of the comment block",
+        "godoc comment appears before any @ annotation",
+        "At minimum includes @Summary, @Router annotations",
+        "@Router specifies both path and HTTP method",
+        "Annotation block is placed directly above the function signature"
+      ]
+    },
+    {
+      "id": 8,
+      "prompt": "Document a GET /search endpoint that accepts a `tags` query parameter where users can pass multiple values (e.g., ?tags=go&tags=api&tags=web).",
+      "expected_output": "Uses []string type for the param with collectionFormat(multi) attribute. Without the skill the model might document it as a single string or miss the collectionFormat attribute.",
+      "assertions": [
+        "@Param annotation uses []string as the data type",
+        "@Param annotation includes collectionFormat(multi) attribute",
+        "Parameter location is query",
+        "@Produce annotation specifies a content type",
+        "@Router annotation is present with [get] method"
+      ]
+    },
+    {
+      "id": 9,
+      "prompt": "We deploy the same binary to staging and production. The swagger host should be `staging-api.example.com` in staging and `api.example.com` in production. How do we make swag docs work for both environments without rebuilding?",
+      "expected_output": "Overrides docs.SwaggerInfo.Host at runtime using an environment variable. Without the skill the model might suggest rebuilding with different annotations, using multiple spec files, or a reverse proxy.",
+      "assertions": [
+        "Uses docs.SwaggerInfo.Host (or docs.SwaggerInfo fields) for runtime override",
+        "Reads host value from an environment variable (os.Getenv or similar)",
+        "Override happens after the blank docs import",
+        "Does not suggest rebuilding or running swag init per environment",
+        "Does not suggest maintaining two separate swagger spec files"
+      ]
+    },
+    {
+      "id": 10,
+      "prompt": "Our API always wraps responses in this envelope:\n\n```go\ntype Envelope struct {\n    Data    interface{} `json:\"data\"`\n    Message string      `json:\"message\"`\n}\n```\n\nDocument a GET /users/{id} endpoint that returns an Envelope where Data is a User object. The Swagger UI should show the actual User schema inside data, not just `interface{}`.",
+      "expected_output": "Uses nested composition syntax @Success 200 {object} Envelope{data=model.User}. Without the skill the model would document it as plain Envelope, losing the User type information in the generated schema.",
+      "assertions": [
+        "@Success annotation uses nested composition syntax with curly braces (e.g., Envelope{data=model.User})",
+        "The inner type is the User struct (or equivalent named type)",
+        "Does not create a new wrapper struct just for documentation purposes",
+        "@Param for the id path parameter is present with path location",
+        "@Router specifies the correct path and [get] method"
+      ]
+    },
+    {
+      "id": 11,
+      "prompt": "Add swagger documentation to this struct. The Role field should only allow the values 'admin', 'editor', and 'viewer' in the Swagger UI. The Score field should be between 0 and 100.\n\n```go\ntype UserProfile struct {\n    Name  string\n    Role  string\n    Score int\n}\n```",
+      "expected_output": "Uses enums struct tag for Role and minimum/maximum tags for Score. Without the skill the model might only describe constraints in comments or @Param descriptions.",
+      "assertions": [
+        "Adds `enums:\"admin,editor,viewer\"` struct tag to Role field",
+        "Adds `minimum:\"0\"` and `maximum:\"100\"` struct tags to Score field",
+        "Adds json tags to all fields",
+        "Adds example tags to at least one field",
+        "Does not only describe constraints in a comment — they must be machine-readable struct tags"
+      ]
+    },
+    {
+      "id": 12,
+      "prompt": "Document this struct for our API. The InternalID and AuditLog fields are internal — they must never appear in the Swagger UI, even if they are exported.\n\n```go\ntype Order struct {\n    ID         int\n    CustomerID int\n    Total      float64\n    InternalID string\n    AuditLog   []string\n}\n```",
+      "expected_output": "Uses swaggerignore:\"true\" struct tag on InternalID and AuditLog. json:\"-\" also works for JSON marshaling exclusion. The trap is only documenting the exclusion in a comment rather than using a machine-readable tag.",
+      "assertions": [
+        "Adds swaggerignore:\"true\" or json:\"-\" to InternalID field",
+        "Adds swaggerignore:\"true\" or json:\"-\" to AuditLog field",
+        "Does not use only a comment to indicate the field should be hidden",
+        "ID, CustomerID, and Total fields retain their documentation",
+        "Adds json tags to the visible fields"
+      ]
+    }
+  ]
+}

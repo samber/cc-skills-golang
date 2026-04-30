@@ -183,7 +183,7 @@ These skills are designed as **atomic, cross-referencing units**. A skill may re
 | ✅ `golang-grpc` | ⚡ | -41% | 69 | 2,149 | 4,965 |
 | ❌ `golang-spf13-cobra` |  | — | 0 | 0 | 0 |
 | ❌ `golang-spf13-viper` |  | — | 0 | 0 | 0 |
-| ❌ `golang-swagger` |  | — | 0 | 0 | 0 |
+| ✅ `golang-swagger` | ⚡ | — | 144 | 2,125 | 3,123 |
 | ✅ `golang-uber-dig` | ⚡ | -10% | 107 | 2,264 | 5,904 |
 | ✅ `golang-uber-fx` | ⚡ | -5% | 118 | 2,499 | 6,747 |
 | ✅ `golang-samber-do` | ⚡ | -81% | 70 | 1,746 | 3,269 |

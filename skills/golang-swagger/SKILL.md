@@ -121,23 +121,23 @@ func ShowAccount(c *gin.Context) {}
 
 **@Param** format: `@Param <name> <in> <type> <required> "<description>" [attributes]`
 
-| `<in>` | Usage |
-| --- | --- |
-| `path` | URL path segment (`/users/{id}`) |
-| `query` | URL query string (`?filter=x`) |
-| `body` | Request body — type must be a struct |
-| `header` | HTTP header |
-| `formData` | Multipart/form field |
+| `<in>`     | Usage                                |
+| ---------- | ------------------------------------ |
+| `path`     | URL path segment (`/users/{id}`)     |
+| `query`    | URL query string (`?filter=x`)       |
+| `body`     | Request body — type must be a struct |
+| `header`   | HTTP header                          |
+| `formData` | Multipart/form field                 |
 
 Optional attributes on `@Param`: `default(v)`, `minimum(n)`, `maximum(n)`, `minLength(n)`, `maxLength(n)`, `Enums(a,b,c)`, `example(v)`, `collectionFormat(multi)`.
 
 **@Success/@Failure** format: `@Success <code> {<kind>} <type> "<description>"`
 
-| `<kind>` | When |
-| --- | --- |
-| `{object}` | Single struct |
-| `{array}` | Slice of structs |
-| `string` / `integer` | Primitive |
+| `<kind>`             | When             |
+| -------------------- | ---------------- |
+| `{object}`           | Single struct    |
+| `{array}`            | Slice of structs |
+| `string` / `integer` | Primitive        |
 
 **Generics** (swag v2): `@Success 200 {object} api.Response[model.User]`
 
@@ -218,4 +218,4 @@ type CreateUserRequest struct {
 
 This skill is not exhaustive. Refer to the swaggo/swag documentation and code examples for up-to-date API signatures and usage patterns. Context7 can help as a discoverability platform.
 
-If you encounter a bug or unexpected behavior in swag, open an issue at https://github.com/swaggo/swag/issues.
+If you encounter a bug or unexpected behavior in swag, open an issue at <https://github.com/swaggo/swag/issues>.

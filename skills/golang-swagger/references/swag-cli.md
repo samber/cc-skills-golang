@@ -30,14 +30,14 @@ swag fmt --exclude ./vendor                    # skip directories
 
 ## Framework Integration Packages
 
-| Framework | Package |
-| --- | --- |
-| Gin | `github.com/swaggo/gin-swagger` |
-| Echo | `github.com/swaggo/echo-swagger` |
-| Fiber | `github.com/swaggo/fiber-swagger` |
-| Chi / net/http / Gorilla | `github.com/swaggo/http-swagger` |
-| Buffalo | `github.com/swaggo/buffalo-swagger` |
-| Hertz | `github.com/hertz-contrib/swagger` |
+| Framework                | Package                             |
+| ------------------------ | ----------------------------------- |
+| Gin                      | `github.com/swaggo/gin-swagger`     |
+| Echo                     | `github.com/swaggo/echo-swagger`    |
+| Fiber                    | `github.com/swaggo/fiber-swagger`   |
+| Chi / net/http / Gorilla | `github.com/swaggo/http-swagger`    |
+| Buffalo                  | `github.com/swaggo/buffalo-swagger` |
+| Hertz                    | `github.com/hertz-contrib/swagger`  |
 
 The shared files package (`github.com/swaggo/files`) is required by all integrations.
 
@@ -107,14 +107,14 @@ func CreateUser(c *gin.Context) {
 
 ## MIME Type Aliases
 
-| Alias | Content-Type |
-| --- | --- |
-| `json` | application/json |
-| `xml` | application/xml |
-| `plain` | text/plain |
-| `html` | text/html |
-| `mpfd` | multipart/form-data |
+| Alias                   | Content-Type                      |
+| ----------------------- | --------------------------------- |
+| `json`                  | application/json                  |
+| `xml`                   | application/xml                   |
+| `plain`                 | text/plain                        |
+| `html`                  | text/html                         |
+| `mpfd`                  | multipart/form-data               |
 | `x-www-form-urlencoded` | application/x-www-form-urlencoded |
-| `octet-stream` | application/octet-stream |
-| `png` / `jpeg` / `gif` | image/png, image/jpeg, image/gif |
-| `event-stream` | text/event-stream |
+| `octet-stream`          | application/octet-stream          |
+| `png` / `jpeg` / `gif`  | image/png, image/jpeg, image/gif  |
+| `event-stream`          | text/event-stream                 |
