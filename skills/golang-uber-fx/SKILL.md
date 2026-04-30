@@ -36,7 +36,24 @@ This skill is not exhaustive. Please refer to library documentation and code exa
 go get go.uber.org/fx
 ```
 
-> **fx vs. dig.** fx wraps dig and adds lifecycle hooks (`fx.Lifecycle`), modules (`fx.Module`), `Run()` with signal handling, structured event logs (`fxevent`), and ergonomic helpers. Use raw dig (`samber/cc-skills-golang@golang-uber-dig` skill) only when you don't need lifecycle or app boot — most production services should use fx.
+## fx vs. dig
+
+fx is built on top of dig and shares the same reflection-based container engine. The DI primitives (`Provide`, `Invoke`, `In`/`Out` structs, named values, value groups) are identical — `fx.In`/`fx.Out` are re-exports of `dig.In`/`dig.Out`.
+
+What fx adds on top:
+
+| Concern | dig | fx |
+| --- | --- | --- |
+| DI container | ✅ `dig.New()` | ✅ (embedded) |
+| Lifecycle hooks | ❌ | ✅ `fx.Lifecycle` OnStart/OnStop |
+| Module system | ❌ | ✅ `fx.Module` with scoped decorators |
+| Signal-aware run loop | ❌ | ✅ `app.Run()` blocks on SIGINT/SIGTERM |
+| Structured event logging | ❌ | ✅ `fx.WithLogger` / `fxevent` |
+| Startup/shutdown timeout | ❌ | ✅ `fx.StartTimeout` / `fx.StopTimeout` |
+
+**Choose fx** for long-running services (HTTP servers, workers, daemons) — lifecycle and signal handling are mandatory there, and modules make large service graphs manageable.
+
+**Choose raw dig** when you need wiring without a framework: CLI tools, libraries that expose a container to callers, test harnesses, or embedding DI into an existing app that manages its own lifecycle. See `samber/cc-skills-golang@golang-uber-dig` skill.
 
 ## The Application
 
