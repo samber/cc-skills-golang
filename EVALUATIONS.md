@@ -14,6 +14,7 @@
 | Skill                           | Version | Assertions | With Skill | Without Skill | Delta     | Uplift    | Concern                     |
 | ------------------------------- | ------- | ---------- | ---------- | ------------- | --------- | --------- | --------------------------- |
 | `golang-naming`                 | v1.0.0  | 51         | 94%        | **71%**       | +24pp     | 1.32×     | **Low delta, high without** |
+| `golang-swagger`                | v1.0.0  | 60         | 97%        | **72%**       | +25pp     | 1.35×     | **Low delta, high without** |
 | `golang-error-handling`         | v1.0.0  | 60         | 98%        | **72%**       | +27pp     | 1.36×     | **Low delta, high without** |
 | `golang-popular-libraries`      | v1.0.0  | 54         | 100%       | **70%**       | +30pp     | 1.43×     | **Low delta, high without** |
 | `golang-security`               | v1.0.0  | 110        | 100%       | **68%**       | +32pp     | 1.47×     | **Low delta, high without** |
@@ -50,7 +51,7 @@
 | `golang-uber-fx`                | v1.0.0  | 21         | 100%       | **95%**       | +5pp      | 1.05×     | **Low delta, high without** |
 | `golang-uber-dig`               | v1.0.0  | 20         | 100%       | **90%**       | +10pp     | 1.11×     | **Low delta, high without** |
 | `golang-samber-do`              | v1.0.0  | 53         | 100%       | 19%           | +81pp     | 5.26×     |                             |
-| **Total (37 skills)**           |         | **3182**   | **98%**    | **55%**       | **+43pp** | **1.78×** |                             |
+| **Total (38 skills)**           |         | **3242**   | **98%**    | **55%**       | **+43pp** | **1.79×** |                             |
 
 ## `golang-naming` — v1.0.0
 
@@ -4498,6 +4499,96 @@
 | 10.5 | Mentions a blocking OnStart hangs the boot                                       | <span class="g">✓</span>       | <span class="g">✓</span>                         |
 
 **Analyst pass:** 3 of 4 evals score equally with and without the skill — the model's baseline knowledge of fx is very strong (lifecycle hooks, fxtest.New, OnStart/goroutine pattern). Only eval 6 differentiates: without the skill the agent picks `fx.Decorate` and skips the `fx.As` interface binding that the production graph requires. This is consistent with a well-known framework where the skill mainly adds value on subtle API choices. Future iterations should target less common patterns: fx.Annotate vs fx.Out trade-offs, fx.Module decorator scoping, fxevent customization, manual lifecycle for CLI embedding.
+
+</details>
+
+## `golang-swagger` — v1.0.0
+
+|             | With Skill      | Without Skill   | Delta     |
+| ----------- | --------------- | --------------- | --------- |
+| **Overall** | **58/60 (97%)** | **43/60 (72%)** | **+25pp** |
+
+<details>
+<summary>Full breakdown (60 assertions)</summary>
+
+**Model:** Claude Sonnet 4.6 | **Runs:** 12 evals × 2 configs = 24 subagents | **Grading:** LLM-as-judge
+
+| #    | Assertion                                                                                               | With                           | Without                        |
+| ---- | ------------------------------------------------------------------------------------------------------- | ------------------------------ | ------------------------------ |
+|      | **1. gin-blank-import** — blank import + ginSwagger wire-up                                             | **<span class="g">5/5</span>** | **<span class="r">4/5</span>** |
+| 1.1  | Adds a blank import of the docs package (e.g., `_ "<module>/docs"`)                                    | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 1.2  | Imports github.com/swaggo/gin-swagger                                                                   | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 1.3  | Imports github.com/swaggo/files                                                                         | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 1.4  | Registers a GET route matching /swagger/*any using ginSwagger.WrapHandler                               | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 1.5  | Does not suggest running swag init again (it was already done)                                          | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **2. map-response-type** — map[string]bool cannot be used directly in @Success                          | **<span class="g">5/5</span>** | **<span class="r">3/5</span>** |
+| 2.1  | Does NOT use `{object} map[string]bool` directly in @Success                                           | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 2.2  | Defines a named struct for the response OR acknowledges a swaggertype workaround is needed              | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 2.3  | @Success annotation uses a named type (not a raw map literal)                                           | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 2.4  | @Router annotation is present with [get] method                                                         | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 2.5  | @Produce annotation specifies json                                                                      | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **3. swaggertype-overrides** — time.Time and []byte need swaggertype tags                               | **<span class="g">5/5</span>** | **<span class="r">1/5</span>** |
+| 3.1  | Adds swaggertype tag to CreatedAt field                                                                 | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 3.2  | Adds swaggertype tag to UpdatedAt field with the same treatment                                         | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 3.3  | Adds swaggertype:"string" and format:"base64" to the Payload []byte field                               | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 3.4  | Preserves the json tags (does not remove them)                                                          | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 3.5  | Does not leave time.Time fields without any swaggertype override                                        | <span class="g">✓</span>       | <span class="r">✗</span>       |
+|      | **4. chi-dynamic-basepath** — Chi router + BasePath from env var                                        | **<span class="g">5/5</span>** | **<span class="g">5/5</span>** |
+| 4.1  | Imports github.com/swaggo/http-swagger                                                                  | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 4.2  | Uses r.Get (chi method) to register the swagger route with a wildcard pattern                           | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 4.3  | Sets docs.SwaggerInfo.BasePath using os.Getenv("API_BASE_PATH") or equivalent                          | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 4.4  | Includes the blank docs import                                                                          | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 4.5  | Does not suggest rebuilding or running swag init per environment                                        | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **5. and-security-condition** — && vs two separate @Security lines                                      | **<span class="g">5/5</span>** | **<span class="r">4/5</span>** |
+| 5.1  | Uses && between security schemes on a single @Security annotation line                                  | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 5.2  | Does NOT write two separate @Security lines for AND semantics                                           | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 5.3  | References valid security definition names (ApiKeyAuth, BasicAuth, or similar)                          | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 5.4  | Explains or implies that two separate @Security lines would mean OR, not AND                            | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 5.5  | @Security line appears inside the handler doc comment block                                             | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **6. tag-exclusion** — swag init --tags with ! prefix to exclude tags                                   | **<span class="g">5/5</span>** | **<span class="r">4/5</span>** |
+| 6.1  | Uses the --tags flag (or -t) with swag init                                                             | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 6.2  | Uses ! prefix to exclude tags (e.g., --tags '!Internal,!Admin' or similar)                              | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 6.3  | Shows a complete swag init command                                                                      | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 6.4  | Does not suggest manually editing the generated swagger.json                                            | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 6.5  | Does not require writing custom Go code to filter endpoints                                             | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **7. godoc-comment-swag-fmt** — godoc comment line required for swag fmt                                | **<span class="g">5/5</span>** | **<span class="r">4/5</span>** |
+| 7.1  | Adds `// CreateOrder godoc` as the first line of the comment block                                     | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 7.2  | godoc comment appears before any @ annotation                                                           | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 7.3  | At minimum includes @Summary, @Router annotations                                                       | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 7.4  | @Router specifies both path and HTTP method                                                             | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 7.5  | Annotation block is placed directly above the function signature                                        | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **8. csv-vs-multi** — collectionFormat(multi) for ids, collectionFormat(csv) for fields                 | **<span class="r">4/5</span>** | **<span class="r">2/5</span>** |
+| 8.1  | @Param for ids uses collectionFormat(multi)                                                             | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 8.2  | @Param for fields uses collectionFormat(csv) or omits it (csv is the default)                           | <span class="r">✗</span>       | <span class="r">✗</span>       |
+| 8.3  | Both params use []string or []int as data type                                                          | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 8.4  | Both params are marked as not required (false)                                                          | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 8.5  | @Router annotation is present with [get] method                                                         | <span class="g">✓</span>       | <span class="r">✗</span>       |
+|      | **9. conditional-swagger** — env-based swagger toggle without build tags                                | **<span class="g">5/5</span>** | **<span class="g">5/5</span>** |
+| 9.1  | Uses os.Getenv (or equivalent) to read APP_ENV at runtime                                               | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 9.2  | Conditionally registers the swagger route only when not in production                                   | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 9.3  | Does not require separate builds or build tags                                                          | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 9.4  | The blank docs import is still present (or acknowledged as needed)                                      | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 9.5  | Solution works without recompiling between environments                                                 | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **10. nested-composition** — Envelope{data=model.User} nested composition syntax                        | **<span class="g">5/5</span>** | **<span class="r">3/5</span>** |
+| 10.1 | @Success annotation uses nested composition syntax with curly braces (e.g., Envelope{data=model.User}) | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 10.2 | The inner type is the User struct (or equivalent named type)                                            | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 10.3 | Does not create a new wrapper struct just for documentation purposes                                    | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 10.4 | @Param for the id path parameter is present with path location                                          | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 10.5 | @Router specifies the correct path and [get] method                                                     | <span class="g">✓</span>       | <span class="r">✗</span>       |
+|      | **11. enums-min-max-tags** — enums/minimum/maximum struct tags                                          | **<span class="r">4/5</span>** | **<span class="r">4/5</span>** |
+| 11.1 | Adds `enums:"admin,editor,viewer"` struct tag to Role field                                            | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 11.2 | Adds `minimum:"0"` and `maximum:"100"` struct tags to Score field                                     | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 11.3 | Adds json tags to all fields                                                                            | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 11.4 | Adds example tags to at least one field                                                                 | <span class="r">✗</span>       | <span class="r">✗</span>       |
+| 11.5 | Does not only describe constraints in a comment — they must be machine-readable struct tags              | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **12. swaggerignore-serialization** — swaggerignore:"true" vs json:"-"                                 | **<span class="g">5/5</span>** | **<span class="r">4/5</span>** |
+| 12.1 | Uses swaggerignore:"true" on the LastModified field                                                     | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 12.2 | Keeps a valid json tag on LastModified (NOT json:"-")                                                   | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 12.3 | Does NOT suggest removing the field from the struct                                                     | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 12.4 | Other struct fields retain their json and swagger documentation                                         | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 12.5 | Explains or implies why json:"-" would be wrong here (breaks serialization)                             | <span class="g">✓</span>       | <span class="g">✓</span>       |
+
+**Analyst pass:** The skill shows clear uplift on annotation mechanics that require knowing non-obvious swag behaviors: blank import requirement (eval 1), map type limitations (eval 2), swaggertype overrides for time.Time and []byte (eval 3), nested composition syntax (eval 10), and swaggerignore vs json:"-" (eval 12). Evals 4 (Chi+env) and 9 (conditional toggle) scored 5/5 in both conditions — the model already knows how to read env vars and register Chi routes, so these evals test common knowledge rather than skill uplift. Eval 11 shows a consistent miss on the `example:` struct tag in both conditions, indicating a coverage gap rather than discrimination; the skill should add an explicit example on `example:` struct tag usage. Future iterations should also target less-known swag behaviors: `@extensions`, `@x-` custom properties, multi-file init patterns (`--dir` flag), and OpenAPI 3.0 output.
 
 </details>
 

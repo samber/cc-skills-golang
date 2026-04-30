@@ -3,7 +3,7 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "I've already run `swag init` and the docs/ folder was generated. Now wire up the Swagger UI in my Gin server so the docs actually show up at /swagger/index.html. Here's my main.go:\n\n```go\npackage main\n\nimport \"github.com/gin-gonic/gin\"\n\nfunc main() {\n    r := gin.Default()\n    r.GET(\"/api/users\", getUsers)\n    r.Run(\":8080\")\n}\n```",
+      "prompt": "I've already run `swag init` and the docs/ folder was generated. Now wire up the Swagger UI in my Gin server so the docs actually show up at /swagger/index.html. Here's my main.go:\n\n```go\npackage main\n\nimport \"github.com/gin-gonic/gin\"\n\nfunc main() {\n    r := gin.Default()  \n    r.GET(\"/api/users\", getUsers)\n    r.Run(\":8080\")\n}\n```",
       "expected_output": "Adds the blank import `_ \"yourmodule/docs\"` AND wires the ginSwagger endpoint. The blank import is the trap — without it the UI loads empty even if the route is registered.",
       "assertions": [
         "Adds a blank import of the docs package (e.g., `_ \"<module>/docs\"`)",
@@ -15,14 +15,14 @@
     },
     {
       "id": 2,
-      "prompt": "Add a POST /users endpoint annotation. The endpoint accepts a username and email in the request body as plain strings.",
-      "expected_output": "Defines a named request struct and uses it as the body param type. The trap is using a primitive type like `string` for body — swag cannot derive a schema from primitives and generation fails.",
+      "prompt": "Our GET /settings endpoint returns a dynamic set of feature flags as a map: `map[string]bool`. Document this endpoint for Swagger so the response schema is visible in the UI.",
+      "expected_output": "Defines a named struct for the response or uses swaggertype annotation — swag cannot generate a schema for map[string]bool directly. The trap is using `{object} map[string]bool` in @Success which fails generation.",
       "assertions": [
-        "Defines a named struct (e.g., CreateUserRequest) with username and email fields",
-        "Uses the struct type in @Param body annotation, not a primitive like string",
-        "@Param annotation has `body` as the location",
-        "@Param annotation marks the body as required (true)",
-        "@Success annotation references a response type"
+        "Does NOT use `{object} map[string]bool` directly in @Success",
+        "Defines a named struct for the response OR acknowledges a swaggertype workaround is needed",
+        "@Success annotation uses a named type (not a raw map literal)",
+        "@Router annotation is present with [get] method",
+        "@Produce annotation specifies json"
       ]
     },
     {
@@ -39,14 +39,14 @@
     },
     {
       "id": 4,
-      "prompt": "Set up the Swagger UI for a Chi HTTP router. The swagger files are already generated.",
-      "expected_output": "Uses github.com/swaggo/http-swagger (not a chi-specific package). The trap is looking for a chi-swagger package that doesn't exist, or using the Gin adapter incorrectly.",
+      "prompt": "Set up the Swagger UI for a Chi HTTP router. The BasePath must be set dynamically from an `API_BASE_PATH` environment variable because we deploy behind different path prefixes in staging and production.",
+      "expected_output": "Uses github.com/swaggo/http-swagger for Chi AND sets docs.SwaggerInfo.BasePath from os.Getenv. The trap is not knowing the http-swagger package for Chi and not knowing about the runtime docs.SwaggerInfo override.",
       "assertions": [
         "Imports github.com/swaggo/http-swagger",
-        "Uses r.Get (chi method) to register the swagger route",
-        "Route pattern uses wildcard to match all swagger sub-paths (e.g., /swagger/*)",
-        "Handler is httpSwagger.Handler or httpSwagger.WrapHandler — not ginSwagger or echoSwagger",
-        "Includes the blank docs import"
+        "Uses r.Get (chi method) to register the swagger route with a wildcard pattern",
+        "Sets docs.SwaggerInfo.BasePath using os.Getenv(\"API_BASE_PATH\") or equivalent",
+        "Includes the blank docs import",
+        "Does not suggest rebuilding or running swag init per environment"
       ]
     },
     {
@@ -63,14 +63,14 @@
     },
     {
       "id": 6,
-      "prompt": "Our general API info annotations (@title, @version, @host, @BasePath) are in internal/server/api.go, not in main.go. When I run `swag init`, the generated spec has no title or host. How do I fix it?",
-      "expected_output": "Uses swag init -g flag to point to the file containing the general info. Without the skill the model might suggest moving the annotations to main.go or doesn't know about -g.",
+      "prompt": "Our API has endpoints tagged with 'Internal' and 'Admin' that must not appear in the public Swagger docs we ship to customers. How do we generate a spec that excludes both of these tags?",
+      "expected_output": "Uses swag init --tags flag with ! prefix to exclude tags. Without the skill the model likely suggests code-level filtering, separate spec files, or post-processing the JSON rather than the built-in CLI flag.",
       "assertions": [
-        "Uses the -g flag with swag init",
-        "The -g flag value points to internal/server/api.go (or the correct file path)",
-        "Does not require moving the annotations to main.go",
-        "Command shown is a complete swag init invocation",
-        "Does not suggest adding duplicate annotations in main.go"
+        "Uses the --tags flag (or -t) with swag init",
+        "Uses ! prefix to exclude tags (e.g., --tags '!Internal,!Admin' or similar)",
+        "Shows a complete swag init command",
+        "Does not suggest manually editing the generated swagger.json",
+        "Does not require writing custom Go code to filter endpoints"
       ]
     },
     {
@@ -87,26 +87,26 @@
     },
     {
       "id": 8,
-      "prompt": "Document a GET /search endpoint that accepts a `tags` query parameter where users can pass multiple values (e.g., ?tags=go&tags=api&tags=web).",
-      "expected_output": "Uses []string type for the param with collectionFormat(multi) attribute. Without the skill the model might document it as a single string or miss the collectionFormat attribute.",
+      "prompt": "Document a GET /export endpoint with two query parameters: `ids` accepts multiple values as separate query keys (e.g., ?ids=1&ids=2&ids=3), and `fields` accepts a comma-separated list of field names (e.g., ?fields=name,email,age). Both are optional.",
+      "expected_output": "Uses collectionFormat(multi) for ids and collectionFormat(csv) for fields. Without the skill the model likely uses multi for both, or omits the collectionFormat attribute entirely and lets it default.",
       "assertions": [
-        "@Param annotation uses []string as the data type",
-        "@Param annotation includes collectionFormat(multi) attribute",
-        "Parameter location is query",
-        "@Produce annotation specifies a content type",
+        "@Param for ids uses collectionFormat(multi)",
+        "@Param for fields uses collectionFormat(csv) or omits it (csv is the default)",
+        "Both params use []string or []int as data type",
+        "Both params are marked as not required (false)",
         "@Router annotation is present with [get] method"
       ]
     },
     {
       "id": 9,
-      "prompt": "We deploy the same binary to staging and production. The swagger host should be `staging-api.example.com` in staging and `api.example.com` in production. How do we make swag docs work for both environments without rebuilding?",
-      "expected_output": "Overrides docs.SwaggerInfo.Host at runtime using an environment variable. Without the skill the model might suggest rebuilding with different annotations, using multiple spec files, or a reverse proxy.",
+      "prompt": "We want to expose the Swagger UI in development but disable it entirely in production. Our app reads `APP_ENV=production` or `APP_ENV=development`. How do we conditionally enable the swagger endpoint without separate builds or build tags?",
+      "expected_output": "Guards the swagger route registration behind an os.Getenv check at startup. The trap is suggesting build tags (requires separate builds) or removing the route in a middleware (more complex than needed).",
       "assertions": [
-        "Uses docs.SwaggerInfo.Host (or docs.SwaggerInfo fields) for runtime override",
-        "Reads host value from an environment variable (os.Getenv or similar)",
-        "Override happens after the blank docs import",
-        "Does not suggest rebuilding or running swag init per environment",
-        "Does not suggest maintaining two separate swagger spec files"
+        "Uses os.Getenv (or equivalent) to read APP_ENV at runtime",
+        "Conditionally registers the swagger route only when not in production",
+        "Does not require separate builds or build tags",
+        "The blank docs import is still present (or acknowledged as needed)",
+        "Solution works without recompiling between environments"
       ]
     },
     {
@@ -135,14 +135,14 @@
     },
     {
       "id": 12,
-      "prompt": "Document this struct for our API. The InternalID and AuditLog fields are internal — they must never appear in the Swagger UI, even if they are exported.\n\n```go\ntype Order struct {\n    ID         int\n    CustomerID int\n    Total      float64\n    InternalID string\n    AuditLog   []string\n}\n```",
-      "expected_output": "Uses swaggerignore:\"true\" struct tag on InternalID and AuditLog. json:\"-\" also works for JSON marshaling exclusion. The trap is only documenting the exclusion in a comment rather than using a machine-readable tag.",
+      "prompt": "We have a struct with a `LastModified time.Time` field used for ETag generation in middleware. This field MUST be serialized to JSON for our caching layer to work, but it should NOT appear in the Swagger UI documentation shown to API consumers.",
+      "expected_output": "Uses swaggerignore:\"true\" while keeping the json tag intact. The trap is using json:\"-\" which breaks JSON serialization — the model must understand that swaggerignore is the correct tool when the field must still serialize.",
       "assertions": [
-        "Adds swaggerignore:\"true\" or json:\"-\" to InternalID field",
-        "Adds swaggerignore:\"true\" or json:\"-\" to AuditLog field",
-        "Does not use only a comment to indicate the field should be hidden",
-        "ID, CustomerID, and Total fields retain their documentation",
-        "Adds json tags to the visible fields"
+        "Uses swaggerignore:\"true\" on the LastModified field",
+        "Keeps a valid json tag on LastModified (NOT json:\"-\")",
+        "Does NOT suggest removing the field from the struct",
+        "Other struct fields retain their json and swagger documentation",
+        "Explains or implies why json:\"-\" would be wrong here (breaks serialization)"
       ]
     }
   ]

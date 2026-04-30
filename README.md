@@ -200,7 +200,7 @@ These skills are designed as **atomic, cross-referencing units**. A skill may re
 
 |             | With Skill          | Without Skill       | Delta     |
 | ----------- | ------------------- | ------------------- | --------- |
-| **Overall** | **3106/3182 (98%)** | **1729/3182 (54%)** | **+44pp** |
+| **Overall** | **3164/3242 (98%)** | **1772/3242 (55%)** | **+43pp** |
 
 See [EVALUATIONS.md](./EVALUATIONS.md) for the full per-skill breakdown.
 
