@@ -14,6 +14,7 @@
 | Skill                           | Version | Assertions | With Skill | Without Skill | Delta     | Uplift    | Concern                     |
 | ------------------------------- | ------- | ---------- | ---------- | ------------- | --------- | --------- | --------------------------- |
 | `golang-naming`                 | v1.0.0  | 51         | 94%        | **71%**       | +24pp     | 1.32×     | **Low delta, high without** |
+| `golang-swagger`                | v1.0.0  | 60         | 97%        | **72%**       | +25pp     | 1.35×     | **Low delta, high without** |
 | `golang-error-handling`         | v1.0.0  | 60         | 98%        | **72%**       | +27pp     | 1.36×     | **Low delta, high without** |
 | `golang-popular-libraries`      | v1.0.0  | 54         | 100%       | **70%**       | +30pp     | 1.43×     | **Low delta, high without** |
 | `golang-security`               | v1.0.0  | 110        | 100%       | **68%**       | +32pp     | 1.47×     | **Low delta, high without** |
@@ -51,7 +52,7 @@
 | `golang-uber-dig`               | v1.0.0  | 20         | 100%       | **90%**       | +10pp     | 1.11×     | **Low delta, high without** |
 | `golang-graphql`                | v0.0.2  | 59         | 100%       | **83%**       | +17pp     | 1.20×     | **Low delta, high without** |
 | `golang-samber-do`              | v1.0.0  | 53         | 100%       | 19%           | +81pp     | 5.26×     |                             |
-| **Total (38 skills)**           |         | **3241**   | **98%**    | **55%**       | **+43pp** | **1.78×** |                             |
+| **Total (38 skills)**           |         | **3242**   | **98%**    | **55%**       | **+43pp** | **1.79×** |                             |
 
 ## `golang-naming` — v1.0.0
 
@@ -4502,96 +4503,93 @@
 
 </details>
 
-## `golang-graphql` — v0.0.2
+## `golang-swagger` — v1.0.0
 
 |             | With Skill      | Without Skill   | Delta     |
 | ----------- | --------------- | --------------- | --------- |
-| **Overall** | **59/59 (100%)** | **49/59 (83%)** | **+17pp** |
+| **Overall** | **58/60 (97%)** | **43/60 (72%)** | **+25pp** |
 
 <details>
-<summary>Full breakdown (59 assertions)</summary>
+<summary>Full breakdown (60 assertions)</summary>
 
-**Model:** Claude Sonnet 4.6 | **Runs:** 13 evals × 2 configs = 26 subagents | **Grading:** LLM-as-judge
+**Model:** Claude Sonnet 4.6 | **Runs:** 12 evals × 2 configs = 24 subagents | **Grading:** Human-as-judge
 
-| #    | Assertion                                                                                              | With                           | Without                        |
-| ---- | ------------------------------------------------------------------------------------------------------ | ------------------------------ | ------------------------------ |
-|      | **1. n-plus-one-user-posts** — User.posts resolver must use DataLoader, not direct DB calls            | **<span class="g">6/6</span>** | **<span class="r">1/6</span>** |
-| 1.1  | Uses a DataLoader or batch loader, not direct db.Query inside the resolver                             | <span class="g">✓</span>       | <span class="r">✗</span>       |
-| 1.2  | Accesses the DataLoader from context (not a package-level or global variable)                          | <span class="g">✓</span>       | <span class="r">✗</span>       |
-| 1.3  | Resolver function signature uses obj *model.User to access parent user's ID                            | <span class="g">✓</span>       | <span class="g">✓</span>       |
-| 1.4  | Does not query the database directly inside the Posts resolver body                                    | <span class="g">✓</span>       | <span class="r">✗</span>       |
-| 1.5  | Mentions DataLoader must be injected per-request via HTTP middleware                                   | <span class="g">✓</span>       | <span class="r">✗</span>       |
-| 1.6  | DataLoader middleware creates a new loader instance per request, not a shared global                   | <span class="g">✓</span>       | <span class="r">✗</span>       |
-|      | **2. graphql-go-int32-type** — graph-gophers Int! must use int32, not int                              | **<span class="g">3/3</span>** | **<span class="g">3/3</span>** |
-| 2.1  | Returns int32 (not int, int64, or uint) for the Int! scalar field                                     | <span class="g">✓</span>       | <span class="g">✓</span>       |
-| 2.2  | Method signature matches SDL field name (case-insensitive)                                             | <span class="g">✓</span>       | <span class="g">✓</span>       |
-| 2.3  | Does not return plain Go int                                                                           | <span class="g">✓</span>       | <span class="g">✓</span>       |
-|      | **3. introspection-production** — production handler must gate introspection and set complexity cap    | **<span class="g">5/5</span>** | **<span class="g">5/5</span>** |
-| 3.1  | Introspection is gated by ENV check or disabled                                                        | <span class="g">✓</span>       | <span class="g">✓</span>       |
-| 3.2  | Complexity limit set using extension.FixedComplexityLimit or equivalent                                | <span class="g">✓</span>       | <span class="g">✓</span>       |
-| 3.3  | Does NOT call srv.Use(extension.Introspection{}) unconditionally                                       | <span class="g">✓</span>       | <span class="g">✓</span>       |
-| 3.4  | Uses handler.New or handler.NewDefaultServer                                                           | <span class="g">✓</span>       | <span class="g">✓</span>       |
-| 3.5  | Mentions complexity limiting as protection against deeply nested queries                                | <span class="g">✓</span>       | <span class="g">✓</span>       |
-|      | **4. subscription-goroutine-leak** — subscription must close channel and respect ctx.Done              | **<span class="g">5/5</span>** | **<span class="g">5/5</span>** |
-| 4.1  | Uses defer close(ch) to close the output channel                                                       | <span class="g">✓</span>       | <span class="g">✓</span>       |
-| 4.2  | Uses select with ctx.Done() to detect client disconnection                                             | <span class="g">✓</span>       | <span class="g">✓</span>       |
-| 4.3  | Returns a receive-only channel                                                                         | <span class="g">✓</span>       | <span class="g">✓</span>       |
-| 4.4  | Does not use a plain for-range loop without ctx.Done() check                                           | <span class="g">✓</span>       | <span class="g">✓</span>       |
-| 4.5  | Goroutine terminates when ctx is cancelled                                                             | <span class="g">✓</span>       | <span class="g">✓</span>       |
-|      | **5. no-edit-generated-files** — use gqlgen.yml to bind existing struct, never edit models_gen.go     | **<span class="g">4/4</span>** | **<span class="r">3/4</span>** |
-| 5.1  | Uses gqlgen.yml (autobind or models.<T>.model) to bind the existing struct                             | <span class="g">✓</span>       | <span class="g">✓</span>       |
-| 5.2  | Does NOT suggest editing models_gen.go or generated.go directly                                        | <span class="g">✓</span>       | <span class="g">✓</span>       |
-| 5.3  | Shows correct gqlgen.yml syntax                                                                        | <span class="g">✓</span>       | <span class="g">✓</span>       |
-| 5.4  | Mentions that generated files are overwritten on next go generate                                      | <span class="g">✓</span>       | <span class="r">✗</span>       |
-|      | **6. graphql-go-nullable-pointer** — nullable String must use *string in graph-gophers               | **<span class="g">3/3</span>** | **<span class="g">3/3</span>** |
-| 6.1  | Uses *string (pointer) for the nullable bio field                                                      | <span class="g">✓</span>       | <span class="g">✓</span>       |
-| 6.2  | Explains non-pointer = non-null and pointer = nullable mapping                                         | <span class="g">✓</span>       | <span class="g">✓</span>       |
-| 6.3  | Does not use sql.NullString for the GraphQL resolver layer                                             | <span class="g">✓</span>       | <span class="g">✓</span>       |
-|      | **7. error-sanitization** — resolvers must not leak raw SQL errors to clients                          | **<span class="g">5/5</span>** | **<span class="g">5/5</span>** |
-| 7.1  | Does NOT return raw sql.ErrNoRows to the client                                                        | <span class="g">✓</span>       | <span class="g">✓</span>       |
-| 7.2  | Translates sql.ErrNoRows to a NOT_FOUND GraphQL error with extension code                              | <span class="g">✓</span>       | <span class="g">✓</span>       |
-| 7.3  | Uses gqlerror.Error or gqlerror.Errorf                                                                 | <span class="g">✓</span>       | <span class="g">✓</span>       |
-| 7.4  | Mentions ErrorPresenter for centralizing error sanitization                                            | <span class="g">✓</span>       | <span class="g">✓</span>       |
-| 7.5  | Wraps internal errors so SQL messages don't reach clients                                              | <span class="g">✓</span>       | <span class="g">✓</span>       |
-|      | **8. mutation-envelope-pattern** — mutations must use payload envelope for validation errors           | **<span class="g">6/6</span>** | **<span class="g">6/6</span>** |
-| 8.1  | Input type has email: String! (non-null)                                                               | <span class="g">✓</span>       | <span class="g">✓</span>       |
-| 8.2  | Input type has bio: String (nullable)                                                                  | <span class="g">✓</span>       | <span class="g">✓</span>       |
-| 8.3  | Mutation returns a payload envelope with both user and errors fields                                   | <span class="g">✓</span>       | <span class="g">✓</span>       |
-| 8.4  | Validation errors in payload errors field, not top-level GraphQL errors                                | <span class="g">✓</span>       | <span class="g">✓</span>       |
-| 8.5  | Payload errors field uses non-null list type like [UserError!]!                                        | <span class="g">✓</span>       | <span class="g">✓</span>       |
-| 8.6  | Does NOT use HTTP 400/422 errors for validation                                                        | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| #    | Assertion                                                                                               | With                           | Without                        |
+| ---- | ------------------------------------------------------------------------------------------------------- | ------------------------------ | ------------------------------ |
+|      | **1. gin-blank-import** — blank import + ginSwagger wire-up                                             | **<span class="g">5/5</span>** | **<span class="r">4/5</span>** |
+| 1.1  | Adds a blank import of the docs package (e.g., `_ "<module>/docs"`)                                    | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 1.2  | Imports github.com/swaggo/gin-swagger                                                                   | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 1.3  | Imports github.com/swaggo/files                                                                         | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 1.4  | Registers a GET route matching /swagger/*any using ginSwagger.WrapHandler                               | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 1.5  | Does not suggest running swag init again (it was already done)                                          | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **2. map-response-type** — map[string]bool cannot be used directly in @Success                          | **<span class="g">5/5</span>** | **<span class="r">3/5</span>** |
+| 2.1  | Does NOT use `{object} map[string]bool` directly in @Success                                           | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 2.2  | Defines a named struct for the response OR acknowledges a swaggertype workaround is needed              | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 2.3  | @Success annotation uses a named type (not a raw map literal)                                           | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 2.4  | @Router annotation is present with [get] method                                                         | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 2.5  | @Produce annotation specifies json                                                                      | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **3. swaggertype-overrides** — time.Time and []byte need swaggertype tags                               | **<span class="g">5/5</span>** | **<span class="r">1/5</span>** |
+| 3.1  | Adds swaggertype tag to CreatedAt field                                                                 | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 3.2  | Adds swaggertype tag to UpdatedAt field with the same treatment                                         | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 3.3  | Adds swaggertype:"string" and format:"base64" to the Payload []byte field                               | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 3.4  | Preserves the json tags (does not remove them)                                                          | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 3.5  | Does not leave time.Time fields without any swaggertype override                                        | <span class="g">✓</span>       | <span class="r">✗</span>       |
+|      | **4. chi-dynamic-basepath** — Chi router + BasePath from env var                                        | **<span class="g">5/5</span>** | **<span class="g">5/5</span>** |
+| 4.1  | Imports github.com/swaggo/http-swagger                                                                  | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 4.2  | Uses r.Get (chi method) to register the swagger route with a wildcard pattern                           | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 4.3  | Sets docs.SwaggerInfo.BasePath using os.Getenv("API_BASE_PATH") or equivalent                          | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 4.4  | Includes the blank docs import                                                                          | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 4.5  | Does not suggest rebuilding or running swag init per environment                                        | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **5. and-security-condition** — && vs two separate @Security lines                                      | **<span class="g">5/5</span>** | **<span class="r">4/5</span>** |
+| 5.1  | Uses && between security schemes on a single @Security annotation line                                  | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 5.2  | Does NOT write two separate @Security lines for AND semantics                                           | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 5.3  | References valid security definition names (ApiKeyAuth, BasicAuth, or similar)                          | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 5.4  | Explains or implies that two separate @Security lines would mean OR, not AND                            | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 5.5  | @Security line appears inside the handler doc comment block                                             | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **6. tag-exclusion** — swag init --tags with ! prefix to exclude tags                                   | **<span class="g">5/5</span>** | **<span class="r">4/5</span>** |
+| 6.1  | Uses the --tags flag (or -t) with swag init                                                             | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 6.2  | Uses ! prefix to exclude tags (e.g., --tags '!Internal,!Admin' or similar)                              | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 6.3  | Shows a complete swag init command                                                                      | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 6.4  | Does not suggest manually editing the generated swagger.json                                            | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 6.5  | Does not require writing custom Go code to filter endpoints                                             | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **7. godoc-comment-swag-fmt** — godoc comment line required for swag fmt                                | **<span class="g">5/5</span>** | **<span class="r">4/5</span>** |
+| 7.1  | Adds `// CreateOrder godoc` as the first line of the comment block                                     | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 7.2  | godoc comment appears before any @ annotation                                                           | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 7.3  | At minimum includes @Summary, @Router annotations                                                       | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 7.4  | @Router specifies both path and HTTP method                                                             | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 7.5  | Annotation block is placed directly above the function signature                                        | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **8. csv-vs-multi** — collectionFormat(multi) for ids, collectionFormat(csv) for fields                 | **<span class="r">4/5</span>** | **<span class="r">2/5</span>** |
+| 8.1  | @Param for ids uses collectionFormat(multi)                                                             | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 8.2  | @Param for fields uses collectionFormat(csv) or omits it (csv is the default)                           | <span class="r">✗</span>       | <span class="r">✗</span>       |
+| 8.3  | Both params use []string or []int as data type                                                          | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 8.4  | Both params are marked as not required (false)                                                          | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 8.5  | @Router annotation is present with [get] method                                                         | <span class="g">✓</span>       | <span class="r">✗</span>       |
+|      | **9. conditional-swagger** — env-based swagger toggle without build tags                                | **<span class="g">5/5</span>** | **<span class="g">5/5</span>** |
+| 9.1  | Uses os.Getenv (or equivalent) to read APP_ENV at runtime                                               | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 9.2  | Conditionally registers the swagger route only when not in production                                   | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 9.3  | Does not require separate builds or build tags                                                          | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 9.4  | The blank docs import is still present (or acknowledged as needed)                                      | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 9.5  | Solution works without recompiling between environments                                                 | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **10. nested-composition** — Envelope{data=model.User} nested composition syntax                        | **<span class="g">5/5</span>** | **<span class="r">3/5</span>** |
+| 10.1 | @Success annotation uses nested composition syntax with curly braces (e.g., Envelope{data=model.User}) | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 10.2 | The inner type is the User struct (or equivalent named type)                                            | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 10.3 | Does not create a new wrapper struct just for documentation purposes                                    | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 10.4 | @Param for the id path parameter is present with path location                                          | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 10.5 | @Router specifies the correct path and [get] method                                                     | <span class="g">✓</span>       | <span class="r">✗</span>       |
+|      | **11. enums-min-max-tags** — enums/minimum/maximum struct tags                                          | **<span class="r">4/5</span>** | **<span class="r">4/5</span>** |
+| 11.1 | Adds `enums:"admin,editor,viewer"` struct tag to Role field                                            | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 11.2 | Adds `minimum:"0"` and `maximum:"100"` struct tags to Score field                                     | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 11.3 | Adds json tags to all fields                                                                            | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 11.4 | Adds example tags to at least one field                                                                 | <span class="r">✗</span>       | <span class="r">✗</span>       |
+| 11.5 | Does not only describe constraints in a comment — they must be machine-readable struct tags              | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **12. swaggerignore-serialization** — swaggerignore:"true" vs json:"-"                                 | **<span class="g">5/5</span>** | **<span class="r">4/5</span>** |
+| 12.1 | Uses swaggerignore:"true" on the LastModified field                                                     | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 12.2 | Keeps a valid json tag on LastModified (NOT json:"-")                                                   | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 12.3 | Does NOT suggest removing the field from the struct                                                     | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 12.4 | Other struct fields retain their json and swagger documentation                                         | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 12.5 | Explains or implies why json:"-" would be wrong here (breaks serialization)                             | <span class="g">✓</span>       | <span class="g">✓</span>       |
 
-**Analyst pass (iteration 1):** Only eval 1 (N+1 DataLoader) and eval 5 (generated file warning) show meaningful skill uplift. Evals 2–4, 6–8 score 100% both with and without the skill — the model's baseline knowledge of gqlgen error handling, subscription goroutine discipline, nullable pointers, mutation envelopes, and introspection gating is already strong.
-
-|      | **9. pubsub-subscribe-once** — Subscribe must be called before goroutine, not inside the loop        | **<span class="g">5/5</span>** | **<span class="g">5/5</span>** |
-| 9.1  | Calls Subscribe BEFORE the go func() call                                                             | <span class="g">✓</span>       | <span class="g">✓</span>       |
-| 9.2  | Does NOT call Subscribe() inside the for-select loop body                                             | <span class="g">✓</span>       | <span class="g">✓</span>       |
-| 9.3  | Uses defer close(ch)                                                                                  | <span class="g">✓</span>       | <span class="g">✓</span>       |
-| 9.4  | Uses select with ctx.Done()                                                                           | <span class="g">✓</span>       | <span class="g">✓</span>       |
-| 9.5  | Subscription handle captured in variable before goroutine starts                                      | <span class="g">✓</span>       | <span class="g">✓</span>       |
-|      | **10. graphql-go-nullable-int32** — optional Int uses *int32, ID uses graphql.ID                     | **<span class="g">4/4</span>** | **<span class="g">4/4</span>** |
-| 10.1 | Uses *int32 for nullable Int argument, not *int                                                       | <span class="g">✓</span>       | <span class="g">✓</span>       |
-| 10.2 | Uses graphql.ID or *graphql.ID for ID argument                                                        | <span class="g">✓</span>       | <span class="g">✓</span>       |
-| 10.3 | Optional arguments are pointer types                                                                  | <span class="g">✓</span>       | <span class="g">✓</span>       |
-| 10.4 | Does NOT use plain int or *int for Int field                                                          | <span class="g">✓</span>       | <span class="g">✓</span>       |
-|      | **11. dataloader-batch-return-type** — one-to-many batch returns [][]*Post, not []*Post              | **<span class="g">4/4</span>** | **<span class="g">4/4</span>** |
-| 11.1 | Return type is [][]*domain.Post (2D slice)                                                            | <span class="g">✓</span>       | <span class="g">✓</span>       |
-| 11.2 | Outer slice has one element per input user ID                                                         | <span class="g">✓</span>       | <span class="g">✓</span>       |
-| 11.3 | Users with zero posts get empty slice, not nil or error                                               | <span class="g">✓</span>       | <span class="g">✓</span>       |
-| 11.4 | Does NOT return flat []*domain.Post                                                                   | <span class="g">✓</span>       | <span class="g">✓</span>       |
-|      | **12. graphql-go-tracer-import** — OTel tracer uses trace/otel sub-package, not hallucinated path    | **<span class="g">4/4</span>** | **<span class="r">0/4</span>** |
-| 12.1 | Imports github.com/graph-gophers/graphql-go/trace/otel                                               | <span class="g">✓</span>       | <span class="r">✗</span>       |
-| 12.2 | Uses otel.DefaultTracer(), not oteltracer.New() or other hallucinated function                        | <span class="g">✓</span>       | <span class="r">✗</span>       |
-| 12.3 | Passes tracer as graphql.Tracer(otel.DefaultTracer()) option                                          | <span class="g">✓</span>       | <span class="r">✗</span>       |
-| 12.4 | Does NOT import a hallucinated trace/oteltracer package                                               | <span class="g">✓</span>       | <span class="r">✗</span>       |
-|      | **13. federation-entity-resolver** — gqlgen federation v2 config + @key + FindUserByID              | **<span class="g">5/5</span>** | **<span class="g">5/5</span>** |
-| 13.1 | Adds federation block with version: 2 to gqlgen.yml                                                  | <span class="g">✓</span>       | <span class="g">✓</span>       |
-| 13.2 | Adds @key(fields: "id") to User type in SDL                                                           | <span class="g">✓</span>       | <span class="g">✓</span>       |
-| 13.3 | Implements or mentions FindUserByID entity resolver                                                   | <span class="g">✓</span>       | <span class="g">✓</span>       |
-| 13.4 | Links Apollo Federation v2 spec URL in schema extend block                                            | <span class="g">✓</span>       | <span class="g">✓</span>       |
-| 13.5 | Does NOT describe manual federation without gqlgen.yml config                                         | <span class="g">✓</span>       | <span class="g">✓</span>       |
-
-**Analyst pass (iteration 2):** Only eval 12 (OTel tracer import path) shows skill uplift — the model without the skill hallucinated `trace/oteltracer` and `oteltracer.New()` instead of the correct `trace/otel` and `otel.DefaultTracer()`. Evals 9, 10, 11, 13 are common knowledge: subscribe-before-goroutine, nullable int32, 2D batch return type, and federation config are all well-documented and the baseline model handles them correctly. The skill's primary discriminating value remains the DataLoader per-request injection (eval 1) and the correct OTel tracer import path (eval 12).
+**Analyst pass:** The skill shows clear uplift on annotation mechanics that require knowing non-obvious swag behaviors: blank import requirement (eval 1), map type limitations (eval 2), swaggertype overrides for time.Time and []byte (eval 3), nested composition syntax (eval 10), and swaggerignore vs json:"-" (eval 12). Evals 4 (Chi+env) and 9 (conditional toggle) scored 5/5 in both conditions — the model already knows how to read env vars and register Chi routes, so these evals test common knowledge rather than skill uplift. Eval 11 shows a consistent miss on the `example:` struct tag in both conditions, indicating a coverage gap rather than discrimination; the skill should add an explicit example on `example:` struct tag usage. Future iterations should also target less-known swag behaviors: `@extensions`, `@x-` custom properties, multi-file init patterns (`--dir` flag), and OpenAPI 3.0 output.
 
 </details>
 
