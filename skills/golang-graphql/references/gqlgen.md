@@ -51,8 +51,7 @@ autobind:
   - github.com/me/app/internal/domain  # reuse existing structs
 
 models:
-  ID:
-    model: github.com/99designs/gqlgen/graphql.IntID
+  # ID: graphql.IntID  # legacy only — use opaque string IDs for new schemas
   User:
     model: github.com/me/app/internal/domain.User
     fields:
@@ -106,8 +105,8 @@ Use `github.com/vikstrous/dataloadgen` (generics, fast) or `github.com/graph-gop
 func Middleware(db *sql.DB, next http.Handler) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
         loaders := &Loaders{
-            PostsByUserID: dataloadgen.NewLoader(func(ctx context.Context, ids []string) ([]*domain.Post, []error) {
-                return batchPostsByUserID(ctx, db, ids)
+            PostsByUserID: dataloadgen.NewLoader(func(ctx context.Context, ids []string) ([][]*domain.Post, []error) {
+                return batchPostsByUserID(ctx, db, ids) // returns one []Post per user ID
             }, dataloadgen.WithWait(1*time.Millisecond)),
         }
         ctx := context.WithValue(r.Context(), loadersKey, loaders)
@@ -192,7 +191,10 @@ srv.SetRecoverFunc(func(ctx context.Context, err any) error {
 srv.AddTransport(transport.Websocket{
     KeepAlivePingInterval: 10 * time.Second,
     Upgrader: websocket.Upgrader{
-        CheckOrigin: func(r *http.Request) bool { return true },
+        // Restrict to your own origin in production; true here is dev-only.
+        CheckOrigin: func(r *http.Request) bool {
+            return r.Header.Get("Origin") == "https://app.example.com"
+        },
     },
     InitFunc: func(ctx context.Context, initPayload transport.InitPayload) (context.Context, *transport.InitPayload, error) {
         // auth at connection time
@@ -264,7 +266,9 @@ srv.AddTransport(transport.MultipartForm{MaxUploadSize: 10 << 20, MaxMemory: 5 <
 srv.AddTransport(transport.Websocket{KeepAlivePingInterval: 10 * time.Second})
 
 srv.SetQueryCache(lru.New[*ast.QueryDocument](1000))
-srv.Use(extension.Introspection{})       // gate in prod: if ENV != "production"
+if os.Getenv("ENV") != "production" {
+    srv.Use(extension.Introspection{})
+}
 srv.Use(extension.AutomaticPersistedQuery{Cache: lru.New[string](100)})
 srv.Use(extension.FixedComplexityLimit(200))
 ```

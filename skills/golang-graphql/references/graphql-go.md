@@ -8,13 +8,14 @@ Schema-first, reflection-based — no codegen. Write SDL, bind Go resolver struc
 import (
     "github.com/graph-gophers/graphql-go"
     "github.com/graph-gophers/graphql-go/relay"
+    "github.com/graph-gophers/graphql-go/trace/otel"
 )
 
 schema := graphql.MustParseSchema(sdlString, &RootResolver{},
     graphql.MaxDepth(10),
     graphql.MaxParallelism(10),
     graphql.UseFieldResolvers(), // expose exported struct fields without explicit methods
-    graphql.Tracer(otelgraphql.DefaultTracer()),
+    graphql.Tracer(otel.DefaultTracer()),
 )
 
 http.Handle("/graphql", &relay.Handler{Schema: schema})
@@ -27,7 +28,9 @@ http.Handle("/graphql", &relay.Handler{Schema: schema})
 One exported method per schema field; name match is case-insensitive:
 
 ```go
-type RootResolver struct{}
+type RootResolver struct {
+    db *sql.DB
+}
 
 type QueryResolver struct {
     db *sql.DB
@@ -59,7 +62,7 @@ Return resolver wrapper structs, not domain models directly — keeps GraphQL pr
 | `[T]` | `[]*T` or `[]T` | |
 | Nullable `T` | `*T` | pointer = nullable |
 | Non-null `T!` | `T` | non-pointer |
-| Custom scalar | implement `UnmarshalGraphQL([]byte) error` + `MarshalJSON() ([]byte, error)` | |
+| Custom scalar | implement `UnmarshalGraphQL(input any) error` + `MarshalJSON() ([]byte, error)` | |
 | Enum | typed string alias | |
 | Input | exported struct with field tags optional | |
 | Interface/Union | Go interface returned; `ToConcreteType() (*T, bool)` discriminators | |

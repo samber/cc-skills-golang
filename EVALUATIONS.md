@@ -49,9 +49,9 @@
 | `golang-samber-lo`              | v1.0.0  | 86         | 97%        | 57%           | +40pp     | 1.70×     |                             |
 | `golang-uber-fx`                | v1.0.0  | 21         | 100%       | **95%**       | +5pp      | 1.05×     | **Low delta, high without** |
 | `golang-uber-dig`               | v1.0.0  | 20         | 100%       | **90%**       | +10pp     | 1.11×     | **Low delta, high without** |
-| `golang-graphql`                | v0.0.2  | 37         | 100%       | **84%**       | +16pp     | 1.19×     | **Low delta, high without** |
+| `golang-graphql`                | v0.0.2  | 59         | 100%       | **83%**       | +17pp     | 1.20×     | **Low delta, high without** |
 | `golang-samber-do`              | v1.0.0  | 53         | 100%       | 19%           | +81pp     | 5.26×     |                             |
-| **Total (38 skills)**           |         | **3219**   | **98%**    | **55%**       | **+43pp** | **1.78×** |                             |
+| **Total (38 skills)**           |         | **3241**   | **98%**    | **55%**       | **+43pp** | **1.78×** |                             |
 
 ## `golang-naming` — v1.0.0
 
@@ -4506,12 +4506,12 @@
 
 |             | With Skill      | Without Skill   | Delta     |
 | ----------- | --------------- | --------------- | --------- |
-| **Overall** | **37/37 (100%)** | **31/37 (84%)** | **+16pp** |
+| **Overall** | **59/59 (100%)** | **49/59 (83%)** | **+17pp** |
 
 <details>
-<summary>Full breakdown (37 assertions)</summary>
+<summary>Full breakdown (59 assertions)</summary>
 
-**Model:** Claude Sonnet 4.6 | **Runs:** 8 evals × 2 configs = 16 subagents | **Grading:** LLM-as-judge
+**Model:** Claude Sonnet 4.6 | **Runs:** 13 evals × 2 configs = 26 subagents | **Grading:** LLM-as-judge
 
 | #    | Assertion                                                                                              | With                           | Without                        |
 | ---- | ------------------------------------------------------------------------------------------------------ | ------------------------------ | ------------------------------ |
@@ -4561,7 +4561,37 @@
 | 8.5  | Payload errors field uses non-null list type like [UserError!]!                                        | <span class="g">✓</span>       | <span class="g">✓</span>       |
 | 8.6  | Does NOT use HTTP 400/422 errors for validation                                                        | <span class="g">✓</span>       | <span class="g">✓</span>       |
 
-**Analyst pass:** Only eval 1 (N+1 DataLoader) and eval 5 (generated file warning) show meaningful skill uplift. Evals 2–4, 6–8 score 100% both with and without the skill — the model's baseline knowledge of gqlgen error handling, subscription goroutine discipline, nullable pointers, mutation envelopes, and introspection gating is already strong. The skill's primary value is in the DataLoader per-request injection pattern (eval 1: 6/6 → 1/6 delta) which is a nuanced architectural constraint, not a well-known API. Future iterations should add evals targeting: DataLoader `wait` timing (too long vs too short), `fields.<f>.resolver: true` requirement in gqlgen.yml, Federation `@key` entity resolver wiring, and subscription WebSocket transport selection (graphql-ws vs graphql-transport-ws protocol). These are all non-obvious choices the model regularly gets wrong without guidance.
+**Analyst pass (iteration 1):** Only eval 1 (N+1 DataLoader) and eval 5 (generated file warning) show meaningful skill uplift. Evals 2–4, 6–8 score 100% both with and without the skill — the model's baseline knowledge of gqlgen error handling, subscription goroutine discipline, nullable pointers, mutation envelopes, and introspection gating is already strong.
+
+|      | **9. pubsub-subscribe-once** — Subscribe must be called before goroutine, not inside the loop        | **<span class="g">5/5</span>** | **<span class="g">5/5</span>** |
+| 9.1  | Calls Subscribe BEFORE the go func() call                                                             | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 9.2  | Does NOT call Subscribe() inside the for-select loop body                                             | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 9.3  | Uses defer close(ch)                                                                                  | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 9.4  | Uses select with ctx.Done()                                                                           | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 9.5  | Subscription handle captured in variable before goroutine starts                                      | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **10. graphql-go-nullable-int32** — optional Int uses *int32, ID uses graphql.ID                     | **<span class="g">4/4</span>** | **<span class="g">4/4</span>** |
+| 10.1 | Uses *int32 for nullable Int argument, not *int                                                       | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 10.2 | Uses graphql.ID or *graphql.ID for ID argument                                                        | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 10.3 | Optional arguments are pointer types                                                                  | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 10.4 | Does NOT use plain int or *int for Int field                                                          | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **11. dataloader-batch-return-type** — one-to-many batch returns [][]*Post, not []*Post              | **<span class="g">4/4</span>** | **<span class="g">4/4</span>** |
+| 11.1 | Return type is [][]*domain.Post (2D slice)                                                            | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 11.2 | Outer slice has one element per input user ID                                                         | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 11.3 | Users with zero posts get empty slice, not nil or error                                               | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 11.4 | Does NOT return flat []*domain.Post                                                                   | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **12. graphql-go-tracer-import** — OTel tracer uses trace/otel sub-package, not hallucinated path    | **<span class="g">4/4</span>** | **<span class="r">0/4</span>** |
+| 12.1 | Imports github.com/graph-gophers/graphql-go/trace/otel                                               | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 12.2 | Uses otel.DefaultTracer(), not oteltracer.New() or other hallucinated function                        | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 12.3 | Passes tracer as graphql.Tracer(otel.DefaultTracer()) option                                          | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 12.4 | Does NOT import a hallucinated trace/oteltracer package                                               | <span class="g">✓</span>       | <span class="r">✗</span>       |
+|      | **13. federation-entity-resolver** — gqlgen federation v2 config + @key + FindUserByID              | **<span class="g">5/5</span>** | **<span class="g">5/5</span>** |
+| 13.1 | Adds federation block with version: 2 to gqlgen.yml                                                  | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 13.2 | Adds @key(fields: "id") to User type in SDL                                                           | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 13.3 | Implements or mentions FindUserByID entity resolver                                                   | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 13.4 | Links Apollo Federation v2 spec URL in schema extend block                                            | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 13.5 | Does NOT describe manual federation without gqlgen.yml config                                         | <span class="g">✓</span>       | <span class="g">✓</span>       |
+
+**Analyst pass (iteration 2):** Only eval 12 (OTel tracer import path) shows skill uplift — the model without the skill hallucinated `trace/oteltracer` and `oteltracer.New()` instead of the correct `trace/otel` and `otel.DefaultTracer()`. Evals 9, 10, 11, 13 are common knowledge: subscribe-before-goroutine, nullable int32, 2D batch return type, and federation config are all well-documented and the baseline model handles them correctly. The skill's primary discriminating value remains the DataLoader per-request injection (eval 1) and the correct OTel tracer import path (eval 12).
 
 </details>
 

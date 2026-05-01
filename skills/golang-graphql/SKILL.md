@@ -185,13 +185,14 @@ Subscriptions use long-lived WebSocket connections. The critical discipline: **a
 // ✓ Good — closes channel when client disconnects
 func (r *subscriptionResolver) MessageAdded(ctx context.Context, room string) (<-chan *model.Message, error) {
     ch := make(chan *model.Message, 1)
+    sub := r.pubsub.Subscribe(room) // subscribe once before the goroutine
     go func() {
         defer close(ch) // always close; signals iteration to stop
         for {
             select {
             case <-ctx.Done():
                 return // client disconnected
-            case msg := <-r.pubsub.Subscribe(room):
+            case msg := <-sub:
                 ch <- msg
             }
         }
