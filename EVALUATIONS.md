@@ -49,8 +49,9 @@
 | `golang-samber-lo`              | v1.0.0  | 86         | 97%        | 57%           | +40pp     | 1.70×     |                             |
 | `golang-uber-fx`                | v1.0.0  | 21         | 100%       | **95%**       | +5pp      | 1.05×     | **Low delta, high without** |
 | `golang-uber-dig`               | v1.0.0  | 20         | 100%       | **90%**       | +10pp     | 1.11×     | **Low delta, high without** |
+| `golang-google-wire`            | v1.0.0  | 50         | 98%        | **82%**       | +16pp     | 1.20×     | **Low delta, high without** |
 | `golang-samber-do`              | v1.0.0  | 53         | 100%       | 19%           | +81pp     | 5.26×     |                             |
-| **Total (37 skills)**           |         | **3182**   | **98%**    | **55%**       | **+43pp** | **1.78×** |                             |
+| **Total (38 skills)**           |         | **3232**   | **98%**    | **55%**       | **+43pp** | **1.78×** |                             |
 
 ## `golang-naming` — v1.0.0
 
@@ -4498,6 +4499,84 @@
 | 10.5 | Mentions a blocking OnStart hangs the boot                                       | <span class="g">✓</span>       | <span class="g">✓</span>                         |
 
 **Analyst pass:** 3 of 4 evals score equally with and without the skill — the model's baseline knowledge of fx is very strong (lifecycle hooks, fxtest.New, OnStart/goroutine pattern). Only eval 6 differentiates: without the skill the agent picks `fx.Decorate` and skips the `fx.As` interface binding that the production graph requires. This is consistent with a well-known framework where the skill mainly adds value on subtle API choices. Future iterations should target less common patterns: fx.Annotate vs fx.Out trade-offs, fx.Module decorator scoping, fxevent customization, manual lifecycle for CLI embedding.
+
+</details>
+
+## `golang-google-wire` — v1.0.0
+
+|             | With Skill      | Without Skill   | Delta     |
+| ----------- | --------------- | --------------- | --------- |
+| **Overall** | **49/50 (98%)** | **41/50 (82%)** | **+16pp** |
+
+<details>
+<summary>Full breakdown (50 assertions)</summary>
+
+**Model:** Claude Sonnet 4.6 | **Runs:** 10 evals × 2 configs = 20 subagents | **Grading:** LLM-as-Judge
+
+| #    | Assertion                                                                                           | With                           | Without                                                                            |
+| ---- | --------------------------------------------------------------------------------------------------- | ------------------------------ | ---------------------------------------------------------------------------------- |
+|      | **1. build-constraint-on-injector** — missing `//go:build wireinject` causes duplicate symbols      | **<span class="g">5/5</span>** | **<span class="r">3/5</span>**                                                     |
+| 1.1  | Identifies the missing `//go:build wireinject` build tag as the root cause                         | <span class="g">✓</span>       | <span class="r">✗</span> suggested `//go:build ignore` instead                    |
+| 1.2  | Shows `//go:build wireinject` as the first line of the injector file                               | <span class="g">✓</span>       | <span class="r">✗</span> showed `//go:build ignore`                               |
+| 1.3  | Explains that the tag prevents the stub from being compiled into the binary                        | <span class="g">✓</span>       | <span class="g">✓</span>                                                           |
+| 1.4  | Does NOT suggest renaming the function or reorganizing packages as the fix                         | <span class="g">✓</span>       | <span class="g">✓</span>                                                           |
+| 1.5  | Does NOT suggest deleting wire_gen.go as the fix                                                   | <span class="g">✓</span>       | <span class="g">✓</span>                                                           |
+|      | **2. interface-binding-required** — `wire.Bind` must be explicit; wire never auto-resolves         | **<span class="g">5/5</span>** | **<span class="r">4/5</span>**                                                     |
+| 2.1  | Explains that wire never auto-resolves interface satisfaction — bindings must be explicit          | <span class="g">✓</span>       | <span class="g">✓</span>                                                           |
+| 2.2  | Shows `wire.Bind(new(UserStore), new(*PostgresUserRepo))` added to the provider set               | <span class="g">✓</span>       | <span class="g">✓</span>                                                           |
+| 2.3  | Places `wire.Bind` inside the same `wire.NewSet` (or adds it to a set in `wire.Build`)            | <span class="g">✓</span>       | <span class="g">✓</span>                                                           |
+| 2.4  | Explains WHY wire requires explicit bindings (predictability — avoids surprise rebinding)          | <span class="g">✓</span>       | <span class="r">✗</span> cited ambiguity concern, not predictability rationale     |
+| 2.5  | Does NOT suggest changing `NewUserRepo` to return `UserStore` directly as the primary fix         | <span class="g">✓</span>       | <span class="g">✓</span>                                                           |
+|      | **3. duplicate-type-named-wrapper** — named types disambiguate same underlying type               | **<span class="g">5/5</span>** | **<span class="r">4/5</span>**                                                     |
+| 3.1  | Introduces distinct named types (e.g., `type PrimaryDSN string` and `type ReplicaDSN string`)    | <span class="g">✓</span>       | <span class="g">✓</span>                                                           |
+| 3.2  | Updates `NewPrimaryDSN` to return `PrimaryDSN` and `NewReplicaDSN` to return `ReplicaDSN`        | <span class="g">✓</span>       | <span class="g">✓</span>                                                           |
+| 3.3  | Updates `NewPrimaryDB` and `NewReplicaDB` signatures to accept the named types                    | <span class="g">✓</span>       | <span class="g">✓</span>                                                           |
+| 3.4  | Explains that wire enforces one provider per type, so distinct named types are the correct fix    | <span class="g">✓</span>       | <span class="g">✓</span>                                                           |
+| 3.5  | Does NOT suggest using a single Config struct with both DSNs as the primary fix                   | <span class="g">✓</span>       | <span class="r">✗</span> presented Config struct as co-primary recommendation      |
+|      | **4. cleanup-signature** — `(T, func(), error)` cleanup propagated through injector              | **<span class="g">5/5</span>** | **<span class="r">4/5</span>**                                                     |
+| 4.1  | Changes `NewDB` to return `(*sql.DB, func(), error)` where cleanup calls `db.Close()`            | <span class="g">✓</span>       | <span class="g">✓</span>                                                           |
+| 4.2  | Changes the injector function to return `(*App, func(), error)` to propagate the cleanup chain   | <span class="g">✓</span>       | <span class="g">✓</span>                                                           |
+| 4.3  | Shows main calling `defer cleanup()` after the nil-check                                          | <span class="g">✓</span>       | <span class="r">✗</span> called `defer cleanup()` directly without nil guard       |
+| 4.4  | Explains that wire chains cleanup functions in reverse construction order                         | <span class="g">✓</span>       | <span class="g">✓</span>                                                           |
+| 4.5  | Does NOT suggest passing db as an extra return value from InitApp alongside *App                  | <span class="g">✓</span>       | <span class="g">✓</span>                                                           |
+|      | **5. no-edit-wire-gen** — never edit `wire_gen.go`; re-run `wire ./...`                           | **<span class="g">5/5</span>** | **<span class="g">5/5</span>**                                                     |
+| 5.1  | Explicitly says NOT to edit wire_gen.go (it is always overwritten)                               | <span class="g">✓</span>       | <span class="g">✓</span>                                                           |
+| 5.2  | Instructs running `wire ./...` to regenerate wire_gen.go                                          | <span class="g">✓</span>       | <span class="g">✓</span>                                                           |
+| 5.3  | Explains that `*zap.Logger` must be provided in the graph (via a provider or `wire.Value`)       | <span class="g">✓</span>       | <span class="g">✓</span>                                                           |
+| 5.4  | Shows how to add `NewLogger` (or `wire.Value`) to the appropriate `wire.NewSet`                  | <span class="g">✓</span>       | <span class="g">✓</span>                                                           |
+| 5.5  | Does NOT present editing wire_gen.go as an option                                                | <span class="g">✓</span>       | <span class="g">✓</span>                                                           |
+|      | **6. provider-set-organization** — per-package `wire.NewSet`, not one giant set in main          | **<span class="g">5/5</span>** | **<span class="g">5/5</span>**                                                     |
+| 6.1  | Introduces per-package `wire.NewSet` variables (e.g., InfraSet, RepoSet, ServiceSet)             | <span class="g">✓</span>       | <span class="g">✓</span>                                                           |
+| 6.2  | Each set lives in its own package's wire.go file (not all in main)                               | <span class="g">✓</span>       | <span class="g">✓</span>                                                           |
+| 6.3  | The injector `wire.Build` references the set variables rather than individual providers           | <span class="g">✓</span>       | <span class="g">✓</span>                                                           |
+| 6.4  | `wire.Bind` declarations move into the relevant package's set (not into `wire.Build` directly)   | <span class="g">✓</span>       | <span class="g">✓</span>                                                           |
+| 6.5  | Explains the benefit: per-package sets are independently composable                               | <span class="g">✓</span>       | <span class="g">✓</span>                                                           |
+|      | **7. injector-parameter-vs-value-provider** — injector parameters vs `wire.Value` for pre-built values | **<span class="r">4/5</span>** | **<span class="g">5/5</span>**                                                |
+| 7.1  | Shows the injector-parameter approach: `func InitApp(cfg *Config) (*App, func(), error)`         | <span class="g">✓</span>       | <span class="g">✓</span>                                                           |
+| 7.2  | OR shows `wire.Value(cfg)` inside `wire.Build` — both are valid answers                           | <span class="r">✗</span>       | <span class="g">✓</span>                                                           |
+| 7.3  | Explains that injector parameters are treated as pre-built providers by wire                     | <span class="g">✓</span>       | <span class="g">✓</span>                                                           |
+| 7.4  | Does NOT use a global variable as the recommended solution                                        | <span class="g">✓</span>       | <span class="g">✓</span>                                                           |
+| 7.5  | Does NOT suggest using `init()` to set the value                                                  | <span class="g">✓</span>       | <span class="g">✓</span>                                                           |
+|      | **8. fields-of-struct** — `wire.FieldsOf` promotes struct fields without manual extractors        | **<span class="g">5/5</span>** | **<span class="r">1/5</span>**                                                     |
+| 8.1  | Uses `wire.FieldsOf(new(Config), "DatabaseDSN", "CacheAddress", "APIKey")` or a subset           | <span class="g">✓</span>       | <span class="r">✗</span> actively discouraged `wire.FieldsOf`                     |
+| 8.2  | Places `wire.FieldsOf` inside the provider set or `wire.Build`                                   | <span class="g">✓</span>       | <span class="r">✗</span> `wire.FieldsOf` not used                                 |
+| 8.3  | Updates `NewDB`, `NewCache`, `NewExternalClient` to accept the string fields as parameters        | <span class="g">✓</span>       | <span class="g">✓</span>                                                           |
+| 8.4  | Explains that `wire.FieldsOf` promotes struct fields as individual graph nodes                   | <span class="g">✓</span>       | <span class="r">✗</span> dismissed rather than explained                           |
+| 8.5  | Does NOT suggest three separate extractor functions as the primary recommendation                 | <span class="g">✓</span>       | <span class="r">✗</span> `ProvideDatabaseDSN` etc. were the only recommendation    |
+|      | **9. test-injector-pattern** — test-only `wire.NewSet` with fake bindings                        | **<span class="g">5/5</span>** | **<span class="g">5/5</span>**                                                     |
+| 9.1  | Creates a test-only provider set with `NewFakeMailer` and `wire.Bind(new(Mailer), new(*FakeMailer))` | <span class="g">✓</span>   | <span class="g">✓</span>                                                           |
+| 9.2  | Creates a test injector function in a `_test.go` file with `//go:build wireinject`               | <span class="g">✓</span>       | <span class="g">✓</span>                                                           |
+| 9.3  | The test injector's `wire.Build` composes production sets with the test-only set                  | <span class="g">✓</span>       | <span class="g">✓</span>                                                           |
+| 9.4  | Does NOT suggest global variables, monkey-patching, or a runtime DI container for tests          | <span class="g">✓</span>       | <span class="g">✓</span>                                                           |
+| 9.5  | Mentions that `wire ./...` (or `go generate`) must be run to produce the test-injector code      | <span class="g">✓</span>       | <span class="g">✓</span>                                                           |
+|      | **10. wire-vs-fx-for-daemon** — wire lacks lifecycle; recommend fx for long-running services     | **<span class="g">5/5</span>** | **<span class="g">5/5</span>**                                                     |
+| 10.1 | Identifies that wire has no built-in lifecycle management (no OnStart/OnStop hooks)              | <span class="g">✓</span>       | <span class="g">✓</span>                                                           |
+| 10.2 | Identifies that wire has no built-in signal handling (SIGINT/SIGTERM)                            | <span class="g">✓</span>       | <span class="g">✓</span>                                                           |
+| 10.3 | Recommends uber-go/fx (or flags it as the better fit) for a long-running HTTP daemon             | <span class="g">✓</span>       | <span class="g">✓</span>                                                           |
+| 10.4 | Does NOT recommend wire as sufficient for a service requiring graceful shutdown                   | <span class="g">✓</span>       | <span class="g">✓</span>                                                           |
+| 10.5 | Mentions that with wire the developer must implement shutdown and signal handling manually        | <span class="g">✓</span>       | <span class="g">✓</span>                                                           |
+
+**Analyst pass:** 5 of 10 evals score equally with and without the skill — evals 5, 6, 9, 10 reflect strong model priors for well-known wire patterns (never-edit wire_gen.go, per-package sets, test injectors, fx-vs-wire comparison). The clearest skill uplift is eval 8 (`wire.FieldsOf`): without the skill, the model actively discourages `wire.FieldsOf` and recommends manual extractor functions instead. Eval 1 also differentiates: without the skill, the model suggests `//go:build ignore` rather than the correct `//go:build wireinject` tag. Eval 7 produced a false negative for the with-skill run — the skill correctly notes `wire.Value` only accepts constant expressions and rejected it for a runtime-parsed config; this is technically correct behavior but the assertion accepts both forms as valid. Future iterations should redesign assertion 7.2 to credit the correct injector-parameter approach when `wire.Value` is rightly excluded.
 
 </details>
 
