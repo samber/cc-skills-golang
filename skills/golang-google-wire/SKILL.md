@@ -41,13 +41,13 @@ go get github.com/google/wire
 
 ## wire vs. Runtime DI
 
-| Concern           | wire                      | dig / fx / samber/do        |
-| ----------------- | ------------------------- | --------------------------- |
-| Resolution        | Compile time (codegen)    | Runtime (reflection)        |
-| Error detection   | `wire ./...` fails        | First `Invoke`/startup      |
-| Runtime container | None — plain Go calls     | Present                     |
-| Lifecycle hooks   | Not built in              | fx: OnStart/OnStop          |
-| Generated files   | `wire_gen.go` (committed) | None                        |
+| Concern           | wire                      | dig / fx / samber/do   |
+| ----------------- | ------------------------- | ---------------------- |
+| Resolution        | Compile time (codegen)    | Runtime (reflection)   |
+| Error detection   | `wire ./...` fails        | First `Invoke`/startup |
+| Runtime container | None — plain Go calls     | Present                |
+| Lifecycle hooks   | Not built in              | fx: OnStart/OnStop     |
+| Generated files   | `wire_gen.go` (committed) | None                   |
 
 For lifecycle, lazy loading, and a full matrix see `samber/cc-skills-golang@golang-dependency-injection`.
 

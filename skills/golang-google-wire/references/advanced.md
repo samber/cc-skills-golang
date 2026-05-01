@@ -182,17 +182,17 @@ Wire treats injector parameters as pre-built providers — they satisfy dependen
 
 ## Quick Reference
 
-| Symbol                                     | Purpose                                              |
-| ------------------------------------------ | ---------------------------------------------------- |
-| `wire.NewSet(providers...)`                | Group providers into a reusable set                  |
-| `wire.Build(sets...)`                      | Declare injector body (codegen replaces it)          |
-| `wire.Bind(new(Iface), new(*Concrete))`    | Bind interface to concrete type                      |
-| `wire.Struct(new(T), "Field", ...)`        | Inject struct fields from the graph                  |
-| `wire.Struct(new(T), "*")`                 | Inject all non-excluded fields                       |
-| `wire.Value(expr)`                         | Bind a constant expression (no fn calls/channels)    |
-| `wire.InterfaceValue(new(I), value)`       | Bind a value to an interface type                    |
-| `wire.FieldsOf(new(T), "Field", ...)`      | Promote struct fields as individual graph nodes      |
-| `//go:build wireinject`                    | Build tag: exclude injector stub from binary         |
-| `wire_gen.go`                              | Generated output — commit, never edit                |
-| `wire ./...`                               | Regenerate all injectors in the module               |
-| `wire check ./...`                         | Validate graph without regenerating                  |
+| Symbol | Purpose |
+| --- | --- |
+| `wire.NewSet(providers...)` | Group providers into a reusable set |
+| `wire.Build(sets...)` | Declare injector body (codegen replaces it) |
+| `wire.Bind(new(Iface), new(*Concrete))` | Bind interface to concrete type |
+| `wire.Struct(new(T), "Field", ...)` | Inject struct fields from the graph |
+| `wire.Struct(new(T), "*")` | Inject all non-excluded fields |
+| `wire.Value(expr)` | Bind a constant expression (no fn calls/channels) |
+| `wire.InterfaceValue(new(I), value)` | Bind a value to an interface type |
+| `wire.FieldsOf(new(T), "Field", ...)` | Promote struct fields as individual graph nodes |
+| `//go:build wireinject` | Build tag: exclude injector stub from binary |
+| `wire_gen.go` | Generated output — commit, never edit |
+| `wire ./...` | Regenerate all injectors in the module |
+| `wire check ./...` | Validate graph without regenerating |
