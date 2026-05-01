@@ -45,7 +45,7 @@
         "Imports github.com/swaggo/http-swagger",
         "Uses r.Get (chi method) to register the swagger route with a wildcard pattern",
         "Sets docs.SwaggerInfo.BasePath using os.Getenv(\"API_BASE_PATH\") or equivalent",
-        "Includes the blank docs import",
+        "Imports the docs package (blank `_ \"<module>/docs\"` or named `docs \"<module>/docs\"`)",
         "Does not suggest rebuilding or running swag init per environment"
       ]
     },

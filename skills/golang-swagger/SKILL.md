@@ -39,10 +39,11 @@ swag init -g cmd/api/main.go     # if general info is not in main.go
 swag fmt                         # format annotation comments (like go fmt)
 ```
 
-Add the blank import so the `docs` package registers itself:
+Import the `docs` package to register the spec. Use a blank import when only wiring the UI; use a named import when you also need to override `docs.SwaggerInfo` at runtime:
 
 ```go
-import _ "yourmodule/docs"
+import _ "yourmodule/docs"          // blank: registers spec, no identifier
+import docs "yourmodule/docs"       // named: use when overriding SwaggerInfo
 ```
 
 Wire the UI endpoint — pick your framework:
@@ -66,10 +67,12 @@ r.Get("/swagger/*", httpSwagger.Handler(swaggerFiles.Handler))
 
 Access the UI at `/swagger/index.html`.
 
-For dynamic host/basepath (multi-environment), override after import:
+For dynamic host/basepath (multi-environment), use a named import and override before serving:
 
 ```go
-docs.SwaggerInfo.Host = os.Getenv("API_HOST")
+import docs "yourmodule/docs"
+
+docs.SwaggerInfo.Host     = os.Getenv("API_HOST")
 docs.SwaggerInfo.BasePath = "/api/v1"
 ```
 

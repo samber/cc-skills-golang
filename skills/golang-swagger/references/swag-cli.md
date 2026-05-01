@@ -46,7 +46,7 @@ The shared files package (`github.com/swaggo/files`) is required by all integrat
 Override spec values at runtime — useful for multi-environment deployments where host and basepath differ between staging and production:
 
 ```go
-import _ "yourmodule/docs"  // registers SwaggerInfo
+import docs "yourmodule/docs"  // named import required to access docs.SwaggerInfo
 
 func main() {
     docs.SwaggerInfo.Title       = "My API"
