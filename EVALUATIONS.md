@@ -13,7 +13,10 @@
 
 | Skill                           | Version | Assertions | With Skill | Without Skill | Delta     | Uplift    | Concern                     |
 | ------------------------------- | ------- | ---------- | ---------- | ------------- | --------- | --------- | --------------------------- |
+| `golang-spf13-viper`            | v1.0.0  | 53         | 98%        | **100%**      | -2pp      | 0.98×     | **Low delta, high without** |
+| `golang-spf13-cobra`            | v1.0.0  | 50         | 100%       | **98%**       | +2pp      | 1.02×     | **Low delta, high without** |
 | `golang-naming`                 | v1.0.0  | 51         | 94%        | **71%**       | +24pp     | 1.32×     | **Low delta, high without** |
+| `golang-swagger`                | v1.0.0  | 60         | 97%        | **72%**       | +25pp     | 1.35×     | **Low delta, high without** |
 | `golang-error-handling`         | v1.0.0  | 60         | 98%        | **72%**       | +27pp     | 1.36×     | **Low delta, high without** |
 | `golang-popular-libraries`      | v1.0.0  | 54         | 100%       | **70%**       | +30pp     | 1.43×     | **Low delta, high without** |
 | `golang-security`               | v1.0.0  | 110        | 100%       | **68%**       | +32pp     | 1.47×     | **Low delta, high without** |
@@ -50,8 +53,9 @@
 | `golang-uber-fx`                | v1.0.0  | 21         | 100%       | **95%**       | +5pp      | 1.05×     | **Low delta, high without** |
 | `golang-uber-dig`               | v1.0.0  | 20         | 100%       | **90%**       | +10pp     | 1.11×     | **Low delta, high without** |
 | `golang-google-wire`            | v1.0.0  | 50         | 98%        | **82%**       | +16pp     | 1.20×     | **Low delta, high without** |
+| `golang-graphql`                | v0.0.2  | 59         | 100%       | **83%**       | +17pp     | 1.20×     | **Low delta, high without** |
 | `golang-samber-do`              | v1.0.0  | 53         | 100%       | 19%           | +81pp     | 5.26×     |                             |
-| **Total (38 skills)**           |         | **3232**   | **98%**    | **55%**       | **+43pp** | **1.78×** |                             |
+| **Total (41 skills)**           |         | **3395**   | **98%**    | **56%**       | **+41pp** | **1.73×** |                             |
 
 ## `golang-naming` — v1.0.0
 
@@ -4577,6 +4581,259 @@
 | 10.5 | Mentions that with wire the developer must implement shutdown and signal handling manually        | <span class="g">✓</span>       | <span class="g">✓</span>                                                           |
 
 **Analyst pass:** 5 of 10 evals score equally with and without the skill — evals 5, 6, 9, 10 reflect strong model priors for well-known wire patterns (never-edit wire_gen.go, per-package sets, test injectors, fx-vs-wire comparison). The clearest skill uplift is eval 8 (`wire.FieldsOf`): without the skill, the model actively discourages `wire.FieldsOf` and recommends manual extractor functions instead. Eval 1 also differentiates: without the skill, the model suggests `//go:build ignore` rather than the correct `//go:build wireinject` tag. Eval 7 produced a false negative for the with-skill run — the skill correctly notes `wire.Value` only accepts constant expressions and rejected it for a runtime-parsed config; this is technically correct behavior but the assertion accepts both forms as valid. Future iterations should redesign assertion 7.2 to credit the correct injector-parameter approach when `wire.Value` is rightly excluded.
+
+</details>
+
+## `golang-spf13-cobra` — v1.0.0
+
+|             | With Skill       | Without Skill    | Delta    |
+| ----------- | ---------------- | ---------------- | -------- |
+| **Overall** | **50/50 (100%)** | **49/50 (98%)**  | **+2pp** |
+
+<details>
+<summary>Full breakdown (50 assertions)</summary>
+
+**Model:** Claude Sonnet 4.6 | **Runs:** 12 evals × 2 configs = 24 self-graded evaluations | **Grading:** self-graded (⚠️ biased — model sees assertions in prompt; without-skill baseline inflated; human-as-judge evaluation recommended for accurate uplift)
+
+| #    | Assertion                                                                   | With                           | Without                        |
+| ---- | --------------------------------------------------------------------------- | ------------------------------ | ------------------------------ |
+|      | **1. rune-vs-run** — RunE vs Run, defer bypass                              | **<span class="g">5/5</span>** | **<span class="g">5/5</span>** |
+| 1.1  | Identifies that Run cannot return an error                                  | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 1.2  | Explains only escape from Run is os.Exit or panic, bypassing defers         | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 1.3  | Recommends switching to RunE                                                | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 1.4  | Shows RunE signature: func(cmd *cobra.Command, args []string) error         | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 1.5  | Does NOT suggest goroutine or recover() as the fix                          | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **2. args-validator** — len(args) in RunE vs Args field                     | **<span class="g">4/4</span>** | **<span class="r">3/4</span>** |
+| 2.1  | Recommends cobra.ExactArgs(1) in the Args field                             | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 2.2  | Shows the Args field on cobra.Command, not inside RunE                      | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 2.3  | Explains cobra generates standard error messages automatically              | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 2.4  | Does NOT suggest keeping the len(args) check inside RunE                    | <span class="g">✓</span>       | <span class="r">✗</span>       |
+|      | **3. outstdout** — cmd.OutOrStdout vs os.Stdout                             | **<span class="g">4/4</span>** | **<span class="g">4/4</span>** |
+| 3.1  | Identifies os.Stdout (via fmt.Println) as root cause — can't redirect       | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 3.2  | Recommends cmd.OutOrStdout() as the io.Writer for output                    | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 3.3  | Shows cmd.SetOut(buf) in test setup to redirect output                      | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 3.4  | Does NOT suggest using os.Pipe() as the fix                                 | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **4. persistentprerun-chain** — PersistentPreRunE replacement not chaining  | **<span class="g">4/4</span>** | **<span class="g">4/4</span>** |
+| 4.1  | Explains cobra does NOT chain PersistentPreRunE — child replaces parent     | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 4.2  | Recommends explicitly calling parent's PersistentPreRunE from child         | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 4.3  | Shows calling parent hook: rootCmd.PersistentPreRunE(cmd, args)             | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 4.4  | Does NOT suggest using PreRunE instead as the fix                           | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **5. silenceusage** — SilenceUsage and SilenceErrors configuration          | **<span class="g">4/4</span>** | **<span class="g">4/4</span>** |
+| 5.1  | Recommends SilenceUsage: true on the root command                           | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 5.2  | Recommends SilenceErrors: true if app prints errors itself                  | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 5.3  | Explains SilenceUsage prevents full usage wall on every error               | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 5.4  | Shows setting fields on root cobra.Command struct                           | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **6. addgroup-ordering** — AddGroup before AddCommand                       | **<span class="g">4/4</span>** | **<span class="g">4/4</span>** |
+| 6.1  | Identifies root cause: AddGroup must be called BEFORE AddCommand            | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 6.2  | Explains cobra does not retroactively assign groups                         | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 6.3  | Shows correct order: AddGroup, GroupID, AddCommand                          | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 6.4  | Does NOT suggest AddCommand before AddGroup as workaround                   | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **7. validargsfunction** — dynamic positional arg completion                | **<span class="g">4/4</span>** | **<span class="g">4/4</span>** |
+| 7.1  | Uses ValidArgsFunction (not just ValidArgs []string)                        | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 7.2  | Shows correct signature with args and toComplete parameters                 | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 7.3  | Returns ShellCompDirectiveNoFileComp to suppress file fallback              | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 7.4  | Does NOT suggest parsing shell completion scripts manually                  | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **8. registerflagcompletionfunc** — flag value completion                   | **<span class="g">4/4</span>** | **<span class="g">4/4</span>** |
+| 8.1  | Uses RegisterFlagCompletionFunc (not ValidArgs on the command)              | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 8.2  | Shows function registered for the specific flag name "format"               | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 8.3  | Returns the static list ["json", "yaml", "table"]                           | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 8.4  | Does NOT suggest modifying shell rc files or completion scripts             | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **9. test-isolation** — fresh command tree per test                         | **<span class="g">4/4</span>** | **<span class="g">4/4</span>** |
+| 9.1  | Identifies cobra accumulates flag state across Execute() calls              | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 9.2  | Recommends building a fresh command tree per test                           | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 9.3  | Suggests factory function (e.g. newRootCmd()) for fresh trees               | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 9.4  | Does NOT recommend -count=1 as the primary fix                              | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **10. matchall** — composing cobra validators                               | **<span class="g">4/4</span>** | **<span class="g">4/4</span>** |
+| 10.1 | Uses cobra.MatchAll() to compose validators                                 | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 10.2 | Shows cobra.MatchAll(cobra.ExactArgs(2), cobra.OnlyValidArgs)               | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 10.3 | Sets ValidArgs on the command for OnlyValidArgs to work                     | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 10.4 | Does NOT suggest custom validator duplicating ExactArgs logic               | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **11. cobra-vs-viper** — cobra does not handle config files                 | **<span class="g">5/5</span>** | **<span class="g">5/5</span>** |
+| 11.1 | Clearly states cobra does NOT handle config file parsing                    | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 11.2 | Recommends viper (spf13/viper) for config file support                      | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 11.3 | Explains cobra handles command tree/flags, viper handles config resolution  | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 11.4 | Mentions BindPFlag as the integration point between cobra and viper         | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 11.5 | Does NOT suggest cobra alone is sufficient for YAML/JSON config files       | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **12. cobra-cli-scaffolder** — cobra-cli scaffolding tool                   | **<span class="g">4/4</span>** | **<span class="g">4/4</span>** |
+| 12.1 | Mentions cobra-cli as the scaffolding tool                                  | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 12.2 | Shows cobra-cli init or cobra-cli add commands                              | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 12.3 | Explains cobra-cli generates command boilerplate                            | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 12.4 | Does NOT suggest writing boilerplate from scratch as the only option        | <span class="g">✓</span>       | <span class="g">✓</span>       |
+
+**Analyst pass:** Almost all 12 evals score equally with and without the skill because the model's baseline cobra knowledge is strong — RunE, Args validators, OutOrStdout, SilenceUsage, and completions are well-documented. The only differentiating eval is 2.4 (explicitly discouraging len(args) checks in RunE as a backup). The self-grading methodology inflates the without-skill baseline — a human-as-judge rerun is recommended to measure true uplift, particularly on the subtler evals (4: PersistentPreRunE non-chaining, 6: AddGroup ordering, 9: test isolation with factory function).
+
+</details>
+
+## `golang-spf13-viper` — v1.0.0
+
+|             | With Skill       | Without Skill    | Delta    |
+| ----------- | ---------------- | ---------------- | -------- |
+| **Overall** | **52/53 (98%)**  | **53/53 (100%)** | **-2pp** |
+
+<details>
+<summary>Full breakdown (53 assertions)</summary>
+
+**Model:** Claude Sonnet 4.6 | **Runs:** 12 evals × 2 configs = 24 self-graded evaluations | **Grading:** self-graded (⚠️ biased — model sees assertions in prompt; without-skill baseline inflated; human-as-judge evaluation recommended for accurate uplift. Negative delta on eval 8.5: with-skill model mentions GetDuration as alternative, which fails the "Does NOT suggest" assertion; without-skill model omits it, which passes.)
+
+| #    | Assertion                                                                         | With                           | Without                        |
+| ---- | --------------------------------------------------------------------------------- | ------------------------------ | ------------------------------ |
+|      | **1. env-key-replacer-nested-keys** — SetEnvKeyReplacer for nested keys           | **<span class="g">5/5</span>** | **<span class="g">5/5</span>** |
+| 1.1  | Identifies the root cause as missing SetEnvKeyReplacer                            | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 1.2  | Explains viper preserves the dot in 'database.host' when looking up env var       | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 1.3  | Provides the fix: viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))          | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 1.4  | Shows full setup requires prefix + replacer + AutomaticEnv together               | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 1.5  | Does NOT suggest renaming the config key to avoid dots                            | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **2. sub-returns-nil** — viper.Sub() returns nil for missing keys                 | **<span class="g">5/5</span>** | **<span class="g">5/5</span>** |
+| 2.1  | Identifies that viper.Sub() returns nil when the key doesn't exist                | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 2.2  | Shows nil check: if sub := viper.Sub("database"); sub != nil { ... }              | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 2.3  | Suggests returning error or using defaults when sub is nil                        | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 2.4  | Does NOT suggest checking err from Sub() (returns no error, only nil)             | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 2.5  | Optionally suggests UnmarshalKey("database", &dbCfg) as an alternative           | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **3. config-file-not-found-graceful** — ConfigFileNotFoundError handling          | **<span class="g">5/5</span>** | **<span class="g">5/5</span>** |
+| 3.1  | Uses errors.As(err, &notFound) with *viper.ConfigFileNotFoundError                | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 3.2  | Only propagates errors that are NOT ConfigFileNotFoundError                       | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 3.3  | Continues execution normally when config file is not found                        | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 3.4  | Does NOT use os.Stat or file existence check as the solution                      | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 3.5  | Does NOT ignore all errors from ReadInConfig (real errors still propagate)        | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **4. global-viper-test-pollution** — viper.New() for test isolation               | **<span class="g">5/5</span>** | **<span class="g">5/5</span>** |
+| 4.1  | Identifies root cause as shared global viper state across tests                   | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 4.2  | Recommends viper.New() per test for isolated instance                             | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 4.3  | Shows v := viper.New() with v.SetConfigFile, v.ReadInConfig, etc.                 | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 4.4  | Does NOT recommend viper.Reset() as the primary solution                          | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 4.5  | Explains why tests are order-dependent (state persists to next test)              | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **5. unmarshal-mapstructure-tags** — mapstructure struct tags required            | **<span class="g">4/4</span>** | **<span class="g">4/4</span>** |
+| 5.1  | Identifies missing mapstructure struct tag as the root cause                      | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 5.2  | Shows adding `mapstructure:"max_conn"` to the MaxConn field                       | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 5.3  | Explains mapstructure does case-insensitive matching but not underscore-camelcase | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 5.4  | Does NOT suggest using viper.GetInt as the fix                                    | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **6. bind-pflag-timing** — BindPFlag must be before Execute()                     | **<span class="g">4/4</span>** | **<span class="g">4/4</span>** |
+| 6.1  | Identifies BindPFlag must be called before Execute() / before RunE runs           | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 6.2  | Recommends moving BindPFlag to init() or PersistentPreRunE                        | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 6.3  | Explains cobra parses flags before RunE — binding after misses Changed state      | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 6.4  | Shows correct pattern: define flag + BindPFlag in init()                          | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **7. viper-key-case-insensitivity** — viper keys always lowercase                 | **<span class="g">4/4</span>** | **<span class="g">4/4</span>** |
+| 7.1  | Explains viper normalizes all keys to lowercase internally                        | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 7.2  | Recommends using lowercase keys consistently in viper.Get* calls                  | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 7.3  | Identifies viper.GetString("database_host") as the correct form                   | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 7.4  | Notes DATABASE_HOST works via lowercasing but is a source of confusion            | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **8. duration-decode-hook** — StringToTimeDurationHookFunc for time.Duration      | **<span class="r">4/5</span>** | **<span class="g">5/5</span>** |
+| 8.1  | Identifies mapstructure cannot decode duration string without a hook              | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 8.2  | Shows viper.Unmarshal with DecodeHook using StringToTimeDurationHookFunc          | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 8.3  | Uses mapstructure.StringToTimeDurationHookFunc() as part of the hook              | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 8.4  | Does NOT suggest changing config value to nanoseconds                             | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 8.5  | Does NOT suggest using viper.GetDuration as a workaround                          | <span class="r">✗</span>       | <span class="g">✓</span>       |
+|      | **9. watch-config-atomic-rename-trap** — fsnotify inode replacement by editors    | **<span class="g">4/4</span>** | **<span class="g">4/4</span>** |
+| 9.1  | Explains vim writes atomically via rename (write-to-temp, then rename)            | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 9.2  | Explains fsnotify watches inode, replaced by rename-based writes                  | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 9.3  | Recommends testing with direct writes (os.WriteFile or echo >>) not editor saves  | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 9.4  | Does NOT suggest downgrading vim or switching editors as the fix                  | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **10. viper-alone-no-cobra** — viper usable without cobra                         | **<span class="g">4/4</span>** | **<span class="g">4/4</span>** |
+| 10.1 | Clearly states viper can be used without cobra                                    | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 10.2 | Explains cobra is for command trees/flags, not needed for HTTP service            | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 10.3 | Shows viper setup without any cobra imports                                       | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 10.4 | Does NOT recommend adding cobra just for configuration purposes                   | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **11. unmarshal-key-vs-sub** — UnmarshalKey vs Sub+Unmarshal                      | **<span class="g">4/4</span>** | **<span class="g">4/4</span>** |
+| 11.1 | Recommends viper.UnmarshalKey("database", &dbCfg) as the simpler alternative     | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 11.2 | Explains it avoids the nil check required with Sub()                              | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 11.3 | Shows correct usage: viper.UnmarshalKey("database", &dbCfg)                      | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 11.4 | If mentioning Sub+Unmarshal, notes the nil risk                                   | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **12. allow-empty-env** — AllowEmptyEnv for empty string env vars                 | **<span class="g">4/4</span>** | **<span class="g">4/4</span>** |
+| 12.1 | Explains viper treats empty string env vars as 'not set' by default               | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 12.2 | Introduces viper.AllowEmptyEnv(true) as the fix                                   | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 12.3 | Explains with AllowEmptyEnv(true), empty env var overrides config file value      | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 12.4 | Does NOT suggest using viper.Set() as a workaround                                | <span class="g">✓</span>       | <span class="g">✓</span>       |
+
+**Analyst pass:** All 12 evals score equally or better without the skill because the model's baseline viper knowledge is strong — ConfigFileNotFoundError, viper.New() for tests, mapstructure tags, and UnmarshalKey are all well-documented. The single differentiating point is eval 8.5 (negative): the skill makes the model mention viper.GetDuration as an alternative, which fails the "Does NOT suggest" assertion. The skill's reference to the unmarshal section may be over-helpful on this eval. The self-grading methodology inflates the without-skill baseline throughout. A human-as-judge rerun is recommended targeting evals 1 (env key replacer — the subtlest viper gotcha), 8 (decode hook), and 12 (AllowEmptyEnv — lesser-known API).
+
+</details>
+
+## `golang-swagger` — v1.0.0
+
+|             | With Skill      | Without Skill   | Delta     |
+| ----------- | --------------- | --------------- | --------- |
+| **Overall** | **58/60 (97%)** | **43/60 (72%)** | **+25pp** |
+
+<details>
+<summary>Full breakdown (60 assertions)</summary>
+
+**Model:** Claude Sonnet 4.6 | **Runs:** 12 evals × 2 configs = 24 subagents | **Grading:** Human-as-judge
+
+| #    | Assertion                                                                                               | With                           | Without                        |
+| ---- | ------------------------------------------------------------------------------------------------------- | ------------------------------ | ------------------------------ |
+|      | **1. gin-blank-import** — blank import + ginSwagger wire-up                                             | **<span class="g">5/5</span>** | **<span class="r">4/5</span>** |
+| 1.1  | Adds a blank import of the docs package (e.g., `_ "<module>/docs"`)                                    | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 1.2  | Imports github.com/swaggo/gin-swagger                                                                   | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 1.3  | Imports github.com/swaggo/files                                                                         | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 1.4  | Registers a GET route matching /swagger/*any using ginSwagger.WrapHandler                               | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 1.5  | Does not suggest running swag init again (it was already done)                                          | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **2. map-response-type** — map[string]bool cannot be used directly in @Success                          | **<span class="g">5/5</span>** | **<span class="r">3/5</span>** |
+| 2.1  | Does NOT use `{object} map[string]bool` directly in @Success                                           | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 2.2  | Defines a named struct for the response OR acknowledges a swaggertype workaround is needed              | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 2.3  | @Success annotation uses a named type (not a raw map literal)                                           | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 2.4  | @Router annotation is present with [get] method                                                         | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 2.5  | @Produce annotation specifies json                                                                      | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **3. swaggertype-overrides** — time.Time and []byte need swaggertype tags                               | **<span class="g">5/5</span>** | **<span class="r">1/5</span>** |
+| 3.1  | Adds swaggertype tag to CreatedAt field                                                                 | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 3.2  | Adds swaggertype tag to UpdatedAt field with the same treatment                                         | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 3.3  | Adds swaggertype:"string" and format:"base64" to the Payload []byte field                               | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 3.4  | Preserves the json tags (does not remove them)                                                          | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 3.5  | Does not leave time.Time fields without any swaggertype override                                        | <span class="g">✓</span>       | <span class="r">✗</span>       |
+|      | **4. chi-dynamic-basepath** — Chi router + BasePath from env var                                        | **<span class="g">5/5</span>** | **<span class="g">5/5</span>** |
+| 4.1  | Imports github.com/swaggo/http-swagger                                                                  | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 4.2  | Uses r.Get (chi method) to register the swagger route with a wildcard pattern                           | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 4.3  | Sets docs.SwaggerInfo.BasePath using os.Getenv("API_BASE_PATH") or equivalent                          | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 4.4  | Includes the blank docs import                                                                          | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 4.5  | Does not suggest rebuilding or running swag init per environment                                        | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **5. and-security-condition** — && vs two separate @Security lines                                      | **<span class="g">5/5</span>** | **<span class="r">4/5</span>** |
+| 5.1  | Uses && between security schemes on a single @Security annotation line                                  | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 5.2  | Does NOT write two separate @Security lines for AND semantics                                           | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 5.3  | References valid security definition names (ApiKeyAuth, BasicAuth, or similar)                          | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 5.4  | Explains or implies that two separate @Security lines would mean OR, not AND                            | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 5.5  | @Security line appears inside the handler doc comment block                                             | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **6. tag-exclusion** — swag init --tags with ! prefix to exclude tags                                   | **<span class="g">5/5</span>** | **<span class="r">4/5</span>** |
+| 6.1  | Uses the --tags flag (or -t) with swag init                                                             | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 6.2  | Uses ! prefix to exclude tags (e.g., --tags '!Internal,!Admin' or similar)                              | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 6.3  | Shows a complete swag init command                                                                      | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 6.4  | Does not suggest manually editing the generated swagger.json                                            | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 6.5  | Does not require writing custom Go code to filter endpoints                                             | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **7. godoc-comment-swag-fmt** — godoc comment line required for swag fmt                                | **<span class="g">5/5</span>** | **<span class="r">4/5</span>** |
+| 7.1  | Adds `// CreateOrder godoc` as the first line of the comment block                                     | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 7.2  | godoc comment appears before any @ annotation                                                           | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 7.3  | At minimum includes @Summary, @Router annotations                                                       | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 7.4  | @Router specifies both path and HTTP method                                                             | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 7.5  | Annotation block is placed directly above the function signature                                        | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **8. csv-vs-multi** — collectionFormat(multi) for ids, collectionFormat(csv) for fields                 | **<span class="r">4/5</span>** | **<span class="r">2/5</span>** |
+| 8.1  | @Param for ids uses collectionFormat(multi)                                                             | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 8.2  | @Param for fields uses collectionFormat(csv) or omits it (csv is the default)                           | <span class="r">✗</span>       | <span class="r">✗</span>       |
+| 8.3  | Both params use []string or []int as data type                                                          | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 8.4  | Both params are marked as not required (false)                                                          | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 8.5  | @Router annotation is present with [get] method                                                         | <span class="g">✓</span>       | <span class="r">✗</span>       |
+|      | **9. conditional-swagger** — env-based swagger toggle without build tags                                | **<span class="g">5/5</span>** | **<span class="g">5/5</span>** |
+| 9.1  | Uses os.Getenv (or equivalent) to read APP_ENV at runtime                                               | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 9.2  | Conditionally registers the swagger route only when not in production                                   | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 9.3  | Does not require separate builds or build tags                                                          | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 9.4  | The blank docs import is still present (or acknowledged as needed)                                      | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 9.5  | Solution works without recompiling between environments                                                 | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **10. nested-composition** — Envelope{data=model.User} nested composition syntax                        | **<span class="g">5/5</span>** | **<span class="r">3/5</span>** |
+| 10.1 | @Success annotation uses nested composition syntax with curly braces (e.g., Envelope{data=model.User}) | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 10.2 | The inner type is the User struct (or equivalent named type)                                            | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 10.3 | Does not create a new wrapper struct just for documentation purposes                                    | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 10.4 | @Param for the id path parameter is present with path location                                          | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 10.5 | @Router specifies the correct path and [get] method                                                     | <span class="g">✓</span>       | <span class="r">✗</span>       |
+|      | **11. enums-min-max-tags** — enums/minimum/maximum struct tags                                          | **<span class="r">4/5</span>** | **<span class="r">4/5</span>** |
+| 11.1 | Adds `enums:"admin,editor,viewer"` struct tag to Role field                                            | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 11.2 | Adds `minimum:"0"` and `maximum:"100"` struct tags to Score field                                     | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 11.3 | Adds json tags to all fields                                                                            | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 11.4 | Adds example tags to at least one field                                                                 | <span class="r">✗</span>       | <span class="r">✗</span>       |
+| 11.5 | Does not only describe constraints in a comment — they must be machine-readable struct tags              | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **12. swaggerignore-serialization** — swaggerignore:"true" vs json:"-"                                 | **<span class="g">5/5</span>** | **<span class="r">4/5</span>** |
+| 12.1 | Uses swaggerignore:"true" on the LastModified field                                                     | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 12.2 | Keeps a valid json tag on LastModified (NOT json:"-")                                                   | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 12.3 | Does NOT suggest removing the field from the struct                                                     | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 12.4 | Other struct fields retain their json and swagger documentation                                         | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 12.5 | Explains or implies why json:"-" would be wrong here (breaks serialization)                             | <span class="g">✓</span>       | <span class="g">✓</span>       |
+
+**Analyst pass:** The skill shows clear uplift on annotation mechanics that require knowing non-obvious swag behaviors: blank import requirement (eval 1), map type limitations (eval 2), swaggertype overrides for time.Time and []byte (eval 3), nested composition syntax (eval 10), and swaggerignore vs json:"-" (eval 12). Evals 4 (Chi+env) and 9 (conditional toggle) scored 5/5 in both conditions — the model already knows how to read env vars and register Chi routes, so these evals test common knowledge rather than skill uplift. Eval 11 shows a consistent miss on the `example:` struct tag in both conditions, indicating a coverage gap rather than discrimination; the skill should add an explicit example on `example:` struct tag usage. Future iterations should also target less-known swag behaviors: `@extensions`, `@x-` custom properties, multi-file init patterns (`--dir` flag), and OpenAPI 3.0 output.
 
 </details>
 

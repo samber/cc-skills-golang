@@ -179,11 +179,11 @@ These skills are designed as **atomic, cross-referencing units**. A skill may re
 | Skill | Flags | Error rate gap | Description (tok) | SKILL.md (tok) | Directory (tok) |
 | --- | --- | --- | --- | --- | --- |
 | ✅ `golang-google-wire` | ⚡ | -16% | 122 | 2,511 | 7,243 |
-| ❌ `golang-graphql` |  | — | 0 | 0 | 0 |
+| ✅ `golang-graphql` |  | -16% | 76 | 2,935 | 7,766 |
 | ✅ `golang-grpc` | ⚡ | -41% | 69 | 2,149 | 4,965 |
-| ❌ `golang-spf13-cobra` |  | — | 0 | 0 | 0 |
-| ❌ `golang-spf13-viper` |  | — | 0 | 0 | 0 |
-| ❌ `golang-swagger` |  | — | 0 | 0 | 0 |
+| ✅ `golang-spf13-cobra` | ⚡ | — | 176 | 2,455 | 7,218 |
+| ✅ `golang-spf13-viper` | ⚡ | — | 170 | 2,412 | 6,936 |
+| ✅ `golang-swagger` | ⚡ | — | 144 | 2,125 | 3,123 |
 | ✅ `golang-uber-dig` | ⚡ | -10% | 107 | 2,264 | 5,904 |
 | ✅ `golang-uber-fx` | ⚡ | -5% | 118 | 2,499 | 6,747 |
 | ✅ `golang-samber-do` | ⚡ | -81% | 70 | 1,746 | 3,269 |
@@ -200,7 +200,7 @@ These skills are designed as **atomic, cross-referencing units**. A skill may re
 
 |             | With Skill          | Without Skill       | Delta     |
 | ----------- | ------------------- | ------------------- | --------- |
-| **Overall** | **3155/3232 (98%)** | **1770/3232 (55%)** | **+43pp** |
+| **Overall** | **3315/3395 (98%)** | **1915/3395 (56%)** | **+41pp** |
 
 See [EVALUATIONS.md](./EVALUATIONS.md) for the full per-skill breakdown.
 
