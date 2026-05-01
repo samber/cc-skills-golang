@@ -181,8 +181,8 @@ These skills are designed as **atomic, cross-referencing units**. A skill may re
 | ❌ `golang-google-wire` |  | — | 0 | 0 | 0 |
 | ❌ `golang-graphql` |  | — | 0 | 0 | 0 |
 | ✅ `golang-grpc` | ⚡ | -41% | 69 | 2,149 | 4,965 |
-| ❌ `golang-spf13-cobra` |  | — | 0 | 0 | 0 |
-| ❌ `golang-spf13-viper` |  | — | 0 | 0 | 0 |
+| ✅ `golang-spf13-cobra` | ⚡ | — | 176 | 2,455 | 7,218 |
+| ✅ `golang-spf13-viper` | ⚡ | — | 170 | 2,412 | 6,936 |
 | ❌ `golang-swagger` |  | — | 0 | 0 | 0 |
 | ✅ `golang-uber-dig` | ⚡ | -10% | 107 | 2,264 | 5,904 |
 | ✅ `golang-uber-fx` | ⚡ | -5% | 118 | 2,499 | 6,747 |
@@ -200,7 +200,7 @@ These skills are designed as **atomic, cross-referencing units**. A skill may re
 
 |             | With Skill          | Without Skill       | Delta     |
 | ----------- | ------------------- | ------------------- | --------- |
-| **Overall** | **3106/3182 (98%)** | **1729/3182 (54%)** | **+44pp** |
+| **Overall** | **3208/3285 (98%)** | **1831/3285 (56%)** | **+42pp** |
 
 See [EVALUATIONS.md](./EVALUATIONS.md) for the full per-skill breakdown.
 
