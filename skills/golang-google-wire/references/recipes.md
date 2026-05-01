@@ -159,29 +159,24 @@ func InitApp() (*App, func(), error) {
 }
 ```
 
-Generate both:
-
-```bash
-wire -tags dev gen .    # produces wire_gen.go with dev providers
-wire gen .              # produces wire_gen.go with prod providers
-```
-
-Commit both generated files under their respective build tags:
-
-```go
-// wire_gen_prod.go — no wireinject tag, but add a prod tag
-//go:build !dev
-
-// wire_gen_dev.go
-//go:build dev
-```
-
-Use `-output_file_prefix` to write separate output files:
+Use `-output_file_prefix` to write separate output files — both commands would otherwise overwrite the same `wire_gen.go`:
 
 ```bash
 wire -tags dev -output_file_prefix=wire_gen_dev gen .
 wire -output_file_prefix=wire_gen_prod gen .
 ```
+
+Add build constraints to the generated files so only one compiles per build:
+
+```go
+// wire_gen_prod.go — add at the top (after wire writes it)
+//go:build !dev
+
+// wire_gen_dev.go — add at the top
+//go:build dev
+```
+
+Commit both generated files. At build time, only the matching file is compiled.
 
 ## Cleanup-Heavy Graph
 
@@ -233,7 +228,11 @@ func runServe(cfg *Config) error {
     quit := make(chan os.Signal, 1)
     signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 
-    go func() { log.Fatal(srv.ListenAndServe()) }()
+    go func() {
+        if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+            log.Fatal(err)
+        }
+    }()
     <-quit
     ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
     defer cancel()

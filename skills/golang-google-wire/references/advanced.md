@@ -4,7 +4,7 @@ Detail topics referenced from `SKILL.md`. Each section is self-contained.
 
 ## Cleanup Chains
 
-When a provider returns `(T, func(), error)`, Wire adds the cleanup to a chain. The generated injector runs cleanups in **reverse construction order**: the last-built dependency is cleaned up first, ensuring dependencies are torn down before their dependants.
+When a provider returns `(T, func(), error)`, Wire adds the cleanup to a chain. The generated injector runs cleanups in **reverse construction order**: the last-built dependant is cleaned up first, ensuring dependants are torn down before their dependencies.
 
 ```go
 // Provider with cleanup

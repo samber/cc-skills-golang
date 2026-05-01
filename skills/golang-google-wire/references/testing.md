@@ -8,7 +8,7 @@ The generated code has no wire dependency. Test constructors directly:
 
 ```go
 func TestUserService_GetUser(t *testing.T) {
-    mockStore := &MockUserStore{users: map[int64]*User{1: {ID: 1, Name: "Alice"}}}
+    mockStore := &MockUserStore{users: map[int64]*User{1: &User{ID: 1, Name: "Alice"}}}
     cache := newTestRedis(t)
     svc := service.NewUserService(mockStore, cache)
 
@@ -51,7 +51,7 @@ func InitTestApp(t *testing.T) (*App, func(), error) {
 
 ```go
 // app_integration_test.go
-//go:build !wireinject  // normal test file, no build tag
+//go:build !wireinject  // compiles when the wireinject tag is NOT set
 
 package main
 
@@ -156,7 +156,7 @@ func TestUserService(t *testing.T) {
         want  string
         err   bool
     }{
-        {"found", 1, map[int64]*User{1: {Name: "Alice"}}, "Alice", false},
+        {"found", 1, map[int64]*User{1: &User{Name: "Alice"}}, "Alice", false},
         {"not found", 99, nil, "", true},
     }
     for _, tc := range cases {
