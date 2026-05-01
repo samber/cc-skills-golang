@@ -49,8 +49,9 @@
 | `golang-samber-lo`              | v1.0.0  | 86         | 97%        | 57%           | +40pp     | 1.70×     |                             |
 | `golang-uber-fx`                | v1.0.0  | 21         | 100%       | **95%**       | +5pp      | 1.05×     | **Low delta, high without** |
 | `golang-uber-dig`               | v1.0.0  | 20         | 100%       | **90%**       | +10pp     | 1.11×     | **Low delta, high without** |
+| `golang-graphql`                | v0.0.2  | 37         | 100%       | **84%**       | +16pp     | 1.19×     | **Low delta, high without** |
 | `golang-samber-do`              | v1.0.0  | 53         | 100%       | 19%           | +81pp     | 5.26×     |                             |
-| **Total (37 skills)**           |         | **3182**   | **98%**    | **55%**       | **+43pp** | **1.78×** |                             |
+| **Total (38 skills)**           |         | **3219**   | **98%**    | **55%**       | **+43pp** | **1.78×** |                             |
 
 ## `golang-naming` — v1.0.0
 
@@ -4498,6 +4499,69 @@
 | 10.5 | Mentions a blocking OnStart hangs the boot                                       | <span class="g">✓</span>       | <span class="g">✓</span>                         |
 
 **Analyst pass:** 3 of 4 evals score equally with and without the skill — the model's baseline knowledge of fx is very strong (lifecycle hooks, fxtest.New, OnStart/goroutine pattern). Only eval 6 differentiates: without the skill the agent picks `fx.Decorate` and skips the `fx.As` interface binding that the production graph requires. This is consistent with a well-known framework where the skill mainly adds value on subtle API choices. Future iterations should target less common patterns: fx.Annotate vs fx.Out trade-offs, fx.Module decorator scoping, fxevent customization, manual lifecycle for CLI embedding.
+
+</details>
+
+## `golang-graphql` — v0.0.2
+
+|             | With Skill      | Without Skill   | Delta     |
+| ----------- | --------------- | --------------- | --------- |
+| **Overall** | **37/37 (100%)** | **31/37 (84%)** | **+16pp** |
+
+<details>
+<summary>Full breakdown (37 assertions)</summary>
+
+**Model:** Claude Sonnet 4.6 | **Runs:** 8 evals × 2 configs = 16 subagents | **Grading:** LLM-as-judge
+
+| #    | Assertion                                                                                              | With                           | Without                        |
+| ---- | ------------------------------------------------------------------------------------------------------ | ------------------------------ | ------------------------------ |
+|      | **1. n-plus-one-user-posts** — User.posts resolver must use DataLoader, not direct DB calls            | **<span class="g">6/6</span>** | **<span class="r">1/6</span>** |
+| 1.1  | Uses a DataLoader or batch loader, not direct db.Query inside the resolver                             | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 1.2  | Accesses the DataLoader from context (not a package-level or global variable)                          | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 1.3  | Resolver function signature uses obj *model.User to access parent user's ID                            | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 1.4  | Does not query the database directly inside the Posts resolver body                                    | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 1.5  | Mentions DataLoader must be injected per-request via HTTP middleware                                   | <span class="g">✓</span>       | <span class="r">✗</span>       |
+| 1.6  | DataLoader middleware creates a new loader instance per request, not a shared global                   | <span class="g">✓</span>       | <span class="r">✗</span>       |
+|      | **2. graphql-go-int32-type** — graph-gophers Int! must use int32, not int                              | **<span class="g">3/3</span>** | **<span class="g">3/3</span>** |
+| 2.1  | Returns int32 (not int, int64, or uint) for the Int! scalar field                                     | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 2.2  | Method signature matches SDL field name (case-insensitive)                                             | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 2.3  | Does not return plain Go int                                                                           | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **3. introspection-production** — production handler must gate introspection and set complexity cap    | **<span class="g">5/5</span>** | **<span class="g">5/5</span>** |
+| 3.1  | Introspection is gated by ENV check or disabled                                                        | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 3.2  | Complexity limit set using extension.FixedComplexityLimit or equivalent                                | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 3.3  | Does NOT call srv.Use(extension.Introspection{}) unconditionally                                       | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 3.4  | Uses handler.New or handler.NewDefaultServer                                                           | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 3.5  | Mentions complexity limiting as protection against deeply nested queries                                | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **4. subscription-goroutine-leak** — subscription must close channel and respect ctx.Done              | **<span class="g">5/5</span>** | **<span class="g">5/5</span>** |
+| 4.1  | Uses defer close(ch) to close the output channel                                                       | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 4.2  | Uses select with ctx.Done() to detect client disconnection                                             | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 4.3  | Returns a receive-only channel                                                                         | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 4.4  | Does not use a plain for-range loop without ctx.Done() check                                           | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 4.5  | Goroutine terminates when ctx is cancelled                                                             | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **5. no-edit-generated-files** — use gqlgen.yml to bind existing struct, never edit models_gen.go     | **<span class="g">4/4</span>** | **<span class="r">3/4</span>** |
+| 5.1  | Uses gqlgen.yml (autobind or models.<T>.model) to bind the existing struct                             | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 5.2  | Does NOT suggest editing models_gen.go or generated.go directly                                        | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 5.3  | Shows correct gqlgen.yml syntax                                                                        | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 5.4  | Mentions that generated files are overwritten on next go generate                                      | <span class="g">✓</span>       | <span class="r">✗</span>       |
+|      | **6. graphql-go-nullable-pointer** — nullable String must use *string in graph-gophers               | **<span class="g">3/3</span>** | **<span class="g">3/3</span>** |
+| 6.1  | Uses *string (pointer) for the nullable bio field                                                      | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 6.2  | Explains non-pointer = non-null and pointer = nullable mapping                                         | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 6.3  | Does not use sql.NullString for the GraphQL resolver layer                                             | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **7. error-sanitization** — resolvers must not leak raw SQL errors to clients                          | **<span class="g">5/5</span>** | **<span class="g">5/5</span>** |
+| 7.1  | Does NOT return raw sql.ErrNoRows to the client                                                        | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 7.2  | Translates sql.ErrNoRows to a NOT_FOUND GraphQL error with extension code                              | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 7.3  | Uses gqlerror.Error or gqlerror.Errorf                                                                 | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 7.4  | Mentions ErrorPresenter for centralizing error sanitization                                            | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 7.5  | Wraps internal errors so SQL messages don't reach clients                                              | <span class="g">✓</span>       | <span class="g">✓</span>       |
+|      | **8. mutation-envelope-pattern** — mutations must use payload envelope for validation errors           | **<span class="g">6/6</span>** | **<span class="g">6/6</span>** |
+| 8.1  | Input type has email: String! (non-null)                                                               | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 8.2  | Input type has bio: String (nullable)                                                                  | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 8.3  | Mutation returns a payload envelope with both user and errors fields                                   | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 8.4  | Validation errors in payload errors field, not top-level GraphQL errors                                | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 8.5  | Payload errors field uses non-null list type like [UserError!]!                                        | <span class="g">✓</span>       | <span class="g">✓</span>       |
+| 8.6  | Does NOT use HTTP 400/422 errors for validation                                                        | <span class="g">✓</span>       | <span class="g">✓</span>       |
+
+**Analyst pass:** Only eval 1 (N+1 DataLoader) and eval 5 (generated file warning) show meaningful skill uplift. Evals 2–4, 6–8 score 100% both with and without the skill — the model's baseline knowledge of gqlgen error handling, subscription goroutine discipline, nullable pointers, mutation envelopes, and introspection gating is already strong. The skill's primary value is in the DataLoader per-request injection pattern (eval 1: 6/6 → 1/6 delta) which is a nuanced architectural constraint, not a well-known API. Future iterations should add evals targeting: DataLoader `wait` timing (too long vs too short), `fields.<f>.resolver: true` requirement in gqlgen.yml, Federation `@key` entity resolver wiring, and subscription WebSocket transport selection (graphql-ws vs graphql-transport-ws protocol). These are all non-obvious choices the model regularly gets wrong without guidance.
 
 </details>
 
