@@ -37,10 +37,12 @@ Viper keys use `.` as separator for nested values. Env vars cannot contain dots.
 //   max_conn: 25
 
 // Without replacer:
+viper.SetEnvPrefix("MYAPP")
 viper.AutomaticEnv()
 viper.GetString("database.host")  // looks for MYAPP_DATABASE.HOST — no match
 
 // With replacer:
+viper.SetEnvPrefix("MYAPP")
 viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 viper.AutomaticEnv()
 viper.GetString("database.host")  // looks for MYAPP_DATABASE_HOST — matches

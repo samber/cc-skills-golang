@@ -284,5 +284,161 @@
         "text": "Explains that cobra-cli is separate from cobra itself (different import path)"
       }
     ]
+  },
+  {
+    "id": 13,
+    "name": "stringarray-vs-stringslice-commas",
+    "description": "Tests StringArray vs StringSlice when flag values contain commas",
+    "prompt": "My Go cobra CLI has a --label flag that users pass multiple times like --label 'env=prod,region=us'. With my current setup, passing --label 'env=prod,region=us' results in two separate values ['env=prod', 'region=us'] instead of one. What flag type should I use?",
+    "trap": "Without the skill, the model uses StringSlice which splits on commas. StringArray is the correct choice when values may legitimately contain commas.",
+    "assertions": [
+      {
+        "id": "13.1",
+        "text": "Recommends StringArray (or StringArrayVar) instead of StringSlice"
+      },
+      {
+        "id": "13.2",
+        "text": "Explains that StringSlice splits on commas while StringArray does not"
+      },
+      {
+        "id": "13.3",
+        "text": "Does NOT suggest quoting or escaping commas as the fix"
+      },
+      {
+        "id": "13.4",
+        "text": "Shows the correct flag definition using StringArray or StringArrayVar"
+      }
+    ]
+  },
+  {
+    "id": 14,
+    "name": "mutually-exclusive-flags",
+    "description": "Tests MarkFlagsMutuallyExclusive instead of manual RunE checks",
+    "prompt": "My Go cobra command has --json and --yaml flags for output format. Users should only be able to pass one of them. How do I prevent both from being passed at the same time?",
+    "trap": "Without the skill, the model writes an if statement checking both flags inside RunE. The correct approach is MarkFlagsMutuallyExclusive which cobra enforces at parse time before RunE.",
+    "assertions": [
+      {
+        "id": "14.1",
+        "text": "Calls cmd.MarkFlagsMutuallyExclusive(\"json\", \"yaml\")"
+      },
+      {
+        "id": "14.2",
+        "text": "Does NOT write a manual if-both-set check inside RunE"
+      },
+      {
+        "id": "14.3",
+        "text": "Explains cobra enforces this at flag parse time and returns a standard error"
+      }
+    ]
+  },
+  {
+    "id": 15,
+    "name": "required-together-flags",
+    "description": "Tests MarkFlagsRequiredTogether instead of manual RunE checks",
+    "prompt": "My Go cobra command has --tls-cert and --tls-key flags. If a user provides one, they must provide the other. How do I enforce this constraint?",
+    "trap": "Without the skill, the model writes manual validation in RunE checking if one is set without the other. MarkFlagsRequiredTogether enforces this at cobra's parse stage.",
+    "assertions": [
+      {
+        "id": "15.1",
+        "text": "Calls cmd.MarkFlagsRequiredTogether(\"tls-cert\", \"tls-key\")"
+      },
+      {
+        "id": "15.2",
+        "text": "Does NOT write manual if-one-without-the-other checks inside RunE"
+      },
+      {
+        "id": "15.3",
+        "text": "Explains cobra validates this before RunE runs"
+      }
+    ]
+  },
+  {
+    "id": 16,
+    "name": "one-required-flag-group",
+    "description": "Tests MarkFlagsOneRequired instead of manual RunE checks",
+    "prompt": "My Go cobra command accepts input from either --file or --stdin. At least one must be provided. How do I enforce that the user passes at least one of them?",
+    "trap": "Without the skill, the model checks flag presence inside RunE. MarkFlagsOneRequired enforces at parse time with a standard cobra error.",
+    "assertions": [
+      {
+        "id": "16.1",
+        "text": "Calls cmd.MarkFlagsOneRequired(\"file\", \"stdin\")"
+      },
+      {
+        "id": "16.2",
+        "text": "Does NOT write a manual check inside RunE for neither flag being set"
+      },
+      {
+        "id": "16.3",
+        "text": "Explains cobra enforces this before RunE runs"
+      }
+    ]
+  },
+  {
+    "id": 17,
+    "name": "flag-changed-distinguish-explicit-zero",
+    "description": "Tests cmd.Flags().Changed() to distinguish explicit zero from absent flag",
+    "prompt": "My Go cobra command has a --timeout flag defaulting to 30s. Users can pass --timeout 0 to disable timeouts entirely. In RunE, how do I tell whether the user explicitly passed --timeout 0 or simply didn't pass --timeout at all?",
+    "trap": "Without the skill, the model checks if timeout == 0, which conflates the two cases. The correct approach is cmd.Flags().Changed(\"timeout\") which returns true only when the user explicitly provided the flag.",
+    "assertions": [
+      {
+        "id": "17.1",
+        "text": "Uses cmd.Flags().Changed(\"timeout\") to detect explicit user input"
+      },
+      {
+        "id": "17.2",
+        "text": "Does NOT use if timeout == 0 as the sole distinguishing condition"
+      },
+      {
+        "id": "17.3",
+        "text": "Explains Changed() returns true only when the flag was explicitly set by the user"
+      },
+      {
+        "id": "17.4",
+        "text": "Shows the pattern: if Changed → apply value, else → use default behavior"
+      }
+    ]
+  },
+  {
+    "id": 18,
+    "name": "postrunE-success-only-use-defer",
+    "description": "Tests that PostRunE runs only on RunE success and defer is the right cleanup pattern",
+    "prompt": "My Go cobra command opens a database connection early in RunE and I want to close it when the command finishes, whether it succeeds or fails. I added cleanup in PostRunE but noticed it doesn't run when RunE returns an error. What's the right pattern?",
+    "trap": "Without the skill, the model may suggest PersistentPostRunE or not know PostRunE is success-only. The correct pattern is defer inside RunE for guaranteed cleanup regardless of outcome.",
+    "assertions": [
+      {
+        "id": "18.1",
+        "text": "Uses defer inside RunE to guarantee cleanup on both success and failure"
+      },
+      {
+        "id": "18.2",
+        "text": "Explains PostRunE only runs when RunE returns nil (success)"
+      },
+      {
+        "id": "18.3",
+        "text": "Does NOT present PostRunE as a solution for failure cleanup"
+      }
+    ]
+  },
+  {
+    "id": 19,
+    "name": "errOrStderr-not-os-stderr",
+    "description": "Tests cmd.ErrOrStderr() instead of os.Stderr for capturable error output",
+    "prompt": "My Go cobra command writes diagnostic details to stderr using fmt.Fprintf(os.Stderr, ...) before returning an error. This works fine at runtime but my tests can't capture the stderr output. How do I fix this?",
+    "trap": "Without the skill, the model uses os.Stderr directly. The correct approach is cmd.ErrOrStderr() which tests can redirect via rootCmd.SetErr(buf).",
+    "assertions": [
+      {
+        "id": "19.1",
+        "text": "Replaces os.Stderr with cmd.ErrOrStderr() as the write target"
+      },
+      { "id": "19.2", "text": "Does NOT use os.Stderr directly" },
+      {
+        "id": "19.3",
+        "text": "Shows rootCmd.SetErr(buf) in the test to capture stderr output"
+      },
+      {
+        "id": "19.4",
+        "text": "Explains the symmetry with cmd.OutOrStdout() / SetOut for stdout"
+      }
+    ]
   }
 ]

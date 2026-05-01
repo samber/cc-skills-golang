@@ -2,7 +2,7 @@
 
 ## The Run\* lifecycle
 
-Cobra commands have six run hooks. Cobra executes them in this fixed order:
+Cobra commands have five run hooks. Cobra executes them in this fixed order:
 
 ```
 PersistentPreRunE → PreRunE → RunE → PostRunE → PersistentPostRunE

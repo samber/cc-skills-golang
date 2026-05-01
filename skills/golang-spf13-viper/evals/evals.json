@@ -212,10 +212,6 @@
       {
         "id": "8.4",
         "text": "Does NOT suggest changing the config value to nanoseconds"
-      },
-      {
-        "id": "8.5",
-        "text": "Does NOT suggest using viper.GetDuration as a workaround (the struct field should work with proper hooks)"
       }
     ]
   },
@@ -313,6 +309,156 @@
       {
         "id": "12.4",
         "text": "Does NOT suggest using viper.Set() as a workaround"
+      }
+    ]
+  },
+  {
+    "id": 13,
+    "name": "merge-in-config-layering",
+    "description": "Tests MergeInConfig for base+override config file pattern",
+    "prompt": "I want my Go service to ship with a built-in default config file, but let ops teams drop an override.yaml in /etc/myapp/ to customize specific values without copying the whole config. How do I implement this layered loading?",
+    "trap": "Without the skill, the model may suggest reading only one file or writing custom merge logic. MergeInConfig is the viper primitive for this — base file first, then MergeInConfig for the override.",
+    "assertions": [
+      {
+        "id": "13.1",
+        "text": "Uses ReadInConfig for the base config and MergeInConfig for the override"
+      },
+      {
+        "id": "13.2",
+        "text": "Explains that keys from the override file win on collision"
+      },
+      {
+        "id": "13.3",
+        "text": "Does NOT suggest duplicating the entire config in the override file"
+      },
+      {
+        "id": "13.4",
+        "text": "Handles the case where the override file is missing (ConfigFileNotFoundError or os.Stat check)"
+      }
+    ]
+  },
+  {
+    "id": 14,
+    "name": "bind-env-non-prefixed-third-party",
+    "description": "Tests BindEnv for env vars that don't follow the app prefix convention",
+    "prompt": "My Go service uses viper with SetEnvPrefix('MYAPP') and AutomaticEnv(). I also need to read GOOGLE_APPLICATION_CREDENTIALS from the environment and expose it as viper key 'google.credentials'. The prefix makes AutomaticEnv look for MYAPP_GOOGLE_CREDENTIALS. How do I bind to the exact env var name?",
+    "trap": "Without the skill, the model may suggest removing the prefix or reading via os.Getenv. BindEnv can bind a specific key to a specific env var name, bypassing the prefix.",
+    "assertions": [
+      {
+        "id": "14.1",
+        "text": "Uses viper.BindEnv(\"google.credentials\", \"GOOGLE_APPLICATION_CREDENTIALS\")"
+      },
+      {
+        "id": "14.2",
+        "text": "Explains BindEnv binds to the exact env var name, bypassing the prefix"
+      },
+      {
+        "id": "14.3",
+        "text": "Does NOT suggest removing SetEnvPrefix to fix this one case"
+      },
+      {
+        "id": "14.4",
+        "text": "Does NOT suggest using os.Getenv as the primary solution"
+      }
+    ]
+  },
+  {
+    "id": 15,
+    "name": "race-safe-on-config-change",
+    "description": "Tests mutex protection for shared state updated in OnConfigChange callback",
+    "prompt": "My Go service updates a global logLevel variable inside the viper.OnConfigChange callback. Under load I see data races flagged by the race detector. What's the correct pattern for updating shared state from a hot-reload callback?",
+    "trap": "Without the skill, the model may only mention logging the error or ignoring the race. The correct pattern is protecting the shared state with sync.RWMutex — OnConfigChange runs in a background goroutine.",
+    "assertions": [
+      {
+        "id": "15.1",
+        "text": "Identifies that OnConfigChange runs in a background goroutine, causing the race"
+      },
+      {
+        "id": "15.2",
+        "text": "Uses sync.RWMutex (or sync.Mutex) to protect the shared state"
+      },
+      {
+        "id": "15.3",
+        "text": "Updates the shared state under Lock() inside OnConfigChange"
+      },
+      {
+        "id": "15.4",
+        "text": "Readers of the shared state use RLock()"
+      }
+    ]
+  },
+  {
+    "id": 16,
+    "name": "go-embed-default-config",
+    "description": "Tests go:embed + viper.ReadConfig for shipping default config in the binary",
+    "prompt": "I want my Go service binary to work out of the box without any config file on disk by including sensible defaults in a bundled YAML file. How do I ship a default config inside the binary and load it via viper?",
+    "trap": "Without the skill, the model suggests calling viper.SetDefault for each key individually. The cleaner approach is //go:embed + viper.ReadConfig(bytes.NewReader(...)) which loads a full YAML file as defaults.",
+    "assertions": [
+      {
+        "id": "16.1",
+        "text": "Uses //go:embed to embed the YAML config file into the binary"
+      },
+      {
+        "id": "16.2",
+        "text": "Passes the embedded bytes to viper.ReadConfig(bytes.NewReader(...))"
+      },
+      {
+        "id": "16.3",
+        "text": "Calls viper.SetConfigType(\"yaml\") before ReadConfig"
+      },
+      {
+        "id": "16.4",
+        "text": "Does NOT suggest calling viper.SetDefault for each key as the primary approach"
+      }
+    ]
+  },
+  {
+    "id": 17,
+    "name": "validate-before-hot-reload-apply",
+    "description": "Tests validate-then-swap pattern to protect against invalid hot-reloaded config",
+    "prompt": "My Go service uses viper.WatchConfig(). A team member accidentally pushed a malformed config and my service began returning zero-values for all settings. How do I protect against invalid config being applied during a hot reload?",
+    "trap": "Without the skill, the model may only suggest logging the error. The correct pattern is: unmarshal into a candidate struct, validate it, and only swap in the new config if validation passes — keep the previous config on failure.",
+    "assertions": [
+      {
+        "id": "17.1",
+        "text": "Unmarshals into a temporary candidate struct before applying"
+      },
+      {
+        "id": "17.2",
+        "text": "Validates the candidate config before overwriting the active config"
+      },
+      {
+        "id": "17.3",
+        "text": "Keeps the previous config unchanged when validation fails"
+      },
+      {
+        "id": "17.4",
+        "text": "Logs a clear error when the reload is rejected"
+      }
+    ]
+  },
+  {
+    "id": 18,
+    "name": "weakly-typed-input-env-bool",
+    "description": "Tests WeaklyTypedInput for env vars that are always strings but map to bool struct fields",
+    "prompt": "My Go service has a Config struct with an Enabled bool field and mapstructure tag. Setting MY_APP_ENABLED=true in the environment and calling viper.Unmarshal leaves cfg.Enabled as false, even though viper.GetBool works. Why?",
+    "trap": "Without the skill, the model may suggest BindEnv or different env var naming. The issue is that env vars are always strings — mapstructure receives the string \"true\" and cannot decode it to bool without WeaklyTypedInput or a decode hook.",
+    "assertions": [
+      {
+        "id": "18.1",
+        "text": "Identifies that env vars are always strings and mapstructure cannot decode \"true\" to bool by default"
+      },
+      {
+        "id": "18.2",
+        "text": "Suggests enabling WeaklyTypedInput in the DecoderConfig or using a StringToBool decode hook"
+      },
+      {
+        "id": "18.3",
+        "text": "Shows viper.Unmarshal(&cfg, func(dc *mapstructure.DecoderConfig) { dc.WeaklyTypedInput = true }) or equivalent"
+      },
+      {
+        "id": "18.4",
+        "text": "Does NOT suggest changing the env var format or using only viper.GetBool as the fix"
       }
     ]
   }

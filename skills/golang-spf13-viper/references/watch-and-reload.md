@@ -33,13 +33,13 @@ In production, this is less of an issue if your config management tool (Kubernet
 Config reload happens in a background goroutine. Any shared state updated in `OnConfigChange` must be synchronized:
 
 ```go
-type AppConfig struct {
+type Config struct {
     mu       sync.RWMutex
-    LogLevel string
-    MaxConn  int
+    LogLevel string `mapstructure:"log_level"`
+    MaxConn  int    `mapstructure:"max_conn"`
 }
 
-var appCfg AppConfig
+var cfg Config
 
 viper.OnConfigChange(func(e fsnotify.Event) {
     var newCfg Config
@@ -48,10 +48,10 @@ viper.OnConfigChange(func(e fsnotify.Event) {
         return  // keep old config on error
     }
 
-    appCfg.mu.Lock()
-    appCfg.LogLevel = newCfg.LogLevel
-    appCfg.MaxConn = newCfg.Database.MaxConn
-    appCfg.mu.Unlock()
+    cfg.mu.Lock()
+    cfg.LogLevel = newCfg.LogLevel
+    cfg.MaxConn = newCfg.MaxConn
+    cfg.mu.Unlock()
 
     log.Printf("config reloaded: log_level=%s", newCfg.LogLevel)
 })

@@ -43,7 +43,7 @@ Cobra owns the command tree — subcommands, flags, arg validation, completions.
 
 ## The precedence pipeline
 
-Viper resolves a key by walking sources in this order (first non-zero wins):
+Viper resolves a key by walking sources in this order (first set value wins):
 
 ```
 1. explicit Set()      — viper.Set("key", val)    highest priority
