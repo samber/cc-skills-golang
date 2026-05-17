@@ -4,13 +4,13 @@
     "name": "time-after-in-select-loop",
     "description": "Tests whether the model avoids time.After inside a select loop and uses time.NewTimer with Reset instead",
     "prompt": "I have a Go worker that reads from a channel and needs a 5-second inactivity timeout. If nothing arrives for 5 seconds, it should log and continue waiting. Write the select loop.",
-    "trap": "Without the skill, the model uses time.After(5*time.Second) inside the for/select loop, which leaks a timer on every iteration",
+    "trap": "Without the skill, the model uses time.After(5*time.Second) inside the for/select loop, creating repeated timer allocations/churn instead of reusing a timer",
     "assertions": [
       {"id": "1.1", "text": "Does NOT use time.After inside the loop body"},
       {"id": "1.2", "text": "Creates time.NewTimer (or time.NewTicker) outside the loop"},
       {"id": "1.3", "text": "Calls timer.Reset() after handling a message or timeout"},
       {"id": "1.4", "text": "Calls timer.Stop() (or defers it) to clean up the timer"},
-      {"id": "1.5", "text": "Drains the timer channel before Reset when appropriate (if !timer.Stop() { <-timer.C })"}
+      {"id": "1.5", "text": "For Go 1.23+, does not use the old stale-drain pattern; for Go <1.23 compatibility, drains before Reset when Stop reports a possible pending value"}
     ]
   },
   {
