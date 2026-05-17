@@ -126,12 +126,12 @@ The linter name in parentheses tells you which linter flagged it. Use this to:
 
 | Problem | Solution |
 | --- | --- |
-| "deadline exceeded" | Increase `run.timeout` in `.golangci.yml` (default: 5m) |
+| "deadline exceeded" | Set or increase `run.timeout` in `.golangci.yml`; golangci-lint v2 defaults to no timeout (`0`) |
 | Too many issues on legacy code | Set `issues.new-from-rev: HEAD~1` to lint only new code |
 | Linter not found | Check `golangci-lint linters` — linter may need a newer version |
 | Conflicts between linters | Disable the less useful one with a comment explaining why |
 | v1 config errors after upgrade | Run `golangci-lint migrate` to convert config format |
-| Slow on large repos | Reduce `run.concurrency` or exclude directories in `run.skip-dirs` |
+| Slow on large repos | Reduce `run.concurrency` or exclude paths with `linters.exclusions.paths` / `formatters.exclusions.paths` |
 
 ## Parallelizing Legacy Codebase Cleanup
 
