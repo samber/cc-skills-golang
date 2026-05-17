@@ -340,14 +340,14 @@
     "id": 25,
     "name": "defense-in-depth-after-fix",
     "description": "Tests Step 10 of methodology: multi-layer defense after fixing a bug",
-    "prompt": "I fixed a bug where user-submitted file paths could traverse outside the upload directory using ../. The fix adds filepath.Clean and a prefix check. Is this fix complete?",
-    "trap": "Model says the fix looks good without considering defense-in-depth — additional validation layers, logging, and test coverage",
+    "prompt": "I fixed a bug where user-submitted file paths could traverse outside the upload directory using ../. The fix adds filepath.Clean and a strings.HasPrefix check. Is this fix complete?",
+    "trap": "Model says the fix looks good without recognizing that Clean+HasPrefix is not robust confinement and without considering defense-in-depth — os.Root, safer lexical fallback, logging, and test coverage",
     "assertions": [
-      {"id": "25.1", "text": "Recommends validating at the entry point (API boundary) — reject paths with .. early"},
+      {"id": "25.1", "text": "States that filepath.Clean plus strings.HasPrefix is not robust confinement"},
       {"id": "25.2", "text": "Recommends adding a test that specifically verifies the path traversal is blocked"},
       {"id": "25.3", "text": "Suggests adding logging or metrics to detect future traversal attempts (observability)"},
       {"id": "25.4", "text": "Considers multiple validation layers — not just one check"},
-      {"id": "25.5", "text": "Mentions that filepath.Join does not prevent path traversal by itself (common misconception)"}
+      {"id": "25.5", "text": "Recommends os.Root for Go 1.24+ or a filepath.IsLocal/filepath.Rel fallback for older targets"}
     ]
   },
   {
@@ -499,9 +499,9 @@
     "assertions": [
       {"id": "36.1", "text": "Identifies that filepath.Join does NOT prevent path traversal"},
       {"id": "36.2", "text": "Shows that input like '../../etc/passwd' resolves to '/etc/passwd' after Join"},
-      {"id": "36.3", "text": "Recommends verifying the result has the base directory as a prefix after Join"},
-      {"id": "36.4", "text": "Shows a safe pattern: filepath.Clean + strings.HasPrefix check"},
-      {"id": "36.5", "text": "Notes the path separator must be appended to the base to prevent partial prefix matches"}
+      {"id": "36.3", "text": "Recommends os.Root for Go 1.24+ user-controlled filesystem access"},
+      {"id": "36.4", "text": "For older Go targets, shows a fallback using filepath.IsLocal plus filepath.Rel with separator-aware checks"},
+      {"id": "36.5", "text": "Does NOT present filepath.Clean plus strings.HasPrefix as a complete traversal defense"}
     ]
   },
   {

@@ -80,11 +80,11 @@ func connectMySQL() (*sql.DB, error) {
     if password == "" {
         return nil, errors.New("DB_PASSWORD required")
     }
-    dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s",
-        user, password,
-        getEnvWithDefault("DB_HOST", "localhost"),
-        getEnvWithDefault("DB_PORT", "3306"),
-        getEnvWithDefault("DB_NAME", "mydb"))
+    host := getEnvWithDefault("DB_HOST", "localhost")
+    port := getEnvWithDefault("DB_PORT", "3306")
+    addr := net.JoinHostPort(host, port)
+    dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s",
+        user, password, addr, getEnvWithDefault("DB_NAME", "mydb"))
     return sql.Open("mysql", dsn)
 }
 
