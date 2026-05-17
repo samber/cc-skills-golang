@@ -331,7 +331,9 @@ fr := trace.NewFlightRecorder(trace.FlightRecorderConfig{
     MinAge:   10 * time.Second, // keep at least 10s of data
     MaxBytes: 5 << 20,          // cap at 5 MiB to limit memory usage
 })
-fr.Start()
+if err := fr.Start(); err != nil {
+    return err
+}
 ```
 
 **Sizing guidance:**

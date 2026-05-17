@@ -4,7 +4,7 @@
     "name": "b-loop-vs-range-bn",
     "description": "Tests whether the model uses b.Loop() (Go 1.24+) instead of the legacy for range b.N pattern",
     "prompt": "Write a Go benchmark for a function `ComputeHash(data []byte) [32]byte` that uses SHA-256. The project uses Go 1.24. Include setup code that loads a 1MB test fixture.",
-    "trap": "Without the skill, the model defaults to `for i := 0; i < b.N; i++` or `for range b.N` which requires manual b.ResetTimer() and a sink variable to prevent dead code elimination",
+    "trap": "Without the skill, the model defaults to `for i := 0; i < b.N; i++` or `for range b.N`, where setup may need manual b.ResetTimer() and unused results may need a sink to prevent dead code elimination",
     "assertions": [
       {"id": "1.1", "text": "Uses b.Loop() as the benchmark loop construct"},
       {"id": "1.2", "text": "Setup code (loading fixture) is placed BEFORE the b.Loop() call, not inside it"},
@@ -90,7 +90,7 @@
     "trap": "Without the skill, the model may suggest inuse_space (which shows live objects, not allocation rate) or alloc_space (which shows bytes, not count)",
     "assertions": [
       {"id": "7.1", "text": "Recommends alloc_objects as the primary choice for GC pressure / high allocation rate"},
-      {"id": "7.2", "text": "Explains that GC cares about object count, not size — alloc_objects counts allocation events"},
+      {"id": "7.2", "text": "Explains that alloc_objects counts allocation events and helps find high-frequency object churn driving GC work"},
       {"id": "7.3", "text": "Explains that inuse_space shows currently live objects and is for leak detection, not GC churn"},
       {"id": "7.4", "text": "Distinguishes alloc_space (total bytes allocated) as useful for reducing peak memory, not GC frequency"},
       {"id": "7.5", "text": "Mentions that runtime.mallocgc dominating CPU profile indicates allocation rate is the bottleneck, not computation"}
@@ -571,20 +571,20 @@
     "assertions": [
       {"id": "42.1", "text": "Recommends the noinlines option (or -noinlines flag)"},
       {"id": "42.2", "text": "Explains that noinlines attributes inlined function costs to their first out-of-line caller — the inlined nodes are collapsed"},
-      {"id": "42.3", "text": "Shows correct usage: granularity=noinlines in interactive mode or -noinlines as CLI flag"},
+      {"id": "42.3", "text": "Shows correct usage: noinlines in interactive mode or -noinlines as CLI flag"},
       {"id": "42.4", "text": "Distinguishes noinlines from hide/ignore: hide/ignore only affect display without changing cost attribution"}
     ]
   },
   {
     "id": 43,
-    "name": "value-receiver-inlining-advantage",
-    "description": "Tests knowledge that value receivers enable better inlining than pointer receivers",
+    "name": "receiver-choice-inlining-and-escape-tradeoffs",
+    "description": "Tests knowledge that receiver choice can affect copying, aliasing, escape analysis, and inlining, but must be verified",
     "prompt": "I'm designing a fluent API for a small config builder in a performance-sensitive path. Should I use value receivers or pointer receivers for the method chain? Consider both correctness and compiler optimization.",
     "trap": "Without the skill, the model defaults to pointer receivers for method chains without considering inlining implications",
     "assertions": [
-      {"id": "43.1", "text": "Mentions that value receivers enable full inlining of method chains"},
-      {"id": "43.2", "text": "Explains that pointer receivers add indirection that can block inlining for fluent APIs"},
-      {"id": "43.3", "text": "Recommends checking with -gcflags=\"-m\" to verify inlining behavior"},
+      {"id": "43.1", "text": "Mentions that receiver choice can affect copying, aliasing, escape analysis, and inlining"},
+      {"id": "43.2", "text": "Does NOT claim that pointer receivers categorically block inlining or that value receivers guarantee full inlining"},
+      {"id": "43.3", "text": "Recommends checking with -gcflags=\"-m -m\" to verify inlining and escape behavior"},
       {"id": "43.4", "text": "Considers both the performance trade-off and the struct size (value receivers copy the struct)"}
     ]
   },
@@ -610,7 +610,7 @@
     "assertions": [
       {"id": "45.1", "text": "Identifies that go_memstats_* metrics internally call runtime.ReadMemStats() which triggers a short stop-the-world pause"},
       {"id": "45.2", "text": "Recommends the Go 1.17+ runtime/metrics-based collector as lower overhead alternative"},
-      {"id": "45.3", "text": "Shows the code to register the modern collector: collectors.NewGoCollector with GoRuntimeMetricsCollection"},
+      {"id": "45.3", "text": "Shows the code to register the modern collector: collectors.NewGoCollector(collectors.WithGoCollectorRuntimeMetrics(collectors.MetricsAll)) or specific runtime metric rules"},
       {"id": "45.4", "text": "Recommends using a custom prometheus.NewRegistry() rather than the default one"}
     ]
   },
@@ -812,7 +812,7 @@
     "assertions": [
       {"id": "60.1", "text": "Shows creating a custom registry with collectors.NewGoCollector"},
       {"id": "60.2", "text": "Uses collectors.WithGoCollectorRuntimeMetrics option"},
-      {"id": "60.3", "text": "Mentions GoRuntimeMetricsAll or specific collection flags"},
+      {"id": "60.3", "text": "Mentions collectors.MetricsAll or specific GoRuntimeMetricsRule values"},
       {"id": "60.4", "text": "Notes this requires Go 1.17+"},
       {"id": "60.5", "text": "Lists scheduler metrics like go_sched_latencies_seconds and CPU class metrics like go_cpu_classes_*"}
     ]
@@ -898,15 +898,15 @@
   },
   {
     "id": 67,
-    "name": "b-reportallocs-only-counts-current-goroutine",
-    "description": "Tests that b.ReportAllocs() only counts allocations on the goroutine running the benchmark, missing allocations from spawned goroutines",
+    "name": "async-work-allocation-measurement-scope",
+    "description": "Tests that benchmark allocation counts cover allocations during the measured window, including other goroutines, but async work can escape measurement if synchronization is wrong",
     "prompt": "I have a benchmark that spawns a goroutine inside the loop to do async work:\n\n```go\nfunc BenchmarkProcess(b *testing.B) {\n    b.ReportAllocs()\n    for b.Loop() {\n        ch := make(chan Result, 1)\n        go worker(ch)  // worker allocates internally\n        <-ch\n    }\n}\n```\n\nThe benchmark reports 1 alloc/op (just the channel). But profiling shows the worker goroutine allocates heavily. Why doesn't ReportAllocs see those?",
-    "trap": "Without the skill, the model says ReportAllocs works correctly or suggests using -benchmem instead — missing that both ReportAllocs and -benchmem only track allocations on the goroutine running the benchmark body, not allocations from child goroutines",
+    "trap": "Without the skill, the model may incorrectly claim ReportAllocs only tracks the benchmark goroutine. Allocation counts are global deltas while the timer is running; discrepancies usually mean async work occurred outside the measured window, synchronization is wrong, or the profile covers a different scope.",
     "assertions": [
-      {"id": "67.1", "text": "Explains that b.ReportAllocs() (and -benchmem) only counts allocations on the goroutine executing the benchmark loop body"},
-      {"id": "67.2", "text": "States that allocations made by the worker goroutine are not attributed to the benchmark goroutine"},
-      {"id": "67.3", "text": "Recommends using a heap profile (-memprofile) to capture all allocations across all goroutines"},
-      {"id": "67.4", "text": "Notes that this is a fundamental limitation of Go's per-goroutine allocation tracking, not a bug in the benchmark infrastructure"}
+      {"id": "67.1", "text": "Explains that ReportAllocs/-benchmem use allocation deltas while the benchmark timer is running, not per-goroutine attribution"},
+      {"id": "67.2", "text": "Checks whether the worker goroutine is fully synchronized inside the b.Loop measured window"},
+      {"id": "67.3", "text": "Recommends using a heap profile (-memprofile) to inspect allocation sites across goroutines"},
+      {"id": "67.4", "text": "Notes that profile-vs-benchmark discrepancies can come from async work outside timing or a different measurement scope"}
     ]
   },
   {

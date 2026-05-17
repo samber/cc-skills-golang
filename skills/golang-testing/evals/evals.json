@@ -99,7 +99,7 @@
       },
       {
         "id": "4.4",
-        "text": "No time.Sleep in test code (except possibly in synctest.Run where synthetic time is used)"
+        "text": "No real-time time.Sleep in test code; use synctest.Test/synctest.Wait or a fake clock for deterministic synthetic time"
       }
     ]
   },
@@ -340,7 +340,7 @@
       },
       {
         "id": "13.3",
-        "text": "Uses the standard for i := 0; i < b.N; i++ loop pattern (or b.Loop() for Go 1.24+)"
+        "text": "Uses b.Loop() for Go 1.24+ benchmark loops; uses legacy b.N only for older module targets"
       },
       {
         "id": "13.4",
