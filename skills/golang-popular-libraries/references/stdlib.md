@@ -6,13 +6,13 @@ The Go standard library continues to evolve with v2 packages and experimental fe
 
 **math/rand/v2** (Go 1.22+) Improved random number generation with better algorithms (ChaCha8, PCG). Auto-seeded, no more rand.Seed() needed.
 
-**encoding/json/v2** (golang.org/x/exp/json) Next-generation JSON encoding/decoding with semantic formatting, less reflection, and better performance. In development.
+**encoding/json/v2** (experimental stdlib package behind `GOEXPERIMENT=jsonv2`) Next-generation JSON encoding/decoding. Evaluate deliberately; most production code should keep `encoding/json` unless the project explicitly opts into the experiment.
 
 ## New Packages (Promoted from x/exp)
 
 **slices** (Go 1.21+) Generic slice operations: BinarySearch, Clone, Compact, Compare, Contains, Delete, Insert, Replace, Reverse, Sort. Reduces the need for external libraries.
 
-**maps** (Go 1.21+) Generic map operations: Clone, Compare, Delete, Equal, Keys, Values. Type-safe map utilities.
+**maps** (Go 1.21+) Generic map operations: Clone, Copy, DeleteFunc, Equal, EqualFunc. Go 1.23+ adds iterator helpers such as All, Collect, Insert, Keys, and Values.
 
 **cmp** (Go 1.21+) Comparison utilities: Compare, Or, Ordered. Used with the slices/maps packages.
 
@@ -38,4 +38,4 @@ The Go standard library continues to evolve with v2 packages and experimental fe
 
 **golang.org/x/sync** Extended synchronization: errgroup, singleflight, semaphore.
 
-**simd/archsimd** (golang.org/x/arch) CPU architecture detection for SIMD operations. Runtime feature detection for AVX, AVX2, AVX512, NEON, etc.
+**golang.org/x/sys/cpu** CPU feature detection for architecture-specific optimized code. Use it only when dispatching between measured implementations; prefer portable stdlib code first.

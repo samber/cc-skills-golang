@@ -237,7 +237,7 @@
     "assertions": [
       {
         "id": "10.1",
-        "text": "Uses epsilon comparison (math.Abs(a-b) < epsilon), not == — IEEE 754 arithmetic is not exact, so 0.1+0.2 != 0.3"
+        "text": "Uses epsilon comparison (math.Abs(a-b) < epsilon), not == — IEEE 754 arithmetic is not exact for runtime float64 values"
       },
       {
         "id": "10.2",
@@ -408,11 +408,11 @@
     "name": "nan-propagation-float-division",
     "description": "NaN from float division propagates silently through computations — not a panic, a silent bug",
     "prompt": "In package `monitor`, write a function `Threshold(baseRate, currentRate float64) bool` that returns true if `currentRate` is at least 90% of `baseRate`. Formula: `currentRate / baseRate >= 0.9`. This is called to decide whether to trigger an alert — if it returns false, we page the on-call team.",
-    "trap": "Model guards against integer division panic but ignores the float case. When baseRate is 0.0, `currentRate / 0.0` produces +Inf or NaN — NaN comparisons always return false, so Threshold(0, 5) silently returns false and triggers a false alert. The model may not check for zero because float division doesn't panic.",
+    "trap": "Model guards against integer division panic but ignores the float case. When baseRate is 0.0, `currentRate / 0.0` can produce +Inf, -Inf, or NaN depending on currentRate; NaN comparisons always return false. The model may not check for zero because float division doesn't panic.",
     "assertions": [
       {
         "id": "17.1",
-        "text": "Guards against zero baseRate — float division by zero produces +Inf or NaN, not a panic. NaN >= 0.9 is always false, causing Threshold(0, 5) to silently return false and trigger a false alert"
+        "text": "Guards against zero baseRate — float division by zero produces +Inf, -Inf, or NaN, not a panic. In particular, 0.0/0.0 is NaN and comparisons with NaN are always false"
       },
       {
         "id": "17.2",

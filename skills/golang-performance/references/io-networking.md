@@ -108,7 +108,7 @@ The standard `encoding/json` package uses reflection to inspect struct fields at
 - **Custom `MarshalJSON`/`UnmarshalJSON`** — hand-written methods for hot-path types eliminate reflection
 - **Code-generation libraries** — `easyjson`, `ffjson` generate marshal/unmarshal methods at build time, no reflection at runtime
 - **Drop-in replacements** — `github.com/goccy/go-json`, `github.com/json-iterator/go`, `github.com/bytedance/sonic` offer 2-5x better performance
-- **`encoding/json/v2`** (experimental) — improved performance over v1
+- **`encoding/json/v2`** (experimental, behind `GOEXPERIMENT=jsonv2`) — evaluate deliberately; most production code should keep `encoding/json` unless the project explicitly opts into the experiment
 
 When using third-party JSON libraries, refer to the library's official documentation for up-to-date API signatures.
 

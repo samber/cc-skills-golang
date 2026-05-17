@@ -32,12 +32,12 @@
       "id": 3,
       "name": "stdlib-vs-lo-preference",
       "prompt": "I'm writing a Go function that needs to check if a string slice contains a value, sort an int slice, and get all keys from a map. I already have samber/lo as a dependency. Should I use lo.Contains, and lo.Keys for these?",
-      "expected_output": "Should recommend stdlib slices.Contains, slices.Sort, maps.Keys over lo equivalents when using Go 1.21+. Should explain that stdlib is preferred for operations it covers.",
+      "expected_output": "Should recommend stdlib slices.Contains and slices.Sort over lo equivalents when using Go 1.21+. For map keys, should gate maps.Keys to Go 1.23+ and use slices.Collect(maps.Keys(m)) when a slice is needed. Should explain that stdlib is preferred for operations it covers.",
       "assertions": [
         {"text": "Recommends slices.Contains from stdlib over lo.Contains", "type": "semantic"},
         {"text": "Recommends slices.Sort or slices.SortFunc from stdlib", "type": "semantic"},
-        {"text": "Recommends maps.Keys from stdlib over lo.Keys", "type": "semantic"},
-        {"text": "Mentions Go 1.21+ as the version where these stdlib functions became available", "type": "semantic"},
+        {"text": "Recommends slices.Collect(maps.Keys(m)) from stdlib over lo.Keys when the module targets Go 1.23+", "type": "semantic"},
+        {"text": "Mentions Go 1.21+ for slices helpers and Go 1.23+ for maps.Keys", "type": "semantic"},
         {"text": "Explains the rationale: prefer stdlib when it covers the operation to avoid unnecessary dependency usage", "type": "semantic"},
         {"text": "Acknowledges that lo is still useful for operations stdlib doesn't provide (Map, Filter, Reduce, GroupBy)", "type": "semantic"}
       ]

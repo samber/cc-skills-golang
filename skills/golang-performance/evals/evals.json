@@ -738,7 +738,7 @@
     "name": "json-performance-alternatives",
     "description": "Tests knowledge of JSON performance alternatives beyond encoding/json",
     "prompt": "Our Go API server spends 40% of CPU time in encoding/json according to pprof. We serialize thousands of Response structs per second. What options do we have to speed up JSON encoding?\n\n```go\ntype Response struct {\n    ID        int       `json:\"id\"`\n    Name      string    `json:\"name\"`\n    Values    []float64 `json:\"values\"`\n    Metadata  map[string]string `json:\"metadata\"`\n    CreatedAt time.Time `json:\"created_at\"`\n}\n```",
-    "trap": "The skill lists specific alternatives: custom MarshalJSON methods, code-gen libraries (easyjson, ffjson), drop-in replacements (goccy/go-json, json-iterator, bytedance/sonic), and experimental encoding/json/v2. Without it, the model may only suggest one approach.",
+    "trap": "The skill lists specific alternatives: custom MarshalJSON methods, code-gen libraries (easyjson, ffjson), drop-in replacements (goccy/go-json, json-iterator, bytedance/sonic), and treats encoding/json/v2 as an explicit GOEXPERIMENT=jsonv2 choice rather than a default production recommendation. Without it, the model may only suggest one approach.",
     "assertions": [
       {"id": "57.1", "text": "Mentions custom MarshalJSON/UnmarshalJSON methods as an option"},
       {"id": "57.2", "text": "Mentions code-generation libraries (easyjson, ffjson)"},

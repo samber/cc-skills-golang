@@ -53,6 +53,19 @@ When using observability libraries (Prometheus client, OpenTelemetry SDK, vendor
 
 See `samber/cc-skills-golang@golang-error-handling` skill for the single handling rule. See `samber/cc-skills-golang@golang-troubleshooting` skill for using observability signals to diagnose production issues. See `samber/cc-skills-golang@golang-security` skill for protecting pprof endpoints and avoiding PII in logs. See `samber/cc-skills-golang@golang-context` skill for propagating trace context across service boundaries. See `samber/cc-skills@promql-cli` skill for querying and exploring PromQL expressions against Prometheus from the CLI.
 
+### Go 1.26+: slog multi-handler
+
+For simple fan-out to multiple slog handlers, prefer stdlib `slog.NewMultiHandler` before adding third-party handler-composition dependencies.
+
+```go
+logger := slog.New(slog.NewMultiHandler(
+    slog.NewJSONHandler(os.Stdout, nil),
+    auditHandler,
+))
+```
+
+Use third-party slog handler libraries only when the stdlib handler composition is insufficient.
+
 ## The Five Signals
 
 | Signal | Question it answers | Tool | When to use |

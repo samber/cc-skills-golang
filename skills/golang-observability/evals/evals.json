@@ -485,7 +485,7 @@
     "prompt": "I need my Go service logs to go to multiple destinations: JSON to stdout, errors to Sentry, and all logs to Datadog. Can slog do this?",
     "trap": "Without the skill, the model may suggest writing custom handlers from scratch",
     "assertions": [
-      {"id": "36.1", "text": "Recommends samber/slog-multi for fan-out to multiple handlers"},
+      {"id": "36.1", "text": "Recommends stdlib slog.NewMultiHandler for simple fan-out on Go 1.26+, or samber/slog-multi when stdlib composition is insufficient"},
       {"id": "36.2", "text": "Mentions samber/slog-sentry for sending errors to Sentry"},
       {"id": "36.3", "text": "Mentions samber/slog-datadog for sending logs to Datadog"},
       {"id": "36.4", "text": "Explains that slog supports pluggable handlers"},
