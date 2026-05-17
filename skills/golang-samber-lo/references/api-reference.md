@@ -154,7 +154,7 @@ Most transform functions have `Err` suffixes: `MapErr`, `FlatMapErr`, `FilterErr
 
 | Function | Description |
 | --- | --- |
-| `lo.Keys(m)` | All keys. Note: prefer `maps.Keys` (stdlib Go 1.21+) |
+| `lo.Keys(m)` | All keys as a slice. Note: for Go 1.23+, prefer `slices.Collect(maps.Keys(m))` when stdlib coverage is enough |
 | `lo.UniqKeys(m)` | Unique keys (useful for multi-maps) |
 | `lo.Values(m)` | All values |
 | `lo.UniqValues(m)` | Unique values |
