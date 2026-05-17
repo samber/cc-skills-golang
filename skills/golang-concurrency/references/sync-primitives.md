@@ -195,7 +195,44 @@ var loadConfig = sync.OnceValue(func() *Config {
 
 ## sync.WaitGroup
 
-Coordinate goroutine completion. Call `Add` before launching the goroutine, `Done` inside the goroutine, `Wait` in the caller.
+Use `sync.WaitGroup` when you only need to wait for a set of goroutines to finish.
+
+### Go 1.25+: `wg.Go`
+
+`WaitGroup.Go` starts a goroutine, adds it to the group, and removes it from the group when the function returns.
+
+```go
+func processAll(items []Item) {
+    var wg sync.WaitGroup
+
+    for _, item := range items {
+        // Go 1.22+ loop variables are per-iteration when the module has `go 1.22+`.
+        // Do not add `item := item` solely for closure capture in modern modules.
+        wg.Go(func() {
+            process(item)
+        })
+    }
+
+    wg.Wait()
+}
+```
+
+Rules:
+
+- `WaitGroup.Go` is Go 1.25+, not Go 1.24.
+- The function passed to `wg.Go` must not panic.
+- `WaitGroup` does not propagate errors and does not cancel siblings.
+- For first-error-wins, cancellation, concurrency limits, or returned values, use `golang.org/x/sync/errgroup`.
+
+**Benefits of `wg.Go()`**:
+
+- No manual `Add`/`Done` bookkeeping
+- Lower risk of `Add`/`Wait` ordering bugs
+- Cleaner API for simple fire-and-wait work
+
+**When to use**: Go 1.25+ projects for simple goroutines that must all finish, do not return errors, do not need cancellation, and must not panic. Use `errgroup` when work returns errors, needs cancellation, limits, or first-error behavior.
+
+### Go <1.25 fallback
 
 ```go
 func processAll(ctx context.Context, items []Item) {
@@ -219,41 +256,6 @@ go func() {
     process(item)
 }()
 ```
-
-### Go 1.24+: wg.Go()
-
-Go 1.24 introduced `wg.Go()` which eliminates the manual `Add`/`Done` bookkeeping:
-
-```go
-func processAll(ctx context.Context, items []Item) error {
-    var wg sync.WaitGroup
-    var mu sync.Mutex
-    var lastErr error
-
-    for _, item := range items {
-        item := item // optional starting Go 1.22+ (per-iteration scoping)
-        wg.Go(func() {
-            if err := process(ctx, item); err != nil {
-                mu.Lock()
-                lastErr = err
-                mu.Unlock()
-            }
-        })
-    }
-
-    wg.Wait()
-    return lastErr
-}
-```
-
-**Benefits of `wg.Go()`**:
-
-- No risk of forgetting `Add` or `Done`
-- Cleaner, less error-prone API
-- Semantically clearer: "do this concurrently"
-- Automatically handles Add/Done internally
-
-**When to use**: Go 1.24+ projects where all concurrent work needs to complete and you want simpler code.
 
 ## golang.org/x/sync/singleflight
 
