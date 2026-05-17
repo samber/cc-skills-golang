@@ -9,9 +9,9 @@ go mod graph
 Output: each line contains two space-separated fields (module and its requirement) in `path@version` format:
 
 ```
-example.com/main github.com/pkg/errors@v0.9.1
+example.com/main github.com/google/uuid@v1.6.0
 example.com/main golang.org/x/text@v0.3.7
-github.com/pkg/errors@v0.9.1 golang.org/x/sys@v0.0.0-20210615035016
+github.com/google/uuid@v1.6.0 golang.org/x/sys@v0.0.0-20210615035016
 ```
 
 ## go mod why
@@ -24,10 +24,11 @@ Shows the shortest import path from your code to the module — useful for under
 
 ## Generate a Graph Image with modgraphviz
 
-Use `modgraphviz` from Go toolchain.
+Pin `modgraphviz` as a module tool, then pipe `go mod graph` into it.
 
 ```bash
-go mod graph | modgraphviz | dot -Tpng -o deps.png
+go get -tool golang.org/x/exp/cmd/modgraphviz@latest
+go mod graph | go tool modgraphviz | dot -Tpng -o deps.png
 ```
 
 Green nodes represent versions selected by MVS (in the final build list). Grey nodes are versions that exist in the requirement graph but are not used.
@@ -38,9 +39,10 @@ Green nodes represent versions selected by MVS (in the final build list). Grey n
 
 ## Complementary Analysis
 
-Use `digraph` from stdlib.
+Pin `digraph` as a module tool for graph queries.
 
 ```bash
+go get -tool golang.org/x/tools/cmd/digraph@latest
 # General graph queries on go mod graph output
-go mod graph | digraph reverse example.com/some/module
+go mod graph | go tool digraph reverse example.com/some/module
 ```
