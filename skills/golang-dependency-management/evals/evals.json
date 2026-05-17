@@ -84,16 +84,16 @@
   },
   {
     "id": 7,
-    "name": "tools-go-pattern",
-    "description": "Tests whether the model knows the tools.go pattern for pinning CLI tool versions in go.mod",
+    "name": "tool-directives",
+    "description": "Tests whether the model knows Go 1.24+ tool directives for pinning CLI tool versions in go.mod",
     "prompt": "My Go project uses golangci-lint and govulncheck. I want to ensure all developers and CI use the exact same versions of these tools. How do I pin them?",
-    "trap": "Without the skill, the model suggests go install @latest in CI or a Makefile, missing the tools.go pattern that pins versions via go.mod",
+    "trap": "Without the skill, the model suggests go install @latest in CI, a Makefile, or the old tools.go blank-import workaround, missing Go 1.24+ tool directives that pin versions via go.mod",
     "assertions": [
-      {"id": "7.1", "text": "Recommends the tools.go pattern (a file with //go:build tools constraint)"},
-      {"id": "7.2", "text": "Uses blank imports (_ imports) to keep tools in go.mod"},
-      {"id": "7.3", "text": "The build constraint ensures the file is never compiled into production code"},
-      {"id": "7.4", "text": "Mentions running go mod tidy after creating the tools.go file"},
-      {"id": "7.5", "text": "Explains that go install then uses the pinned version from go.mod"}
+      {"id": "7.1", "text": "Recommends Go 1.24+ go.mod tool directives"},
+      {"id": "7.2", "text": "Uses go get -tool to add golangci-lint and govulncheck"},
+      {"id": "7.3", "text": "Uses go tool to run the pinned tools reproducibly"},
+      {"id": "7.4", "text": "Mentions running go mod tidy and reviewing go.mod/go.sum after adding tools"},
+      {"id": "7.5", "text": "Does NOT create a new tools.go blank-import file unless the module targets Go <1.24"}
     ]
   },
   {

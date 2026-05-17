@@ -17,7 +17,7 @@ Automate minor/patch dependency updates to reduce maintenance burden and stay cu
 
 ## Auto-Merge Strategy
 
-- **Minor and patch updates**: Auto-merge after CI passes (tests + lint + govulncheck)
+- **Minor and patch updates**: Auto-merge only after CI passes (tests + lint + govulncheck) and the package is low-risk for the project
 - **Major updates**: Create PR for manual review (may contain breaking changes)
 - **Security updates**: Auto-merge regardless of version bump type
 
@@ -29,6 +29,7 @@ Before committing a dependency update:
 
 0. Suggest improvements to your project based on changelog features.
 1. Run `go test ./...` and `go build ./...`
-2. Scan with `govulncheck ./...`
-3. Major version upgrades may contain breaking changes — the package's changelog documents them
-4. Adopt new APIs or patterns introduced in the updated version where they improve the codebase
+2. Scan with `govulncheck ./...` or `go tool govulncheck ./...`
+3. Review release notes/changelogs for libraries that affect persistence, serialization, networking, authentication, authorization, cryptography, or public APIs
+4. Major version upgrades may contain breaking changes — the package's changelog documents them
+5. Adopt new APIs or patterns introduced in the updated version where they improve the codebase

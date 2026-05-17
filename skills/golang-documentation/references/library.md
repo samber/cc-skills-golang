@@ -151,8 +151,8 @@ go doc github.com/{owner}/{repo}.FuncName
 go doc -all github.com/{owner}/{repo}
 
 # Start a local godoc server
-go install golang.org/x/pkgsite/cmd/pkgsite@latest
-pkgsite -http=:6060
+go get -tool golang.org/x/pkgsite/cmd/pkgsite@latest
+go tool pkgsite -http=:6060
 # Then open http://localhost:6060
 ```
 

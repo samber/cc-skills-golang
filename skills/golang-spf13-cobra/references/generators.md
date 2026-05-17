@@ -51,14 +51,14 @@ err := doc.GenReSTTree(rootCmd, "/tmp/docs/")
 `cobra-cli` generates command files and wires them into your project:
 
 ```bash
-go install github.com/spf13/cobra-cli@latest
+go get -tool github.com/spf13/cobra-cli@latest
 
 # Initialize a new cobra project
-cobra-cli init myapp
+go tool cobra-cli init myapp
 
 # Add a subcommand
-cobra-cli add serve
-cobra-cli add migrate
+go tool cobra-cli add serve
+go tool cobra-cli add migrate
 
 # Add with a parent other than root
 cobra-cli add list --parent serve

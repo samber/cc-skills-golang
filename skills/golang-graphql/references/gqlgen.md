@@ -8,21 +8,15 @@ gqlgen is a schema-first, code-generation library. Write SDL, run `go generate`,
 # Bootstrap a new project
 go run github.com/99designs/gqlgen init
 
-# Pin the tool in tools.go so go mod keeps it
+# Pin the tool in go.mod for reproducible generation (Go 1.24+)
+go get -tool github.com/99designs/gqlgen@latest
 ```
 
-```go
-//go:build tools
-// +build tools
-
-package tools
-
-import _ "github.com/99designs/gqlgen"
-```
+For Go <1.24 modules, use the legacy `tools.go` blank-import workaround instead.
 
 ```bash
 # Regenerate after every schema change
-go run github.com/99designs/gqlgen generate
+go tool gqlgen generate
 ```
 
 Never hand-edit generated files (`generated.go`, `models_gen.go`) — `generate` overwrites them.

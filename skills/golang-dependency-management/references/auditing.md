@@ -32,6 +32,8 @@ To check whether a large dependency is actually linked into your binary (vs. onl
 ```bash
 # Scan source code (most common)
 govulncheck ./...
+# Or, when govulncheck is pinned with a Go 1.24+ tool directive:
+go tool govulncheck ./...
 
 # Scan a compiled binary
 govulncheck -mode=binary ./bin/myapp
@@ -78,7 +80,7 @@ goweight --json   # JSON output for CI tracking
 **Modern alternative**: [go-size-analyzer](https://github.com/Zxilly/go-size-analyzer) (`gsa`) supports ELF, Mach-O, PE, and WebAssembly formats with interactive HTML/SVG visualization:
 
 ```bash
-go install github.com/nicholasgasior/gsa@latest
+go get -tool github.com/nicholasgasior/gsa@latest
 go build -o ./myapp ./cmd/myapp
-gsa -f html -o size-report.html ./myapp
+go tool gsa -f html -o size-report.html ./myapp
 ```
