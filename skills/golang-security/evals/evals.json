@@ -17,16 +17,16 @@
     },
     {
       "id": 2,
-      "name": "bcrypt-72-byte-truncation",
-      "description": "Tests awareness of bcrypt's silent 72-byte password truncation — a Go-specific gotcha for long passwords",
+    "name": "bcrypt-72-byte-limit",
+    "description": "Tests awareness of bcrypt's 72-byte password limit in Go and correct long-password support",
       "prompt": "Write Go functions HashPassword and VerifyPassword using bcrypt. The system must support passwords up to 1000 characters long.",
-      "trap": "Model might use bcrypt directly without pre-hashing. bcrypt silently truncates input at 72 bytes, so passwords 'abc...73chars' and 'abc...73chars+anything' hash identically — a security hole for long passwords. The Go-idiomatic fix is to SHA-256 pre-hash before bcrypt (or use Argon2id).",
+    "trap": "Model might use bcrypt directly without handling long passwords. Go's bcrypt returns an error for passwords over 72 bytes, so a system that must support 1000-character passwords needs Argon2id/scrypt or a deliberate pre-hashing design before bcrypt.",
       "assertions": [
-        {"id": "2.1", "text": "Addresses the bcrypt 72-byte truncation limit explicitly (either via comment, pre-hashing, or choosing Argon2id instead)"},
+        {"id": "2.1", "text": "Addresses bcrypt's 72-byte password limit explicitly (either via comment, pre-hashing, or choosing Argon2id/scrypt instead)"},
         {"id": "2.2", "text": "Either pre-hashes the password with SHA-256/SHA-512 before bcrypt, OR uses Argon2id/scrypt that have no such truncation limit"},
-        {"id": "2.3", "text": "If using bcrypt directly without pre-hashing, warns that passwords longer than 72 bytes will be silently truncated"},
+        {"id": "2.3", "text": "If using bcrypt directly without pre-hashing, handles the Go bcrypt error for passwords longer than 72 bytes"},
         {"id": "2.4", "text": "Uses constant-time comparison — either bcrypt.CompareHashAndPassword or an equivalent that does not short-circuit"},
-        {"id": "2.5", "text": "Does NOT add a manual length check like 'if len(password) > 72 { return error }' as a workaround (this reveals the truncation boundary to attackers via timing)"}
+        {"id": "2.5", "text": "Does NOT claim Go bcrypt silently truncates passwords; it either supports long passwords deliberately or returns a clear policy error"}
       ]
     },
     {
@@ -47,9 +47,9 @@
       "id": 4,
       "name": "path-traversal-file-serving",
       "prompt": "Write a Go HTTP handler that serves user-uploaded files from a /var/www/uploads directory. The filename comes from the URL path parameter. Use Go 1.24+.",
-      "expected_output": "Uses os.Root for scoped file access, or validates path with filepath.Clean + prefix check. Prevents ../../../etc/passwd.",
+      "expected_output": "Uses os.Root for scoped file access. If Go <1.24 compatibility is required, uses filepath.IsLocal plus filepath.Rel with separator-aware checks; does not rely on Clean+HasPrefix.",
       "assertions": [
-        {"id": "4.1", "text": "Uses os.OpenRoot to scope file access to /var/www/uploads (Go 1.24+ preferred), OR validates resolved path stays within uploads directory"},
+        {"id": "4.1", "text": "Uses os.OpenRoot to scope file access to /var/www/uploads (Go 1.24+ preferred), OR for older Go uses filepath.IsLocal plus filepath.Rel with separator-aware checks"},
         {"id": "4.2", "text": "Prevents path traversal via ../ sequences — does NOT just use filepath.Join without additional validation"},
         {"id": "4.3", "text": "Does NOT leak system file paths in error responses to the client"},
         {"id": "4.4", "text": "Returns appropriate HTTP status codes (404 for not found, 403 for traversal attempts)"},
@@ -142,10 +142,10 @@
       "id": 11,
       "name": "zipslip-extraction",
       "prompt": "Write a Go function that extracts a ZIP archive uploaded by a user to a specified target directory. Use Go 1.24+.",
-      "expected_output": "Validates zip entry paths against traversal (ZipSlip). Uses os.Root or prefix check. Limits decompression size.",
+      "expected_output": "Validates zip entry paths against traversal (ZipSlip). Uses os.Root or a filepath.IsLocal/Rel fallback. Limits decompression size.",
       "assertions": [
-        {"id": "11.1", "text": "Checks for path traversal in zip entry names (rejects entries containing .. or absolute paths)"},
-        {"id": "11.2", "text": "Uses os.OpenRoot to scope extraction to target directory, OR validates extracted paths stay within target"},
+        {"id": "11.1", "text": "Checks for path traversal in zip entry names with filepath.IsLocal or os.Root confinement"},
+        {"id": "11.2", "text": "Uses os.OpenRoot to scope extraction to target directory, OR validates extracted paths with filepath.Rel and separator-aware checks"},
         {"id": "11.3", "text": "Limits total decompression size or individual file size to prevent decompression bombs"},
         {"id": "11.4", "text": "Does NOT just use filepath.Join(dest, file.Name) without validation"},
         {"id": "11.5", "text": "Handles errors during extraction (corrupted entries, permission issues) without crashing"}

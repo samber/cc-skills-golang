@@ -4,7 +4,7 @@ Filesystem vulnerabilities can lead to unauthorized file access, data leakage, a
 
 **Rules:**
 
-1. File paths MUST be sanitized against traversal (`../`).
+1. User-controlled file paths MUST be confined to an allowed root.
 2. `os.Root` SHOULD be used for scoped file access (Go 1.24+).
 3. Zip extraction MUST check for ZipSlip path traversal.
 4. Temporary files MUST use `os.CreateTemp` — NEVER predictable names.
@@ -32,9 +32,33 @@ defer root.Close()
 f, err := root.Open(filename) // cannot escape root directory
 ```
 
-`os.Root` prevents path traversal at the OS level — no manual path validation needed. All operations (`Open`, `Create`, `Stat`, `OpenFile`, etc.) are confined to the root directory. Symlinks that resolve outside the root are rejected.
+`os.Root` prevents ordinary path traversal at the OS level. All operations (`Open`, `Create`, `Stat`, `OpenFile`, etc.) are confined to the root directory, and symlinks that resolve outside the root are rejected. It is not a full sandbox: it does not by itself block bind mounts, special device files, or all `/proc`-style filesystem behavior. For archive extraction and uploads, still reject special files and choose a root without attacker-controlled mounts.
 
 **Good (pre-Go 1.24 fallback):**
+
+```go
+func safeJoin(baseDir, userPath string) (string, error) {
+    if userPath == "" || filepath.IsAbs(userPath) || !filepath.IsLocal(userPath) {
+        return "", errors.New("invalid relative path")
+    }
+
+    full := filepath.Join(baseDir, userPath)
+
+    rel, err := filepath.Rel(baseDir, full)
+    if err != nil {
+        return "", fmt.Errorf("checking path: %w", err)
+    }
+    if rel == ".." || strings.HasPrefix(rel, ".."+string(os.PathSeparator)) {
+        return "", errors.New("path escapes base directory")
+    }
+
+    return full, nil
+}
+```
+
+This lexical fallback is not a full symlink-resistant substitute for `os.Root`.
+
+**Bad:**
 
 ```go
 fullPath := filepath.Join(baseDir, filename)
@@ -76,13 +100,17 @@ for _, file := range reader.File {
 
 ```go
 for _, file := range reader.File {
-    if strings.Contains(file.Name, "..") || strings.HasPrefix(file.Name, "/") {
-        return errors.New("invalid path")
+    if !filepath.IsLocal(file.Name) {
+        return fmt.Errorf("unsafe archive path: %q", file.Name)
     }
-    targetPath := filepath.Join(dest, file.Name)
-    if !strings.HasPrefix(filepath.Clean(targetPath), filepath.Clean(dest)) {
-        return errors.New("path traversal attempt")
+
+    targetPath, err := safeJoin(dest, file.Name)
+    if err != nil {
+        return err
     }
+
+    // create parent directories, then write targetPath
+    _ = targetPath
 }
 ```
 
@@ -234,12 +262,9 @@ func readFile(filename string) ([]byte, error) {
 const allowedDir = "/var/www/public/"
 
 func readFile(filename string) ([]byte, error) {
-    if strings.Contains(filename, "..") {
-        return nil, errors.New("invalid filename")
-    }
-    fullPath := filepath.Join(allowedDir, filename)
-    if !strings.HasPrefix(filepath.Clean(fullPath), filepath.Clean(allowedDir)) {
-        return nil, errors.New("access denied")
+    fullPath, err := safeJoin(allowedDir, filename)
+    if err != nil {
+        return nil, err
     }
     return os.ReadFile(fullPath)
 }
