@@ -28,7 +28,7 @@
     "task": "Write a symbol table deduplicator in package `symbols` for Go 1.24+. `func Intern(s string) *string` returns a canonical pointer for equivalent strings. When all external references to the canonical string are dropped, it should be GC'd AND its map entry should be automatically removed (not just become a dead weak pointer — the map must shrink). Thread-safe.",
     "assertions": [
       { "id": "3.1", "text": "Uses `weak.Pointer` or `weak.Make`", "trap": "Without skill, model uses runtime.SetFinalizer instead of weak.Pointer" },
-      { "id": "3.2", "text": "Uses `runtime.AddCleanup` (not SetFinalizer)", "trap": "Without skill, model defaults to deprecated SetFinalizer pattern" },
+      { "id": "3.2", "text": "Uses `runtime.AddCleanup` (not SetFinalizer)", "trap": "Without skill, model defaults to the more error-prone SetFinalizer pattern" },
       { "id": "3.3", "text": "Dead map entries automatically removed", "trap": "none — both approaches can achieve this" }
     ]
   },

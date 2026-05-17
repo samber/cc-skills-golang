@@ -28,7 +28,7 @@ func processItems(ctx context.Context, items []Item) error {
 
 ### Why `defer cancel()` matters
 
-Every `WithCancel`, `WithTimeout`, and `WithDeadline` allocates internal resources (timers, goroutines). cancel() MUST be called (via defer) to prevent resource leaks. Even if the context will expire on its own, always defer cancel.
+Every `WithCancel`, `WithTimeout`, and `WithDeadline` creates cancellation state; timeout/deadline contexts also use timer resources. `cancel()` MUST be called on all control-flow paths unless the function explicitly returns or transfers ownership of both the context and cancel function. In ordinary scoped work, defer cancel immediately.
 
 ```go
 // ✗ Bad — cancel is never called, resources leak
@@ -37,7 +37,7 @@ func fetch(ctx context.Context) error {
     return doWork(ctx)
 }
 
-// ✓ Good — defer cancel immediately
+// ✓ Good — scoped work, defer cancel immediately
 func fetch(ctx context.Context) error {
     ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
     defer cancel()
