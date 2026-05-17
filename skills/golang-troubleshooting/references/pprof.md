@@ -87,6 +87,10 @@ curl http://localhost:6060/debug/pprof/goroutine?debug=2 > goroutines.txt
 # Goroutine profile (for pprof analysis)
 curl http://localhost:6060/debug/pprof/goroutine > goroutine.prof
 
+# Go 1.26 experimental goroutine leak profile, only with GOEXPERIMENT=goroutineleakprofile
+curl http://localhost:6060/debug/pprof/goroutineleak?debug=2
+go tool pprof http://localhost:6060/debug/pprof/goroutineleak
+
 # Mutex contention
 curl http://localhost:6060/debug/pprof/mutex > mutex.prof
 

@@ -448,22 +448,29 @@ import "crypto/pbkdf2"
 
 ### Use tool directives in `go.mod` _(Go 1.24+)_
 
-```go
-// Before: tools.go with blank imports
-//go:build tools
-package tools
-import (
-    _ "golang.org/x/tools/cmd/stringer"
-    _ "github.com/golangci/golangci-lint/cmd/golangci-lint"
-)
+Use `tool` directives instead of `tools.go` blank imports.
 
-// After (Go 1.24+): in go.mod
-// tool (
-//     golang.org/x/tools/cmd/stringer
-//     github.com/golangci/golangci-lint/cmd/golangci-lint
-// )
-// Run: go tool stringer ./...
+```bash
+go get -tool golang.org/x/tools/cmd/stringer@latest
+go get -tool github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
+go tool stringer -type=Kind
+go tool golangci-lint run ./...
 ```
+
+`go.mod` shape for a module targeting Go 1.26 or newer. This is an example target, not a cap; keep the project's actual `go` directive and do not change it just to add tools.
+
+```go.mod
+module example.com/project
+
+go 1.26
+
+tool (
+    golang.org/x/tools/cmd/stringer
+    github.com/golangci/golangci-lint/v2/cmd/golangci-lint
+)
+```
+
+Use `go install tool` to install all module-pinned tools when needed and `go get -u tool` to update them deliberately.
 
 ### Use `fmt.Appendf`, `fmt.Appendln` _(Go 1.19+, often overlooked)_
 
@@ -535,15 +542,17 @@ func TestConcurrent(t *testing.T) {
 }
 ```
 
-**Note**: Use `synctest.Test` (not `synctest.Run` which is deprecated since Go 1.25).
+**Note**: Use `synctest.Test` in Go 1.25+ and Go 1.26+. Do not use the old Go 1.24 experimental `synctest.Run` API in Go 1.25+ code.
 
 ### Use `runtime/trace.FlightRecorder` _(Go 1.25+)_
 
 Lightweight always-on ring-buffer tracing for production:
 
 ```go
-fr := trace.NewFlightRecorder()
-fr.Start()
+fr := trace.NewFlightRecorder(trace.FlightRecorderConfig{})
+if err := fr.Start(); err != nil {
+    return err
+}
 // ... later, on error:
 fr.WriteTo(file) // captures recent trace data
 ```
@@ -563,6 +572,15 @@ import _ "go.uber.org/automaxprocs"
 ### `encoding/json/v2` (experimental) _(Go 1.25+, GOEXPERIMENT=jsonv2)_
 
 Major JSON revision. **Experimental** — evaluate for new code, don't migrate production yet.
+
+### Go 1.25 additions to prefer when target allows
+
+- `sync.WaitGroup.Go`: simple fire-and-wait goroutines; function must not panic; no errors/cancellation.
+- `testing/synctest.Test` and `synctest.Wait`: stable deterministic concurrent/time tests. Do not use the Go 1.24 experimental `synctest.Run` in Go 1.25+.
+- `net/http.CrossOriginProtection`: stdlib helper for cross-origin / CSRF-style protection in HTTP servers.
+- `reflect.TypeAssert[T](v)`: prefer over `v.Interface().(T)` in reflection code.
+- `os.Root.FS` and additional `os.Root` methods: use for confined filesystem APIs.
+- New vet checks: `waitgroup` misuse and manual host:port formatting; prefer `net.JoinHostPort`.
 
 ---
 
@@ -600,16 +618,72 @@ cfg := Config{Timeout: new(30)}
 
 Hybrid Public Key Encryption (RFC 9180) is now in the standard library.
 
+### Use RSA-OAEP or HPKE instead of new PKCS#1 v1.5 encryption _(Go 1.26+)_
+
+For new encryption use, avoid `crypto/rsa.EncryptPKCS1v15`. Prefer RSA-OAEP (`rsa.EncryptOAEP` / `rsa.EncryptOAEPWithOptions`) or a modern KEM/HPKE design.
+
 ### Green Tea GC enabled by default _(Go 1.26+)_
 
-10-40% reduction in GC overhead. Review and potentially remove manual GC tuning (`GOGC`, `GOMEMLIMIT`) that compensated for older GC behavior.
+Re-evaluate GC and allocation tuning under Go 1.26 Green Tea GC using profiles and benchmarks. Remove legacy tuning only when data supports it. Keep `GOMEMLIMIT` when it represents a real container or service memory ceiling. Remove third-party `automaxprocs` workarounds unless the project has a measured reason, because Go 1.25+ makes `GOMAXPROCS` container-aware by default.
+
+### Go 1.26+ test artifacts
+
+Use `t.ArtifactDir()`, `b.ArtifactDir()`, and `f.ArtifactDir()` for files created by tests, benchmarks, and fuzzers that should persist for inspection.
+
+### Go 1.26+ slog multi-handler
+
+For simple fan-out to multiple slog handlers, prefer stdlib `slog.NewMultiHandler` before adding third-party handler-composition dependencies.
+
+### Go 1.26+ ReverseProxy
+
+For new reverse proxy code, prefer `httputil.ReverseProxy{Rewrite: ...}`. Do not generate new `Director`-based proxy code unless preserving old compatibility.
+
+```go
+proxy := &httputil.ReverseProxy{
+    Rewrite: func(pr *httputil.ProxyRequest) {
+        pr.SetURL(targetURL)
+        pr.SetXForwarded()
+    },
+}
+```
+
+### Small Go 1.26+ API preferences
+
+- Use `bytes.Buffer.Peek(n)` when you need to inspect upcoming bytes without consuming them.
+- Use reflect iterators where they simplify code:
+  - `reflect.Type.Fields()`
+  - `reflect.Type.Methods()`
+  - `reflect.Type.Ins()`
+  - `reflect.Type.Outs()`
+  - `reflect.Value.Fields()`
+  - `reflect.Value.Methods()`
+- Prefer these over manual `NumField`/`Field(i)` or `NumMethod`/`Method(i)` loops when the iterator form is clearer.
+
+### Go 1.26+ goroutine leak profile
+
+For Go 1.26 diagnostics, there is an experimental goroutine leak profile. It is useful for production-oriented leak investigation, but is gated by `GOEXPERIMENT=goroutineleakprofile`; do not rely on it as default stable behavior.
+
+### Go 1.26+ documentation command
+
+Use `go doc`, not `go tool doc`. Go 1.26 removed the old `cmd/doc` / `go tool doc` path.
+
+### Go 1.26+ module target note
+
+When using a Go 1.26 or newer toolchain, `go mod init` may create a module with an older default `go` directive. If the project intentionally targets Go 1.26+ APIs, update the directive deliberately:
+
+```bash
+go mod edit -go=1.26
+go mod tidy
+```
+
+For future Go versions, use the project's intended target version. Do not use APIs newer than the module's `go` directive until the project explicitly agrees to upgrade it.
 
 ### Modernized `go fix` _(Go 1.26+)_
 
-Go 1.26 rewrote `go fix` to apply modernize analyzers automatically:
+Go 1.26 rewrote `go fix` to apply a subset of modernize-style analyzers automatically. Check `go tool fix help` for exact coverage; some modernizations still require linting or manual review.
 
 ```bash
-go fix ./...  # applies safe modernize transformations
+go fix ./...  # applies the enabled safe transformations
 ```
 
 ---

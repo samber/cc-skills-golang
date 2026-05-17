@@ -28,14 +28,14 @@ Upgrade to golangci-lint v2. **Migration**: Run `golangci-lint migrate` to conve
 **Note**: The vulnerability database tracks Go standard library issues starting from Go 1.18. Third-party module vulnerabilities are tracked regardless of Go version. For best results (better call graph analysis), use Go 1.22+.
 
 ```bash
-# Install
-go install golang.org/x/vuln/cmd/govulncheck@latest
+# Pin in the module (Go 1.24+)
+go get -tool golang.org/x/vuln/cmd/govulncheck@latest
 
 # Scan source code
-govulncheck ./...
+go tool govulncheck ./...
 
 # Scan a compiled binary
-govulncheck -mode=binary ./myapp
+go tool govulncheck -mode=binary ./myapp
 ```
 
 ## Profile-Guided Optimization (PGO) _(Go 1.21+)_

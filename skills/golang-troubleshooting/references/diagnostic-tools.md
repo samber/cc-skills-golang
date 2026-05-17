@@ -2,6 +2,10 @@
 
 ## Runtime Diagnostics (GODEBUG)
 
+### Go documentation command
+
+Use `go doc`, not `go tool doc`. Go 1.26 removed the old `cmd/doc` / `go tool doc` path.
+
 ### GC Tracing
 
 ```bash

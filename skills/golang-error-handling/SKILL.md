@@ -37,7 +37,7 @@ This skill guides the creation of robust, idiomatic error handling in Go applica
 2. **Errors MUST be wrapped with context** using `fmt.Errorf("{context}: %w", err)`
 3. **Error strings MUST be lowercase**, without trailing punctuation
 4. **Use `%w` internally, `%v` at system boundaries** to control error chain exposure
-5. **MUST use `errors.Is` and `errors.As`** instead of direct comparison or type assertion
+5. **MUST use `errors.Is` for sentinel matching and `errors.As`/`errors.AsType` for typed chain inspection** instead of direct comparison or bare type assertions. For Go 1.26+, prefer `errors.AsType[T](err)` when `T` implements `error`; use `errors.As(err, &target)` for Go <1.26 or for non-error interface targets.
 6. **SHOULD use `errors.Join`** (Go 1.20+) to combine independent errors
 7. **Errors MUST be either logged OR returned**, NEVER both (single handling rule)
 8. **Use sentinel errors** for expected conditions, custom types for carrying data
@@ -53,7 +53,7 @@ This skill guides the creation of robust, idiomatic error handling in Go applica
 
 - **[Error Creation](./references/error-creation.md)** — How to create errors that tell the story: error messages should be lowercase, no punctuation, and describe what happened without prescribing action. Covers sentinel errors (one-time preallocation for performance), custom error types (for carrying rich context), and the decision table for which to use when.
 
-- **[Error Wrapping and Inspection](./references/error-wrapping.md)** — Why `fmt.Errorf("{context}: %w", err)` beats `fmt.Errorf("{context}: %v", err)` (chains vs concatenation). How to inspect chains with `errors.Is`/`errors.As` for type-safe error handling, and `errors.Join` for combining independent errors.
+- **[Error Wrapping and Inspection](./references/error-wrapping.md)** — Why `fmt.Errorf("{context}: %w", err)` beats `fmt.Errorf("{context}: %v", err)` (chains vs concatenation). How to inspect chains with `errors.Is`, `errors.As`, and Go 1.26+ `errors.AsType` for type-safe error handling, and `errors.Join` for combining independent errors.
 
 - **[Error Handling Patterns and Logging](./references/error-handling.md)** — The single handling rule: errors are either logged OR returned, NEVER both (prevents duplicate logs cluttering aggregators). Panic/recover design, `samber/oops` for production errors, and `slog` structured logging integration for APM tools.
 
