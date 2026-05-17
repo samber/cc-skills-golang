@@ -66,7 +66,7 @@
       {"id": "5.2", "text": "Explains that the outer err remains nil because the inner := never assigned to it"},
       {"id": "5.3", "text": "Recommends using = (assignment) instead of := to assign to the outer err variable"},
       {"id": "5.4", "text": "Shows the fix: declare result separately (var result ResultType) and use result, err = someFunc()"},
-      {"id": "5.5", "text": "Mentions go vet -shadow or shadow analyzer as a detection tool"}
+      {"id": "5.5", "text": "Mentions the golang.org/x/tools shadow analyzer as a detection tool, without relying on the obsolete go vet shadow flag"}
     ]
   },
   {
@@ -301,7 +301,7 @@
     "trap": "Model focuses only on the heap sizes and misses the 18% GC CPU overhead as the key signal",
     "assertions": [
       {"id": "22.1", "text": "Identifies that 18% GC CPU overhead is significantly high (threshold is >10%)"},
-      {"id": "22.2", "text": "Explains the heap size breakdown: 1024MB before mark, 900MB after mark, 500MB after sweep"},
+      {"id": "22.2", "text": "Explains the heap size breakdown as heap at GC start, heap at GC end, and live heap"},
       {"id": "22.3", "text": "Identifies the large pause times (45ms) as a likely cause of the latency spikes"},
       {"id": "22.4", "text": "Suggests the application is over-allocating and recommends investigating allocation patterns"},
       {"id": "22.5", "text": "Recommends using pprof heap/alloc profiling to find hot allocation sites"}
@@ -340,14 +340,14 @@
     "id": 25,
     "name": "defense-in-depth-after-fix",
     "description": "Tests Step 10 of methodology: multi-layer defense after fixing a bug",
-    "prompt": "I fixed a bug where user-submitted file paths could traverse outside the upload directory using ../. The fix adds filepath.Clean and a prefix check. Is this fix complete?",
-    "trap": "Model says the fix looks good without considering defense-in-depth — additional validation layers, logging, and test coverage",
+    "prompt": "I fixed a bug where user-submitted file paths could traverse outside the upload directory using ../. The fix adds filepath.Clean and a strings.HasPrefix check. Is this fix complete?",
+    "trap": "Model says the fix looks good without recognizing that Clean+HasPrefix is not robust confinement and without considering defense-in-depth — os.Root, safer lexical fallback, logging, and test coverage",
     "assertions": [
-      {"id": "25.1", "text": "Recommends validating at the entry point (API boundary) — reject paths with .. early"},
+      {"id": "25.1", "text": "States that filepath.Clean plus strings.HasPrefix is not robust confinement"},
       {"id": "25.2", "text": "Recommends adding a test that specifically verifies the path traversal is blocked"},
       {"id": "25.3", "text": "Suggests adding logging or metrics to detect future traversal attempts (observability)"},
       {"id": "25.4", "text": "Considers multiple validation layers — not just one check"},
-      {"id": "25.5", "text": "Mentions that filepath.Join does not prevent path traversal by itself (common misconception)"}
+      {"id": "25.5", "text": "Recommends os.Root for Go 1.24+ or a filepath.IsLocal/filepath.Rel fallback for older targets"}
     ]
   },
   {
@@ -499,20 +499,20 @@
     "assertions": [
       {"id": "36.1", "text": "Identifies that filepath.Join does NOT prevent path traversal"},
       {"id": "36.2", "text": "Shows that input like '../../etc/passwd' resolves to '/etc/passwd' after Join"},
-      {"id": "36.3", "text": "Recommends verifying the result has the base directory as a prefix after Join"},
-      {"id": "36.4", "text": "Shows a safe pattern: filepath.Clean + strings.HasPrefix check"},
-      {"id": "36.5", "text": "Notes the path separator must be appended to the base to prevent partial prefix matches"}
+      {"id": "36.3", "text": "Recommends os.Root for Go 1.24+ user-controlled filesystem access"},
+      {"id": "36.4", "text": "For older Go targets, shows a fallback using filepath.IsLocal plus filepath.Rel with separator-aware checks"},
+      {"id": "36.5", "text": "Does NOT present filepath.Clean plus strings.HasPrefix as a complete traversal defense"}
     ]
   },
   {
     "id": 37,
-    "name": "time-after-in-loop-memory-leak",
-    "description": "Tests the time.After in loop memory leak from code-review-flags and concurrency-debug",
+    "name": "time-after-in-loop-allocation-churn",
+    "description": "Tests the repeated time.After in loop allocation-churn pattern from code-review-flags and concurrency-debug",
     "prompt": "My Go worker processes messages from a channel with a timeout. Memory usage grows over time even though messages are processed correctly. Here's the code:\n\n```go\nfor {\n    select {\n    case msg := <-incoming:\n        process(msg)\n    case <-time.After(30 * time.Second):\n        log.Println(\"idle timeout\")\n        return\n    }\n}\n```",
-    "trap": "Model suggests the message processing is leaking memory or suggests a heap profile, without identifying time.After as the leak source",
+    "trap": "Model suggests the message processing is leaking memory, without identifying repeated time.After allocation churn and reset semantics as the likely issue",
     "assertions": [
-      {"id": "37.1", "text": "Identifies that time.After creates a new timer on every loop iteration that isn't garbage collected until it fires"},
-      {"id": "37.2", "text": "Explains this causes a memory leak proportional to the message rate"},
+      {"id": "37.1", "text": "Identifies that time.After creates a new timer on every loop iteration"},
+      {"id": "37.2", "text": "Explains this causes allocation churn and was a leak-like pattern on older Go versions before Go 1.23 timer GC improvements"},
       {"id": "37.3", "text": "Recommends using time.NewTimer with Reset() or time.NewTicker instead"},
       {"id": "37.4", "text": "Shows the correct pattern with a reusable timer and defer timer.Stop()"},
       {"id": "37.5", "text": "Does NOT suggest heap profiling as the first diagnostic step for this known pattern"}

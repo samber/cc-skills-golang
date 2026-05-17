@@ -90,7 +90,7 @@ func doWork() error {
 }
 ```
 
-**Detect:** `go vet -shadow` or `golang.org/x/tools/go/analysis/passes/shadow`.
+**Detect:** run the `golang.org/x/tools/go/analysis/passes/shadow` analyzer through your lint setup. The old shadow flag is not part of standard `go vet`.
 
 ## Slice and Map Gotchas
 
@@ -179,8 +179,8 @@ if err != nil {
 go vet ./...
 
 # More thorough
-go install github.com/kisielk/errcheck@latest
-errcheck ./...
+go get -tool github.com/kisielk/errcheck@latest
+go tool errcheck ./...
 ```
 
 **Error wrapping — use `%w`, not `%v`:**
@@ -710,12 +710,36 @@ userInput := "../../etc/passwd"
 path := filepath.Join(base, userInput)
 // path = "/etc/passwd" — escaped!
 
-// GOOD — verify the result stays within the base
+// GOOD (Go 1.24+) — confine access to the base directory
+root, err := os.OpenRoot("/srv/files")
+if err != nil {
+    return err
+}
+defer root.Close()
+file, err := root.Open(userInput)
+if err != nil {
+    return err
+}
+defer file.Close()
+```
+
+For Go <1.24, use a lexical fallback only when `os.Root` is unavailable:
+
+```go
 func safePath(base, userInput string) (string, error) {
+    if userInput == "" || filepath.IsAbs(userInput) || !filepath.IsLocal(userInput) {
+        return "", fmt.Errorf("invalid relative path: %q", userInput)
+    }
+
     path := filepath.Join(base, userInput)
-    if !strings.HasPrefix(filepath.Clean(path), filepath.Clean(base)+string(os.PathSeparator)) {
+    rel, err := filepath.Rel(base, path)
+    if err != nil {
+        return "", fmt.Errorf("checking path: %w", err)
+    }
+    if rel == ".." || strings.HasPrefix(rel, ".."+string(os.PathSeparator)) {
         return "", fmt.Errorf("path traversal attempt: %s", userInput)
     }
+
     return path, nil
 }
 ```

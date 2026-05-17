@@ -7,7 +7,7 @@ If you see these in code review, flag them:
 | `result, _ := doSomething()` | Silent error — mystery bugs later |
 | `go func() { }()` without context | Can't cancel, leaks goroutine |
 | Channel without close | Goroutine leak when sender exits |
-| `time.After` in loop | Memory leak (allocates timer each iter) |
+| `time.After` in hot loop | Repeated timer allocation/churn; use a reusable timer when reset semantics matter |
 | Global map without mutex | Data race |
 | `defer` inside hot loop | Deferred calls pile up until return |
 | `json.Marshal` in hot path | Expensive, causes GC pressure |
