@@ -113,7 +113,7 @@ Enable via:
 prometheus.NewRegistry().MustRegister(
     collectors.NewGoCollector(
         collectors.WithGoCollectorRuntimeMetrics(
-            collectors.GoRuntimeMetricsAll,
+            collectors.MetricsAll,
         ),
     ),
 )

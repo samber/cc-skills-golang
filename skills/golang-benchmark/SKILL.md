@@ -35,7 +35,7 @@ This skill covers the full measurement workflow: write a benchmark, run it, prof
 
 ### `b.Loop()` (Go 1.24+) — preferred
 
-`b.Loop()` prevents the compiler from optimizing away the code under test — without it, the compiler can detect dead results and eliminate them, producing misleadingly fast numbers. It also excludes setup code before the loop from timing automatically.
+For Go 1.24+, prefer `b.Loop()` for new benchmarks. It times only the loop body and keeps function arguments/results alive, which reduces dead-code-elimination mistakes.
 
 ```go
 func BenchmarkParse(b *testing.B) {
@@ -46,7 +46,7 @@ func BenchmarkParse(b *testing.B) {
 }
 ```
 
-Existing `for range b.N` benchmarks still work but should migrate to `b.Loop()` — the old pattern requires manual `b.ResetTimer()` and a package-level sink variable to prevent dead code elimination.
+Legacy `b.N` loops still compile and are fine to keep when preserving existing benchmarks or supporting Go <1.24. They are easier to get wrong: setup may need `b.ResetTimer()`, and results may need a sink if the compiler can eliminate the work. Go 1.26 fixed the earlier `b.Loop()` inlining limitation, so new Go 1.26+ benchmarks should usually use `b.Loop()`.
 
 ### Memory tracking
 

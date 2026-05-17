@@ -9,7 +9,7 @@ Each profile type answers a different performance question. Choosing the wrong p
 | Profile | Flag / Endpoint | Use when | Why this profile and not another |
 | --- | --- | --- | --- |
 | **CPU** | `-cpuprofile` or `/debug/pprof/profile?seconds=30` | High CPU usage, slow functions | Samples which functions are on-CPU at 100Hz; misses off-CPU time (I/O, sleep) |
-| **Heap (alloc_objects)** | `-memprofile` then `pprof -alloc_objects` | GC pressure, too many allocations | Counts allocation events regardless of size — a 1-byte alloc counts the same as 1MB; reveals GC churn sources |
+| **Heap (alloc_objects)** | `-memprofile` then `pprof -alloc_objects` | GC pressure, too many allocations | Counts allocation events regardless of size; useful when allocation frequency and object churn dominate |
 | **Heap (alloc_space)** | `pprof -alloc_space` | Finding largest allocation sites by volume | Measures total bytes allocated; use when you need to reduce peak memory, not just GC frequency |
 | **Heap (inuse_space)** | `pprof -inuse_space` | Memory growing over time, suspected leaks | Shows currently live heap objects; compare two snapshots to isolate leak sources |
 | **Heap (inuse_objects)** | `pprof -inuse_objects` | Object count growth, suspected leak of small objects | Counts live objects regardless of size; useful when leak is many small objects not visible in inuse_space |
@@ -20,7 +20,7 @@ Each profile type answers a different performance question. Choosing the wrong p
 
 ### Choosing between alloc_objects and alloc_space
 
-- **alloc_objects** — "where do I allocate the most often?" — use for reducing GC frequency (GC cares about object count, not size)
+- **alloc_objects** — "where do I allocate the most often?" — use when allocation frequency and object churn are driving GC work
 - **alloc_space** — "where do I allocate the most bytes?" — use for reducing peak memory usage and RSS
 - In practice, start with `alloc_objects` because GC churn is the most common allocation-related bottleneck in Go.
 
@@ -41,8 +41,8 @@ import "runtime"
 // 5 means 1 out of 5 events is recorded. Higher = less overhead but less detail.
 runtime.SetMutexProfileFraction(5)
 
-// Block profiling: nanosecond threshold.
-// 1 = record all blocking events. Higher values filter short blocks.
+// Block profiling: time-based sampling rate.
+// 1 = record all blocking events. Higher values sample about one event per rate nanoseconds blocked.
 // Use 1 for debugging, higher values (e.g. 1000000 = 1ms) for production.
 runtime.SetBlockProfileRate(1)
 ```

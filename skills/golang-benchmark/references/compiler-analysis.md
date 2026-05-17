@@ -112,7 +112,7 @@ The inline cost budget is 80 (as of Go 1.22+). Functions with higher cost (more 
 | **`select` statement** | Complex runtime interaction | Simplify channel patterns in hot functions |
 | **Large function body** | Many statements add up in cost | Break into smaller functions — the hot inner function may inline |
 
-**Value receivers vs pointer receivers:** Value receivers enable full inlining of method chains. Pointer receivers add indirection that can block inlining for fluent APIs. Check with `-gcflags="-m"`.
+**Value receivers vs pointer receivers:** Receiver choice can affect copying, aliasing, escape analysis, and inlining, but pointer receiver methods can inline too and value receivers do not guarantee inlining. Check real compiler decisions with `-gcflags="-m -m"`.
 
 ## SSA Dump
 

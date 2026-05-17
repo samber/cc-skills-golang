@@ -49,7 +49,7 @@ import "github.com/prometheus/client_golang/prometheus/collectors"
 // Use runtime/metrics-based collector (lower overhead)
 reg := prometheus.NewRegistry()
 reg.MustRegister(collectors.NewGoCollector(
-    collectors.WithGoCollections(collectors.GoRuntimeMetricsCollection),
+    collectors.WithGoCollectorRuntimeMetrics(collectors.MetricsAll),
 ))
 reg.MustRegister(collectors.NewProcessCollector(collectors.ProcessCollectorOpts{}))
 ```
