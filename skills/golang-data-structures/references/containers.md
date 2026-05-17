@@ -85,7 +85,7 @@ avg := sum / float64(r.Len())
 
 `bufio` wraps `io.Reader` and `io.Writer` with an internal buffer, reducing system call overhead for frequent small reads/writes. Use `NewReader()` / `NewWriter()` for default 4096-byte buffers, or `NewReaderSize()` / `NewWriterSize()` for custom sizes.
 
-**bufio.Reader & Writer:** Call `Flush()` explicitly on writers—buffered data is not written until flush or buffer is full. Always `defer w.Flush()` to avoid data loss.
+**bufio.Reader & Writer:** Call `Flush()` explicitly on writers and check its error. Buffered data is not written until flush or the buffer is full; ignoring a flush error can silently lose data.
 
 **bufio.Scanner:** Convenient line-by-line reading with `scanner.Scan()` and `scanner.Text()`. Default max token size is 64 KB; call `scanner.Buffer()` to increase for larger lines.
 

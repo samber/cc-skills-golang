@@ -20,7 +20,7 @@
       "prompt": "Write a Go function ProcessOrders(ctx context.Context, orders []Order) error that validates and processes each order. Order has ID, UserID, Amount, Currency fields. When validation fails (amount <= 0, empty currency, empty user ID), the error message should clearly indicate which order failed and why, so operators can debug issues in production. Return all errors, not just the first.",
       "trap": "\"indicate which order failed\" tempts interpolating order IDs into error strings",
       "assertions": [
-        { "id": "2.1", "text": "Error messages low-cardinality (no IDs in error strings)" },
+        { "id": "2.1", "text": "Log/APM grouping messages are low-cardinality; IDs and paths are attached as structured attributes rather than baked into the stable log message" },
         { "id": "2.2", "text": "Variable data as structured attributes (oops/slog)" },
         { "id": "2.3", "text": "Uses errors.Join to collect all order errors" },
         { "id": "2.4", "text": "Error strings lowercase" },

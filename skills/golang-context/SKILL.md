@@ -29,7 +29,7 @@ allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(g
 2. `ctx` MUST be the first parameter, named `ctx context.Context`
 3. NEVER store context in a struct — pass explicitly through function parameters
 4. NEVER pass `nil` context — use `context.TODO()` if unsure
-5. `cancel()` MUST always be deferred immediately after `WithCancel`/`WithTimeout`/`WithDeadline`
+5. `cancel()` MUST be called on all control-flow paths for `WithCancel`/`WithTimeout`/`WithDeadline`, unless ownership of the context and cancel function is explicitly returned or transferred
 6. `context.Background()` MUST only be used at the top level (main, init, tests)
 7. **Use `context.TODO()`** as a placeholder when you know a context is needed but don't have one yet
 8. NEVER create a new `context.Background()` in the middle of a request path

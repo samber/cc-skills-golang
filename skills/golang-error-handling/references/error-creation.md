@@ -61,10 +61,10 @@ var ErrUnauthorized = errors.New("unauthorized")
 ```go
 import "github.com/samber/oops"
 
-// ✗ Avoid — high-cardinality message, each user/tenant combo is a unique string
+// ✗ Avoid at log/APM boundaries — each user/tenant combo becomes a unique group
 return fmt.Errorf("user %s not found in tenant %s", userID, tenantID)
 
-// ✓ Prefer — static message, variable data as structured attributes
+// ✓ Prefer for grouped production errors — static message, variable data as structured attributes
 return oops.With("user_id", userID).With("tenant_id", tenantID).Errorf("user not found")
 ```
 
@@ -81,12 +81,12 @@ See [Low-Cardinality Error Messages](#low-cardinality-error-messages) for why th
 
 ## Low-Cardinality Error Messages
 
-APM and log aggregation tools (Datadog, Loki, Sentry) group errors by message. When you interpolate variable data into error strings, every unique combination creates a separate group — dashboards become unusable and alerting breaks.
+APM and log aggregation tools (Datadog, Loki, Sentry) commonly group events by the logged message or exception fingerprint. When the stable log message contains variable data, every unique combination can create a separate group — dashboards become noisy and alerting breaks.
 
 ```go
 import "github.com/samber/oops"
 
-// ✗ Bad — high cardinality: each file/line combo creates a unique error message
+// ✗ Bad at the log boundary — each file/line combo can create a unique group
 fmt.Errorf("error in %s at line %d of the csv", csvPath, line)
 
 // ✓ Good (stdlib) — static error, structured attributes at the log site
@@ -100,7 +100,7 @@ oops.With("csv_file_path", csvPath).With("csv_file_line", line).Errorf("csv pars
 
 The stdlib approach works but scatters context: the error travels up the stack and the handler logging it may no longer have access to the variable data. `samber/oops` (external dependency `github.com/samber/oops`) solves this by attaching structured attributes directly to the error, so they're available wherever the error is eventually logged.
 
-**Static wrapping prefixes are fine** — `fmt.Errorf("fetching user: %w", err)` is low-cardinality because the prefix never changes. What to avoid is interpolating IDs, paths, counts, or other variable data into the message itself.
+**Static wrapping prefixes are fine** — `fmt.Errorf("fetching user: %w", err)` is low-cardinality because the prefix never changes. Dynamic context in returned errors is sometimes useful for CLI output or debugging, but production logging should keep the grouping message stable and attach IDs, paths, counts, and other variable data as structured attributes.
 
 ## Custom Error Types
 
