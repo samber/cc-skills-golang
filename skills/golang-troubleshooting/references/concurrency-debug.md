@@ -8,6 +8,15 @@
 
 Use pprof goroutine profile (see [pprof.md](./pprof.md)) with `?debug=2` for human-readable output, then look for goroutines stuck in `chan receive`.
 
+For Go 1.26 diagnostics, there is also an experimental goroutine leak profile. It is useful for production-oriented leak investigation, but is gated by `GOEXPERIMENT=goroutineleakprofile`; do not rely on it as default stable behavior.
+
+```bash
+curl http://localhost:6060/debug/pprof/goroutineleak?debug=2
+go tool pprof http://localhost:6060/debug/pprof/goroutineleak
+```
+
+Keep existing tools: `go.uber.org/goleak` in tests, `runtime.NumGoroutine()` for coarse monitoring, `/debug/pprof/goroutine?debug=2` for stack dumps, and `go test -race ./...` for race checks.
+
 ```go
 // Programmatic monitoring — log goroutine count to detect leaks
 go func() {
@@ -46,7 +55,7 @@ for {
 // Always defer resp.Body.Close() after HTTP calls.
 // See production-debug.md for the correct pattern.
 
-// 3. time.After in loop — allocates a new timer each iteration
+// 3. time.After in hot loop — allocates a new timer each iteration
 // BAD
 for {
     select {
@@ -54,7 +63,7 @@ for {
         do()
     }
 }
-// GOOD
+// GOOD — reuse a ticker for repeated intervals
 ticker := time.NewTicker(time.Second)
 defer ticker.Stop()
 for {

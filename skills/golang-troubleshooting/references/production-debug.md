@@ -40,7 +40,11 @@ func ProcessOrder(ctx context.Context, orderID string) error {
 // 2. Before and after external calls
 log.Printf("calling payment API for order %s", orderID)
 resp, err := paymentClient.Charge(ctx, req)
-log.Printf("payment API: status=%d err=%v", resp.StatusCode, err)
+if err != nil {
+    log.Printf("payment API: err=%v", err)
+} else {
+    log.Printf("payment API: status=%d", resp.StatusCode)
+}
 
 // 3. At decision points
 if user.IsAdmin {

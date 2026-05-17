@@ -30,10 +30,12 @@ func setupPprof(mux *http.ServeMux) {
     }
 
     // Protect pprof endpoints with basic auth — never expose unauthenticated
-    auth := basicAuth(
-        os.Getenv("PPROF_USERNAME"),
-        os.Getenv("PPROF_PASSWORD"),
-    )
+    username := os.Getenv("PPROF_USERNAME")
+    password := os.Getenv("PPROF_PASSWORD")
+    if username == "" || password == "" {
+        panic("PPROF_USERNAME and PPROF_PASSWORD must be set when pprof is enabled")
+    }
+    auth := basicAuth(username, password)
 
     mux.Handle("/debug/pprof/", auth(http.HandlerFunc(pprof.Index)))
     mux.Handle("/debug/pprof/cmdline", auth(http.HandlerFunc(pprof.Cmdline)))
@@ -87,6 +89,10 @@ curl http://localhost:6060/debug/pprof/goroutine?debug=2 > goroutines.txt
 # Goroutine profile (for pprof analysis)
 curl http://localhost:6060/debug/pprof/goroutine > goroutine.prof
 
+# Go 1.26 experimental goroutine leak profile, only with GOEXPERIMENT=goroutineleakprofile
+curl http://localhost:6060/debug/pprof/goroutineleak?debug=2
+go tool pprof http://localhost:6060/debug/pprof/goroutineleak
+
 # Mutex contention
 curl http://localhost:6060/debug/pprof/mutex > mutex.prof
 
@@ -110,7 +116,7 @@ go tool pprof -base heap1.prof heap2.prof  # compare heap snapshots
 
 For production servers, replace `localhost:6060` with your server address and use basic auth credentials.
 
-**Safety:** pprof has minimal overhead. CPU profile defaults to 30s capture. Heap profile is a snapshot.
+**Safety:** idle pprof endpoints have low overhead, but profile captures are not free. CPU profiling samples for the requested duration, heap profiles may trigger extra work, and block/mutex profiles add runtime overhead when enabled.
 
 ---
 
