@@ -1,12 +1,12 @@
 ---
 name: golang-performance
-description: "Golang performance optimization patterns and methodology - if X bottleneck, then apply Y. Covers allocation reduction, CPU efficiency, memory layout, GC tuning, pooling, caching, and hot-path optimization. Use when profiling or benchmarks have identified a bottleneck and you need the right optimization pattern to fix it. Also use when performing performance code review to suggest improvements or benchmarks that could help identify quick performance gains. Not for measurement methodology (see golang-benchmark skill) or debugging workflow (see golang-troubleshooting skill)."
+description: "Golang performance optimization patterns and methodology - if X bottleneck, then apply Y. Covers allocation reduction, CPU efficiency, memory layout, GC tuning, pooling, caching, and hot-path optimization. Use when profiling or benchmarks have identified a bottleneck and you need the right optimization pattern to fix it. Also use when performing performance code review to suggest improvements or benchmarks that could help identify quick performance gains. Not for measurement methodology (→ See `samber/cc-skills-golang@golang-benchmark` skill) or debugging workflow (→ See `samber/cc-skills-golang@golang-troubleshooting` skill)."
 user-invocable: true
 license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.1.2"
+  version: "1.1.3"
   openclaw:
     emoji: "🏎️"
     homepage: https://github.com/samber/cc-skills-golang

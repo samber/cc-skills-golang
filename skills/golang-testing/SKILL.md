@@ -1,12 +1,12 @@
 ---
 name: golang-testing
-description: "Provides a comprehensive guide for writing production-ready Golang tests. Covers table-driven tests, test suites with testify, mocks, unit tests, integration tests, benchmarks, code coverage, parallel tests, fuzzing, fixtures, goroutine leak detection with goleak, snapshot testing, memory leaks, CI with GitHub Actions, and idiomatic naming conventions. Use this whenever writing tests, asking about testing patterns or setting up CI for Go projects. Essential for ANY test-related conversation in Go."
+description: "Production-ready Golang tests — table-driven tests, testify suites and mocks, parallel tests, fuzzing, fixtures, goroutine leak detection with goleak, snapshot testing, code coverage, integration tests, idiomatic test naming. Use when writing or reviewing Go tests, choosing a testing approach, setting up Go test CI, or debugging flaky/slow tests. For testify-specific APIs see `samber/cc-skills-golang@golang-stretchr-testify`; for measurement methodology see `samber/cc-skills-golang@golang-benchmark`."
 user-invocable: true
 license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.1.3"
+  version: "1.1.4"
   openclaw:
     emoji: "🧪"
     homepage: https://github.com/samber/cc-skills-golang

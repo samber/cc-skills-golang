@@ -1,12 +1,12 @@
 ---
 name: golang-project-layout
-description: "Provides a guide for setting up Golang project layouts and workspaces. Use this whenever starting a new Go project, organizing an existing codebase, setting up a monorepo with multiple packages, creating CLI tools with multiple main packages, or deciding on directory structure. Apply this for any Go project initialization or restructuring work."
+description: "Provides a guide for setting up Golang project layouts and workspaces. Use when starting a new Go project, organizing an existing codebase, setting up a monorepo with multiple packages, creating CLI tools with multiple main packages, or deciding between cmd/internal/pkg directory conventions."
 user-invocable: true
 license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.1.3"
+  version: "1.1.4"
   openclaw:
     emoji: "📁"
     homepage: https://github.com/samber/cc-skills-golang

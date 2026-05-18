@@ -1,12 +1,12 @@
 ---
 name: golang-context
-description: "Idiomatic context.Context usage in Golang — creation, propagation, cancellation, timeouts, deadlines, context values, and cross-service tracing. Apply when working with context.Context in any Go code."
+description: "Idiomatic context.Context usage in Golang — propagation through API boundaries, cancellation, timeouts and deadlines, request-scoped values, context.WithoutCancel for background work outliving requests. Apply when designing context propagation across layers, debugging leaked or unexpired contexts, choosing between context.Background/TODO/WithoutCancel, or storing values in context. Not for code that merely accepts ctx as first parameter."
 user-invocable: true
 license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.1.1"
+  version: "1.1.2"
   openclaw:
     emoji: "🔗"
     homepage: https://github.com/samber/cc-skills-golang

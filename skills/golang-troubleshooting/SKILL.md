@@ -1,12 +1,12 @@
 ---
 name: golang-troubleshooting
-description: "Troubleshoot Golang programs systematically - find and fix the root cause. Use when encountering bugs, crashes, deadlocks, or unexpected behavior in Go code. Covers debugging methodology, common Go pitfalls, test-driven debugging, pprof setup and capture, Delve debugger, race detection, GODEBUG tracing, and production debugging. Start here for any 'something is wrong' situation. Not for interpreting profiles or benchmarking (see golang-benchmark skill) or applying optimization patterns (see golang-performance skill)."
+description: "Troubleshoot Golang programs systematically - find and fix the root cause. Use when encountering bugs, crashes, deadlocks, or unexpected behavior in Go code. Covers debugging methodology, common Go pitfalls, test-driven debugging, pprof setup and capture, Delve debugger, race detection, GODEBUG tracing, and production debugging. Start here for any 'something is wrong' situation. Not for interpreting profiles or benchmarking (→ See `samber/cc-skills-golang@golang-benchmark` skill) or applying optimization patterns (→ See `samber/cc-skills-golang@golang-performance` skill)."
 user-invocable: true
 license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.1.2"
+  version: "1.1.3"
   openclaw:
     emoji: "🔍"
     homepage: https://github.com/samber/cc-skills-golang

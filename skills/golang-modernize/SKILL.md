@@ -1,12 +1,12 @@
 ---
 name: golang-modernize
-description: "Continuously modernize Golang code to use the latest language features, standard library improvements, and idiomatic patterns. Use this skill whenever writing, reviewing, or refactoring Go code to ensure it leverages modern Go idioms. Also use when the user asks about Go upgrades, migration, modernization, deprecation, or when modernize linter reports issues. Also covers tooling modernization: linters, SAST, AI-powered code review in CI, and modern development practices. Trigger this skill proactively when you notice old-style Go patterns that have modern replacements."
+description: "Modernize Golang code toward recent language features and stdlib additions (range-over-int/func, any, slices/maps/cmp/slog, iterators, t.Context, b.Loop, synctest, PGO). Use when the user explicitly asks for modernization, a Go version upgrade, or migration off deprecated APIs; when modernize linter or golangci-lint v2 reports issues; or when reviewing a CI/tooling refresh (linters, SAST, AI code review)."
 user-invocable: true
 license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.1.4"
+  version: "1.1.5"
   openclaw:
     emoji: "🔄"
     homepage: https://github.com/samber/cc-skills-golang
