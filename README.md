@@ -189,7 +189,7 @@ These skills are designed as **atomic, cross-referencing units**. A skill may re
 | ⭐️ | ✅ `golang-documentation` | ⚡ ⚙️ | -53% | 73 | 2,678 | 10,549 |
 | ⭐️ | ✅ `golang-error-handling` | ⚡ ⚙️ | -26% | 139 | 1,520 | 4,394 |
 | ⭐️ | 👷 `golang-how-to` |  | — | 0 | 0 | 0 |
-| ⭐️ | ✅ `golang-modernize` | ⚡ | -61% | 103 | 2,476 | 7,599 |
+| ⭐️ | ✅ `golang-modernize` | ⚡ | -61% | 60 | 2,476 | 7,599 |
 | ⭐️ | ✅ `golang-naming` | ⚡ ⚙️ | -23% | 158 | 2,865 | 7,233 |
 | ⭐️ | ✅ `golang-safety` | ⚡ | -58% | 78 | 2,457 | 5,227 |
 | ⭐️ | ✅ `golang-testing` | ⚡ 🧠 ⚙️ | -32% | 113 | 3,105 | 6,212 |
@@ -207,7 +207,7 @@ These skills are designed as **atomic, cross-referencing units**. A skill may re
 |  | ✅ `golang-observability` | ⚡ ⚙️ | -37% | 161 | 2,921 | 18,453 |
 |  | ✅ `golang-performance` | ⚡ 🧠 | -39% | 127 | 1,953 | 17,855 |
 |  | ✅ `golang-popular-libraries` | ⚡ | -30% | 61 | 788 | 4,131 |
-|  | ✅ `golang-project-layout` | ⚡ | -38% | 56 | 1,510 | 5,718 |
+|  | ✅ `golang-project-layout` | ⚡ | -38% | 69 | 1,510 | 5,718 |
 |  | ✅ `golang-stay-updated` | ⚡ | -56% | 43 | 1,916 | 1,916 |
 
 **Tools:**
