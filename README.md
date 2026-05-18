@@ -182,7 +182,7 @@ These skills are designed as **atomic, cross-referencing units**. A skill may re
 
 |  | Skill | Flags | Error rate gap | Description (tok) | SKILL.md (tok) | Directory (tok) |
 | --- | --- | --- | --- | --- | --- | --- |
-| ⭐️ | ✅ `golang-code-style` | ⚡ ⚙️ | -40% | 116 | 2,069 | 2,685 |
+| ⭐️ | ✅ `golang-code-style` | ⚡ ⚙️ | -40% | 115 | 2,069 | 2,685 |
 | ⭐️ | ✅ `golang-data-structures` | ⚡ | -39% | 92 | 2,464 | 6,176 |
 | ⭐️ | ✅ `golang-database` | ⚡ ⚙️ | -38% | 97 | 2,725 | 7,248 |
 | ⭐️ | ✅ `golang-design-patterns` | ⚡ ⚙️ | -37% | 66 | 2,610 | 9,316 |
