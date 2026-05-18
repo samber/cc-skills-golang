@@ -184,7 +184,7 @@ These skills are designed as **atomic, cross-referencing units**. A skill may re
 | --- | --- | --- | --- | --- | --- | --- |
 | ⭐️ | ✅ `golang-code-style` | ⚡ ⚙️ | -40% | 116 | 2,069 | 2,685 |
 | ⭐️ | ✅ `golang-data-structures` | ⚡ | -39% | 92 | 2,464 | 6,176 |
-| ⭐️ | ✅ `golang-database` | ⚡ ⚙️ | -38% | 112 | 2,725 | 7,248 |
+| ⭐️ | ✅ `golang-database` | ⚡ ⚙️ | -38% | 97 | 2,725 | 7,248 |
 | ⭐️ | ✅ `golang-design-patterns` | ⚡ ⚙️ | -37% | 66 | 2,610 | 9,316 |
 | ⭐️ | ✅ `golang-documentation` | ⚡ ⚙️ | -53% | 73 | 2,678 | 10,549 |
 | ⭐️ | ✅ `golang-error-handling` | ⚡ ⚙️ | -26% | 139 | 1,520 | 4,394 |
@@ -199,11 +199,11 @@ These skills are designed as **atomic, cross-referencing units**. A skill may re
 |  | ✅ `golang-cli` | ⚡ | -43% | 122 | 2,274 | 6,089 |
 |  | ✅ `golang-concurrency` | ⚡ ⚙️ | -39% | 71 | 1,873 | 6,338 |
 |  | ✅ `golang-context` | ⚡ ⚙️ | -34% | 80 | 1,144 | 3,940 |
-|  | ✅ `golang-continuous-integration` | ⚡ | -59% | 105 | 2,835 | 6,477 |
+|  | ✅ `golang-continuous-integration` | ⚡ | -59% | 82 | 2,835 | 6,477 |
 |  | ✅ `golang-dependency-injection` | ⚡ ⚙️ | -47% | 176 | 2,842 | 5,113 |
-|  | ✅ `golang-dependency-management` | ⚡ | -54% | 94 | 1,877 | 4,957 |
+|  | ✅ `golang-dependency-management` | ⚡ | -54% | 77 | 1,877 | 4,957 |
 |  | ✅ `golang-structs-interfaces` | ⚡ ⚙️ | -35% | 110 | 2,999 | 2,999 |
-|  | ✅ `golang-lint` | ⚡ | -41% | 119 | 1,714 | 5,493 |
+|  | ✅ `golang-lint` | ⚡ | -41% | 98 | 1,714 | 5,493 |
 |  | ✅ `golang-observability` | ⚡ ⚙️ | -37% | 161 | 2,921 | 18,453 |
 |  | ✅ `golang-performance` | ⚡ 🧠 | -39% | 127 | 1,953 | 17,855 |
 |  | ✅ `golang-popular-libraries` | ⚡ | -30% | 61 | 788 | 4,131 |
@@ -222,7 +222,7 @@ These skills are designed as **atomic, cross-referencing units**. A skill may re
 | ✅ `golang-swagger` | ⚡ | — | 144 | 2,125 | 3,123 |
 | ✅ `golang-uber-dig` | ⚡ | -10% | 107 | 2,264 | 5,904 |
 | ✅ `golang-uber-fx` | ⚡ | -5% | 118 | 2,499 | 6,747 |
-| ✅ `golang-samber-do` | ⚡ | -81% | 70 | 1,746 | 3,269 |
+| ✅ `golang-samber-do` | ⚡ | -81% | 71 | 1,746 | 3,269 |
 | ✅ `golang-samber-hot` | ⚡ | -54% | 118 | 1,843 | 7,273 |
 | ✅ `golang-samber-lo` | ⚡ | -40% | 165 | 2,410 | 10,031 |
 | ✅ `golang-samber-mo` | ⚡ 🧠 | -48% | 81 | 2,800 | 11,215 |
