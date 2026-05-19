@@ -111,9 +111,14 @@ block, _ := aes.NewCipher(key)
 // Using block.Encrypt directly = ECB mode
 
 // Good — GCM provides authenticated encryption
-aead, _ := cipher.NewGCM(block) // randomized, authenticated
+aead, err := cipher.NewGCM(block) // randomized, authenticated
+if err != nil {
+    return nil, err
+}
 nonce := make([]byte, aead.NonceSize())
-rand.Read(nonce)
+if _, err := rand.Read(nonce); err != nil {
+    return nil, err
+}
 ciphertext := aead.Seal(nonce, nonce, plaintext, nil)
 ```
 
@@ -127,7 +132,9 @@ nonce := []byte("fixed_nonce!") // catastrophic with GCM
 
 // Good — random nonce per encryption
 nonce := make([]byte, 12) // 96-bit for GCM
-rand.Read(nonce)
+if _, err := rand.Read(nonce); err != nil {
+    return nil, err
+}
 ```
 
 ### Mistake 3: Non-constant-time comparison for secrets — Medium
@@ -228,7 +235,10 @@ hash := argon2.IDKey([]byte(pw), salt, 3, 64*1024, 4, 32)
 
 // Or bcrypt (simpler API, no salt management):
 import "golang.org/x/crypto/bcrypt"
-hash, _ := bcrypt.GenerateFromPassword([]byte(pw), bcrypt.DefaultCost)
+hash, err := bcrypt.GenerateFromPassword([]byte(pw), bcrypt.DefaultCost)
+if err != nil {
+    return nil, err
+}
 
 // For general-purpose hashing (not passwords):
 import "crypto/sha256"
@@ -380,16 +390,24 @@ key := argon2.IDKey([]byte(password), salt, 3, 64*1024, 4, 32)
 
 // Or bcrypt (simpler API, widely supported):
 import "golang.org/x/crypto/bcrypt"
-hash, _ := bcrypt.GenerateFromPassword([]byte(pw), bcrypt.DefaultCost)
+hash, err := bcrypt.GenerateFromPassword([]byte(pw), bcrypt.DefaultCost)
+if err != nil {
+    return nil, err
+}
 
-// Or PBKDF2 with 600,000+ iterations:
-import "golang.org/x/crypto/pbkdf2"
-key := pbkdf2.Key([]byte(password), salt, 600000, 32, sha512.New)
+// Or PBKDF2 with 600,000+ iterations (Go 1.24+ stdlib):
+import "crypto/pbkdf2"
+key, err := pbkdf2.Key(sha512.New, password, salt, 600_000, 32)
+if err != nil {
+    return err
+}
 
 // Or scrypt:
 import "golang.org/x/crypto/scrypt"
 key := scrypt.Key([]byte(password), salt, 32768, 8, 1, 32)
 ```
+
+For Go 1.24+, prefer stdlib `crypto/hkdf`, `crypto/pbkdf2`, and `crypto/sha3`. Use `golang.org/x/crypto/...` fallbacks only for modules targeting older Go versions or for algorithms still outside the standard library.
 
 ---
 

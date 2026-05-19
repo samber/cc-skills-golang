@@ -82,7 +82,7 @@ For the full methodology with Go examples, DFD trust boundaries, DREAD scoring, 
 | Critical | SQL Injection | Parameterized queries separate data from code | `database/sql` with `?` placeholders |
 | Critical | Command Injection | Pass args separately, never via shell concatenation | `exec.Command` with separate args |
 | High | XSS | Auto-escaping renders user data as text, not HTML/JS | `html/template`, `text/template` |
-| High | Path Traversal | Scope file access to a root, prevent `../` escapes | `os.Root` (Go 1.24+), `filepath.Clean` |
+| High | Path Traversal | Scope untrusted file access to an allowed root | Go 1.24+: use `os.Root`. Pre-Go 1.24: use `filepath.IsLocal` + `filepath.Rel` + separator-aware checks; never rely on `filepath.Clean` + `strings.HasPrefix` alone. |
 | Medium | Timing Attacks | Constant-time comparison avoids byte-by-byte leaks | `crypto/subtle.ConstantTimeCompare` |
 | High | Crypto Issues | Use vetted algorithms; never roll your own | `crypto/aes`, `crypto/rand` |
 | Medium | HTTP Security | TLS + security headers prevent downgrade attacks | `net/http`, configure TLSConfig |
@@ -120,12 +120,12 @@ For deeper security-specific analysis:
 
 ```bash
 # Go security checker (SAST)
-go install github.com/securego/gosec/v2/cmd/gosec@latest
-gosec ./...
+go get -tool github.com/securego/gosec/v2/cmd/gosec@latest
+go tool gosec ./...
 
 # Vulnerability scanner — see golang-dependency-management for full govulncheck usage
-go install golang.org/x/vuln/cmd/govulncheck@latest
-govulncheck ./...
+go get -tool golang.org/x/vuln/cmd/govulncheck@latest
+go tool govulncheck ./...
 ```
 
 ### Security Testing

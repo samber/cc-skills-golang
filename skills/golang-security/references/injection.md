@@ -282,12 +282,12 @@ if strings.Contains(u.Hostname(), "metadata.") {
 
 ## Unsafe Deserialization — Critical
 
-Deserializing untrusted input can lead to RCE.
+Deserializing untrusted input can lead to resource exhaustion, type confusion, or unsafe object construction.
 
 **Bad:**
 
 ```go
-dec := gob.NewDecoder(r.Body) // DON'T: gob can execute code
+dec := gob.NewDecoder(r.Body) // DON'T: gob is not hardened for adversarial input
 var user interface{}
 dec.Decode(&user)
 ```
