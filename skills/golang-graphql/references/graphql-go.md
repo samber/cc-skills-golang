@@ -209,7 +209,11 @@ func (r *SubscriptionResolver) MessageAdded(ctx context.Context, args struct{ Ro
             case <-ctx.Done():
                 return
             case msg := <-sub.Chan():
-                ch <- &MessageResolver{msg: msg}
+                select {
+                case ch <- &MessageResolver{msg: msg}:
+                case <-ctx.Done():
+                    return
+                }
             }
         }
     }()

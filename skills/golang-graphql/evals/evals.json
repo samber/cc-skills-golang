@@ -34,7 +34,7 @@
         "Introspection is gated — either disabled in production or guarded by an environment variable check",
         "A complexity limit is set using extension.FixedComplexityLimit or equivalent",
         "Does NOT call srv.Use(extension.Introspection{}) unconditionally without an env guard",
-        "Uses handler.New or handler.NewDefaultServer from github.com/99designs/gqlgen/handler",
+        "Uses handler.New or handler.NewDefaultServer from github.com/99designs/gqlgen/graphql/handler",
         "Mentions MaxDepth or complexity limiting as a protection against deeply nested queries"
       ],
       "files": []
