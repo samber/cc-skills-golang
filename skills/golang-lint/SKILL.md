@@ -35,7 +35,7 @@ allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(g
 
 `golangci-lint` is the standard Go linting tool. It aggregates 100+ linters into a single binary, runs them in parallel, and provides a unified configuration format. Run it frequently during development and always in CI.
 
-Every Go project MUST have a `.golangci.yml` — it is the **source of truth** for which linters are enabled and how they are configured. See the [recommended configuration](./assets/.golangci.yml) for a production-ready setup with 33 linters enabled.
+Every Go project MUST have a `.golangci.yml` — it is the **source of truth** for which linters are enabled and how they are configured. See the [recommended configuration](./assets/.golangci.yml) for a production-ready setup with 48 linters enabled.
 
 ## Quick Reference
 
@@ -82,7 +82,7 @@ Rules:
 1. **//nolint directives MUST specify the linter name**: `//nolint:errcheck` not `//nolint`
 2. **//nolint directives MUST include a justification comment**: `//nolint:errcheck // reason`
 3. **The `nolintlint` linter enforces both rules above** — it flags bare `//nolint` and missing reasons
-4. **NEVER suppress security linters** (bodyclose, sqlclosecheck) without a very strong reason
+4. **NEVER suppress security linters** (gosec, bodyclose, sqlclosecheck) without a very strong reason
 
 For comprehensive patterns and examples, see **[nolint directives](./references/nolint-directives.md)** — when to suppress, how to write justifications, patterns for per-line vs per-function suppression, and anti-patterns.
 

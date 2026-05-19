@@ -66,10 +66,10 @@ func getHandler() http.Handler {
 
 ### Nil map, slice, and channel behavior
 
-| Type | Read from nil | Write to nil | Len/Cap of nil | Range over nil |
+| Type | Index into nil | Write to nil | Len/Cap of nil | Range over nil |
 | --- | --- | --- | --- | --- |
 | Map | Zero value | **panic** | 0 | 0 iterations |
-| Slice | **panic** (index) | **panic** (index) | 0 | 0 iterations |
+| Slice | **panic** | **panic** | 0 | 0 iterations |
 | Channel | Blocks forever | Blocks forever | 0 | Blocks forever |
 
 ```go

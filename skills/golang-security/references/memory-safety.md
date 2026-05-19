@@ -32,7 +32,7 @@ func safeMultiply(a, b int) (int, error) {
     if a == 0 || b == 0 {
         return 0, nil
     }
-    if a > math.MaxInt64/b {
+    if a > math.MaxInt/b {
         return 0, errors.New("integer overflow")
     }
     result := a * b

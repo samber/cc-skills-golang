@@ -76,9 +76,17 @@ func fanOut(ctx context.Context, in <-chan Task, workers int) <-chan Result {
         wg.Add(1)
         go func() {
             defer wg.Done()
-            for task := range in {
+            for {
                 select {
-                case out <- process(ctx, task):
+                case task, ok := <-in:
+                    if !ok {
+                        return
+                    }
+                    select {
+                    case out <- process(ctx, task):
+                    case <-ctx.Done():
+                        return
+                    }
                 case <-ctx.Done():
                     return
                 }

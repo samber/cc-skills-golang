@@ -621,7 +621,7 @@ go tool pprof http://localhost:6060/debug/pprof/profile?seconds=30
 go tool pprof -svg http://localhost:6060/debug/pprof/profile?seconds=10 > cpu.svg
 
 # CPU profile — fetch with a timeout
-go tool pprof -seconds=30 -timeout=60 http://localhost:6060/debug/pprof/profile
+go tool pprof -timeout=60 "http://localhost:6060/debug/pprof/profile?seconds=30"
 
 # Heap profile — fetch and show top allocation sites
 go tool pprof -top -alloc_objects http://localhost:6060/debug/pprof/heap

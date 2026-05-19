@@ -77,8 +77,8 @@ func (c *DBCollector) Collect(ch chan<- prometheus.Metric) {
             prometheus.GaugeValue, float64(stats.Idle), poolName)
 
         ch <- prometheus.MustNewConstMetric(
-            prometheus.NewDesc("db_total_latency_seconds", "Total latency for a connection", []string{"pool"}, nil),
-            prometheus.CounterValue, float64(stats.LatencyCount), poolName)
+            prometheus.NewDesc("db_wait_duration_seconds_total", "Total connection wait duration", []string{"pool"}, nil),
+            prometheus.CounterValue, stats.WaitDuration.Seconds(), poolName)
     }
 }
 

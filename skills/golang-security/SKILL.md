@@ -141,7 +141,7 @@ go test -fuzz=Fuzz
 ## Common Mistakes
 
 | Severity | Mistake | Fix |
-| --- | --- | --- | --- |
+| --- | --- | --- |
 | High | `math/rand` for tokens | Output is predictable — attacker can reproduce the sequence. Use `crypto/rand` |
 | Critical | SQL string concatenation | Attacker can modify query logic. Parameterized queries keep data and code separate |
 | Critical | `exec.Command("bash -c")` | Shell interprets metacharacters (`;`, ` | `, `` ` ``). Pass args separately to avoid shell parsing |

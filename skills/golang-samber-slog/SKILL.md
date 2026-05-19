@@ -92,7 +92,7 @@ Six composition patterns, each for a different routing need:
 | `Router().Add(h, predicate).Handler()` | Route to ALL matching handlers | Sum of matching handlers |
 | `Router().Add(...).FirstMatch().Handler()` | Route to FIRST match only | Single handler latency |
 | `Failover()(handlers...)` | Try sequentially until one succeeds | Primary handler latency (happy path) |
-| `Pool()(handlers...)` | Concurrent broadcast to all handlers | Max of all handler latencies |
+| `Pool()(handlers...)` | Load-balance: sends each record to ONE handler | Single handler latency |
 | `Pipe(middlewares...).Handler(sink)` | Middleware chain before sink | Middleware overhead + sink |
 
 ```go

@@ -9,7 +9,7 @@ A general-purpose doubly-linked list. Elements hold `any` values (no type safety
 | Operation | Complexity | Notes |
 | --- | --- | --- |
 | **Insert at front/back** | O(1) | `PushFront()`, `PushBack()` |
-| **Remove front/back** | O(1) | `RemoveFront()`, `RemoveBack()` |
+| **Remove front/back** | O(1) | `l.Remove(l.Front())`, `l.Remove(l.Back())` |
 | **Insert at arbitrary position** | O(1) | If you have the element reference (`*Element`) |
 | **Remove at arbitrary position** | O(1) | If you have the element reference |
 | **Access by index** | O(n) | Must walk the chain — no random access |

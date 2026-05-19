@@ -170,14 +170,14 @@ Go 1.26+ includes an experimental `simd/archsimd` package (requires `GOEXPERIMEN
 
 **Options for explicit SIMD in Go:**
 
-- **Experimental `simd/archsimd` (Go 1.26+)** — Direct SIMD intrinsics via vector types (`Int8x16`, `Float64x8`, etc.) with CPU feature detection. Limited to AMD64. Use with caution: experimental API, not covered by Go 1 compatibility guarantees, and should never be exposed in public APIs.
+- **Experimental `simd/archsimd` (Go 1.26+, speculative)** — Direct SIMD intrinsics via vector types with CPU feature detection. Limited to AMD64. Use with caution: this is an experimental, in-progress API (`GOEXPERIMENT=simd`) whose package path and type names are subject to change before stabilization. Not covered by Go 1 compatibility guarantees, and should never be exposed in public APIs. Verify the actual import path and API against the Go toolchain you are using.
 
   ```go
   // Requires: GOEXPERIMENT=simd go build
+  // WARNING: experimental API — package path and types may change
   import "simd/archsimd"
 
   v := archsimd.Int32x4{1, 2, 3, 4}
-  // Operations map directly to hardware instructions
   ```
 
 - **Let the compiler do it** — write simple, idiomatic loops on `[]float64`/`[]int32` slices. Check auto-vectorization: `go build -gcflags="-d=ssa/prove/debug=2" ./...`

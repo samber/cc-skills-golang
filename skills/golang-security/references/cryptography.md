@@ -404,7 +404,10 @@ if err != nil {
 
 // Or scrypt:
 import "golang.org/x/crypto/scrypt"
-key := scrypt.Key([]byte(password), salt, 32768, 8, 1, 32)
+key, err := scrypt.Key([]byte(password), salt, 32768, 8, 1, 32)
+if err != nil {
+    return err
+}
 ```
 
 For Go 1.24+, prefer stdlib `crypto/hkdf`, `crypto/pbkdf2`, and `crypto/sha3`. Use `golang.org/x/crypto/...` fallbacks only for modules targeting older Go versions or for algorithms still outside the standard library.

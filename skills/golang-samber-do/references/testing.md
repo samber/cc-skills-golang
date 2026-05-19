@@ -7,7 +7,7 @@ Clone containers for isolated tests:
 ```go
 func TestUserService(t *testing.T) {
     // Create test container by cloning main container
-    testInjector := do.Clone(mainInjector)
+    testInjector := mainInjector.Clone()
 
     // Override with mocks
     mockDB := &MockDatabase{}

@@ -605,13 +605,15 @@ if pathErr, ok := errors.AsType[*os.PathError](err); ok {
 
 ### Use enhanced `new()` _(Go 1.26+)_
 
+`new(expr)` now accepts a value expression and returns a pointer to it (not zero-initialized):
+
 ```go
 // Before: helper function needed
 func ptr[T any](v T) *T { return &v }
 cfg := Config{Timeout: ptr(30)}
 
-// After (Go 1.26+)
-cfg := Config{Timeout: new(30)}
+// After (Go 1.26+): new(expr) initializes the value — equivalent to ptr(30)
+cfg := Config{Timeout: new(30)} // *int pointing to 30, not 0
 ```
 
 ### Use `crypto/hpke` _(Go 1.26+)_

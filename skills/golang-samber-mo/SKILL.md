@@ -128,6 +128,7 @@ func fetchUser(id string) mo.Either[CachedUser, FreshUser] {
 }
 
 // Pattern match
+result := fetchUser("user-123")
 result.Match(
     func(cached CachedUser) mo.Either[CachedUser, FreshUser] { /* use cached */ },
     func(fresh FreshUser) mo.Either[CachedUser, FreshUser] { /* use fresh */ },

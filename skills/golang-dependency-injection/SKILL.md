@@ -159,7 +159,7 @@ func InitializeAPI() (*API, error) {
     wire.Build(NewConfig, NewDatabase, NewUserStore, NewUserService, NewAPI)
     return nil, nil
 }
-// No shutdown or health check support
+// No lifecycle hooks (OnStart/OnStop) or health checks; cleanup via returned func() from providers
 ```
 
 **uber-go/fx**:
@@ -230,7 +230,7 @@ func TestUserService_WithDo(t *testing.T) {
     testInjector := do.New()
 
     // Provide the mock UserStore interface
-    do.Override[UserStore](testInjector, &MockUserStore{
+    do.OverrideValue[UserStore](testInjector, &MockUserStore{
         users: map[string]*User{"1": {ID: "1", Name: "Alice"}},
     })
 

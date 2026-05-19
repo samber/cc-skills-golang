@@ -83,8 +83,8 @@ do.ProvideTransient(injector, func(i do.Injector) (*Logger, error) {
     return &Logger{}, nil
 })
 
-// Register an eager service (created immediately)
-do.Provide(injector, do.Eager(&Config{Port: 8080}))
+// Register an eager service (created immediately at startup)
+do.ProvideValue(injector, &Config{Port: 8080})
 ```
 
 ### 2. Invoke Services

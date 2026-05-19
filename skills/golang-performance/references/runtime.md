@@ -119,13 +119,13 @@ Reducing allocations helps more than tuning GOGC — it addresses the root cause
 
 **Diagnose:** 1- `go tool pprof` (CPU profile) — look for high `runtime.schedule` or `runtime.findRunnable` overhead; this indicates too many P's competing for work or too few P's starving goroutines 2- `go tool trace` — check if goroutines are evenly distributed across P's; uneven distribution suggests GOMAXPROCS is misconfigured for the container 3- `GODEBUG=schedtrace=1000` — print scheduler state every second; look for `runqueue` imbalances or idle P's when work is available 4- `runtime.GOMAXPROCS(0)` — query the current value; if it returns the host CPU count (e.g., 64) instead of the container limit (e.g., 2), the runtime is over-scheduling 5- Prometheus `rate(process_cpu_seconds_total[5m])` — monitor CPU cores consumed in production; if consistently near GOMAXPROCS value, the app is CPU-saturated
 
-**Go 1.25+** automatically detects and respects container CPU limits (cgroup v1 and v2). The runtime sets `GOMAXPROCS` based on:
+**Go 1.25+** improves container CPU detection, particularly for cgroup v2. The runtime sets `GOMAXPROCS` based on:
 
 - Logical CPUs on the machine
 - Process CPU affinity mask
 - cgroup CPU quota limits (on Linux)
 
-In a container with 2 CPU cores on a 64-core host running Go 1.25+, `GOMAXPROCS` is correctly set to 2 by default—no additional setup required.
+In a container with 2 CPU cores on a 64-core host running Go 1.25+ with **cgroup v2**, `GOMAXPROCS` is correctly set to 2 by default. For **cgroup v1** environments, validate the detected value at startup and consider using `go.uber.org/automaxprocs` to ensure correctness.
 
 **For Go 1.24 and earlier**, use the `go.uber.org/automaxprocs` library to handle container CPU detection:
 

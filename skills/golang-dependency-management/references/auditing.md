@@ -80,7 +80,7 @@ goweight --json   # JSON output for CI tracking
 **Modern alternative**: [go-size-analyzer](https://github.com/Zxilly/go-size-analyzer) (`gsa`) supports ELF, Mach-O, PE, and WebAssembly formats with interactive HTML/SVG visualization:
 
 ```bash
-go get -tool github.com/nicholasgasior/gsa@latest
+go get -tool github.com/Zxilly/go-size-analyzer/cmd/gsa@latest
 go build -o ./myapp ./cmd/myapp
 go tool gsa -f html -o size-report.html ./myapp
 ```

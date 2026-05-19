@@ -98,7 +98,7 @@ go build -gcflags="-m" ./pkg/handler 2>&1 | grep -E "(inline|escape|moved to hea
 ./pkg/handler/handler.go:42:19: inlining call to validateInput
 ```
 
-The inline cost budget is 80 (as of Go 1.22+). Functions with higher cost (more AST nodes, complex control flow) are not inlined.
+The inline cost budget is approximately 80–82 AST nodes (as of Go 1.22+; has increased in later releases). Functions with higher cost (more AST nodes, complex control flow) are not inlined. Check the actual threshold with `-gcflags="-m -m"`.
 
 ### Common inlining blockers
 

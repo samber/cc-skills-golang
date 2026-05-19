@@ -117,8 +117,12 @@ slog.InfoContext(ctx, "order created", "order_id", orderID)
 ```go
 // When recording a histogram observation, attach the trace_id as an exemplar
 // so you can jump from a P99 spike directly to the offending trace
-histogram.WithLabelValues("POST", "/orders").
-    Exemplar(prometheus.Labels{"trace_id": traceID}, duration)
+obs := histogram.WithLabelValues("POST", "/orders")
+if eo, ok := obs.(prometheus.ExemplarObserver); ok {
+    eo.ObserveWithExemplar(duration, prometheus.Labels{"trace_id": traceID})
+} else {
+    obs.Observe(duration)
+}
 ```
 
 ## Migrating Legacy Loggers

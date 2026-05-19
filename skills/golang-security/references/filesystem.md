@@ -133,6 +133,8 @@ io.Copy(out, gr) // DON'T: No size limits
 ```go
 const maxDecompressedSize = 100 * 1024 * 1024 // 100MB limit
 
+var errDecompressedSizeLimitExceeded = errors.New("decompressed size limit exceeded")
+
 type limitedReader struct {
     r    io.Reader
     read int64
@@ -140,7 +142,8 @@ type limitedReader struct {
 
 func (l *limitedReader) Read(p []byte) (int, error) {
     if l.read >= maxDecompressedSize {
-        return 0, io.EOF
+        // Return a sentinel error — io.EOF would be treated as success by io.Copy
+        return 0, errDecompressedSizeLimitExceeded
     }
     n, err := l.r.Read(p)
     l.read += int64(n)
@@ -148,7 +151,9 @@ func (l *limitedReader) Read(p []byte) (int, error) {
 }
 
 lr := &limitedReader{r: gr}
-io.Copy(out, lr)
+if _, err := io.Copy(out, lr); err != nil {
+    return fmt.Errorf("decompressing: %w", err)
+}
 ```
 
 ---

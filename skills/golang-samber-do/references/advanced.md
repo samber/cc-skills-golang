@@ -13,7 +13,7 @@ do.Provide(root, func(i do.Injector) (Database, error) {
 })
 
 // Create child scope
-apiScope := do.Scope(root, "api")
+apiScope := root.Scope("api")
 
 // Services in apiScope can access root services
 do.Provide(apiScope, func(i do.Injector) (UserService, error) {
@@ -22,7 +22,7 @@ do.Provide(apiScope, func(i do.Injector) (UserService, error) {
 })
 
 // Child scopes are isolated from each other
-userScope := do.Scope(root, "user")
+userScope := root.Scope("user")
 ```
 
 Organize services by lifecycle and visibility:
@@ -125,7 +125,7 @@ report := injector.ShutdownWithContext(ctx)
 ### List Services
 
 ```go
-services := do.ListProvidedServices(injector)
+services := injector.ListProvidedServices()
 for _, svc := range services {
     fmt.Printf("%s: %s\n", svc.ScopeName, svc.Service)
 }

@@ -198,7 +198,7 @@ Run `wire ./...` after every constructor signature change. Add `//go:generate go
 | --- | --- |
 | Editing `wire_gen.go` manually | Never edit it. Change providers or injectors and re-run `wire ./...`. |
 | Missing `//go:build wireinject` | Add the tag as the very first line of every injector file. |
-| Two providers returning `*sql.DB` | Wrap with named types (`type PrimaryDB *sql.DB` or a wrapper struct). |
+| Two providers returning `*sql.DB` | Wrap with a named struct type: `type PrimaryDB struct { *sql.DB }` — Wire does not distinguish pointer type aliases. |
 | Injecting an interface without `wire.Bind` | Add `wire.Bind(new(MyInterface), new(*MyImpl))` to the provider set. |
 | Forgetting to re-run `wire ./...` after changes | Run wire before `go build`; add it to `go generate` or a Makefile target. |
 | Calling `cleanup()` without guarding for nil | Wire returns nil cleanup on construction error; guard with `if cleanup != nil { defer cleanup() }`. |
