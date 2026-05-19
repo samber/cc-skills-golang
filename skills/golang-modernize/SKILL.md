@@ -80,7 +80,7 @@ When the project's `go.mod` targets an older version, suggest upgrading and expl
 
 ## Using the modernize linter
 
-The `modernize` linter (available since **golangci-lint v2.6.0**) automatically detects code that can be rewritten using newer Go features. It originates from `golang.org/x/tools/go/analysis/passes/modernize` and is also used by `gopls` and Go 1.26's rewritten `go fix` command. See the `samber/cc-skills-golang@golang-lint` skill for configuration.
+The `modernize` linter (available since **golangci-lint v2.6.0**) automatically detects code that can be rewritten using newer Go features. It originates from `golang.org/x/tools/go/analysis/passes/modernize`; `gopls` and Go 1.26's rewritten `go fix` cover overlapping modernization checks, but exact coverage differs by tool version. See the `samber/cc-skills-golang@golang-lint` skill for configuration.
 
 ## Version-specific modernizations
 
@@ -105,7 +105,7 @@ For CI tooling, govulncheck, PGO, golangci-lint v2, and AI-powered modernization
 | `golang.org/x/crypto/hkdf` | `crypto/hkdf` | Go 1.24 |
 | `golang.org/x/crypto/pbkdf2` | `crypto/pbkdf2` | Go 1.24 |
 | `testing/synctest.Run` | `testing/synctest.Test` | Go 1.25 |
-| `crypto.EncryptPKCS1v15` | OAEP encryption | Go 1.26 |
+| `crypto/rsa.EncryptPKCS1v15` for new encryption use | RSA-OAEP (`rsa.EncryptOAEP` / `rsa.EncryptOAEPWithOptions`) or HPKE/KEM design | Go 1.26 |
 | `net/http/httputil.ReverseProxy.Director` | `ReverseProxy.Rewrite` | Go 1.26 |
 
 ## Migration Priority Guide
@@ -144,7 +144,7 @@ When modernizing a codebase, prioritize changes by impact:
 22. Upgrade to golangci-lint v2 with modernize linter _(golangci-lint v2.6.0+)_
 23. Add `govulncheck` to CI pipeline
 24. Set up monthly modernization CI pipeline
-25. Evaluate `encoding/json/v2` for new code _(Go 1.25+, experimental)_
+25. Evaluate `encoding/json/v2` only when the project explicitly opts into `GOEXPERIMENT=jsonv2` _(Go 1.25+, experimental)_
 26. Set up AI-driven code review in CI — loads these skills to guide review per area; see `samber/cc-skills-golang@golang-continuous-integration`
 
 ## Related Skills
