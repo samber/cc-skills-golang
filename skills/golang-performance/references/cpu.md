@@ -166,10 +166,19 @@ Expect 2-4x improvement for tight arithmetic loops. Only use when profiling show
 
 **Diagnose:** 1- `go tool pprof` (CPU profile) — confirm a numeric inner loop consumes >20% of CPU; SIMD only helps CPU-bound numeric work, not allocation or I/O bottlenecks 2- `go test -bench` — measure the loop's baseline ns/op; provides the reference point to validate SIMD gains 3- `go build -gcflags="-d=ssa/prove/debug=2"` — check if the compiler already auto-vectorized the loop; look for `"Proved"` bounds-check eliminations that enable vectorization 4- `GOSSAFUNC=MyFunc go build` — generate SSA dump (`ssa.html`) to inspect whether the compiler produces vector instructions for the hot loop 5- `go tool objdump -s MyFunc ./binary` — verify the final assembly contains SIMD instructions (e.g., `VMOVAPD`, `VADDPD` on amd64) rather than scalar equivalents
 
-Go does not provide stable, portable SIMD intrinsics in the standard library. For most code, rely on simple loops that the compiler can optimize, `math/bits` intrinsics, or well-maintained libraries with architecture-specific assembly.
+Go 1.26+ includes an experimental `simd/archsimd` package (requires `GOEXPERIMENT=simd` flag) providing low-level SIMD intrinsics for amd64 with 128/256/512-bit vectors. For broader portability, the compiler auto-vectorizes simple loops, and several strategies exist.
 
 **Options for explicit SIMD in Go:**
 
+- **Experimental `simd/archsimd` (Go 1.26+)** — Direct SIMD intrinsics via vector types (`Int8x16`, `Float64x8`, etc.) with CPU feature detection. Limited to AMD64. Use with caution: experimental API, not covered by Go 1 compatibility guarantees, and should never be exposed in public APIs.
+
+  ```go
+  // Requires: GOEXPERIMENT=simd go build
+  import "simd/archsimd"
+
+  v := archsimd.Int32x4{1, 2, 3, 4}
+  // Operations map directly to hardware instructions
+  ```
 - **Let the compiler do it** — write simple, idiomatic loops on `[]float64`/`[]int32` slices. Check auto-vectorization: `go build -gcflags="-d=ssa/prove/debug=2" ./...`
 - **`math/bits`** — operations like `OnesCount`, `LeadingZeros`, `RotateLeft` map directly to hardware instructions (POPCNT, CLZ, ROL)
 - **Hand-written assembly** — `.s` files with AVX2/NEON instructions for critical inner loops. Libraries like `klauspost/compress` and `minio/sha256-simd` use this approach
@@ -270,7 +279,7 @@ go build -tags=nosimd -o app-safe .                # Fallback everywhere
 - Auto-vectorization covers the most common cases (simple numeric loops)
 - If your bottleneck is allocations or I/O, SIMD won't help
 
-**Recommendation:** Start with auto-vectorization. Move to runtime detection (option 2 above) if profiling shows a bottleneck and the code needs to run on heterogeneous hardware. Only use compile-time selection (option 3) if you control the deployment environment and can test each per-binary variant.
+**Recommendation:** Start with auto-vectorization. For Go 1.26+, evaluate `simd/archsimd` for AMD64-only workloads (remembering it's experimental). Move to runtime detection (option 2 above) if profiling shows a bottleneck and the code needs to run on heterogeneous hardware. Only use compile-time selection (option 3) if you control the deployment environment and can test each per-binary variant.
 
 Only invest in hand-written SIMD when profiling shows a numeric inner loop consuming >20% of CPU and the compiler isn't auto-vectorizing it.
 
