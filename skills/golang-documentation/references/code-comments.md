@@ -32,6 +32,17 @@ Good — explains why, when, and what can go wrong:
 func GetUser(id string) (*User, error) {
 ```
 
+### Anti-Patterns to Remove on Sight
+
+| Anti-pattern | Example | Fix |
+| --- | --- | --- |
+| Pure paraphrase | `// GetUser gets a user` on `func GetUser()` — starts with the name (required by godoc) but adds nothing | After the name, add _when_ to use it, constraints, and what can go wrong |
+| Signature restatement | `// Returns a string and an error` | Document _which_ error and _why_ — the signature already shows types |
+| Marketing vocabulary | `seamlessly`, `powerful`, `robust`, `enterprise-grade` | Remove — state facts instead |
+| Invented rationale | `// designed to improve scalability` | Only document what the code actually does |
+| Groundless future claims | `// supports future extensibility` | Remove or back it with an interface or configuration |
+| Hollow filler | `// It's worth noting that...`, `// As mentioned above` | Cut — restate the fact directly if it matters |
+
 ### Format
 
 Every doc comment MUST start with the function/method name followed by a verb phrase. This is how godoc renders it in package indexes.
