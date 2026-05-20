@@ -25,9 +25,7 @@
         // No language for code blocks: disable (common for prose/READMEs)
         "MD040": false,
         // Blank lines around fences: disable (common for prose/READMEs)
-        "MD041": false,
-        // Table column alignment: disable — empty cells and long content make raw pipe alignment inconsistent
-        "MD060": false
+        "MD041": false
     },
     // Custom rules (npm packages or local .js)
     "customRules": [],
