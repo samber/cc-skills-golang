@@ -20,9 +20,9 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - uses: astral-sh/setup-uv@v7
+      - uses: astral-sh/setup-uv@v8
 
       - name: Run Snyk Agent Scan
-        run: uvx snyk-agent-scan@latest --ci --skills ./skills
+        run: uvx snyk-agent-scan@latest --ci --dangerously-run-mcp-servers --skills ./skills
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
