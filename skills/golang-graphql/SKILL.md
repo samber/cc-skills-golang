@@ -271,6 +271,6 @@ For graph-gophers: `graphql.MaxDepth(10)` and `graphql.MaxParallelism(10)` optio
 - [graph-gophers/graphql-go](https://github.com/graph-gophers/graphql-go)
 - [Relay cursor connections spec](https://relay.dev/graphql/connections.htm)
 
-If you encounter a bug or unexpected behavior in gqlgen, open an issue at https://github.com/99designs/gqlgen/issues.
+If you encounter a bug or unexpected behavior in gqlgen, open an issue at <https://github.com/99designs/gqlgen/issues>.
 
-If you encounter a bug or unexpected behavior in graph-gophers/graphql-go, open an issue at https://github.com/graph-gophers/graphql-go/issues.
+If you encounter a bug or unexpected behavior in graph-gophers/graphql-go, open an issue at <https://github.com/graph-gophers/graphql-go/issues>.

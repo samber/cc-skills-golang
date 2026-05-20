@@ -144,7 +144,7 @@ go test -fuzz=Fuzz
 | --- | --- | --- |
 | High | `math/rand` for tokens | Output is predictable — attacker can reproduce the sequence. Use `crypto/rand` |
 | Critical | SQL string concatenation | Attacker can modify query logic. Parameterized queries keep data and code separate |
-| Critical | `exec.Command("bash -c")` | Shell interprets metacharacters (`;`, ` | `, `` ` ``). Pass args separately to avoid shell parsing |
+| Critical | `exec.Command("bash -c")` | Shell interprets metacharacters (`;`, `\|`, `` ` ``). Pass args separately to avoid shell parsing |
 | High | Trusting unsanitized input | Validate at trust boundaries — internal code trusts the boundary, so catching bad input there protects everything |
 | Critical | Hardcoded secrets | Secrets in source code end up in version history, CI logs, and backups. Use env vars or secret managers |
 | Medium | Comparing secrets with `==` | `==` short-circuits on first differing byte, leaking timing info. Use `crypto/subtle.ConstantTimeCompare` |

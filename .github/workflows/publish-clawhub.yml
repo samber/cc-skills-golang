@@ -1,23 +1,13 @@
-# name: Publish skills to ClawHub
+# Disabled: ClawHub publishing is not currently active.
 
-# on:
-#   push:
-#     branches: [main]
-#     paths: ['skills/**']
-#   workflow_dispatch: {}
+name: Publish skills to ClawHub (disabled)
 
-# jobs:
-#   publish:
-#     if: github.repository_owner == 'samber'
-#     runs-on: ubicloud-standard-2
-#     steps:
-#       - uses: actions/checkout@v4
+on:
+  workflow_dispatch: {}
 
-#       - uses: actions/setup-node@v4
-#         with:
-#           node-version: '22'
-
-#       - name: Publish all skills
-#         run: ./clawhub-publish.sh
-#         env:
-#           CLAWHUB_TOKEN: ${{ secrets.CLAWHUB_TOKEN }}
+jobs:
+  publish:
+    if: false
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "This workflow is disabled"
