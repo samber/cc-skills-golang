@@ -52,20 +52,21 @@ Return resolver wrapper structs, not domain models directly — keeps GraphQL pr
 
 ## Type Mapping
 
-| GraphQL type | Go type | Notes |
-| --- | --- | --- |
-| `ID` | `graphql.ID` | string alias |
-| `Int` | `int32` | **NOT `int`** — mismatch is a parse-time error |
-| `Float` | `float64` | |
-| `String` | `string` | |
-| `Boolean` | `bool` | |
-| `[T]` | `[]*T` or `[]T` | |
-| Nullable `T` | `*T` | pointer = nullable |
-| Non-null `T!` | `T` | non-pointer |
-| Custom scalar | implement `UnmarshalGraphQL(input any) error` + `MarshalJSON() ([]byte, error)` | |
-| Enum | typed string alias | |
-| Input | exported struct with field tags optional | |
-| Interface/Union | Go interface returned; `ToConcreteType() (*T, bool)` discriminators | |
+<!-- prettier-ignore -->
+|GraphQL type|Go type|Notes|
+|---|---|---|
+|`ID`|`graphql.ID`|string alias|
+|`Int`|`int32`|**NOT `int`** — mismatch is a parse-time error|
+|`Float`|`float64`||
+|`String`|`string`||
+|`Boolean`|`bool`||
+|`[T]`|`[]*T` or `[]T`||
+|Nullable `T`|`*T`|pointer = nullable|
+|Non-null `T!`|`T`|non-pointer|
+|Custom scalar|implement `UnmarshalGraphQL(input any) error` + `MarshalJSON() ([]byte, error)`||
+|Enum|typed string alias||
+|Input|exported struct with field tags optional||
+|Interface/Union|Go interface returned; `ToConcreteType() (*T, bool)` discriminators||
 
 Common mistake: using `int` for an `Int!` field — the parser rejects it with a type mismatch error.
 
