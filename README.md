@@ -420,7 +420,7 @@ Reactive streams with samber/ro. 150+ type-safe operators, cold/hot observables,
 
 #### `golang-samber-slog`
 
-Structured logging pipeline with samber/slog-**** packages. Multi-handler routing (slog-multi), sampling, formatting, HTTP middleware, and 20+ backend sinks.
+Structured logging pipeline with samber/slog-\*\*\*\* packages. Multi-handler routing (slog-multi), sampling, formatting, HTTP middleware, and 20+ backend sinks.
 
 ### Testing
 
