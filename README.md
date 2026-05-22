@@ -232,6 +232,14 @@ These skills are designed as **atomic, cross-referencing units**. A skill may re
 | ❌ `golang-temporal` |  | — | 0 | 0 | 0 |
 | ✅ `golang-stretchr-testify` | ⚡ | -47% | 90 | 1,714 | 2,533 |
 
+## 🧪 Skill evaluations
+
+|             | With Skill          | Without Skill       | Delta     |
+| ----------- | ------------------- | ------------------- | --------- |
+| **Overall** | **3315/3395 (98%)** | **1915/3395 (56%)** | **+41pp** |
+
+See [EVALUATIONS.md](./EVALUATIONS.md) for the full per-skill breakdown.
+
 ## 📖 Skills description
 
 ### `golang-benchmark`
@@ -401,14 +409,6 @@ Reflection-based DI with uber-go/dig. Provide/Invoke, dig.In/dig.Out, named valu
 ### `golang-uber-fx`
 
 Application framework with uber-go/fx. fx.New, fx.Provide/Invoke, fx.Module, lifecycle hooks, fx.Annotate, fx.Decorate, signal-aware Run.
-
-## 🧪 Skill evaluations
-
-|             | With Skill          | Without Skill       | Delta     |
-| ----------- | ------------------- | ------------------- | --------- |
-| **Overall** | **3315/3395 (98%)** | **1915/3395 (56%)** | **+41pp** |
-
-See [EVALUATIONS.md](./EVALUATIONS.md) for the full per-skill breakdown.
 
 ## 🕵 Use in CI for AI-driven reviews
 
