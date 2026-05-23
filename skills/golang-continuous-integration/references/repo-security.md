@@ -1,15 +1,15 @@
 # Repository Security Settings
 
-After creating workflow files, ALWAYS tell the developer to configure these GitHub repository settings. These are not optional — they are the security foundation that makes the CI pipeline trustworthy.
+After creating workflow files, repository security settings should be configured. These are not optional — they are the security foundation that makes the CI pipeline trustworthy.
 
-Determine the project's GitHub URL from its git remote (e.g., `git remote -v`) and build clickable links to the settings pages. For a project hosted at `https://github.com/{owner}/{repo}`, the relevant links are:
+The project's GitHub URL can be determined from its git remote (e.g., `git remote -v`). For a project hosted at `https://github.com/{owner}/{repo}`, the relevant settings links are:
 
 - Branch protection: `https://github.com/{owner}/{repo}/settings/branches`
 - Actions permissions: `https://github.com/{owner}/{repo}/settings/actions`
 - Secrets: `https://github.com/{owner}/{repo}/settings/secrets/actions`
 - Environments: `https://github.com/{owner}/{repo}/settings/environments`
 
-Provide these links to the developer so they can click directly to the right settings page.
+These links allow direct navigation to the appropriate settings page.
 
 ## Branch Protection Rules
 
@@ -48,7 +48,7 @@ For public/open-source repositories:
 
 ## Permissions Cheat Sheet
 
-Warn the developer about the security implications of every permission used:
+The security implications of every permission used are documented below:
 
 | Permission | Workflows that need it | Risk |
 | --- | --- | --- |
