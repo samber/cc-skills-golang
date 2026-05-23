@@ -149,4 +149,4 @@ All plugins follow the same pattern:
 3. Plugin operators return `func(Observable[T]) Observable[R]` — standard operator signature
 4. No global state — each operator instance is independent
 
-Plugins are documented individually in their package directories. Check `pkg.go.dev/github.com/samber/ro/plugins/...` for API details.
+Plugins are documented individually in their package directories. API details for each plugin are available at `pkg.go.dev/github.com/samber/ro/plugins/...`.

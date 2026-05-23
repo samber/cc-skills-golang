@@ -120,11 +120,11 @@ env | grep API_KEY
 
 ## Step 5: Check Observability Tools
 
-Production debugging MUST start with observability data. Before diving into code, check if the project uses observability tools — they often have the answer already. Look for imports or dependencies like `prometheus`, `opentelemetry`, `datadog`, `sentry`, `elastic/apm` in the codebase. Even if you don't see them in code, the developer may have them deployed separately.
+Production debugging MUST start with observability data. The project may already use observability tools that have the answer — look for imports or dependencies like `prometheus`, `opentelemetry`, `datadog`, `sentry`, `elastic/apm` in the codebase. Even if you don't see them in code, the developer may have them deployed separately.
 
 If the information is missing, **ask the user** what monitoring and observability tools they use. Common stacks:
 
-- **Prometheus + Grafana** — Check dashboards for error rate spikes, latency changes, resource saturation. Query examples:
+- **Prometheus + Grafana** — Dashboards may show error rate spikes, latency changes, resource saturation. Query examples:
 
   ```promql
   rate(http_requests_total{status=~"5.."}[5m])           # error rate
@@ -134,7 +134,7 @@ If the information is missing, **ask the user** what monitoring and observabilit
   rate(go_gc_duration_seconds_sum[5m])                    # GC pressure
   ```
 
-- **Datadog** — Check APM traces, error tracking, and infrastructure metrics. Query examples:
+- **Datadog** — APM traces, error tracking, and infrastructure metrics are available. Query examples:
 
   ```
   avg:trace.http.request.duration{service:myapp} by {resource_name}
@@ -142,16 +142,16 @@ If the information is missing, **ask the user** what monitoring and observabilit
   avg:runtime.go.num_goroutine{service:myapp}
   ```
 
-- **Sentry** — Check for captured exceptions, breadcrumbs, and error grouping. Sentry often captures the full stack trace and context of the first occurrence.
-- **ELK (Elasticsearch + Logstash + Kibana)** — Search structured logs for error patterns:
+- **Sentry** — Captured exceptions, breadcrumbs, and error grouping are available. Sentry often captures the full stack trace and context of the first occurrence.
+- **ELK (Elasticsearch + Logstash + Kibana)** — Structured logs can be searched for error patterns:
 
   ```
   level:error AND service:myapp AND @timestamp:[now-1h TO now]
   ```
 
-- **OpenTelemetry / Jaeger / Zipkin** — Check distributed traces for latency breakdowns across services, failed spans, and propagation issues.
+- **OpenTelemetry / Jaeger / Zipkin** — Distributed traces show latency breakdowns across services, failed spans, and propagation issues.
 
-If the user has an MCP server for any of these tools (Datadog MCP, Grafana MCP, etc.), suggest using it for interactive queries. Otherwise, suggest manual checks via their web UI or CLI.
+If the user has an MCP server for any of these tools (Datadog MCP, Grafana MCP, etc.), interactive queries may be available through it.
 
 ## Step 6: Compare with Working Code
 

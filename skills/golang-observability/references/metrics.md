@@ -167,7 +167,7 @@ This convention has practical benefits: PromQL queries are reviewed in PRs along
 
 Production-ready metrics covering all four types with comprehensive PromQL for dashboards and alerts.
 
-For infrastructure and dependency alerting (databases, caches, message brokers, reverse proxies, Kubernetes), use [awesome-prometheus-alerts](https://samber.github.io/awesome-prometheus-alerts/) — a curated collection of ~500 ready-to-use Prometheus alerting rules organized by technology. Browse to your dependency, copy the YAML rules, and customize thresholds for your environment. This saves significant effort compared to writing alert rules from scratch. See [alerting.md](alerting.md) for integration details and Go runtime alerts.
+For infrastructure and dependency alerting (databases, caches, message brokers, reverse proxies, Kubernetes), [awesome-prometheus-alerts](https://samber.github.io/awesome-prometheus-alerts/) provides a curated collection of ~500 ready-to-use Prometheus alerting rules organized by technology. See [alerting.md](alerting.md) for integration details and Go runtime alerts.
 
 NEVER use `irate(...)` for alerts — use `rate(...)` instead.
 
