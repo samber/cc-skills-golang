@@ -259,4 +259,4 @@ Skills can be copied into the repository and appended to `.github/copilot-instru
 
 ## Related Skills
 
-Related skills: `golang-lint`, `golang-security`, `golang-testing`, `golang-dependency-management`, `golang-modernize`.
+See `samber/cc-skills-golang@golang-lint`, `samber/cc-skills-golang@golang-security`, `samber/cc-skills-golang@golang-testing`, `samber/cc-skills-golang@golang-dependency-management`, `samber/cc-skills-golang@golang-modernize` skills.
