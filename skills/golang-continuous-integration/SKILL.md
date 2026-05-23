@@ -102,7 +102,7 @@ Use `-count=1` to disable test caching — cached results can hide flaky service
 
 ### golangci-lint Configuration
 
-Create `.golangci.yml` at the root of the project. The recommended golangci-lint configuration is documented in the golang-lint skill.
+Create `.golangci.yml` at the root of the project. See the `samber/cc-skills-golang@golang-lint` skill for the recommended configuration.
 
 ---
 
