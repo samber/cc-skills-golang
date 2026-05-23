@@ -27,9 +27,9 @@ For workflow configuration files (dependabot.yml, renovate.json, auto-merge work
 
 Before committing a dependency update:
 
-0. Suggest improvements to your project based on changelog features.
+0. Changelogs may suggest improvements applicable to the project.
 1. Run `go test ./...` and `go build ./...`
 2. Scan with `govulncheck ./...` or `go tool govulncheck ./...`
-3. Review release notes/changelogs for libraries that affect persistence, serialization, networking, authentication, authorization, cryptography, or public APIs
+3. Release notes/changelogs for libraries that affect persistence, serialization, networking, authentication, authorization, cryptography, or public APIs may contain important information about breaking changes
 4. Major version upgrades may contain breaking changes — the package's changelog documents them
-5. Adopt new APIs or patterns introduced in the updated version where they improve the codebase
+5. New APIs or patterns introduced in the updated version may offer improvements worth considering

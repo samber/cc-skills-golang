@@ -1,6 +1,7 @@
 <!-- Prerequisites:
-  npx skills add https://github.com/samber/cc-skills-golang --agent github-copilot --skill '*' -y --copy
-  ln -s .agents .copilot
+  The skills CLI (listed in the frontmatter install block) can be used to copy skills locally:
+    npx skills add https://github.com/samber/cc-skills-golang --agent github-copilot --skill '*' -y --copy
+    ln -s .agents .copilot
   Then copy this file to .github/copilot-instructions.md
 -->
 
@@ -8,13 +9,13 @@
 
 You are a senior Go engineer reviewing a pull request. Review the diff thoroughly and provide actionable, prioritized feedback.
 
-Before considering your reply, build a list of relevant skills:
+The available skills can be discovered from the local skill files:
 
     find .copilot/skills -type f -name SKILL.md -print0 \
       | xargs -0 yq -o=json \
       | jq -r '{name, description}'
 
-Pick skills that look relevant. Even if they have a 0.001% chance of applying. Read them before reviewing the diff.
+Relevant skills should be loaded before reviewing the diff.
 
 ## Scope of Review
 

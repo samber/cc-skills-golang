@@ -15,7 +15,7 @@ Alert on what matters to users. Google's SRE book defines four golden signals �
 
 ## Awesome Prometheus Alerts
 
-[awesome-prometheus-alerts](https://samber.github.io/awesome-prometheus-alerts/) is a curated collection of ~500 ready-to-use Prometheus alerting rules. Instead of writing alert rules from scratch for every database, message broker, and infrastructure component, use this as your starting point.
+[awesome-prometheus-alerts](https://samber.github.io/awesome-prometheus-alerts/) is a curated collection of ~500 ready-to-use Prometheus alerting rules. This collection serves as a starting point for infrastructure and dependency alerting.
 
 ### Categories
 
@@ -30,10 +30,11 @@ Alert on what matters to users. Google's SRE book defines four golden signals �
 
 ### How to Use It
 
-1. **Browse by technology** — find your database, message broker, or infrastructure component
-2. **Copy the alert rule** — each rule is a ready-to-use Prometheus alerting rule in YAML format
-3. **Customize thresholds** — adjust the threshold values (`> 0.01`, `> 100`, etc.) and the `for:` duration to match your SLOs and traffic patterns
-4. **Add to your Prometheus config** — paste into your `prometheus/rules/` directory
+The rules are organized by technology. Each rule is a ready-to-use Prometheus alerting rule in YAML format with customizable threshold values and `for:` durations.
+
+1. **Find by technology** — locate the relevant database, message broker, or infrastructure component
+2. **Adapt the YAML rule** — adjust threshold values (`> 0.01`, `> 100`, etc.) and the `for:` duration to match your SLOs and traffic patterns
+3. **Place in Prometheus config** — add to the `prometheus/rules/` directory
 
 ### Integration Example
 
@@ -74,8 +75,8 @@ rule_files:
 
 When adding a new infrastructure dependency (database, cache, message broker, reverse proxy) to a Go service:
 
-1. Check [awesome-prometheus-alerts](https://samber.github.io/awesome-prometheus-alerts/) for that technology
-2. Copy the relevant alert rules and adapt thresholds to your environment
+1. [awesome-prometheus-alerts](https://samber.github.io/awesome-prometheus-alerts/) has alert rules organized by technology
+2. Adapt the relevant alert rules and thresholds to your environment
 3. Verify the exporter is deployed (e.g., `postgres_exporter`, `redis_exporter`) — the alerts depend on metrics from these exporters
 4. Add the rules to your `prometheus/rules/` directory
 

@@ -22,6 +22,9 @@ metadata:
       - kind: brew
         formula: gh
         bins: [gh]
+      - kind: npm
+        package: skills
+        bins: [skills]
 allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(git:*) Agent WebFetch Bash(goreleaser:*) Bash(gh:*) AskUserQuestion
 ---
 
@@ -207,7 +210,7 @@ Key details:
 
 ## Repository Security Settings
 
-After creating workflow files, ALWAYS tell the developer to configure GitHub repository settings (branch protection, workflow permissions, secrets, environments) — see [repo-security.md](./references/repo-security.md)
+Repository security settings (branch protection, workflow permissions, secrets, environments) form the security foundation for the CI pipeline — these are documented in [repo-security.md](./references/repo-security.md).
 
 ---
 
@@ -230,9 +233,9 @@ The workflow runs parallel jobs, each scoped to a set of review areas and priori
 | `security` | Security, Dependencies | Blocking-first |
 | `quality-depth` | Tests, Performance, Observability, Modernize | Mixed |
 
-Depending on your project, also load: `golang-cli`, `golang-context`, `golang-data-structures`, `golang-database`, `golang-dependency-injection`, or any library-specific skill.
+Additional skills that may be relevant depending on the project: `golang-cli`, `golang-context`, `golang-data-structures`, `golang-database`, `golang-dependency-injection`, or any library-specific skill.
 
-Run `/install-github-app` in Claude Code to connect to the Claude API and configure the required secrets.
+The Claude Code GitHub App integration is configured via the `/install-github-app` command, which sets up the required API secrets.
 
 ### GitHub Copilot
 

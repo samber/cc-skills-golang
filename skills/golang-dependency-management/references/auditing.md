@@ -51,7 +51,7 @@ For CI pipeline integration, see the `samber/cc-skills-golang@golang-continuous-
 
 ## Tracking Outdated Dependencies with go-mod-outdated
 
-Use `psampaz/go-mod-outdated`.
+`psampaz/go-mod-outdated` lists outdated direct dependencies with available updates.
 
 ```bash
 # Show outdated direct dependencies with available updates
@@ -68,9 +68,7 @@ Output columns: MODULE, CURRENT version, WANTED (latest minor/patch), LATEST (la
 
 ## Analyzing Dependency Size with goweight
 
-Use `jondot/goweight`.
-
-`goweight` lists every package linked into the binary sorted by size contribution. Use it to identify bloated dependencies and evaluate whether a lighter alternative exists.
+`jondot/goweight` lists every package linked into the binary sorted by size contribution. It helps identify bloated dependencies and evaluate whether a lighter alternative exists.
 
 ```bash
 goweight          # Sort by size

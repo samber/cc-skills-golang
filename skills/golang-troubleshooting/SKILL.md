@@ -136,7 +136,7 @@ When you don't understand the issue:
 
 Before flagging a bug or proposing a fix, trace the data flow and check for upstream handling. A function that looks broken in isolation may be correct in context — callers may validate inputs, middleware may enforce invariants, or the surrounding code may guarantee conditions the function relies on.
 
-1. **Trace callers** — who calls this function and with what values? Use Grep/Agent to find all call sites.
+1. **Trace callers** — who calls this function and with what values? Call sites can be found with code search tools.
 2. **Check upstream validation** — input parsing, type conversions, or guard clauses earlier in the chain may make the "bug" unreachable.
 3. **Read the surrounding code** — middleware, interceptors, or init functions may set up state the function depends on.
 

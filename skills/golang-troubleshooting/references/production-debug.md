@@ -6,7 +6,7 @@ When paged for a production issue:
 
 ### Step 1: Capture Immediately (don't restart!)
 
-Capture all profiles before restarting the process. Use the curl commands from [pprof.md](./pprof.md), targeting your production server address. At minimum, capture: goroutine dump (`?debug=2`), heap, CPU (30s), and mutex profiles.
+Capture all profiles before restarting the process. The curl commands in [pprof.md](./pprof.md) can be used targeting your production server address. At minimum, capture: goroutine dump (`?debug=2`), heap, CPU (30s), and mutex profiles.
 
 ### Step 2: System Metrics
 
@@ -92,7 +92,7 @@ func RequestID(ctx context.Context) string {
 ### HTTP Client Issues
 
 ```go
-// 1. Always set timeouts — default http.Client has NO timeout
+// 1. HTTP clients MUST set timeouts — default http.Client has NO timeout
 client := &http.Client{
     Timeout: 30 * time.Second,
     Transport: &http.Transport{
@@ -104,7 +104,7 @@ client := &http.Client{
     },
 }
 
-// 2. Always close response body
+// 2. Response body MUST be closed
 resp, err := client.Do(req)
 if err != nil {
     return err
