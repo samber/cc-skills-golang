@@ -239,7 +239,12 @@ The Claude Code GitHub App integration is configured via the `/install-github-ap
 
 ### GitHub Copilot
 
-Skills can be copied into the repository and appended to `.github/copilot-instructions.md` — see [copilot-review-instructions.md](./assets/copilot-review-instructions.md) for the review instructions template. The skills CLI is available via the frontmatter install block above.
+Copy skills into your repo, then append [copilot-review-instructions.md](./assets/copilot-review-instructions.md) to `.github/copilot-instructions.md`:
+
+```bash
+npx skills add https://github.com/samber/cc-skills-golang --agent github-copilot --skill '*' -y --copy
+ln -s .agents .copilot
+```
 
 ---
 
