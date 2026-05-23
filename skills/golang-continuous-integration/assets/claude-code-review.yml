@@ -45,7 +45,7 @@ jobs:
           go-version: stable
 
       - name: Install Go skills
-        run: npx skills@0.6.0 add https://github.com/samber/cc-skills-golang -a claude-code --skill '*' -y --copy
+        run: npx skills add https://github.com/samber/cc-skills-golang -a claude-code --skill '*' -y --copy
 
       - uses: anthropics/claude-code-action@v1
         with:
@@ -121,7 +121,7 @@ jobs:
           go-version: stable
 
       - name: Install Go skills
-        run: npx skills@0.6.0 add https://github.com/samber/cc-skills-golang -a claude-code --skill '*' -y --copy
+        run: npx skills add https://github.com/samber/cc-skills-golang -a claude-code --skill '*' -y --copy
 
       - uses: anthropics/claude-code-action@v1
         with:
@@ -200,7 +200,7 @@ jobs:
           go-version: stable
 
       - name: Install Go skills
-        run: npx skills@0.6.0 add https://github.com/samber/cc-skills-golang -a claude-code --skill '*' -y --copy
+        run: npx skills add https://github.com/samber/cc-skills-golang -a claude-code --skill '*' -y --copy
 
       - uses: anthropics/claude-code-action@v1
         with:
@@ -278,7 +278,7 @@ jobs:
           go-version: stable
 
       - name: Install Go skills
-        run: npx skills@0.6.0 add https://github.com/samber/cc-skills-golang -a claude-code --skill '*' -y --copy
+        run: npx skills add https://github.com/samber/cc-skills-golang -a claude-code --skill '*' -y --copy
 
       - uses: anthropics/claude-code-action@v1
         with:
