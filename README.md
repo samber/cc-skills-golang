@@ -188,7 +188,7 @@ These skills are designed as **atomic, cross-referencing units**. A skill may re
 | ⭐️ | ✅ `golang-design-patterns` | ⚡ ⚙️ | -37% | 66 | 2,610 | 9,316 |
 | ⭐️ | ✅ `golang-documentation` | ⚡ ⚙️ | -53% | 73 | 2,678 | 10,549 |
 | ⭐️ | ✅ `golang-error-handling` | ⚡ ⚙️ | -26% | 139 | 1,520 | 4,394 |
-| ⭐️ | 👷 `golang-how-to` |  | — | 0 | 0 | 0 |
+| ⭐️ | ✅ `golang-how-to` | ⚡ | — | 156 | 2,519 | 10,583 |
 | ⭐️ | ✅ `golang-modernize` | ⚡ | -61% | 68 | 2,476 | 7,599 |
 | ⭐️ | ✅ `golang-naming` | ⚡ ⚙️ | -23% | 158 | 2,865 | 7,233 |
 | ⭐️ | ✅ `golang-safety` | ⚡ | -58% | 78 | 2,457 | 5,227 |
