@@ -553,6 +553,8 @@ Before starting any task, propose a branch name and ask the developer to confirm
 
 After making changes, suggest the following as next steps for the developer to run. Do NOT execute these automatically.
 
+> **If the skill's scope changed** (new topic added, topic moved to another skill) **or if a skill was added/removed**: update `skills/golang-how-to/SKILL.md` — the skill loading table and the competing clusters section must reflect the current state of the plugin.
+
 1. ~~Validate against the spec: `skills-ref validate ./skills/{name}`~~ (disabled — [skills-ref doesn't support `user-invocable` yet](https://github.com/agentskills/agentskills/issues/105))
 2. Reformat markdowns with `npx prettier --write *.md "**/*.md"` then lint with `markdownlint-cli2 --config .markdownlint-cli2.jsonc ./` — run before measuring tokens, as formatting changes token counts 2b. Run `SNYK_TOKEN=<token> uvx snyk-agent-scan@latest skills/<name>/` and fix any W011/W012/W001 warnings before proceeding (see [Snyk agent scanner compliance](#snyk-agent-scanner-compliance))
 3. Measure token counts:
