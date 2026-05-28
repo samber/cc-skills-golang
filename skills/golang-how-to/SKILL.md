@@ -1,6 +1,6 @@
 ---
 name: golang-how-to
-description: "Navigator for the Golang skills plugin — classifies, routes, and disambiguates all 42 Golang skills in samber/cc-skills-golang. Use when you need to know which skill to apply (route mode), when two skills seem to overlap (disambiguate mode: performance vs benchmark vs troubleshooting, samber/lo vs mo vs ro, dependency injection cluster, testing vs stretchr-testify, safety vs security), or when you want to force-trigger specific Golang skills in a project CLAUDE.md or AGENTS.md (configure mode). Invoke as /golang-how-to or trigger contextually when the user asks \"which Go skill\", \"what's the difference between\", or \"always apply skill X in this project\"."
+description: "Golang skills orchestrator — always active on any Golang coding, review, debug, or setup task. Reads the task context and loads the most relevant skills from samber/cc-skills-golang, often multiple at once: writing a gRPC service loads golang-grpc + golang-testing + golang-error-handling; debugging a panic loads golang-troubleshooting + golang-safety; auditing security loads golang-security + golang-lint + golang-safety. Also: disambiguates competing clusters when two skills seem to overlap (performance vs benchmark vs troubleshooting, samber/lo vs mo vs ro, DI cluster, safety vs security), and configures CLAUDE.md or AGENTS.md to force-trigger skills in a project (/golang-how-to configure)."
 user-invocable: true
 license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents. Requires git.
@@ -17,44 +17,50 @@ metadata:
 allowed-tools: Read Edit Write Glob Grep Bash(git:*) Agent AskUserQuestion
 ---
 
-**Persona:** You are a Go skills librarian. Route Go tasks to the right skill — never improvise rules that another skill owns.
+**Persona:** You are a Go skills orchestrator. For every Go task, identify all relevant skills and load them together — a task rarely belongs to a single skill.
 
 **Modes:**
 
-- **Route** — given a task description, identify the single best skill and explain the boundary with competing skills.
-- **Disambiguate** — given two or more overlapping skill names or topic areas, show the boundary table.
-- **Configure** — add a `## Required Go skills` block to the project's `CLAUDE.md` or `AGENTS.md` so chosen skills always load. Follow [project-config.md](references/project-config.md).
+- **Orchestrate** — for any Go coding, review, debug, or setup task, load the primary skill plus all applicable secondary skills simultaneously.
+- **Disambiguate** — when two skills seem to overlap, show the boundary table. See [disambiguation.md](references/disambiguation.md).
+- **Configure** — add a `## Required Go skills` block to the project's `CLAUDE.md` or `AGENTS.md`. Follow [project-config.md](references/project-config.md).
 
-## Decision tree
+## Skill loading
 
-Route by primary intent:
+For each task, load the **primary skill** and all applicable **secondary skills** at the same time. Do not wait — load them together at the start.
 
-| Intent | Best skill |
-| --- | --- |
-| Design an API, choose a pattern | `samber/cc-skills-golang@golang-design-patterns` |
-| Name a type, function, or package | `samber/cc-skills-golang@golang-naming` |
-| Handle errors idiomatically | `samber/cc-skills-golang@golang-error-handling` |
-| Write goroutines, channels, sync | `samber/cc-skills-golang@golang-concurrency` |
-| Pass deadlines / cancel operations | `samber/cc-skills-golang@golang-context` |
-| Design structs, embed, use interfaces | `samber/cc-skills-golang@golang-structs-interfaces` |
-| Database queries and transactions | `samber/cc-skills-golang@golang-database` |
-| Build a gRPC service | `samber/cc-skills-golang@golang-grpc` |
-| Build a CLI command tree | `samber/cc-skills-golang@golang-spf13-cobra` |
-| Layer config from flags/env/file | `samber/cc-skills-golang@golang-spf13-viper` |
-| Write tests (table-driven, fuzz, parallel) | `samber/cc-skills-golang@golang-testing` |
-| Apply assert/require/mock assertions | `samber/cc-skills-golang@golang-stretchr-testify` |
-| Apply optimization patterns | `samber/cc-skills-golang@golang-performance` |
-| Measure with pprof / benchstat | `samber/cc-skills-golang@golang-benchmark` |
-| Debug a panic or unexpected behavior | `samber/cc-skills-golang@golang-troubleshooting` |
-| Monitor in production (logs, metrics, traces) | `samber/cc-skills-golang@golang-observability` |
-| Audit security vulnerabilities | `samber/cc-skills-golang@golang-security` |
-| Review formatting and style conventions | `samber/cc-skills-golang@golang-code-style` |
-| Configure golangci-lint | `samber/cc-skills-golang@golang-lint` |
-| Write godoc / README / CHANGELOG | `samber/cc-skills-golang@golang-documentation` |
-| Set up a new project structure | `samber/cc-skills-golang@golang-project-layout` |
-| Set up CI/CD pipeline | `samber/cc-skills-golang@golang-continuous-integration` |
-| Choose a library | `samber/cc-skills-golang@golang-popular-libraries` |
-| Adopt new Go language features | `samber/cc-skills-golang@golang-modernize` |
+| Intent | Primary | Also load |
+| --- | --- | --- |
+| Design an API, choose a pattern | `golang-design-patterns` | `golang-structs-interfaces`, `golang-naming` |
+| Name a type, function, or package | `golang-naming` | `golang-code-style` |
+| Handle errors idiomatically | `golang-error-handling` | `golang-safety` (nil-heavy code) |
+| Write goroutines, channels, sync | `golang-concurrency` | `golang-context` (if cancellation) |
+| Pass deadlines / cancel operations | `golang-context` | `golang-concurrency` (if goroutines) |
+| Design structs, embed, use interfaces | `golang-structs-interfaces` | `golang-design-patterns` |
+| Database queries and transactions | `golang-database` | `golang-error-handling`, `golang-security` |
+| Build a gRPC service | `golang-grpc` | `golang-testing`, `golang-error-handling` |
+| Build a GraphQL API | `golang-graphql` | `golang-testing`, `golang-error-handling` |
+| Build a CLI command tree | `golang-spf13-cobra` | `golang-cli`, `golang-spf13-viper` (if config) |
+| Layer config from flags/env/file | `golang-spf13-viper` | `golang-spf13-cobra` |
+| Write tests | `golang-testing` | `golang-stretchr-testify` (if using testify) |
+| Apply optimization patterns | `golang-performance` | `golang-benchmark` (measure first) |
+| Measure with pprof / benchstat | `golang-benchmark` | `golang-performance` (fix), `golang-troubleshooting` (root cause) |
+| Debug a panic or unexpected behavior | `golang-troubleshooting` | `golang-safety`, `golang-benchmark` (if perf-related) |
+| Monitor in production | `golang-observability` | `golang-performance` (if SLO breach) |
+| Audit security vulnerabilities | `golang-security` | `golang-safety`, `golang-lint` |
+| Review formatting and style | `golang-code-style` | `golang-naming`, `golang-lint` |
+| Configure golangci-lint | `golang-lint` | `golang-code-style` |
+| Write godoc / README / CHANGELOG | `golang-documentation` | `golang-naming` |
+| Set up a new project structure | `golang-project-layout` | `golang-design-patterns`, `golang-dependency-injection` |
+| Set up CI/CD pipeline | `golang-continuous-integration` | `golang-lint`, `golang-security` |
+| Choose a library | `golang-popular-libraries` | relevant library-specific skill |
+| Adopt new Go language features | `golang-modernize` | `golang-lint` |
+| Use samber/lo (slice/map helpers) | `golang-samber-lo` | `golang-data-structures` |
+| Use samber/oops (structured errors) | `golang-samber-oops` | `golang-error-handling` |
+| Use samber/slog-* (logging pipeline) | `golang-samber-slog` | `golang-observability` |
+| Use dependency injection | `golang-dependency-injection` | `golang-google-wire` or `golang-uber-fx` or `golang-samber-do` |
+
+All skill identifiers above are short forms of `samber/cc-skills-golang@<name>`.
 
 ## Categories at a glance
 
@@ -74,77 +80,24 @@ Full catalog with "use when" hooks: [by-category.md](references/by-category.md)
 
 ## Competing clusters — boundary lines
 
-Deep disambiguation with concrete examples: [disambiguation.md](references/disambiguation.md)
+Full boundary tables with routing examples: [disambiguation.md](references/disambiguation.md)
 
-### Performance cluster
+Key clusters and their owners:
 
-| Skill | Owns |
-| --- | --- |
-| `samber/cc-skills-golang@golang-performance` | Optimization patterns — "if X bottleneck → apply Y" |
-| `samber/cc-skills-golang@golang-benchmark` | pprof/trace capture, benchstat, CI regression |
-| `samber/cc-skills-golang@golang-troubleshooting` | Root cause, Delve, race detector, GODEBUG |
-| `samber/cc-skills-golang@golang-observability` | Always-on production signals (logs, metrics, traces) |
-
-### Dependency injection cluster
-
-| Skill | Owns |
-| --- | --- |
-| `samber/cc-skills-golang@golang-dependency-injection` | Concepts, manual injection, library comparison/decision |
-| `samber/cc-skills-golang@golang-google-wire` | Compile-time codegen (wire.Build, wire.NewSet) |
-| `samber/cc-skills-golang@golang-uber-dig` | Runtime reflection-based DI (dig.In/Out, value groups) |
-| `samber/cc-skills-golang@golang-uber-fx` | Full app framework: lifecycle + modules (wraps dig) |
-| `samber/cc-skills-golang@golang-samber-do` | Type-safe container, health checks, scopes |
-
-### samber/\* functional cluster
-
-| Skill | Owns |
-| --- | --- |
-| `samber/cc-skills-golang@golang-samber-lo` | Finite slice/map transforms (500+ generic helpers) |
-| `samber/cc-skills-golang@golang-samber-ro` | Reactive streams — infinite/event-driven (ReactiveX) |
-| `samber/cc-skills-golang@golang-samber-mo` | Monadic types: Option, Result, Either, Future |
-
-### Error handling cluster
-
-| Skill | Owns |
-| --- | --- |
-| `samber/cc-skills-golang@golang-error-handling` | Idiomatic wrapping, errors.Is/As, sentinel errors, panic/recover |
-| `samber/cc-skills-golang@golang-samber-oops` | Structured errors: stack traces, codes, attributes (samber/oops) |
-| `samber/cc-skills-golang@golang-safety` | Preventing panics/silent corruption (nil, overflow, aliasing) — not handling |
-
-### Style/naming/lint/docs cluster
-
-| Skill | Owns |
-| --- | --- |
-| `samber/cc-skills-golang@golang-code-style` | Formatting conventions, var declarations, comment heuristics |
-| `samber/cc-skills-golang@golang-naming` | Identifier names: packages, errors, booleans, receivers, acronyms |
-| `samber/cc-skills-golang@golang-lint` | golangci-lint config, nolint suppressions, linter selection |
-| `samber/cc-skills-golang@golang-documentation` | godoc comments, README structure, CHANGELOG, llms.txt |
-
-### CLI cluster
-
-| Skill | Owns |
-| --- | --- |
-| `samber/cc-skills-golang@golang-cli` | Architecture: exit codes, signal handling, I/O patterns |
-| `samber/cc-skills-golang@golang-spf13-cobra` | cobra.Command, RunE hooks, validators, shell completion |
-| `samber/cc-skills-golang@golang-spf13-viper` | Config layering, BindPFlag, ReadInConfig, hot reload |
-
-### Testing cluster
-
-| Skill | Owns |
-| --- | --- |
-| `samber/cc-skills-golang@golang-testing` | Table-driven, parallel, fuzz, goleak, integration tests, coverage |
-| `samber/cc-skills-golang@golang-stretchr-testify` | assert/require/mock/suite library APIs |
-
-### Boundary gaps (not explicit in source skill descriptions — see [disambiguation.md](references/disambiguation.md))
-
-- **design-patterns vs structs-interfaces**: type-level design (receivers, embedding, tags) → `golang-structs-interfaces`; architectural patterns (functional options, middleware) → `golang-design-patterns`.
-- **concurrency vs context**: goroutine coordination → `golang-concurrency`; cancellation/timeouts propagation → `golang-context`. Load both when cancelling goroutines via context.
-- **safety vs security**: internal correctness (nil, overflow, aliasing) → `golang-safety`; external threats (injection, crypto, secrets) → `golang-security`.
-- **modernize vs lint**: language feature adoption → `golang-modernize`; static analysis config → `golang-lint`.
+- **Performance**: `golang-performance` (optimization patterns) · `golang-benchmark` (measurement) · `golang-troubleshooting` (root cause) · `golang-observability` (always-on production)
+- **DI**: `golang-dependency-injection` (concepts/decision) · `golang-google-wire` (compile-time) · `golang-uber-dig` (runtime reflection) · `golang-uber-fx` (lifecycle framework) · `golang-samber-do` (type-safe container)
+- **samber/\***: `golang-samber-lo` (finite transforms) · `golang-samber-ro` (reactive streams) · `golang-samber-mo` (monadic types)
+- **Errors**: `golang-error-handling` (idioms) · `golang-samber-oops` (structured errors) · `golang-safety` (prevent panics)
+- **Style**: `golang-code-style` · `golang-naming` · `golang-lint` · `golang-documentation`
+- **CLI**: `golang-cli` (architecture) · `golang-spf13-cobra` (command tree) · `golang-spf13-viper` (config layering)
+- **Gap — type vs arch**: `golang-structs-interfaces` (type design) vs `golang-design-patterns` (architectural patterns)
+- **Gap — goroutine vs cancel**: `golang-concurrency` + `golang-context` — load both when cancelling goroutines via context
+- **Gap — correctness vs threat**: `golang-safety` (internal bugs) vs `golang-security` (external threats)
+- **Gap — features vs rules**: `golang-modernize` (language adoption) vs `golang-lint` (static analysis config)
 
 ## Configure mode
 
-Force-trigger specific skills in a project's `CLAUDE.md` or `AGENTS.md` so they always load, regardless of trigger heuristics.
+Force-trigger specific skills in a project's `CLAUDE.md` or `AGENTS.md` so they always load.
 
 When invoked as `/golang-how-to configure`, follow [project-config.md](references/project-config.md).
 
