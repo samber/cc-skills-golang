@@ -57,7 +57,7 @@ For each task, load the **primary skill** and all applicable **secondary skills*
 | Adopt new Go language features | `golang-modernize` | `golang-lint` |
 | Use samber/lo (slice/map helpers) | `golang-samber-lo` | `golang-data-structures`, `golang-performance` |
 | Use samber/oops (structured errors) | `golang-samber-oops` | `golang-error-handling` |
-| Use samber/slog-* (logging pipeline) | `golang-samber-slog` | `golang-observability` |
+| Use log/slog | `golang-samber-slog` | `golang-observability` |
 | Use dependency injection | `golang-dependency-injection` | `golang-google-wire` or `golang-uber-fx` or `golang-samber-do` |
 
 All skill identifiers above are short forms of `samber/cc-skills-golang@<name>`.
