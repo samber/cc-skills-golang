@@ -51,7 +51,7 @@ For each task, load the **primary skill** and all applicable **secondary skills*
 | Review formatting and style | `golang-code-style` | `golang-naming`, `golang-lint` |
 | Configure golangci-lint | `golang-lint` | `golang-code-style` |
 | Write godoc / README / CHANGELOG | `golang-documentation` | `golang-naming` |
-| Set up a new project structure | `golang-project-layout` | `golang-design-patterns`, `golang-dependency-injection` |
+| Set up a new project structure | `golang-project-layout` | `golang-design-patterns`, `golang-dependency-injection`, `golang-lint` |
 | Set up CI/CD pipeline | `golang-continuous-integration` | `golang-lint`, `golang-security` |
 | Choose a library | `golang-popular-libraries` | relevant library-specific skill |
 | Adopt new Go language features | `golang-modernize` | `golang-lint` |
