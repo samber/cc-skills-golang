@@ -374,10 +374,3 @@ Use when: the codebase imports `github.com/stretchr/testify`. For test architect
 
 See "QA & Performance" section above.
 
----
-
-## Absent skills
-
-### `golang-temporal`
-
-The `skills/golang-temporal/` directory exists in this repository but contains no `SKILL.md`. This skill is not yet available. Inform the user and suggest consulting the Temporal Go SDK documentation directly.
