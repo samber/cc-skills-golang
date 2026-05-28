@@ -55,7 +55,7 @@ For each task, load the **primary skill** and all applicable **secondary skills*
 | Set up CI/CD pipeline | `golang-continuous-integration` | `golang-lint`, `golang-security` |
 | Choose a library | `golang-popular-libraries` | relevant library-specific skill |
 | Adopt new Go language features | `golang-modernize` | `golang-lint` |
-| Use samber/lo (slice/map helpers) | `golang-samber-lo` | `golang-data-structures` |
+| Use samber/lo (slice/map helpers) | `golang-samber-lo` | `golang-data-structures`, `golang-performance` |
 | Use samber/oops (structured errors) | `golang-samber-oops` | `golang-error-handling` |
 | Use samber/slog-* (logging pipeline) | `golang-samber-slog` | `golang-observability` |
 | Use dependency injection | `golang-dependency-injection` | `golang-google-wire` or `golang-uber-fx` or `golang-samber-do` |
