@@ -33,7 +33,7 @@ If the block already exists, read it and confirm with the user whether to update
 
 ## Step 3 — Confirm the skill set with the user
 
-Use `AskUserQuestion` to confirm which skills to always load. Present the ⭐️ recommended skills as the default selection. Remind the user of the token budget (each always-loaded skill adds its description tokens to every session — the 13 recommended skills add ~1,400 tokens at startup).
+Use `AskUserQuestion` to confirm which skills to always load. Present the ⭐️ recommended skills as the default selection. Remind the user of the token budget (each always-loaded skill adds its description tokens to every session — the 11 recommended skills add ~1,100 tokens at startup).
 
 Recommended ⭐️ set for most projects:
 
