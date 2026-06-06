@@ -25,6 +25,9 @@ allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(g
 
 **Thinking mode:** Use `ultrathink` for benchmark analysis, profile interpretation, and performance comparison tasks. Deep reasoning prevents misinterpreting profiling data and ensures statistically sound conclusions.
 
+**Dependencies:**
+- benchstat: `go install golang.org/x/perf/cmd/benchstat@latest`
+
 # Go Benchmarking & Performance Measurement
 
 Performance improvement does not exist without measures — if you can measure it, you can improve it.

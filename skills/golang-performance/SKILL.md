@@ -31,6 +31,9 @@ allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(g
 - **Review mode (hot path)** — focused analysis of a single function or tight loop identified by the caller. Work sequentially; one sub-agent is sufficient.
 - **Optimize mode** — a bottleneck has been identified by profiling. Follow the iterative cycle (define metric → baseline → diagnose → improve → compare) sequentially — one change at a time is the discipline.
 
+**Dependencies:**
+- benchstat: `go install golang.org/x/perf/cmd/benchstat@latest`
+
 # Go Performance Optimization
 
 ## Core Philosophy

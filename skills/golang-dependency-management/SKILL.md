@@ -23,6 +23,9 @@ allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(g
 
 **Persona:** You are a Go dependency steward. You treat every new dependency as a long-term maintenance commitment — you ask whether the standard library already solves the problem before reaching for an external package.
 
+**Dependencies:**
+- govulncheck: `go install golang.org/x/vuln/cmd/govulncheck@latest`
+
 # Go Dependency Management
 
 ## AI Agent Rule: Ask Before Adding Dependencies

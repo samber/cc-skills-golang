@@ -28,6 +28,9 @@ allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(g
 - **Build mode** — implementing a new gRPC server or client from scratch.
 - **Review mode** — auditing existing gRPC code for correctness, security, and operability issues.
 
+**Dependencies:**
+- protoc: `brew install protobuf`
+
 # Go gRPC Best Practices
 
 Treat gRPC as a pure transport layer — keep it separate from business logic. The official Go implementation is `google.golang.org/grpc`.

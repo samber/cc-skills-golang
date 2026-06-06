@@ -29,6 +29,9 @@ allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(g
 - **Build** — adding Swagger to a new or existing Go project: set up the toolchain, annotate handlers, generate docs, wire the UI endpoint.
 - **Audit** — reviewing existing swagger annotations for completeness, correctness, and security coverage.
 
+**Dependencies:**
+- swag: `go install github.com/swaggo/swag/cmd/swag@latest`
+
 ## Setup
 
 Three steps to get Swagger UI running:
