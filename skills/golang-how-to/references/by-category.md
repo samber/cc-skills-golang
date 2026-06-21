@@ -196,6 +196,14 @@ Use when: managing go.mod, dealing with replace directives, or structuring a mul
 
 ---
 
+### `samber/cc-skills-golang@golang-pkg-go-dev`
+
+Golang package and module exploration via `godig`, a pkg.go.dev API client (CLI + MCP server) — docs, symbols, versions, importers, licenses, and known vulnerabilities.
+
+Use when: looking up a module's available versions, CVEs, docs/symbols, or who imports it, or searching pkg.go.dev. For upgrading deps → `golang-dependency-management`; for choosing a library → `golang-popular-libraries`.
+
+---
+
 ### `samber/cc-skills-golang@golang-popular-libraries`
 
 Curated recommendations for production-ready Golang libraries — when the stdlib is enough vs when to reach for a package.
