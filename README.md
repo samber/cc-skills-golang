@@ -206,7 +206,7 @@ These skills are designed as **atomic, cross-referencing units**. A skill may re
 |  | ✅ `golang-lint` | ⚡ | -41% | 98 | 1,714 | 5,493 |
 |  | ✅ `golang-observability` | ⚡ ⚙️ | -37% | 161 | 2,921 | 18,453 |
 |  | ✅ `golang-performance` | ⚡ 🧠 | -39% | 127 | 1,953 | 17,855 |
-|  | ✅ `golang-pkg-go-dev` | ⚡ | — | 185 | 3,200 | 3,200 |
+|  | ✅ `golang-pkg-go-dev` | ⚡ | — | 185 | 3,165 | 3,165 |
 |  | ✅ `golang-popular-libraries` | ⚡ | -30% | 61 | 788 | 4,131 |
 |  | ✅ `golang-project-layout` | ⚡ | -38% | 69 | 1,510 | 5,718 |
 |  | ✅ `golang-stay-updated` | ⚡ | -56% | 43 | 1,916 | 1,916 |

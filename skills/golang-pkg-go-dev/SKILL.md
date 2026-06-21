@@ -68,35 +68,37 @@ Hosted instance (no install needed) — a public server runs at `https://godig.s
 claude mcp add --transport http pkg-go-dev https://godig.samber.dev/mcp
 ```
 
-The CLI and the MCP server expose the **same** operations. Prefer the CLI when available; otherwise use the MCP tools.
+The CLI and the MCP server expose the **same** operations under matching names. Prefer the CLI when `godig` is installed; the hosted instance is a fallback when it is not.
 
-## Usage — intent → command/tool
+## Usage — intent → command
 
 Always append `-o md` to CLI commands so the output is Markdown (renders well in chat).
 
-| Usage | Example | MCP tool |
-| --- | --- | --- |
-| `godig overview <path>` — start here, one compact call | `godig overview github.com/samber/ro -o md` | `overview` |
-| `godig search <query> [--symbol <s>] [--filter <expr>] [--limit N]` | `godig search "result option monad" --limit 5 -o md` | `search` |
-| `godig package info <path> [--imports]` | `godig package info github.com/samber/ro -o md` | `package-info` |
-| `godig package doc <path> --format <md\|text\|html>` | `godig package doc github.com/samber/ro --format md -o md` | `package-doc` |
-| `godig package examples <path>` | `godig package examples github.com/samber/ro -o md` | `package-examples` |
-| `godig package licenses <path>` | `godig package licenses github.com/samber/ro -o md` | `package-licenses` |
-| `godig module info <path>` | `godig module info github.com/samber/ro -o md` | `module-info` |
-| `godig module licenses <path>` | `godig module licenses github.com/samber/ro -o md` | `module-licenses` |
-| `godig module readme <path>` | `godig module readme github.com/samber/ro -o md` | `module-readme` |
-| `godig packages <path> [--limit N]` | `godig packages github.com/samber/ro -o md` | `packages` |
-| `godig versions <path> [--filter <expr>] [--limit N]` | `godig versions github.com/samber/ro -o md` | `versions` |
-| `godig imported-by <path> [--limit N]` | `godig imported-by github.com/samber/ro --limit 20 -o md` | `imported-by` |
-| `godig symbols <path> [--goos <os>] [--goarch <arch>] [--limit N]` | `godig symbols github.com/samber/ro -o md` | `symbols` |
-| `godig vulns <path>` | `godig vulns github.com/samber/ro -o md` | `vulns` |
+| Usage | Example |
+| --- | --- |
+| `godig overview <path>` — start here, one compact call | `godig overview github.com/samber/ro -o md` |
+| `godig search <query> [--symbol <s>] [--filter <expr>] [--limit N]` | `godig search "result option monad" --limit 5 -o md` |
+| `godig package info <path> [--imports]` | `godig package info github.com/samber/ro -o md` |
+| `godig package doc <path> --format <md\|text\|html>` | `godig package doc github.com/samber/ro --format md -o md` |
+| `godig package examples <path>` | `godig package examples github.com/samber/ro -o md` |
+| `godig package licenses <path>` | `godig package licenses github.com/samber/ro -o md` |
+| `godig module info <path>` | `godig module info github.com/samber/ro -o md` |
+| `godig module licenses <path>` | `godig module licenses github.com/samber/ro -o md` |
+| `godig module readme <path>` | `godig module readme github.com/samber/ro -o md` |
+| `godig packages <path> [--limit N]` | `godig packages github.com/samber/ro -o md` |
+| `godig versions <path> [--filter <expr>] [--limit N]` | `godig versions github.com/samber/ro -o md` |
+| `godig imported-by <path> [--limit N]` | `godig imported-by github.com/samber/ro --limit 20 -o md` |
+| `godig symbols <path> [--goos <os>] [--goarch <arch>] [--limit N]` | `godig symbols github.com/samber/ro -o md` |
+| `godig vulns <path>` | `godig vulns github.com/samber/ro -o md` |
+
+When `godig` runs as an MCP server, each command above is available as an operation of the same name (e.g. `overview`, `search`, `vulns`).
 
 ### Tips
 
 - **Start with `overview`** — one call returns a compact summary (metadata, latest + recent versions, license types, vulnerabilities). Reach for `doc`/`examples`/`module readme`/`licenses` (LARGE) only when the full text is needed.
 - **Always pass `-o md`** so results render as Markdown (tables, or raw doc/README) in the chat. Other formats exist (`table` default, `json`, `raw`) but prefer `md` here.
-- `<path>` is a full import path, e.g. `github.com/samber/lo`. Pass it as the positional argument (CLI) or as the `path` argument (MCP tool).
-- Optional parameters map 1:1 to CLI flags and MCP tool arguments (`version`, `module`, `limit`, `filter`, `goos`, `goarch`, ...).
+- `<path>` is a full import path, e.g. `github.com/samber/lo` — pass it as the positional argument.
+- Optional parameters map to CLI flags (`--version`, `--module`, `--limit`, `--filter`, `--goos`, `--goarch`, ...).
 - `--filter` is a **Go boolean expression** over item fields (functions: `contains`, `hasPrefix`, `hasSuffix`, `matches`), e.g. `--filter 'hasPrefix(version, "v1.5")'` — not a regex.
 - `--goos`/`--goarch` set the documentation/symbols build context (e.g. `linux`/`amd64`).
 - Listing commands auto-paginate (return all results); use `--limit` to cap.
@@ -142,23 +144,23 @@ godig vulns github.com/samber/ro -o md
 
 `godig overview github.com/samber/ro -o md`
 
-| field          | value                        |
-| -------------- | ---------------------------- |
-| latestVersion  | v0.3.0                       |
-| licenses       | ["Apache-2.0"]               |
-| modulePath     | github.com/samber/ro         |
-| name           | ro                           |
-| path           | github.com/samber/ro         |
-| recentVersions | ["v0.3.0","v0.2.0","v0.1.0"] |
-| repoUrl        | https://github.com/samber/ro |
+| field          | value                          |
+| -------------- | ------------------------------ |
+| latestVersion  | v0.3.0                         |
+| licenses       | ["Apache-2.0"]                 |
+| modulePath     | github.com/samber/ro           |
+| name           | ro                             |
+| path           | github.com/samber/ro           |
+| recentVersions | ["v0.3.0","v0.2.0","v0.1.0"]   |
+| repoUrl        | <https://github.com/samber/ro> |
 
 `godig search ro --limit 3 -o md`
 
 | modulePath | packagePath | synopsis | version |
 | --- | --- | --- | --- |
-| github.com/samber/ro | github.com/samber/ro |  | v0.3.0 |
-| github.com/blevesearch/bleve | github.com/blevesearch/bleve/analysis/lang/ro |  | v1.0.14 |
-| github.com/blevesearch/bleve/v2 | github.com/blevesearch/bleve/v2/analysis/lang/ro |  | v2.6.0 |
+| github.com/samber/ro | github.com/samber/ro | — | v0.3.0 |
+| github.com/blevesearch/bleve | github.com/blevesearch/bleve/analysis/lang/ro | — | v1.0.14 |
+| github.com/blevesearch/bleve/v2 | github.com/blevesearch/bleve/v2/analysis/lang/ro | — | v2.6.0 |
 
 `godig package info github.com/samber/ro -o md`
 
@@ -191,7 +193,7 @@ godig vulns github.com/samber/ro -o md
 
 | details | fixedVersion | id | summary |
 | --- | --- | --- | --- |
-| Authorization bypass in github.com/dgrijalva/jwt-go |  | GO-2020-0017 |  |
+| Authorization bypass in github.com/dgrijalva/jwt-go | — | GO-2020-0017 | — |
 
 `godig package licenses github.com/samber/ro -o md`
 
@@ -201,24 +203,24 @@ godig vulns github.com/samber/ro -o md
 
 `godig module info github.com/samber/ro -o md`
 
-| field             | value                        |
-| ----------------- | ---------------------------- |
-| commitTime        | 2026-03-02T15:16:08Z         |
-| hasGoMod          | true                         |
-| isLatest          | true                         |
-| isRedistributable | true                         |
-| path              | github.com/samber/ro         |
-| repoUrl           | https://github.com/samber/ro |
-| version           | v0.3.0                       |
+| field             | value                          |
+| ----------------- | ------------------------------ |
+| commitTime        | 2026-03-02T15:16:08Z           |
+| hasGoMod          | true                           |
+| isLatest          | true                           |
+| isRedistributable | true                           |
+| path              | github.com/samber/ro           |
+| repoUrl           | <https://github.com/samber/ro> |
+| version           | v0.3.0                         |
 
 `godig packages github.com/samber/ro --limit 4 -o md`
 
 | isRedistributable | name | path | synopsis |
 | --- | --- | --- | --- |
-| true | ro | github.com/samber/ro |  |
-| true | constraints | github.com/samber/ro/internal/constraints |  |
-| true | xatomic | github.com/samber/ro/internal/xatomic |  |
-| true | xerrors | github.com/samber/ro/internal/xerrors |  |
+| true | ro | github.com/samber/ro | — |
+| true | constraints | github.com/samber/ro/internal/constraints | — |
+| true | xatomic | github.com/samber/ro/internal/xatomic | — |
+| true | xerrors | github.com/samber/ro/internal/xerrors | — |
 
 `godig symbols github.com/samber/ro --limit 4 -o md`
 

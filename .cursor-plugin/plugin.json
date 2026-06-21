@@ -2,7 +2,7 @@
     "name": "cc-skills-golang",
     "displayName": "Skills for Golang",
     "description": "AI Agent Skills for production-ready Go projects",
-    "version": "1.5.1",
+    "version": "1.6.0",
     "author": {
         "name": "Samuel Berthe",
         "email": "hey@samuel-berthe.fr"
