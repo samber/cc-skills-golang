@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.0.3"
+  version: "1.0.4"
   openclaw:
     emoji: "🔥"
     homepage: https://github.com/samber/cc-skills-golang
@@ -29,7 +29,7 @@ Generic, type-safe in-memory caching library for Go 1.22+ with 9 eviction algori
 - [pkg.go.dev/github.com/samber/hot](https://pkg.go.dev/github.com/samber/hot)
 - [github.com/samber/hot](https://github.com/samber/hot)
 
-This skill is not exhaustive. Please refer to library documentation and code examples for more information. Context7 can help as a discoverability platform.
+This skill is not exhaustive. Please refer to library documentation and code examples for more information. Context7 can help as a discoverability platform. For Go package docs, versions, symbols, and known vulnerabilities, → See `samber/cc-skills-golang@golang-pkg-go-dev` skill.
 
 ```bash
 go get -u github.com/samber/hot

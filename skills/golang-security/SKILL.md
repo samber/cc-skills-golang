@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.1.7"
+  version: "1.1.8"
   openclaw:
     emoji: "🔒"
     homepage: https://github.com/samber/cc-skills-golang
@@ -131,6 +131,8 @@ go tool gosec ./...
 go get -tool golang.org/x/vuln/cmd/govulncheck@latest
 go tool govulncheck ./...
 ```
+
+To check the known CVEs of a specific module or version without scanning the whole tree (e.g. when vetting a dependency on pkg.go.dev), → See `samber/cc-skills-golang@golang-pkg-go-dev` skill.
 
 ### Security Testing
 

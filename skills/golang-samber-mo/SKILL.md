@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.0.4"
+  version: "1.0.5"
   openclaw:
     emoji: "🎭"
     homepage: https://github.com/samber/cc-skills-golang
@@ -31,7 +31,7 @@ Go 1.18+ library providing type-safe monadic types with zero dependencies. Inspi
 - [pkg.go.dev/github.com/samber/mo](https://pkg.go.dev/github.com/samber/mo)
 - [github.com/samber/mo](https://github.com/samber/mo)
 
-This skill is not exhaustive. Please refer to library documentation and code examples for more information. Context7 can help as a discoverability platform.
+This skill is not exhaustive. Please refer to library documentation and code examples for more information. Context7 can help as a discoverability platform. For Go package docs, versions, symbols, and known vulnerabilities, → See `samber/cc-skills-golang@golang-pkg-go-dev` skill.
 
 ```bash
 go get github.com/samber/mo

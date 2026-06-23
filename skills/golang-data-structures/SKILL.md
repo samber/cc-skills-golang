@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.1.3"
+  version: "1.1.4"
   openclaw:
     emoji: "🗃"
     homepage: https://github.com/samber/cc-skills-golang
@@ -156,7 +156,7 @@ For advanced data structures (trees, sets, queues, stacks) beyond the standard l
 - **`deckarep/golang-set`** — thread-safe and non-thread-safe set implementations
 - **`gammazero/deque`** — fast double-ended queue
 
-When using third-party libraries, refer to their official documentation and code examples for current API signatures. Context7 can help as a discoverability platform.
+When using third-party libraries, refer to their official documentation and code examples for current API signatures. Context7 can help as a discoverability platform. For Go package docs, versions, symbols, and known vulnerabilities, → See `samber/cc-skills-golang@golang-pkg-go-dev` skill.
 
 ## Cross-References
 
