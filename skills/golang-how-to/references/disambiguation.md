@@ -1,6 +1,6 @@
 # Competing clusters — deep disambiguation
 
-Eleven clusters where skills overlap. Each cluster includes a boundary table, concrete routing examples, and notes on gap cases not yet explicit in source skill descriptions.
+Twelve clusters where skills overlap. Each cluster includes a boundary table, concrete routing examples, and notes on gap cases not yet explicit in source skill descriptions.
 
 ---
 
@@ -214,3 +214,29 @@ Both skills suggest code changes, but for different reasons.
 - "My CI fails on `perfsprint` lint rule" → `golang-lint` (interpret the rule and decide whether to fix or suppress).
 - "Should I migrate from `log` to `slog`?" → `golang-modernize`.
 - "How do I configure golangci-lint to run only security-relevant linters?" → `golang-lint`.
+
+---
+
+## 12. Package lookup / discovery cluster
+
+These four skills all touch "third-party packages", but each owns a different stage. `golang-pkg-go-dev` is the read-only lookup layer (query facts about an _existing_ import path on pkg.go.dev); the others decide, manage, or remediate.
+
+| Skill | Unique territory | Does NOT own |
+| --- | --- | --- |
+| `samber/cc-skills-golang@golang-pkg-go-dev` | Querying pkg.go.dev for a known path: available versions, docs/symbols/examples, importers (`imported-by`), licenses, known CVEs — via the `godig` CLI/MCP | Deciding which library to pick, editing go.mod, scanning your own tree |
+| `samber/cc-skills-golang@golang-popular-libraries` | Recommending a library for a use case; stdlib-vs-third-party judgment | Looking up facts about a specific published package |
+| `samber/cc-skills-golang@golang-dependency-management` | Editing go.mod: `go get`, upgrading, pinning, `replace`/`exclude`, workspaces | Browsing a package's docs or version history |
+| `samber/cc-skills-golang@golang-security` | Whole-tree vulnerability scanning with `govulncheck`, remediation across the module | Checking one module's CVEs without scanning the tree |
+
+**Overlap zone:** "is dependency X safe / current?" — `golang-pkg-go-dev` answers facts (which versions exist, does this version have CVEs, who imports it); `golang-dependency-management` performs the upgrade/pin; `golang-security` scans your own code path for reachable vulnerabilities.
+
+**Routing examples:**
+
+- "What versions of github.com/samber/lo exist?" → `golang-pkg-go-dev` (`versions`).
+- "Does golang.org/x/text v0.3.0 have known vulnerabilities?" → `golang-pkg-go-dev` (`vulns`).
+- "Which packages import my library?" → `golang-pkg-go-dev` (`imported-by`).
+- "Which logging library should I adopt?" → `golang-popular-libraries`.
+- "Upgrade github.com/foo/bar to the latest version" → `golang-dependency-management`.
+- "Scan my whole module for reachable CVEs" → `golang-security` (`govulncheck`).
+
+> Note: this skill cross-references the other three in its body (and they reference it back). Prefer `golang-pkg-go-dev` over Context7 for any Go package fact-lookup.
