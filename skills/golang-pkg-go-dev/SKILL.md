@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents. Requires the godig CLI (go install github.com/samber/godig/cmd/godig@latest) or access to a godig MCP server, and internet access to reach the pkg.go.dev API.
 metadata:
   author: samber
-  version: "1.0.0"
+  version: "1.1.0"
   openclaw:
     emoji: "🔎"
     homepage: https://github.com/samber/cc-skills-golang
@@ -18,6 +18,7 @@ metadata:
       - kind: go
         package: github.com/samber/godig/cmd/godig@latest
         bins: [godig]
+    skill-library-version: "0.1.0"
 allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(git:*) Bash(godig:*) Agent
 ---
 
@@ -70,39 +71,64 @@ claude mcp add --transport http pkg-go-dev https://godig.samber.dev/mcp
 
 The CLI and the MCP server expose the **same** operations under matching names. Prefer the CLI when `godig` is installed; the hosted instance is a fallback when it is not.
 
-## Usage — intent → command
+## Commands
 
-Always append `-o md` to CLI commands so the output is Markdown (renders well in chat).
+**Global flags (all commands):** `-o/--output table|json|raw|md` (default `table` — pass `-o md` for chat), `--base-url`, `--timeout`, `--log-level debug|info|warn|error|off`. All are also settable via `GODIG_*` env vars.
 
-| Usage | Example |
-| --- | --- |
-| `godig overview <path>` — start here, one compact call | `godig overview github.com/samber/ro -o md` |
-| `godig search <query> [--symbol <s>] [--filter <expr>] [--limit N]` | `godig search "result option monad" --limit 5 -o md` |
-| `godig package info <path> [--imports]` | `godig package info github.com/samber/ro -o md` |
-| `godig package doc <path> --format <md\|text\|html>` | `godig package doc github.com/samber/ro --format md -o md` |
-| `godig package examples <path>` | `godig package examples github.com/samber/ro -o md` |
-| `godig package licenses <path>` | `godig package licenses github.com/samber/ro -o md` |
-| `godig module info <path>` | `godig module info github.com/samber/ro -o md` |
-| `godig module licenses <path>` | `godig module licenses github.com/samber/ro -o md` |
-| `godig module readme <path>` | `godig module readme github.com/samber/ro -o md` |
-| `godig packages <path> [--limit N]` | `godig packages github.com/samber/ro -o md` |
-| `godig versions <path> [--filter <expr>] [--limit N]` | `godig versions github.com/samber/ro -o md` |
-| `godig imported-by <path> [--limit N]` | `godig imported-by github.com/samber/ro --limit 20 -o md` |
-| `godig symbols <path> [--goos <os>] [--goarch <arch>] [--limit N]` | `godig symbols github.com/samber/ro -o md` |
-| `godig vulns <path>` | `godig vulns github.com/samber/ro -o md` |
+| Command | Args | Specific flags | Purpose |
+| --- | --- | --- | --- |
+| `overview` | `<path>` | `--version` | Compact summary (metadata, versions, licenses, vulns) — start here |
+| `search` | `<query>` | `--symbol --limit --filter` | Find packages (optionally exporting a symbol) |
+| `package info` | `<path>` | `--module --version` | Package metadata |
+| `package imports` | `<path>` | `--module --version` | Packages this package imports (plain list) |
+| `package doc` | `<path>` | `--module --version --goos --goarch --format md\|text\|html\|markdown` | Full package doc (LARGE) |
+| `package examples` | `<path>` | `--module --version --goos --goarch --symbol` | Runnable examples (LARGE; scope with `--symbol`) |
+| `package licenses` | `<path>` | `--module --version` | License files, full text (LARGE) |
+| `symbol doc` | `<path> <symbol>` | `--module --version --goos --goarch` | One symbol's signature + doc (token-efficient) |
+| `symbol examples` | `<path> <symbol>` | `--module --version --goos --goarch` | One symbol's runnable examples |
+| `symbols` | `<path>` | `--module --version --goos --goarch --limit --filter` | List exported symbols |
+| `module info` | `<path>` | `--version` | Module metadata |
+| `module licenses` | `<path>` | `--version` | Module license files (LARGE) |
+| `module readme` | `<path>` | `--version` | Module README, full Markdown (LARGE) |
+| `dependencies` | `<path>` | `--version` | go.mod deps: requires / replaces / excludes / go directive |
+| `packages` | `<path>` | `--version --limit --filter` | Packages contained in a module |
+| `versions` | `<path>` | `--limit --filter` | All versions, newest first |
+| `major-versions` | `<path>` | `--limit --filter --exclude-pseudo` | Major versions (v1, v2 …) living as separate modules |
+| `imported-by` | `<path>` | `--module --version --limit --filter` | Packages that import this one |
+| `vulns` | `<path>` | `--module --version --limit --filter` | Known vulnerabilities |
+| `mcp` | — | `--transport stdio\|http --addr --cache-ttl --cache-size` | Run as an MCP server |
+| `version` | — | — | Print godig version / commit / build date |
 
-When `godig` runs as an MCP server, each command above is available as an operation of the same name (e.g. `overview`, `search`, `vulns`).
+When `godig` runs as an MCP server, each data command above is exposed as an operation of the same name.
+
+Full `-o md` output for every command: [sample-output.md](references/sample-output.md).
 
 ### Tips
 
 - **Start with `overview`** — one call returns a compact summary (metadata, latest + recent versions, license types, vulnerabilities). Reach for `doc`/`examples`/`module readme`/`licenses` (LARGE) only when the full text is needed.
 - **Always pass `-o md`** so results render as Markdown (tables, or raw doc/README) in the chat. Other formats exist (`table` default, `json`, `raw`) but prefer `md` here.
 - `<path>` is a full import path, e.g. `github.com/samber/lo` — pass it as the positional argument.
-- Optional parameters map to CLI flags (`--version`, `--module`, `--limit`, `--filter`, `--goos`, `--goarch`, ...).
-- `--filter` is a **Go boolean expression** over item fields (functions: `contains`, `hasPrefix`, `hasSuffix`, `matches`), e.g. `--filter 'hasPrefix(version, "v1.5")'` — not a regex.
+- `--version` pins a specific module version (`v1.5.0`, `latest`, `master`, `main`); `--module` disambiguates which module a package belongs to.
+- `--filter` narrows list results server-side with a Go boolean expression — see [Filter syntax](#filter-syntax).
 - `--goos`/`--goarch` set the documentation/symbols build context (e.g. `linux`/`amd64`).
+- Prefer `symbol doc`/`symbol examples` over the package-wide `package doc`/`package examples` when you only need one symbol — far fewer tokens.
 - Listing commands auto-paginate (return all results); use `--limit` to cap.
-- `vulns` returns an empty list when a module has no known vulnerabilities.
+
+### Filter syntax
+
+`--filter` (on `search`, `versions`, `major-versions`, `packages`, `imported-by`, `symbols`, `vulns`) takes a **Go boolean expression evaluated server-side, once per result item**. It is not a regex — wrap the whole expression in single quotes for the shell.
+
+- **Identifiers** are the item's output fields (the columns of that command's table): e.g. `version`, `kind`, `name`, `path`, `synopsis`, `parent`, `deprecated`, `retracted`, `isRedistributable`. An unknown field fails with `undefined identifier` (HTTP 400).
+- **Operators**: `==` `!=` `<` `<=` `>` `>=`, boolean `&&` `||` `!`, parentheses for grouping.
+- **String functions**: `contains(s, sub)`, `hasPrefix(s, pre)`, `hasSuffix(s, suf)`, `matches(s, regexp)` — only `matches` is a regex.
+- **Literals**: double-quoted strings (`"Function"`), `true`/`false`, numbers.
+
+```bash
+godig symbols github.com/samber/lo --filter 'kind=="Function"' -o md
+godig symbols github.com/samber/lo --filter 'kind=="Function" && hasPrefix(name,"Map")' -o md
+godig versions github.com/samber/lo --filter 'matches(version,"^v1\.5")' -o md
+godig versions github.com/samber/lo --filter 'deprecated==false && retracted==false' -o md
+```
 
 ### Examples
 
@@ -117,131 +143,35 @@ godig search "result option monad" --limit 5 -o md
 
 # Package facets
 godig package info github.com/samber/ro -o md
+godig package imports github.com/samber/ro -o md
 godig package doc github.com/samber/ro --format md -o md
-godig package examples github.com/samber/ro -o md
+godig package examples github.com/samber/ro --symbol Map -o md
 godig package licenses github.com/samber/ro -o md
+
+# Single symbol (token-efficient vs package-wide doc/examples)
+godig symbol doc github.com/samber/lo Map -o md
+godig symbol examples github.com/samber/oops OopsError.Error -o md
 
 # Module facets
 godig module info github.com/samber/ro -o md
-godig module readme github.com/samber/ro -o md
-godig module licenses github.com/samber/ro -o md
+godig module readme github.com/samber/ro -o raw
+godig dependencies github.com/samber/ro -o md
 
 # Lists (auto-paginated; --limit to cap)
 godig versions github.com/samber/ro -o md
+godig major-versions github.com/samber/lo -o md
 godig packages github.com/samber/ro -o md
 godig imported-by github.com/samber/ro --limit 20 -o md
-godig symbols github.com/samber/ro -o md
+godig symbols github.com/samber/ro --filter 'kind=="Function"' -o md
 
-# Filter (Go boolean expression over item fields) and build context (goos/goarch)
-godig versions github.com/samber/ro --filter 'hasPrefix(version, "v0.3")' -o md
+# Pin a version / set the build context
+godig versions github.com/samber/ro --filter 'hasPrefix(version,"v0.3")' -o md
+godig package doc github.com/samber/lo --version v1.50.0 -o md
 godig symbols github.com/samber/ro --goos linux --goarch amd64 -o md
 
 # Vulnerabilities
 godig vulns github.com/samber/ro -o md
 ```
-
-### Sample output
-
-`godig overview github.com/samber/ro -o md`
-
-| field          | value                          |
-| -------------- | ------------------------------ |
-| latestVersion  | v0.3.0                         |
-| licenses       | ["Apache-2.0"]                 |
-| modulePath     | github.com/samber/ro           |
-| name           | ro                             |
-| path           | github.com/samber/ro           |
-| recentVersions | ["v0.3.0","v0.2.0","v0.1.0"]   |
-| repoUrl        | <https://github.com/samber/ro> |
-
-`godig search ro --limit 3 -o md`
-
-| modulePath | packagePath | synopsis | version |
-| --- | --- | --- | --- |
-| github.com/samber/ro | github.com/samber/ro | — | v0.3.0 |
-| github.com/blevesearch/bleve | github.com/blevesearch/bleve/analysis/lang/ro | — | v1.0.14 |
-| github.com/blevesearch/bleve/v2 | github.com/blevesearch/bleve/v2/analysis/lang/ro | — | v2.6.0 |
-
-`godig package info github.com/samber/ro -o md`
-
-| field             | value                |
-| ----------------- | -------------------- |
-| isLatest          | true                 |
-| isStandardLibrary | false                |
-| modulePath        | github.com/samber/ro |
-| name              | ro                   |
-| path              | github.com/samber/ro |
-| version           | v0.3.0               |
-
-`godig versions github.com/samber/ro --limit 3 -o md`
-
-| commitTime | hasGoMod | latestVersion | modulePath | version |
-| --- | --- | --- | --- | --- |
-| 2026-03-02T15:16:08Z | true | v0.3.0 | github.com/samber/ro | v0.3.0 |
-| 2025-10-25T22:20:38Z | true | v0.3.0 | github.com/samber/ro | v0.2.0 |
-| 2025-10-14T12:21:03Z | true | v0.3.0 | github.com/samber/ro | v0.1.0 |
-
-`godig imported-by github.com/samber/ro --limit 3 -o md`
-
-| package                                |
-| -------------------------------------- |
-| github.com/CooperCorona/websocket      |
-| github.com/CooperCorona/websocket/test |
-| github.com/samber/ro/ee/plugins/otel   |
-
-`godig vulns github.com/dgrijalva/jwt-go -o md`
-
-| details | fixedVersion | id | summary |
-| --- | --- | --- | --- |
-| Authorization bypass in github.com/dgrijalva/jwt-go | — | GO-2020-0017 | — |
-
-`godig package licenses github.com/samber/ro -o md`
-
-| contents                                 | filePath | types          |
-| ---------------------------------------- | -------- | -------------- |
-| Apache License Version 2.0 … (full text) | LICENSE  | ["Apache-2.0"] |
-
-`godig module info github.com/samber/ro -o md`
-
-| field             | value                          |
-| ----------------- | ------------------------------ |
-| commitTime        | 2026-03-02T15:16:08Z           |
-| hasGoMod          | true                           |
-| isLatest          | true                           |
-| isRedistributable | true                           |
-| path              | github.com/samber/ro           |
-| repoUrl           | <https://github.com/samber/ro> |
-| version           | v0.3.0                         |
-
-`godig packages github.com/samber/ro --limit 4 -o md`
-
-| isRedistributable | name | path | synopsis |
-| --- | --- | --- | --- |
-| true | ro | github.com/samber/ro | — |
-| true | constraints | github.com/samber/ro/internal/constraints | — |
-| true | xatomic | github.com/samber/ro/internal/xatomic | — |
-| true | xerrors | github.com/samber/ro/internal/xerrors | — |
-
-`godig symbols github.com/samber/ro --limit 4 -o md`
-
-| kind     | name              | parent          | synopsis                  |
-| -------- | ----------------- | --------------- | ------------------------- |
-| Type     | Backpressure      | Backpressure    | type Backpressure int8    |
-| Constant | BackpressureBlock | Backpressure    | const BackpressureBlock   |
-| Constant | BackpressureDrop  | Backpressure    | const BackpressureDrop    |
-| Type     | ConcurrencyMode   | ConcurrencyMode | type ConcurrencyMode int8 |
-
-`godig package doc <path> --format md -o md`, `godig package examples <path> -o md` and `godig module readme <path> -o md` return raw Markdown (long output), e.g.:
-
-```markdown
-# package ro
-
-## Constants
-
-...
-```
-
-`godig module licenses <path> -o md` mirrors `package licenses` (full license text).
 
 ---
 
