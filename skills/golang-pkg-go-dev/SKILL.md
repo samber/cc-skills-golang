@@ -101,6 +101,8 @@ The CLI and the MCP server expose the **same** operations under matching names. 
 
 When `godig` runs as an MCP server, each data command above is exposed as an operation of the same name.
 
+**Exit codes:** `0` success, `1` runtime error (network, package not found), `2` usage error — a missing/invalid argument or flag (e.g. a non-positive `--limit`), or a command group invoked with no subcommand (`godig package`). Check for `2` to tell a malformed call apart from a failed lookup.
+
 Full `-o md` output for every command: [sample-output.md](references/sample-output.md).
 
 ### Tips
@@ -119,16 +121,29 @@ Full `-o md` output for every command: [sample-output.md](references/sample-outp
 
 `--filter` (on `search`, `versions`, `major-versions`, `packages`, `imported-by`, `symbols`, `vulns`) takes a **Go boolean expression evaluated server-side, once per result item**. It is not a regex — wrap the whole expression in single quotes for the shell.
 
-- **Identifiers** are the item's output fields (the columns of that command's table): e.g. `version`, `kind`, `name`, `path`, `synopsis`, `parent`, `deprecated`, `retracted`, `isRedistributable`. An unknown field fails with `undefined identifier` (HTTP 400).
+- **Identifiers are the item's fields, which differ per command** — a field valid for one list is rejected by another (e.g. `search` exposes `packagePath`, not `path`). An unknown field fails with `undefined identifier: <name>` (HTTP 400), which names the offending field. Casing is not uniform: most fields use the lowercase JSON key, but `vulns` uses Go-style names (`ID`, not `id`), and `kind` values are capitalized (`Function`, not `func`).
 - **Operators**: `==` `!=` `<` `<=` `>` `>=`, boolean `&&` `||` `!`, parentheses for grouping.
-- **String functions**: `contains(s, sub)`, `hasPrefix(s, pre)`, `hasSuffix(s, suf)`, `matches(s, regexp)` — only `matches` is a regex.
+- **String functions**: `contains(s, sub)`, `hasPrefix(s, pre)`, `hasSuffix(s, suf)`.
 - **Literals**: double-quoted strings (`"Function"`), `true`/`false`, numbers.
+
+Filterable fields per command (string unless noted):
+
+| Command | Fields |
+| --- | --- |
+| `search` | `modulePath`, `packagePath`, `synopsis`, `version` |
+| `versions` | `version`, `modulePath`, `deprecated` (bool), `retracted` (bool), `hasGoMod` (bool), `commitTime` |
+| `packages` | `path`, `name`, `synopsis`, `isRedistributable` (bool) |
+| `imported-by` | `path` (the importing package path) |
+| `symbols` | `name`, `kind` (`Function`/`Method`/`Type`/`Variable`/`Constant`), `synopsis`, `parent` |
+| `vulns` | `ID`, `package`, `Details` |
+| `major-versions` | `modulePath`, `major`, `version`, `isLatest` (bool) |
 
 ```bash
 godig symbols github.com/samber/lo --filter 'kind=="Function"' -o md
 godig symbols github.com/samber/lo --filter 'kind=="Function" && hasPrefix(name,"Map")' -o md
-godig versions github.com/samber/lo --filter 'matches(version,"^v1\.5")' -o md
+godig versions github.com/samber/lo --filter 'hasPrefix(version,"v1.5")' -o md
 godig versions github.com/samber/lo --filter 'deprecated==false && retracted==false' -o md
+godig search "result option" --filter 'hasPrefix(packagePath,"github.com/samber/")' -o md
 ```
 
 ### Examples
