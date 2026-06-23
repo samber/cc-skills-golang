@@ -126,16 +126,25 @@ Full `-o md` output for every command: [sample-output.md](references/sample-outp
 - **String functions**: `contains(s, sub)`, `hasPrefix(s, pre)`, `hasSuffix(s, suf)`.
 - **Literals**: double-quoted strings (`"Function"`), `true`/`false`, numbers.
 
-Examples (regex matched against endpoint-specific fields; when in doubt, start broad and refine):
+Filterable fields per command (string unless noted):
 
-    # Versions matching v1.5.x
-    godig versions github.com/samber/lo --filter '^v1\.5\.' -o md
+| Command | Fields |
+| --- | --- |
+| `search` | `modulePath`, `packagePath`, `synopsis`, `version` |
+| `versions` | `version`, `modulePath`, `deprecated` (bool), `retracted` (bool), `hasGoMod` (bool), `commitTime` |
+| `packages` | `path`, `name`, `synopsis`, `isRedistributable` (bool) |
+| `imported-by` | `path` (the importing package path) |
+| `symbols` | `name`, `kind` (`Function`/`Method`/`Type`/`Variable`/`Constant`), `synopsis`, `parent` |
+| `vulns` | `ID`, `package`, `Details` |
+| `major-versions` | `modulePath`, `major`, `version`, `isLatest` (bool) |
 
-    # Major versions whose module path ends with /v2
-    godig major-versions github.com/samber/do --filter '/v2$' -o md
-
-    # Imported-by paths under github.com
-    godig imported-by github.com/samber/ro --filter '^github\.com/' --limit 20 -o md
+```bash
+godig symbols github.com/samber/lo --filter 'kind=="Function"' -o md
+godig symbols github.com/samber/lo --filter 'kind=="Function" && hasPrefix(name,"Map")' -o md
+godig versions github.com/samber/lo --filter 'hasPrefix(version,"v1.5")' -o md
+godig versions github.com/samber/lo --filter 'deprecated==false && retracted==false' -o md
+godig search "result option" --filter 'hasPrefix(packagePath,"github.com/samber/")' -o md
+```
 
 ### Examples
 
