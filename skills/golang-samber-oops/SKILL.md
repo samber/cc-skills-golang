@@ -1,6 +1,6 @@
 ---
 name: golang-samber-oops
-description: "Structured error handling in Golang with samber/oops — error builders, stack traces, error codes, error context, error wrapping, error attributes, user-facing vs developer messages, panic recovery, and logger integration. Apply when using or adopting samber/oops, or when the codebase already imports github.com/samber/oops."
+description: "Structured error handling in Golang with samber/oops — error builders, stack traces, error codes, error context, wrapping, attributes, user-facing vs developer messages, panic recovery, and logger integration. Apply when the codebase already imports github.com/samber/oops, when the user explicitly asks for samber/oops, or when an approved error-handling design requires structured error context to travel with errors."
 user-invocable: true
 license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
@@ -35,6 +35,19 @@ Standard Go errors lack context — you see `connection failed` but not which us
 - **Low-cardinality messages** — variable data in `.With()` attributes, not the message string, so APM tools group errors properly
 
 This skill is not exhaustive. Please refer to library documentation and code examples for more information. Context7 can help as a discoverability platform. For Go package docs, versions, symbols, and known vulnerabilities, → See `samber/cc-skills-golang@golang-pkg-go-dev` skill.
+
+## Adoption Gate
+
+Do not introduce `samber/oops` when standard errors plus structured logging are enough. Modern Go already has `errors.Is`, `errors.As`, `errors.Join`, `%w` wrapping, domain error types, and `log/slog` attributes.
+
+Before adding `samber/oops`:
+
+1. Confirm errors need to carry structured attributes, codes, public messages, stack traces, or ownership metadata across package boundaries.
+2. Check whether `fmt.Errorf("%w")`, custom error types, and `slog` at the handling boundary are simpler.
+3. Decide where error attributes are allowed to include PII or tenant/user identifiers.
+4. If this changes the project's error contract or observability model, produce an RFC and get human sign-off first.
+
+→ See `samber/cc-skills-golang@golang-architecture-governance`.
 
 ## Core pattern: Error builder chain
 

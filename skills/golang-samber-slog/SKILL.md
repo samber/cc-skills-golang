@@ -1,6 +1,6 @@
 ---
 name: golang-samber-slog
-description: "Structured logging extensions for Golang using samber/slog-**** packages — multi-handler pipelines (slog-multi), log sampling (slog-sampling), attribute formatting (slog-formatter), HTTP middleware (slog-fiber, slog-gin, slog-chi, slog-echo), and backend routing (slog-datadog, slog-sentry, slog-loki, slog-syslog, slog-logstash, slog-graylog...). Apply when using or adopting slog, or when the codebase already imports any github.com/samber/slog-* package."
+description: "Structured logging extensions for Golang using samber/slog-**** packages — multi-handler pipelines (slog-multi), log sampling (slog-sampling), attribute formatting (slog-formatter), HTTP middleware, and backend routing. Apply when the codebase already imports any github.com/samber/slog-* package, when the user explicitly asks for samber/slog packages, or when an approved logging design needs handler fanout/routing/sampling/formatting/sinks beyond stdlib log/slog."
 user-invocable: true
 license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
@@ -63,6 +63,20 @@ allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(g
 - [github.com/samber/slog-formatter](https://github.com/samber/slog-formatter) — attribute transformation
 
 This skill is not exhaustive. Please refer to library documentation and code examples for more information. Context7 can help as a discoverability platform. For Go package docs, versions, symbols, and known vulnerabilities, → See `samber/cc-skills-golang@golang-pkg-go-dev` skill.
+
+## Adoption Gate
+
+Start logging designs with stdlib `log/slog`. The samber/slog packages are useful extensions, but they should not trigger merely because a project uses `slog`.
+
+Before adding samber/slog packages:
+
+1. Check whether `slog.NewJSONHandler`, `slog.NewTextHandler`, `HandlerOptions`, `LogValuer`, groups, and a small custom `slog.Handler` are enough.
+2. Confirm the project needs fanout, routing, sampling, attribute formatting, framework middleware, or backend-specific sinks.
+3. Identify shutdown/flush behavior for buffered network sinks.
+4. Keep the logging contract compatible with plain `slog.Handler` where possible.
+5. If the pipeline affects observability architecture, PII handling, or alerting, produce an RFC and get human sign-off first.
+
+→ See `samber/cc-skills-golang@golang-architecture-governance`.
 
 ## The Pipeline Model
 

@@ -119,7 +119,7 @@ Go has three main approaches to DI libraries:
 
 | Criteria | Manual | google/wire | uber-go/dig + fx | samber/do |
 | --- | --- | --- | --- | --- |
-| **Project size** | Small (< 10 services) | Medium-Large | Large | Any size |
+| **Project size** | Small (< 10 services) | Medium-Large | Large | Medium-Large or lifecycle-heavy |
 | **Type safety** | Compile-time | Compile-time (codegen) | Runtime (reflection) | Compile-time (generics) |
 | **Code generation** | None | Required (`wire_gen.go`) | None | None |
 | **Reflection** | None | None | Yes | None |
@@ -257,6 +257,8 @@ This is particularly useful for integration tests where you want most services t
 | Need health checks, graceful shutdown | Use a library with built-in lifecycle support |
 | Team unfamiliar with DI concepts | Start manual, migrate incrementally |
 
+Adding or replacing a DI container changes startup structure, testing strategy, and service ownership. For architecture-sensitive changes, produce an RFC and get human sign-off first. → See `samber/cc-skills-golang@golang-architecture-governance`.
+
 ## Common Mistakes
 
 | Mistake | Fix |
@@ -271,6 +273,7 @@ This is particularly useful for integration tests where you want most services t
 ## Cross-References
 
 - → See `samber/cc-skills-golang@golang-samber-do` skill for detailed samber/do usage patterns
+- → See `samber/cc-skills-golang@golang-architecture-governance` skill for RFC sign-off before adopting or replacing a DI container
 - → See `samber/cc-skills-golang@golang-structs-interfaces` skill for interface design and composition
 - → See `samber/cc-skills-golang@golang-testing` skill for testing with dependency injection
 - → See `samber/cc-skills-golang@golang-project-layout` skill for DI initialization placement

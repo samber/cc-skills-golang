@@ -52,6 +52,20 @@ When recommending libraries:
 
 Remember: The best library is often no library at all. Go's standard library is excellent and sufficient for many use cases.
 
+## Dependency Adoption Gate
+
+Adding a dependency is an architectural decision when it changes package boundaries, runtime behavior, security posture, data flow, observability, or operational ownership.
+
+Before recommending or adding a new architectural dependency:
+
+1. Check whether modern Go stdlib or a small explicit implementation already solves the problem.
+2. Compare at least one mature alternative when the choice is not obvious.
+3. Verify maintenance, license, latest version, importers/adoption, and known vulnerabilities.
+4. Explain why the dependency is worth its abstraction and supply-chain cost.
+5. If the dependency affects service structure, database access, caching, logging pipelines, DI, multi-tenancy, or infrastructure, stop and produce an RFC for human sign-off first.
+
+→ See `samber/cc-skills-golang@golang-architecture-governance` for the RFC workflow.
+
 ## Anti-Patterns to Avoid
 
 - Over-engineering simple problems with complex libraries
@@ -63,6 +77,7 @@ Remember: The best library is often no library at all. Go's standard library is 
 ## Cross-References
 
 - → See `samber/cc-skills-golang@golang-dependency-management` skill for adding, auditing, and managing dependencies
+- → See `samber/cc-skills-golang@golang-architecture-governance` skill for RFC sign-off before architectural dependency choices
 - → See `samber/cc-skills-golang@golang-pkg-go-dev` skill to vet a candidate library on pkg.go.dev — versions, importers, licenses, and known vulnerabilities — before adopting it
 - → See `samber/cc-skills-golang@golang-samber-do` skill for samber/do dependency injection details
 - → See `samber/cc-skills-golang@golang-samber-oops` skill for samber/oops error handling details

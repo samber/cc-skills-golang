@@ -140,14 +140,14 @@ These skills are designed as **atomic, cross-referencing units**. A skill may re
 ┌──────────────┐ ┌──────────────┐ ┌─────────────────┐ ┌──────────────────┐
 │ Code Quality │ │ Arch & Design│ │    QA & Perf    │ │  Project Start   │
 ├──────────────┤ ├──────────────┤ ├─────────────────┤ ├──────────────────┤
-│ code-style   │ │ design-patt  │ │ testing         │ │ project-layout   │
-│ naming       │ │ concurrency  │ │ benchmark       │ │ popular-libs     │
-│ error-handl  │ │ context      │ │ performance     │ │ cli              │
-│ safety       │ │ dep-inject   │ │ troubleshoot    │ │ CI               │
-│ structs-iface│ │ data-structs │ │ observability   │ │ stay-updated     │
-│ documentation│ │ database     │ │                 │ │ dep-management   │
-│ lint         │ │ modernize    │ │                 │ │                  │
-│ security     │ │              │ │                 │ │                  │
+│ code-style   │ │ arch-govern  │ │ testing         │ │ project-layout   │
+│ naming       │ │ design-patt  │ │ benchmark       │ │ popular-libs     │
+│ error-handl  │ │ concurrency  │ │ performance     │ │ cli              │
+│ safety       │ │ context      │ │ troubleshoot    │ │ CI               │
+│ structs-iface│ │ dep-inject   │ │ observability   │ │ stay-updated     │
+│ documentation│ │ data-structs │ │                 │ │ dep-management   │
+│ lint         │ │ database     │ │                 │ │                  │
+│ security     │ │ modernize    │ │                 │ │                  │
 └──────────────┘ └──────────────┘ └─────────────────┘ └──────────────────┘
 
     ┌─────────────────────────────────────────────────────────────────────────┐
@@ -184,6 +184,7 @@ These skills are designed as **atomic, cross-referencing units**. A skill may re
 |  | Skill | Flags | Error rate gap | Description (tok) | SKILL.md (tok) | Directory (tok) |
 | --- | --- | --- | --- | --- | --- | --- |
 | ⭐️ | ✅ `golang-code-style` | ⚡ ⚙️ | -40% | 115 | 2,069 | 2,685 |
+| ⭐️ | ✅ `golang-architecture-governance` | ⚡ ⚙️ | — | 122 | 1,720 | 1,720 |
 | ⭐️ | ✅ `golang-data-structures` | ⚡ | -39% | 92 | 2,497 | 6,216 |
 | ⭐️ | ✅ `golang-database` | ⚡ ⚙️ | -38% | 97 | 2,725 | 7,248 |
 | ⭐️ | ✅ `golang-design-patterns` | ⚡ ⚙️ | -37% | 66 | 2,610 | 9,316 |
@@ -279,6 +280,10 @@ Go security best practices. Injection prevention (SQL, command, XSS), cryptograp
 Go struct and interface design. Composition, embedding, type assertions, interface segregation, struct tags (JSON/YAML/DB), pointer vs value receivers. Overridable.
 
 ### Architecture & Design
+
+#### `golang-architecture-governance`
+
+Architecture governance for Go agent workflows. Requires an RFC-style design proposal and human sign-off before creating services, changing package boundaries, adding infrastructure, changing database access/pooling, introducing multi-tenancy, or adopting major dependencies/frameworks. Prioritizes stdlib-first choices, resource limits, security, supply-chain review, and locked execution after approval. Overridable.
 
 #### `golang-concurrency`
 
@@ -399,6 +404,8 @@ CLI command trees with spf13/cobra. Command hierarchy, RunE hooks, flag manageme
 Layered configuration with spf13/viper. Flag > env > file > KV > default precedence, BindPFlag, hot reload, test isolation, and remote KV integration.
 
 ### samber/\*
+
+These skills document samber libraries when a project already uses them, when the user explicitly asks for them, or when an approved design decision chooses them. They are not intended to override the repository's stdlib-first guidance: for architectural dependency choices, use `golang-architecture-governance` and require human sign-off before implementation.
 
 #### `golang-samber-do`
 

@@ -21,7 +21,7 @@ allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(g
 
 **Modes:**
 
-- **Design mode** — creating new APIs, packages, or application structure: ask the developer about their architecture preference before proposing patterns; favor the smallest pattern that satisfies the requirement.
+- **Design mode** — creating new APIs, packages, or application structure: produce a short RFC and ask for human sign-off before writing application code; favor the smallest pattern that satisfies the requirement.
 - **Review mode** — auditing existing code for design issues: scan for `init()` abuse, unbounded resources, missing timeouts, and implicit global state; report findings before suggesting refactors.
 
 > **Community default.** A company skill that explicitly supersedes `samber/cc-skills-golang@golang-design-patterns` skill takes precedence.
@@ -242,6 +242,8 @@ Retry logic MUST check `ctx.Err()` between attempts and use exponential/linear b
 
 ## Architecture
 
+When a change affects service structure, package boundaries, data access, infrastructure, multi-tenancy, or major dependencies, stop before implementation and use an RFC-style proposal. Ask the developer to approve the global approach before writing code. → See `samber/cc-skills-golang@golang-architecture-governance`.
+
 Ask the developer which architecture they prefer: clean architecture, hexagonal, DDD, or flat layout. Don't impose complex architecture on a small project.
 
 Core principles regardless of architecture:
@@ -274,3 +276,4 @@ Core principles regardless of architecture:
 - → See `samber/cc-skills-golang@golang-concurrency` skill for goroutine lifecycle and graceful shutdown
 - → See `samber/cc-skills-golang@golang-context` skill for timeout and cancellation patterns
 - → See `samber/cc-skills-golang@golang-project-layout` skill for architecture and directory structure
+- → See `samber/cc-skills-golang@golang-architecture-governance` skill for RFC sign-off before structural changes

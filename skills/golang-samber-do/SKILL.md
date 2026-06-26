@@ -1,6 +1,6 @@
 ---
 name: golang-samber-do
-description: "Dependency injection in Golang using samber/do — service containers, lifecycle management, scopes, health checks, graceful shutdown, and module organization. Apply when using or adopting samber/do, when the codebase imports github.com/samber/do or github.com/samber/do/v2, or when refactoring manual constructor injection into a DI container."
+description: "Dependency injection in Golang using samber/do — service containers, lifecycle management, scopes, health checks, graceful shutdown, and module organization. Apply when the codebase already imports github.com/samber/do or github.com/samber/do/v2, when the user explicitly asks for samber/do, or when an approved architecture decision refactors manual constructor injection into a DI container."
 user-invocable: true
 license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
@@ -31,6 +31,19 @@ Type-safe dependency injection toolkit for Go based on Go 1.18+ generics.
 - [github.com/samber/do/v2](https://github.com/samber/do)
 
 This skill is not exhaustive. Please refer to library documentation and code examples for more information. Context7 can help as a discoverability platform. For Go package docs, versions, symbols, and known vulnerabilities, → See `samber/cc-skills-golang@golang-pkg-go-dev` skill.
+
+## Adoption Gate
+
+Do not introduce `samber/do` just because a project needs dependency injection. In Go, manual constructor injection is the default and is usually better for small graphs.
+
+Before adding `samber/do` to a project:
+
+1. Check whether manual constructors are still clear enough.
+2. Confirm the project needs container features such as lazy services, scoped services, lifecycle shutdown, health checks, container cloning, or many service registrations.
+3. Compare with the project's existing DI style and with other approved DI options when relevant.
+4. If this changes service wiring, package boundaries, startup lifecycle, or test setup, produce an RFC and get human sign-off first.
+
+→ See `samber/cc-skills-golang@golang-architecture-governance`.
 
 DO NOT USE v1 OF THIS LIBRARY. INSTALL v2 INSTEAD:
 

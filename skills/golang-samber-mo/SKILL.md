@@ -1,6 +1,6 @@
 ---
 name: golang-samber-mo
-description: "Monadic types for Golang using samber/mo — Option, Result, Either, Future, IO, Task, and State types for type-safe nullable values, error handling, and functional composition with pipeline sub-packages. Apply when using or adopting samber/mo, when the codebase imports `github.com/samber/mo`, or when considering functional programming patterns as a safety design for Golang."
+description: "Monadic types for Golang using samber/mo — Option, Result, Either, Future, IO, Task, and State types for nullable values, error handling, and functional composition. Apply when the codebase already imports `github.com/samber/mo`, when the user explicitly asks for samber/mo, or when an approved architecture decision adopts functional monadic types for a bounded domain."
 user-invocable: true
 license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
@@ -32,6 +32,20 @@ Go 1.18+ library providing type-safe monadic types with zero dependencies. Inspi
 - [github.com/samber/mo](https://github.com/samber/mo)
 
 This skill is not exhaustive. Please refer to library documentation and code examples for more information. Context7 can help as a discoverability platform. For Go package docs, versions, symbols, and known vulnerabilities, → See `samber/cc-skills-golang@golang-pkg-go-dev` skill.
+
+## Adoption Gate
+
+Monadic abstractions are not the default Go style. Prefer plain `(T, error)`, explicit structs, zero values, pointer fields, `sql.Null*` types, and small helper functions unless the project has intentionally adopted functional domain modeling.
+
+Before introducing `samber/mo`:
+
+1. Confirm the team wants Option/Result/Either types in public or internal APIs.
+2. Check whether ordinary Go error handling and nil/zero-value design are clearer.
+3. Avoid wrapping every Go API boundary if it adds conversion noise without reducing bugs.
+4. Keep adoption bounded to a package or domain unless the RFC explicitly approves wider use.
+5. If the choice changes API shapes or error-handling conventions, produce an RFC and get human sign-off first.
+
+→ See `samber/cc-skills-golang@golang-architecture-governance`.
 
 ```bash
 go get github.com/samber/mo

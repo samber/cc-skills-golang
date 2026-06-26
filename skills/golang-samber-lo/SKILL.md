@@ -1,6 +1,6 @@
 ---
 name: golang-samber-lo
-description: "Functional programming helpers for Golang using samber/lo — 500+ type-safe generic functions for slices, maps, channels, strings, math, tuples, and concurrency (Map, Filter, Reduce, GroupBy, Chunk, Flatten, Find, Uniq, etc.). Core immutable package (lo), concurrent variants (lo/parallel aka lop), in-place mutations (lo/mutable aka lom), lazy iterators (lo/it aka loi for Go 1.23+), and experimental SIMD (lo/exp/simd). Apply when using or adopting samber/lo, when the codebase imports github.com/samber/lo, or when implementing functional-style data transformations in Go. Not for streaming pipelines (→ See `samber/cc-skills-golang@golang-samber-ro` skill)."
+description: "Functional programming helpers for Golang using samber/lo — type-safe generic helpers for slices, maps, channels, strings, math, tuples, and concurrency (Map, Filter, Reduce, GroupBy, Chunk, Flatten, Find, Uniq, etc.). Core immutable package (lo), concurrent variants (lo/parallel aka lop), in-place mutations (lo/mutable aka lom), lazy iterators (lo/it aka loi for Go 1.23+), and experimental SIMD. Apply when the codebase already imports github.com/samber/lo, when the user explicitly asks for samber/lo, or when stdlib slices/maps/iter plus small loops would be materially less clear. Not for streaming pipelines (→ See `samber/cc-skills-golang@golang-samber-ro` skill)."
 user-invocable: true
 license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
@@ -31,6 +31,19 @@ Lodash-inspired, generics-first utility library with 500+ type-safe helpers for 
 - [pkg.go.dev/github.com/samber/lo](https://pkg.go.dev/github.com/samber/lo)
 
 This skill is not exhaustive. Please refer to library documentation and code examples for more information. Context7 can help as a discoverability platform. For Go package docs, versions, symbols, and known vulnerabilities, → See `samber/cc-skills-golang@golang-pkg-go-dev` skill.
+
+## Adoption Gate
+
+`samber/lo` is widely used and maintained, but modern Go covers many common collection helpers directly. Do not add it only for `Contains`, sorting, map keys, min/max, or simple one-off loops.
+
+Before adding `samber/lo`:
+
+1. Prefer `slices`, `maps`, `iter`, `cmp`, builtins, and short explicit loops when they are clear.
+2. Use `lo` when repeated Map/Filter/GroupBy/Chunk/Flatten-style transforms improve readability across a real package.
+3. Avoid `lo` chains in hot paths until benchmarks show the allocation/readability trade-off is acceptable.
+4. If adopting `lo` establishes a project-wide style rule, get human sign-off first.
+
+→ See `samber/cc-skills-golang@golang-architecture-governance`.
 
 ## Why samber/lo
 

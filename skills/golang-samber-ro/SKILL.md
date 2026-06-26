@@ -1,6 +1,6 @@
 ---
 name: golang-samber-ro
-description: "Reactive streams and event-driven programming in Golang using samber/ro — ReactiveX implementation with 150+ type-safe operators, cold/hot observables, 5 subject types (Publish, Behavior, Replay, Async, Unicast), declarative pipelines via Pipe, 40+ plugins (HTTP, cron, fsnotify, JSON, logging), automatic backpressure, error propagation, and Go context integration. Apply when using or adopting samber/ro, when the codebase imports github.com/samber/ro, or when building asynchronous event-driven pipelines, real-time data processing, streams, or reactive architectures in Go. Not for finite slice transforms (→ See `samber/cc-skills-golang@golang-samber-lo` skill)."
+description: "Reactive streams and event-driven programming in Golang using samber/ro — ReactiveX implementation with 150+ type-safe operators, cold/hot observables, subjects, declarative pipelines via Pipe, plugins, backpressure, error propagation, and Go context integration. Apply when the codebase already imports github.com/samber/ro, when the user explicitly asks for samber/ro, or when an approved architecture decision adopts reactive streams for complex event pipelines. Not for finite slice transforms (→ See `samber/cc-skills-golang@golang-samber-lo` skill)."
 user-invocable: true
 license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
@@ -33,6 +33,20 @@ Go implementation of [ReactiveX](https://reactivex.io/). Generics-first, type-sa
 - [pkg.go.dev/github.com/samber/ro](https://pkg.go.dev/github.com/samber/ro)
 
 This skill is not exhaustive. Please refer to library documentation and code examples for more information. Context7 can help as a discoverability platform. For Go package docs, versions, symbols, and known vulnerabilities, → See `samber/cc-skills-golang@golang-pkg-go-dev` skill.
+
+## Adoption Gate
+
+Reactive streams are a high-level abstraction for Go. Prefer ordinary channels, `context`, `select`, worker pools, iterators, and explicit goroutine ownership until the stream graph is complex enough to justify ReactiveX concepts.
+
+Before introducing `samber/ro`:
+
+1. Confirm the problem is a long-lived or asynchronous stream, not a finite slice transform.
+2. Check whether channels plus clear cancellation and backpressure are simpler.
+3. Identify ownership of subscriptions, shutdown, retries, and error propagation.
+4. Keep reactive code at system boundaries; do not leak observables through simple domain APIs unless approved.
+5. If this changes concurrency architecture or event-flow ownership, produce an RFC and get human sign-off first.
+
+→ See `samber/cc-skills-golang@golang-architecture-governance`.
 
 ## Why samber/ro (Streams vs Slices)
 

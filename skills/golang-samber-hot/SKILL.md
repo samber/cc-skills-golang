@@ -1,6 +1,6 @@
 ---
 name: golang-samber-hot
-description: "In-memory caching in Golang using samber/hot — eviction algorithms (LRU, LFU, TinyLFU, W-TinyLFU, S3FIFO, ARC, TwoQueue, SIEVE, FIFO), TTL, cache loaders, sharding, stale-while-revalidate, missing key caching, and Prometheus metrics. Apply when using or adopting samber/hot, when the codebase imports github.com/samber/hot, or when the project repeatedly loads the same medium-to-low cardinality resources at high frequency and needs to reduce latency or backend pressure."
+description: "In-memory caching in Golang using samber/hot — eviction algorithms (LRU, LFU, TinyLFU, W-TinyLFU, S3FIFO, ARC, TwoQueue, SIEVE, FIFO), TTL, cache loaders, sharding, stale-while-revalidate, missing key caching, and Prometheus metrics. Apply when the codebase already imports github.com/samber/hot, when the user explicitly asks for samber/hot, or when an approved caching design needs advanced eviction, TTL, loaders, sharding, stale-while-revalidate, or metrics."
 user-invocable: true
 license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
@@ -30,6 +30,20 @@ Generic, type-safe in-memory caching library for Go 1.22+ with 9 eviction algori
 - [github.com/samber/hot](https://github.com/samber/hot)
 
 This skill is not exhaustive. Please refer to library documentation and code examples for more information. Context7 can help as a discoverability platform. For Go package docs, versions, symbols, and known vulnerabilities, → See `samber/cc-skills-golang@golang-pkg-go-dev` skill.
+
+## Adoption Gate
+
+Do not introduce `samber/hot` for every memoization or map lookup problem. A `map` with a mutex, a small TTL wrapper, or a purpose-built singleflight layer may be clearer for simple caches.
+
+Before adding `samber/hot`:
+
+1. Define the cache purpose, working set, cardinality, memory budget, TTL, and invalidation model.
+2. Confirm advanced eviction/loaders/metrics are needed and cannot be implemented more simply.
+3. Compare with existing project cache choices and common alternatives when the cache is performance-critical.
+4. Decide failure behavior for loader errors, stale data, missing-key caching, and shutdown.
+5. If this cache affects data consistency, resource budgets, or backend load, produce an RFC and get human sign-off first.
+
+→ See `samber/cc-skills-golang@golang-architecture-governance`.
 
 ```bash
 go get -u github.com/samber/hot
