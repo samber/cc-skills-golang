@@ -1,6 +1,6 @@
 # godig sample output
 
-Representative `-o md` output for each command, captured against `godig` v0.1.0. Empty cells are shown as `—`. Field sets mirror the pkg.go.dev API and may grow over time.
+Representative `-o md` output for each command, captured against `godig` v0.2.0. Empty cells are shown as `—`. Field sets mirror the underlying APIs — pkg.go.dev for most commands, the Go vulnerability database (`vuln.go.dev`, OSV) for `vulns` — and may grow over time.
 
 ## overview
 
@@ -86,11 +86,13 @@ Representative `-o md` output for each command, captured against `godig` v0.1.0.
 
 `godig vulns github.com/dgrijalva/jwt-go -o md`
 
-| details | fixedVersion | id | summary |
-| --- | --- | --- | --- |
-| Authorization bypass in github.com/dgrijalva/jwt-go | — | GO-2020-0017 | — |
+Since v0.2.0 `vulns` reads the Go vulnerability database (`vuln.go.dev`, OSV) directly, so `summary` and per-range fix versions are populated (they were empty when sourced from pkg.go.dev). `fixedVersion` is gone — fixed/introduced versions now live in `ranges`; new `aliases`, `packages` and `references` fields are also returned.
 
-`vulns` returns an empty list when a module has no known vulnerabilities.
+| aliases | details | id | ranges | summary |
+| --- | --- | --- | --- | --- |
+| ["CVE-2020-26160","GHSA-w73w-5m7g-f7qc"] | If a JWT contains an audience claim with an array of strings ... | GO-2020-0017 | [{"introduced":"0.0.0-20150717181359-44718f8a89b0"}] | Authorization bypass in github.com/dgrijalva/jwt-go |
+
+`vulns` returns an empty list when a module has no known vulnerabilities. `--filter` and `--module` no longer apply to `vulns`; only `--version` and `--limit` do.
 
 ## dependencies
 
