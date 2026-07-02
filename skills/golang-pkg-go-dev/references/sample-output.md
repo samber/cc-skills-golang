@@ -1,6 +1,6 @@
 # godig sample output
 
-Representative `-o md` output for each command, captured against `godig` v0.2.0. Empty cells are shown as `—`. Field sets mirror the pkg.go.dev API and may grow over time.
+Representative `-o md` output for each command, captured against `godig` v0.2.0. Empty cells are shown as `—`. Field sets mirror the underlying APIs — pkg.go.dev for most commands, the Go vulnerability database (`vuln.go.dev`, OSV) for `vulns` — and may grow over time.
 
 ## overview
 
