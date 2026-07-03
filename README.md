@@ -112,6 +112,31 @@ Codex auto-discovers skills from `~/.agents/skills/` and `.agents/skills/`. Upda
 </details>
 
 <details>
+<summary>Autohand Code</summary>
+
+Copy skills into Autohand Code's global discovery directory:
+
+```bash
+git clone https://github.com/samber/cc-skills-golang.git
+mkdir -p ~/.autohand/skills
+cp -R cc-skills-golang/skills/* ~/.autohand/skills/
+```
+
+Or install into the current project:
+
+```bash
+git clone https://github.com/samber/cc-skills-golang.git
+mkdir -p .autohand/skills
+cp -R cc-skills-golang/skills/* .autohand/skills/
+```
+
+If these skills are later published to an Autohand Skills index, install a
+cataloged skill with `autohand --skill-install <skill-name>`, or add `--project`
+to install it into the current project.
+
+</details>
+
+<details>
 <summary>Antigravity</summary>
 
 Clone and symlink into the cross-client discovery path:
