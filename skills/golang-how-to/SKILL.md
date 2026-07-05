@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents. Requires git.
 metadata:
   author: samber
-  version: "1.1.0"
+  version: "1.1.1"
   openclaw:
     emoji: "🧭"
     homepage: https://github.com/samber/cc-skills-golang
@@ -18,7 +18,7 @@ metadata:
       - kind: go
         package: golang.org/x/tools/gopls@latest
         bins: [gopls]
-allowed-tools: Read Edit Write Glob Grep Bash(git:*) Agent AskUserQuestion LSP
+allowed-tools: Read Edit Write Glob Grep Bash(git:*) Agent AskUserQuestion LSP Bash(gopls:*) mcp__gopls__*
 ---
 
 **Persona:** You are a Go skills orchestrator. For every Go task, identify all relevant skills and load them together — a task rarely belongs to a single skill.
@@ -80,7 +80,7 @@ All skill identifiers above are short forms of `samber/cc-skills-golang@<name>`.
 
 **The native `LSP` tool** — Claude Code's built-in editor-style integration. It is **not enabled by default**: set `ENABLE_LSP_TOOL=1`, install `gopls`, and wire it as the Go language server by installing the official `gopls-lsp@claude-plugins-official` marketplace plugin. Its operations (`goToDefinition`, `findReferences`, `hover`, `documentSymbol`, `workspaceSymbol`, `goToImplementation`, call hierarchy) are keyed by `line`/`character`, so they're most useful once you already have a location — typically right after a grep or read — rather than as a first search. Its unique value the MCP server doesn't replicate: compiler diagnostics get pushed into context automatically after every edit, with no explicit `go_diagnostics` call needed.
 
-Either way, `gopls` only reasons about code that is present and resolvable in the local build: your workspace plus every dependency exactly as pinned in `go.sum` (including `replace` directives). `go_vulncheck` only flags what your *current* build actually reaches — for a specific published package/version you haven't added yet, or for a comprehensive whole-tree `govulncheck` audit, see `samber/cc-skills-golang@golang-pkg-go-dev` and `samber/cc-skills-golang@golang-security` respectively. For any fact that isn't tied to your local build — version history, licenses, ecosystem-wide importers — use `golang-pkg-go-dev` (`godig`). See that skill's `godig` vs gopls section for the full boundary.
+Either way, `gopls` only reasons about code that is present and resolvable in the local build: your workspace plus every dependency exactly as pinned in `go.sum` (including `replace` directives). `go_vulncheck` only flags what your _current_ build actually reaches — for a specific published package/version you haven't added yet, or for a comprehensive whole-tree `govulncheck` audit, see `samber/cc-skills-golang@golang-pkg-go-dev` and `samber/cc-skills-golang@golang-security` respectively. For any fact that isn't tied to your local build — version history, licenses, ecosystem-wide importers — use `golang-pkg-go-dev` (`godig`). See that skill's `godig` vs gopls section for the full boundary.
 
 ## Categories at a glance
 
