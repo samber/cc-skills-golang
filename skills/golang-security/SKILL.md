@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.1.8"
+  version: "1.1.9"
   openclaw:
     emoji: "🔒"
     homepage: https://github.com/samber/cc-skills-golang
@@ -18,7 +18,7 @@ metadata:
       - kind: go
         package: golang.org/x/vuln/cmd/govulncheck@latest
         bins: [govulncheck]
-allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(git:*) Agent WebFetch Bash(govulncheck:*) WebSearch AskUserQuestion
+allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(git:*) Agent WebFetch Bash(govulncheck:*) WebSearch AskUserQuestion EnterWorktree ExitWorktree
 ---
 
 **Persona:** You are a senior Go security engineer. You apply security thinking both when auditing existing code and when writing new code — threats are easier to prevent than to fix.
@@ -28,7 +28,7 @@ allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(g
 **Modes:**
 
 - **Review mode** — reviewing a PR for security issues. Start from the changed files, then trace call sites and data flows into adjacent code — a vulnerability may live outside the diff but be triggered by it. Sequential.
-- **Audit mode** — full codebase security scan. Launch up to 5 parallel sub-agents (via the Agent tool), each covering an independent vulnerability domain: (1) injection patterns, (2) cryptography and secrets, (3) web security and headers, (4) authentication and authorization, (5) concurrency safety and dependency vulnerabilities. Aggregate findings, score with DREAD, and report by severity.
+- **Audit mode** — full codebase security scan. Launch up to 5 parallel sub-agents (via the Agent tool), each covering an independent vulnerability domain: (1) injection patterns, (2) cryptography and secrets, (3) web security and headers, (4) authentication and authorization, (5) concurrency safety and dependency vulnerabilities. Aggregate findings, score with DREAD, and report by severity. A large audit produces many independent findings — apply each fix/improvement in its own worktree (`EnterWorktree`), so one fix = one worktree = one focused, reviewable, independently revertable PR, instead of one large mixed-concern change.
 - **Coding mode** — use when writing new code or fixing a reported vulnerability. Follow the skill's sequential guidance. Optionally launch a background agent to grep for common vulnerability patterns in newly written code while the main agent continues implementing the feature.
 
 **Dependencies:**

@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.2.2"
+  version: "1.2.3"
   openclaw:
     emoji: "🏎"
     homepage: https://github.com/samber/cc-skills-golang
@@ -18,7 +18,7 @@ metadata:
       - kind: go
         package: golang.org/x/perf/cmd/benchstat@latest
         bins: [benchstat]
-allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(git:*) Agent WebFetch Bash(benchstat:*) Bash(fieldalignment:*) Bash(staticcheck:*) Bash(curl:*) Bash(fgprof:*) Bash(perf:*) WebSearch AskUserQuestion
+allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(git:*) Agent WebFetch Bash(benchstat:*) Bash(fieldalignment:*) Bash(staticcheck:*) Bash(curl:*) Bash(fgprof:*) Bash(perf:*) WebSearch AskUserQuestion EnterWorktree ExitWorktree
 ---
 
 **Persona:** You are a Go performance engineer. You never optimize without profiling first — measure, hypothesize, change one thing, re-measure.
@@ -65,6 +65,8 @@ Before optimizing Go code, verify the bottleneck is in your process — if 90% o
 8. **Repeat** — increment report number, tackle next bottleneck
 
 Refer to library documentation for known patterns before inventing custom solutions. Keep all `/tmp/report-*.txt` files as an audit trail.
+
+When multiple candidate optimizations compete for the same bottleneck, implement each in an isolated worktree via a separate sub-agent — then → See `samber/cc-skills-golang@golang-benchmark` skill for comparing the variants and its serial-measurement caveat (concurrent benchmark runs on shared CPU contaminate results, even when the implementations themselves were built in parallel).
 
 ## Decision Tree: Where Is Time Spent?
 

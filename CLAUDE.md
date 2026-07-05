@@ -156,6 +156,7 @@ Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(git:*) Agent
 | `WebFetch` | Library-specific skills, skills requiring deep research/analysis, skills fetching external docs or resources |
 | `WebSearch` | Skills requiring deep research or analysis (security, benchmarking, performance, troubleshooting, observability) and skills that discover resources or track updates |
 | `AskUserQuestion` | Skills that benefit from clarifying user intent, confirming assumptions, or gathering context before proceeding — useful for audit/review modes, architecture decisions, ambiguous requirements, or any skill where acting on wrong assumptions is costly |
+| `EnterWorktree ExitWorktree` | Skills whose workflow spawns **mutating** parallel sub-agents (doc generation, modernization sweeps), compares code variants (benchmarks/perf), or applies each fix on its own branch (large security audits). Not for read-only parallel audits — concurrent reads need no isolation. |
 
 When creating a new skill, suggest a tailored `allowed-tools` list based on the skill's purpose.
 

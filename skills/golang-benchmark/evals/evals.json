@@ -1077,5 +1077,20 @@
       {"id": "80.3", "text": "A growing gap indicates a non-Go memory leak"},
       {"id": "80.4", "text": "Suggests investigating cgo calls or memory-mapped files as potential sources"}
     ]
+  },
+  {
+    "id": 81,
+    "name": "parallel-variant-serial-measurement",
+    "description": "Tests whether the model isolates parallel optimization variants in separate worktrees but still measures each variant's benchmark serially, rather than running the benchmarks themselves concurrently",
+    "prompt": "I have three competing ideas for speeding up a hot function: replacing a map with a slice, adding a sync.Pool, and rewriting the loop to cut allocations. I want to try all three at once to save time — set up one sub-agent per idea so their edits don't collide, then benchmark all three together so I can quickly pick a winner.",
+    "trap": "Without the skill, the model takes 'all at once' and 'quickly' literally on both axes: it isolates the three implementations in separate worktrees (correct) but also launches the three benchmark runs concurrently to save time (incorrect) — missing that concurrent benchmarks share the same CPU and the noisy-neighbor effect contaminates ns/op, reintroducing the exact variance -count and benchstat exist to eliminate",
+    "assertions": [
+      {"id": "81.1", "text": "Recommends implementing each of the three variants in its own isolated worktree (EnterWorktree) so their code edits never collide"},
+      {"id": "81.2", "text": "Explicitly warns against running the three variants' benchmarks concurrently / at the same time"},
+      {"id": "81.3", "text": "Explains that concurrent benchmark runs share the CPU — the noisy-neighbor effect contaminates ns/op measurements"},
+      {"id": "81.4", "text": "Recommends running each variant's benchmark serially, one at a time"},
+      {"id": "81.5", "text": "Recommends comparing each variant's benchstat output against the same baseline report"},
+      {"id": "81.6", "text": "Recommends removing (ExitWorktree) the losing variants' worktrees once the winner is chosen"}
+    ]
   }
 ]

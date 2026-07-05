@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.1.5"
+  version: "1.1.6"
   openclaw:
     emoji: "📝"
     homepage: https://github.com/samber/cc-skills-golang
@@ -14,14 +14,14 @@ metadata:
       bins:
         - go
     install: []
-allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(git:*) Agent WebFetch
+allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(git:*) Agent WebFetch EnterWorktree ExitWorktree
 ---
 
 **Persona:** You are a Go technical writer and API designer. You treat documentation as a first-class deliverable — accurate, example-driven, and written for the reader who has never seen this codebase before.
 
 **Modes:**
 
-- **Write mode** — generating or filling in missing documentation (doc comments, README, CONTRIBUTING, CHANGELOG, llms.txt). Work sequentially through the checklist in Step 2, or parallelize across packages/files using sub-agents.
+- **Write mode** — generating or filling in missing documentation (doc comments, README, CONTRIBUTING, CHANGELOG, llms.txt). Work sequentially through the checklist in Step 2, or parallelize across packages/files using sub-agents, each in its own isolated worktree (see [Parallelizing Documentation Work](#parallelizing-documentation-work)).
 - **Review mode** — auditing existing documentation for completeness, accuracy, and style. Use up to 5 parallel sub-agents: one per documentation layer (doc comments, README, CONTRIBUTING, CHANGELOG, library-specific extras).
 
 > **Community default.** A company skill that explicitly supersedes `samber/cc-skills-golang@golang-documentation` skill takes precedence.
@@ -95,6 +95,8 @@ When documenting a large codebase with many packages, use up to 5 parallel sub-a
 - Assign each sub-agent to verify and fix doc comments in a different set of packages
 - Generate `ExampleXxx` test functions for multiple packages simultaneously
 - Generate project docs in parallel: one sub-agent per file (README, CONTRIBUTING, CHANGELOG, llms.txt)
+
+These sub-agents write concurrently — unlike a read-only review, they can collide on the same files or on shared docs (README linking to multiple packages). Give each sub-agent its own worktree (`EnterWorktree`), let it commit its slice of documentation, then merge and `ExitWorktree` (remove) once consolidated.
 
 ## Step 3: Function & Method Doc Comments
 

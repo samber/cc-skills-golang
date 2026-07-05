@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.2.2"
+  version: "1.2.3"
   openclaw:
     emoji: "🔄"
     homepage: https://github.com/samber/cc-skills-golang
@@ -14,7 +14,7 @@ metadata:
       bins:
         - go
     install: []
-allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(git:*) Agent WebFetch WebSearch AskUserQuestion
+allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(git:*) Agent WebFetch WebSearch AskUserQuestion EnterWorktree ExitWorktree
 ---
 
 <!-- markdownlint-disable ol-prefix -->
@@ -24,7 +24,7 @@ allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(g
 **Modes:**
 
 - **Inline mode** (developer is actively coding): suggest only modernizations relevant to the current file or feature; mention other opportunities you noticed but do not touch unrelated files.
-- **Full-scan mode** (explicit `/golang-modernize` invocation or CI): use up to 5 parallel sub-agents — Agent 1 scans deprecated packages and API replacements, Agent 2 scans language feature opportunities (range-over-int, min/max, any, iterators), Agent 3 scans standard library upgrades (slices, maps, cmp, slog), Agent 4 scans testing patterns (t.Context, b.Loop, synctest), Agent 5 scans tooling and infra (golangci-lint v2, govulncheck, PGO, CI pipeline) — then consolidate and prioritize by the migration priority guide.
+- **Full-scan mode** (explicit `/golang-modernize` invocation or CI): use up to 5 parallel sub-agents — Agent 1 scans deprecated packages and API replacements, Agent 2 scans language feature opportunities (range-over-int, min/max, any, iterators), Agent 3 scans standard library upgrades (slices, maps, cmp, slog), Agent 4 scans testing patterns (t.Context, b.Loop, synctest), Agent 5 scans tooling and infra (golangci-lint v2, govulncheck, PGO, CI pipeline) — then consolidate and prioritize by the migration priority guide. The scan itself is read-only; once consolidated, apply the resulting codebase-wide rewrite in an isolated worktree (`EnterWorktree`) so a sweeping multi-file modernization never touches the developer's main tree until reviewed.
 
 # Go Code Modernization Guide
 
@@ -48,7 +48,7 @@ When invoked:
 6. **Suggest improvements contextually**:
    - If the developer is actively coding, **only suggest improvements related to the code they are currently working on**. Do not refactor unrelated files. Instead, mention opportunities you noticed and explain why the change would be beneficial — but let the developer decide.
    - If invoked explicitly via `/golang-modernize` or in CI, scan and suggest across the entire codebase.
-7. **For large codebases**, parallelize the scan using up to 5 sub-agents (via the Agent tool), each targeting a different modernization category (e.g. deprecated packages, language features, standard library upgrades, testing patterns, tooling and infra)
+7. **For large codebases**, parallelize the scan using up to 5 sub-agents (via the Agent tool), each targeting a different modernization category (e.g. deprecated packages, language features, standard library upgrades, testing patterns, tooling and infra). Once scanning is done and changes are ready to apply, do so in an isolated worktree (`EnterWorktree`) — a codebase-wide modernization sweep touches many files at once, and isolation keeps the main tree safe to abandon or review before merging.
 8. **Before suggesting a dependency update**, run `go mod tidy` and the test suite to verify compatibility. Ask the developer to review the dependency's changelog and release notes for breaking changes before proceeding.
 9. **If the developer explicitly ignores a suggestion**, write a short memo to `.modernize` in the project root so it is not suggested again. Format: one line per ignored suggestion, with a short description.
 
