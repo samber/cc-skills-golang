@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents. Requires the godig CLI (go install github.com/samber/godig/cmd/godig@latest) or access to a godig MCP server, and internet access to reach the pkg.go.dev API.
 metadata:
   author: samber
-  version: "1.2.0"
+  version: "1.3.0"
   openclaw:
     emoji: "🔎"
     homepage: https://github.com/samber/cc-skills-golang
@@ -38,36 +38,9 @@ Trigger on questions like:
 - "Which packages import X?"
 - "Search Go packages for Y."
 
-## `godig` vs gopls vs Context7
+## Choosing between `godig`, gopls, Context7, and govulncheck
 
-Three tools can answer "how does this library work," and they don't overlap as much as they look:
-
-- **Context7** is a general-purpose, cross-language documentation fetcher — useful when no more specific source exists. For a Go package or module, `godig` is almost always the better choice: it pulls **structured, Go-specific data** straight from pkg.go.dev — exact versions, exported symbols with signatures, runnable examples, `imported-by`, and known vulnerabilities — rather than Context7's generic scraped/curated docs, which don't expose that structure and can lag or miss lesser-known Go modules. Reach for Context7 only when a dependency's documentation genuinely doesn't exist or isn't indexed on pkg.go.dev.
-- **`godig`** answers questions about the **published ecosystem**: any Go package or module, whether or not it's in your `go.mod` yet — it calls the remote pkg.go.dev API and never touches your local checkout.
-- **`gopls`** (via its MCP server, or the native `LSP` tool) answers questions about **your specific build**: your code plus every dependency exactly as pinned in `go.sum`, including `replace` directives pointing at forks or local paths — neither `godig` nor Context7 can see that.
-
-Pick by task:
-
-| Task | Tool | How |
-| --- | --- | --- |
-| Find where a symbol is defined in your own repo | `gopls` | `go_search`, then `go_file_context` |
-| Understand a file's intra-package dependencies | `gopls` | `go_file_context` |
-| Jump into a dependency's exact resolved source (incl. forks/`replace`d versions) | `gopls` | `go_package_api`, or the native `LSP` tool's `goToDefinition` |
-| Find every call site in your own code that references a dependency's symbol | `gopls` | `go_symbol_references` — `godig`'s `imported-by` only lists public *packages*, not call sites in your repo |
-| Get compiler diagnostics right after an edit | `gopls` | `go_diagnostics` (MCP), or automatic with the native `LSP` tool |
-| Check whether your current build can reach a known vulnerability | `gopls` | `go_vulncheck` |
-| Whole-tree vulnerability audit across the module | `golang-security` skill | `govulncheck ./...` |
-| List available versions of a published package | `godig` | `godig versions <path>` |
-| Check known CVEs for a package/version you haven't added yet | `godig` | `godig vulns <path>` |
-| See exported symbols/signatures of a published package | `godig` | `godig symbols` / `symbol doc` |
-| Get runnable code examples for a symbol | `godig` | `godig symbol examples` |
-| Read a package's rendered README/docs | `godig` | `godig module readme` / `package doc` |
-| See who imports a package across the whole public ecosystem | `godig` | `godig imported-by` |
-| Search for a package or library candidate | `godig` | `godig search` |
-| Check a package's or module's license | `godig` | `godig package licenses` / `module licenses` |
-| Get docs for a non-Go library, or a Go module not indexed on pkg.go.dev | Context7 | `resolve-library-id` / `query-docs` |
-
-See the `samber/cc-skills-golang@golang-how-to` skill for wiring `gopls` (MCP server and native `LSP` tool) with Claude Code.
+In short: `godig` answers questions about the **published ecosystem** (works even for packages not yet in your `go.mod`); `gopls` reasons about **your locally resolved build** (`go.sum`, including `replace`d forks); Context7 is a fallback for non-Go or unindexed docs; `govulncheck` is the whole-tree vulnerability audit (→ `samber/cc-skills-golang@golang-security`). See the `samber/cc-skills-golang@golang-how-to` skill's "`godig` vs gopls vs Context7 vs govulncheck" section for the full task-to-tool matrix, and its "Code navigation with gopls" section for wiring `gopls` (MCP server and native `LSP` tool) with Claude Code.
 
 ## Setup
 
