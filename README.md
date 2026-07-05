@@ -172,6 +172,7 @@ These skills are designed as **atomic, cross-referencing units**. A skill may re
 - ❌ To-do
 - ⚡ Command available
 - 🧠 Ultrathink automatically
+- 🤖 Ultracode automatically
 - ⚙️ Overridable (see doc below)
 - **Description (tok)**: weight of the `description` field from YAML frontmatter, always loaded into Claude's context for skill triggering
 - **SKILL.md (tok)**: weight of the full `SKILL.md` file loaded when the skill triggers
@@ -183,30 +184,30 @@ These skills are designed as **atomic, cross-referencing units**. A skill may re
 
 |  | Skill | Flags | Error rate gap | Description (tok) | SKILL.md (tok) | Directory (tok) |
 | --- | --- | --- | --- | --- | --- | --- |
-| ⭐️ | ✅ `golang-code-style` | ⚡ ⚙️ | -40% | 115 | 2,069 | 2,685 |
+| ⭐️ | ✅ `golang-code-style` | ⚡ 🤖 ⚙️ | -40% | 115 | 2,069 | 2,685 |
 | ⭐️ | ✅ `golang-data-structures` | ⚡ | -39% | 92 | 2,497 | 6,216 |
 | ⭐️ | ✅ `golang-database` | ⚡ ⚙️ | -38% | 97 | 2,725 | 7,248 |
 | ⭐️ | ✅ `golang-design-patterns` | ⚡ ⚙️ | -37% | 66 | 2,610 | 9,316 |
-| ⭐️ | ✅ `golang-documentation` | ⚡ ⚙️ | -53% | 73 | 3,017 | 11,116 |
-| ⭐️ | ✅ `golang-error-handling` | ⚡ ⚙️ | -26% | 139 | 1,520 | 4,394 |
+| ⭐️ | ✅ `golang-documentation` | ⚡ 🤖 ⚙️ | -53% | 73 | 3,017 | 11,116 |
+| ⭐️ | ✅ `golang-error-handling` | ⚡ 🤖 ⚙️ | -26% | 139 | 1,520 | 4,394 |
 | ⭐️ | ✅ `golang-how-to` | ⚡ | — | 165 | 2,254 | 10,372 |
-| ⭐️ | ✅ `golang-modernize` | ⚡ | -61% | 68 | 2,719 | 9,032 |
+| ⭐️ | ✅ `golang-modernize` | ⚡ 🤖 | -61% | 68 | 2,780 | 9,093 |
 | ⭐️ | ✅ `golang-naming` | ⚡ ⚙️ | -23% | 158 | 2,865 | 7,233 |
 | ⭐️ | ✅ `golang-safety` | ⚡ | -58% | 78 | 2,457 | 5,227 |
-| ⭐️ | ✅ `golang-testing` | ⚡ 🧠 ⚙️ | -32% | 113 | 3,105 | 6,212 |
-| ⭐️ | ✅ `golang-troubleshooting` | ⚡ 🧠 | -32% | 126 | 2,735 | 15,901 |
-| ⭐️ | ✅ `golang-security` | ⚡ 🧠 | -32% | 85 | 3,094 | 21,530 |
+| ⭐️ | ✅ `golang-testing` | ⚡ 🧠 🤖 ⚙️ | -32% | 113 | 3,105 | 6,212 |
+| ⭐️ | ✅ `golang-troubleshooting` | ⚡ 🧠 🤖 | -32% | 126 | 2,735 | 15,901 |
+| ⭐️ | ✅ `golang-security` | ⚡ 🧠 🤖 | -32% | 85 | 3,160 | 21,596 |
 |  | ✅ `golang-benchmark` | ⚡ 🧠 | -50% | 102 | 2,814 | 29,996 |
 |  | ✅ `golang-cli` | ⚡ | -43% | 122 | 2,274 | 6,089 |
-|  | ✅ `golang-concurrency` | ⚡ ⚙️ | -39% | 71 | 1,873 | 6,338 |
+|  | ✅ `golang-concurrency` | ⚡ 🤖 ⚙️ | -39% | 71 | 1,873 | 6,338 |
 |  | ✅ `golang-context` | ⚡ ⚙️ | -34% | 80 | 1,144 | 3,940 |
 |  | ✅ `golang-continuous-integration` | ⚡ | -59% | 82 | 2,835 | 6,477 |
-|  | ✅ `golang-dependency-injection` | ⚡ ⚙️ | -47% | 176 | 2,842 | 5,113 |
+|  | ✅ `golang-dependency-injection` | ⚡ 🤖 ⚙️ | -47% | 176 | 2,842 | 5,113 |
 |  | ✅ `golang-dependency-management` | ⚡ | -54% | 77 | 2,361 | 5,499 |
 |  | ✅ `golang-structs-interfaces` | ⚡ ⚙️ | -35% | 110 | 2,999 | 2,999 |
-|  | ✅ `golang-lint` | ⚡ | -41% | 98 | 1,714 | 5,493 |
-|  | ✅ `golang-observability` | ⚡ ⚙️ | -37% | 161 | 2,921 | 18,453 |
-|  | ✅ `golang-performance` | ⚡ 🧠 | -39% | 130 | 2,121 | 18,121 |
+|  | ✅ `golang-lint` | ⚡ 🤖 | -41% | 98 | 1,714 | 5,493 |
+|  | ✅ `golang-observability` | ⚡ 🤖 ⚙️ | -37% | 161 | 2,921 | 18,453 |
+|  | ✅ `golang-performance` | ⚡ 🧠 🤖 | -39% | 130 | 2,190 | 18,190 |
 |  | ✅ `golang-pkg-go-dev` | ⚡ | — | 185 | 2,693 | 4,302 |
 |  | ✅ `golang-popular-libraries` | ⚡ | -30% | 61 | 893 | 4,287 |
 |  | ✅ `golang-project-layout` | ⚡ | -38% | 69 | 1,510 | 5,718 |

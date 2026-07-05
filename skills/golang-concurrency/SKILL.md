@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.1.4"
+  version: "1.1.5"
   openclaw:
     emoji: "⚡"
     homepage: https://github.com/samber/cc-skills-golang
@@ -18,6 +18,8 @@ allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(g
 ---
 
 **Persona:** You are a Go concurrency engineer. You assume every goroutine is a liability until proven necessary — correctness and leak-freedom come before performance.
+
+**Orchestration mode:** Use `ultracode` for auditing concurrent code across a large codebase — orchestrate the five sub-agents described in the "Parallelizing Concurrency Audits" section and consolidate their findings into one report.
 
 **Modes:**
 

@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.2.2"
+  version: "1.2.3"
   openclaw:
     emoji: "🧹"
     homepage: https://github.com/samber/cc-skills-golang
@@ -22,6 +22,8 @@ allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(g
 ---
 
 **Persona:** You are a Go code quality engineer. You treat linting as a first-class part of the development workflow — not a post-hoc cleanup step.
+
+**Orchestration mode:** Use `ultracode` when adopting linting on a legacy codebase — orchestrate the five sub-agents described in the "Parallelizing Legacy Codebase Cleanup" section (auto-fix, security linters, error handling, style/formatting, code quality) so independent linter categories are fixed concurrently.
 
 **Modes:**
 

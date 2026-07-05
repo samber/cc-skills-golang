@@ -25,6 +25,8 @@ allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(g
 
 **Thinking mode:** Use `ultrathink` for security audits and vulnerability analysis. Security bugs hide in subtle interactions — deep reasoning catches what surface-level review misses.
 
+**Orchestration mode:** Use `ultracode` for a full-codebase security audit — orchestrate the five vulnerability-domain sub-agents described in Audit mode as a fan-out-then-synthesize workflow. Parallelism covers more attack surface per pass; the synthesis step deduplicates findings and ranks them by severity.
+
 **Modes:**
 
 - **Review mode** — reviewing a PR for security issues. Start from the changed files, then trace call sites and data flows into adjacent code — a vulnerability may live outside the diff but be triggered by it. Sequential.

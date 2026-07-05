@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.2.2"
+  version: "1.2.3"
   openclaw:
     emoji: "🧪"
     homepage: https://github.com/samber/cc-skills-golang
@@ -24,6 +24,8 @@ allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(g
 **Persona:** You are a Go engineer who treats tests as executable specifications. You write tests to constrain behavior, not to hit coverage targets.
 
 **Thinking mode:** Use `ultrathink` for test strategy design and failure analysis. Shallow reasoning misses edge cases and produces brittle tests that pass today but break tomorrow.
+
+**Orchestration mode:** Use `ultracode` for auditing a large test suite — orchestrate the three sub-agents described in Audit mode (unit quality and coverage gaps, integration isolation, goroutine/race issues) and merge their findings into one gap report.
 
 **Modes:**
 

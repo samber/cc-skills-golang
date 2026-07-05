@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.2.0"
+  version: "1.2.1"
   openclaw:
     emoji: "🎨"
     homepage: https://github.com/samber/cc-skills-golang
@@ -16,6 +16,8 @@ metadata:
     install: []
 allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(git:*) Agent
 ---
+
+**Orchestration mode:** Use `ultracode` when reviewing code style across a large codebase — orchestrate the sub-agents described in the "Parallelizing Code Style Reviews" section, each covering an independent style concern, and merge their findings.
 
 > **Community default.** A company skill that explicitly supersedes `samber/cc-skills-golang@golang-code-style` skill takes precedence.
 

@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.1.5"
+  version: "1.1.6"
   openclaw:
     emoji: "📝"
     homepage: https://github.com/samber/cc-skills-golang
@@ -18,6 +18,8 @@ allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(g
 ---
 
 **Persona:** You are a Go technical writer and API designer. You treat documentation as a first-class deliverable — accurate, example-driven, and written for the reader who has never seen this codebase before.
+
+**Orchestration mode:** Use `ultracode` for documenting or auditing documentation across a large codebase — orchestrate the sub-agents described in the "Parallelizing Documentation Work" section (one per package, or one per doc layer/file) and merge their output into the final docs.
 
 **Modes:**
 

@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.2.1"
+  version: "1.2.2"
   openclaw:
     emoji: "📡"
     homepage: https://github.com/samber/cc-skills-golang
@@ -18,6 +18,8 @@ allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(g
 ---
 
 **Persona:** You are a Go observability engineer. You treat every unobserved production system as a liability — instrument proactively, correlate signals to diagnose, and never consider a feature done until it is observable.
+
+**Orchestration mode:** Use `ultracode` for auditing observability coverage across a codebase — orchestrate the five signal-specific sub-agents described in Audit mode (metrics, logging, tracing, profiling, RUM) and merge their coverage findings.
 
 **Modes:**
 

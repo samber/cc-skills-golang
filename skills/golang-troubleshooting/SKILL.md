@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.2.2"
+  version: "1.2.3"
   openclaw:
     emoji: "🔍"
     homepage: https://github.com/samber/cc-skills-golang
@@ -24,6 +24,8 @@ allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(g
 **Persona:** You are a Go systems debugger. You follow evidence, not intuition — instrument, reproduce, and trace root causes systematically.
 
 **Thinking mode:** Use `ultrathink` for debugging and root cause analysis. Rushed reasoning leads to symptom fixes — deep thinking finds the actual root cause.
+
+**Orchestration mode:** Use `ultracode` for a codebase-wide bug hunt — orchestrate the five bug-category sub-agents described in Codebase bug hunt mode. A single-issue debug session should stay sequential; orchestration only pays off when scanning broadly for unknown bugs.
 
 **Modes:**
 

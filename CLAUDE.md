@@ -189,10 +189,11 @@ Place these directives at the very top of the body, before the first heading, in
 | --- | --- | --- | --- |
 | **Persona** | Optional | `**Persona:** You are a <role>. <mindset or goal>.` | Analytical/generative/multi-mode skills |
 | **Thinking mode** | Optional | `**Thinking mode:** Use \`ultrathink\` for <task>. <Why deep reasoning matters>.` | Deep analysis: profiling, security auditing, root cause analysis |
+| **Orchestration mode** | Optional | `**Orchestration mode:** Use \`ultracode\` for <task>. <Why fan-out orchestration helps here>.` | Skills with a parallel fan-out audit/scan/cleanup mode (up to N sub-agents) |
 | **Modes** | Optional | `**Modes:**` section listing each invocation mode and its sub-agent strategy | Skills invoked in distinct contexts (audit, coding, review, code understanding...) |
 | **Dependencies** | Optional | `**Dependencies:**` list of required binaries with install commands | Skills that require external tools beyond `go` (e.g. `benchstat`, `dlv`, `golangci-lint`) |
 
-All four are optional. A short procedural skill may have none. A complex orchestrating skill may have all four.
+All five are optional. A short procedural skill may have none. A complex orchestrating skill may have all five.
 
 The **Dependencies** block lists only non-trivial developer tools — skip universal system utilities (e.g. `curl`, `git`). Prefer `go install` over `brew install` when the tool provides a Go install path; use `brew install` only for tools without one (e.g. `protoc`). Place this block last among the top-of-body directives, just before the first `#` heading.
 
@@ -272,6 +273,18 @@ When creating or modifying a skill that involves deep analysis, profiling, debug
 ```
 
 Update the README.md Ultrathink column (🧠 emoji) to keep track of skills requiring ultrathink mode.
+
+### Ultracode policy
+
+Skills that already describe a full-codebase audit/scan/cleanup mode with several parallel sub-agents (e.g. "launch up to 5 parallel sub-agents") include a **Orchestration mode:** `ultracode` instruction in their SKILL.md body. When you encounter this instruction and the user is requesting a broad, codebase-wide sweep, escalate to multi-agent fan-out orchestration instead of a single sequential pass.
+
+When creating or modifying a skill whose audit/scan/cleanup mode already fans out to parallel sub-agents, add this line in the top-of-body directives block, after **Thinking mode** (if present, otherwise after **Persona**) and before **Modes**:
+
+```
+**Orchestration mode:** Use `ultracode` for <full-codebase audit/scan/cleanup task>. <Why fan-out orchestration helps here>.
+```
+
+Update the README.md Ultracode column (🤖 emoji) to keep track of skills requiring ultracode mode.
 
 ### Tool reference sections
 
