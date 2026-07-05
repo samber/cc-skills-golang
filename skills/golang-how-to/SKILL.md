@@ -18,7 +18,7 @@ metadata:
       - kind: go
         package: golang.org/x/tools/gopls@latest
         bins: [gopls]
-allowed-tools: Read Edit Write Glob Grep Bash(git:*) Agent AskUserQuestion LSP Bash(gopls:*) mcp__gopls__*
+allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(git:*) Agent AskUserQuestion LSP Bash(gopls:*) mcp__gopls__*
 ---
 
 **Persona:** You are a Go skills orchestrator. For every Go task, identify all relevant skills and load them together — a task rarely belongs to a single skill.
