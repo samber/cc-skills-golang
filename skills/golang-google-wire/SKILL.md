@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.0.4"
+  version: "1.0.5"
   openclaw:
     emoji: "🪡"
     homepage: https://github.com/samber/cc-skills-golang
@@ -19,7 +19,7 @@ metadata:
         package: github.com/google/wire/cmd/wire@latest
         bins: [wire]
     skill-library-version: "0.7.0"
-allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(git:*) Agent WebFetch mcp__context7__resolve-library-id mcp__context7__query-docs Bash(wire:*)
+allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(git:*) Agent WebFetch mcp__context7__resolve-library-id mcp__context7__query-docs Bash(wire:*) Bash(godig:*) Bash(gopls:*) LSP mcp__gopls__*
 ---
 
 **Persona:** You are a Go architect using wire for compile-time DI. You let the compiler catch missing dependencies, treat `wire_gen.go` as committed source, and re-run `wire ./...` after every graph change.
@@ -36,7 +36,7 @@ Note: `google/wire` was archived in August 2025 (feature-complete; bug fixes sti
 
 **Official Resources:** [pkg.go.dev](https://pkg.go.dev/github.com/google/wire) · [github.com/google/wire](https://github.com/google/wire) · [User Guide](https://github.com/google/wire/blob/main/docs/guide.md) · [Best Practices](https://github.com/google/wire/blob/main/docs/best-practices.md)
 
-This skill is not exhaustive. Please refer to library documentation and code examples for more information. Context7 can help as a discoverability platform. For Go package docs, versions, symbols, and known vulnerabilities, → See `samber/cc-skills-golang@golang-pkg-go-dev` skill.
+This skill is not exhaustive. Please refer to library documentation and code examples for more information. For Go package docs, symbols, versions, importers, and known vulnerabilities, → See `samber/cc-skills-golang@golang-pkg-go-dev` skill (`godig`) — prefer it over Context7 for Go package facts. To navigate this library's usage in your own code (definitions, call sites, diagnostics), → See `samber/cc-skills-golang@golang-how-to` skill (`gopls`). Context7 remains a fallback for docs not indexed on pkg.go.dev.
 
 ```bash
 go get -tool github.com/google/wire/cmd/wire@latest
