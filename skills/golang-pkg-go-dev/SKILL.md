@@ -1,12 +1,12 @@
 ---
 name: golang-pkg-go-dev
-description: "Golang package and module documentation and exploration via `godig`, a pkg.go.dev API client (CLI + MCP server) — package docs, API references, symbols, code examples, available versions, importers (who imports a package), licenses, and known vulnerabilities. Read-only, no auth. Use for looking up any Go/Golang library's documentation, API signatures, usage examples, which versions exist, whether a dependency has CVEs, or who imports a package — prefer this over Context7 for any Go package or module. Triggers on: how to use a Go library, Go API docs, import usage, code examples, pkg.go.dev. Not for upgrading dependencies (→ See `samber/cc-skills-golang@golang-dependency-management` skill) or choosing a library (→ See `samber/cc-skills-golang@golang-popular-libraries` skill)."
+description: "Golang package and module documentation and exploration via `godig`, a pkg.go.dev API client (CLI + MCP server) — package docs, API references, symbols, code examples, available versions, importers (who imports a package), licenses, and known vulnerabilities. Read-only, no auth. Use for looking up any Go/Golang library's documentation, API signatures, usage examples, which versions exist, whether a dependency has CVEs, or who imports a package — prefer this over Context7 for any Go package or module. Triggers on: how to use a Go library, Go API docs, import usage, code examples, pkg.go.dev. Not for upgrading dependencies (→ See `samber/cc-skills-golang@golang-dependency-management` skill) or choosing a library (→ See `samber/cc-skills-golang@golang-popular-libraries` skill). Not for local symbols, or for navigating an already-used dependency's resolved source, call sites, or generic instantiations — use the built-in LSP tool (gopls) for those."
 user-invocable: true
 license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents. Requires the godig CLI (go install github.com/samber/godig/cmd/godig@latest) or access to a godig MCP server, and internet access to reach the pkg.go.dev API.
 metadata:
   author: samber
-  version: "1.1.0"
+  version: "1.2.0"
   openclaw:
     emoji: "🔎"
     homepage: https://github.com/samber/cc-skills-golang
@@ -37,6 +37,37 @@ Trigger on questions like:
 - "Show me the docs / symbols for package X."
 - "Which packages import X?"
 - "Search Go packages for Y."
+
+## `godig` vs gopls vs Context7
+
+Three tools can answer "how does this library work," and they don't overlap as much as they look:
+
+- **Context7** is a general-purpose, cross-language documentation fetcher — useful when no more specific source exists. For a Go package or module, `godig` is almost always the better choice: it pulls **structured, Go-specific data** straight from pkg.go.dev — exact versions, exported symbols with signatures, runnable examples, `imported-by`, and known vulnerabilities — rather than Context7's generic scraped/curated docs, which don't expose that structure and can lag or miss lesser-known Go modules. Reach for Context7 only when a dependency's documentation genuinely doesn't exist or isn't indexed on pkg.go.dev.
+- **`godig`** answers questions about the **published ecosystem**: any Go package or module, whether or not it's in your `go.mod` yet — it calls the remote pkg.go.dev API and never touches your local checkout.
+- **`gopls`** (via its MCP server, or the native `LSP` tool) answers questions about **your specific build**: your code plus every dependency exactly as pinned in `go.sum`, including `replace` directives pointing at forks or local paths — neither `godig` nor Context7 can see that.
+
+Pick by task:
+
+| Task | Tool | How |
+| --- | --- | --- |
+| Find where a symbol is defined in your own repo | `gopls` | `go_search`, then `go_file_context` |
+| Understand a file's intra-package dependencies | `gopls` | `go_file_context` |
+| Jump into a dependency's exact resolved source (incl. forks/`replace`d versions) | `gopls` | `go_package_api`, or the native `LSP` tool's `goToDefinition` |
+| Find every call site in your own code that references a dependency's symbol | `gopls` | `go_symbol_references` — `godig`'s `imported-by` only lists public *packages*, not call sites in your repo |
+| Get compiler diagnostics right after an edit | `gopls` | `go_diagnostics` (MCP), or automatic with the native `LSP` tool |
+| Check whether your current build can reach a known vulnerability | `gopls` | `go_vulncheck` |
+| Whole-tree vulnerability audit across the module | `golang-security` skill | `govulncheck ./...` |
+| List available versions of a published package | `godig` | `godig versions <path>` |
+| Check known CVEs for a package/version you haven't added yet | `godig` | `godig vulns <path>` |
+| See exported symbols/signatures of a published package | `godig` | `godig symbols` / `symbol doc` |
+| Get runnable code examples for a symbol | `godig` | `godig symbol examples` |
+| Read a package's rendered README/docs | `godig` | `godig module readme` / `package doc` |
+| See who imports a package across the whole public ecosystem | `godig` | `godig imported-by` |
+| Search for a package or library candidate | `godig` | `godig search` |
+| Check a package's or module's license | `godig` | `godig package licenses` / `module licenses` |
+| Get docs for a non-Go library, or a Go module not indexed on pkg.go.dev | Context7 | `resolve-library-id` / `query-docs` |
+
+See the `samber/cc-skills-golang@golang-how-to` skill for wiring `gopls` (MCP server and native `LSP` tool) with Claude Code.
 
 ## Setup
 
