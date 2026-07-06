@@ -26,79 +26,52 @@ allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(g
 
 **Dependencies:** `gopls` — `go install golang.org/x/tools/gopls@latest` (v0.20+). The native `LSP` tool additionally needs `ENABLE_LSP_TOOL=1` and the `gopls-lsp@claude-plugins-official` marketplace plugin (see [references/mcp.md](references/mcp.md)).
 
-`gopls` is the official Go language server. It answers questions about **your specific, locally resolved build**: your workspace plus every dependency exactly as pinned in `go.sum`, including `replace` directives pointing at forks or local paths. It cannot see a package that isn't part of that build — for the published ecosystem (versions, docs, licenses, CVEs of a package you haven't added yet), → See `samber/cc-skills-golang@golang-pkg-go-dev` skill (`godig`) instead.
+`gopls` is the official Go language server. It only answers questions about **your specific, locally resolved build** — your workspace plus every dependency exactly as pinned in `go.sum`, including `replace` directives. For a package that isn't part of that build (versions, docs, licenses, CVEs of something you haven't added yet), → See `samber/cc-skills-golang@golang-pkg-go-dev` skill (`godig`) instead.
 
 ## Three ways to reach gopls
 
-The same capabilities are exposed through three different surfaces. They are not interchangeable — pick by what you already know and what you need back.
+Not interchangeable — pick by what you already know and what you need back:
 
-1. **gopls's own MCP server (preferred for most tasks)** — purpose-built for AI agents. Its tools take names, file paths, and fuzzy queries rather than raw cursor positions, so they fit how an agent naturally asks questions ("where is `Server` defined" rather than "what's at line 42, column 7"). Register it once per machine:
+- **gopls's own MCP server (preferred for most tasks)** — purpose-built for agents: tools take names, file paths, and fuzzy queries instead of raw cursor positions. Register once per machine: `claude mcp add gopls -- gopls mcp`. Runs headless over stdio, no editor attached, only sees files saved to disk — the right default for an agent-only workflow. See [references/mcp.md](references/mcp.md) for every tool.
+- **The native `LSP` tool** — Claude Code's built-in editor-style integration. Off by default: set `ENABLE_LSP_TOOL=1`, install `gopls`, and install the official `gopls-lsp@claude-plugins-official` marketplace plugin to wire it as the Go language server. Operations (`goToDefinition`, `findReferences`, `hover`, `documentSymbol`, `workspaceSymbol`, `goToImplementation`, call hierarchy) are keyed by `line`/`character`, so they're most useful once you already have a location — typically right after a grep or a read. Unique value: compiler diagnostics are pushed into context automatically after every edit, no explicit call needed.
+- **The `gopls` CLI** — same engine, invoked as `gopls <command> <file:line:col>`. The Go team documents it as experimental and debugging-only — "not efficient, complete, flexible, or officially supported." Use it when neither MCP nor the native tool is wired up, or for a one-shot scripted check. Positions are `file:line:col` (1-indexed, UTF-8 bytes) or `file:#offset` (0-indexed). See [references/cli.md](references/cli.md).
 
-   ```bash
-   claude mcp add gopls -- gopls mcp
-   ```
-
-   This runs gopls **detached**, over stdio, headless — no editor attached, only sees files saved to disk. An **attached** mode also exists (`gopls serve -mcp.listen=localhost:8092`), which shares memory with a live LSP session and can see unsaved buffers; detached is the right default for an agent-only workflow. See [references/mcp.md](references/mcp.md) for every tool.
-
-2. **The native `LSP` tool** — Claude Code's built-in editor-style integration. Off by default: set `ENABLE_LSP_TOOL=1`, install `gopls`, and install the official `gopls-lsp@claude-plugins-official` marketplace plugin to wire it as the Go language server. Its operations (`goToDefinition`, `findReferences`, `hover`, `documentSymbol`, `workspaceSymbol`, `goToImplementation`, call hierarchy) are keyed by `line`/`character`, so they're most useful once you already have a location — typically right after a grep or a read — rather than as a first search. Its one capability the MCP server doesn't replicate: **compiler diagnostics are pushed into context automatically after every edit**, with no explicit diagnostics call needed. See [references/mcp.md](references/mcp.md).
-
-3. **The `gopls` CLI** — the same engine, invoked directly as `gopls <command> <file:line:col>`. The Go team documents this interface as **experimental and intended for debugging**, not for production tooling — "not efficient, complete, flexible, or officially supported." Use it when neither MCP nor the native tool is wired up, for one-shot scripted checks, or to sanity-check a query outside the agent loop. Positions are `file:line:col` (1-indexed, columns in UTF-8 bytes) or `file:#offset` (0-indexed). See [references/cli.md](references/cli.md).
-
-**Preference order: MCP → native `LSP` → CLI.** The MCP tools match how an agent thinks (by name/path, not cursor position); the native tool adds free automatic diagnostics on top; the CLI is the documented fallback of last resort. Wire as many as are available and let the task pick the tool — a query you already have a `line:col` for is cheap via `LSP`, a "where is X" query is cheap via `go_search`, and a quick unattended check is cheap via the CLI.
+**Preference order: MCP → native `LSP` → CLI.** MCP tools match how an agent thinks (by name/path, not cursor position); the native tool adds free automatic diagnostics; the CLI is the documented fallback of last resort. Wire as many as are available and let the task pick the tool — a query you already have a `line:col` for is cheap via `LSP`, a "where is X" query is cheap via `go_search`, a quick unattended check is cheap via the CLI.
 
 ## Capability → CLI → MCP → native LSP
 
-| Capability | CLI | MCP tool | Native LSP op |
-| --- | --- | --- | --- |
-| Workspace layout (module/workspace/GOPATH) | `gopls stats` | `go_workspace` | — |
-| Fuzzy-find a symbol by name, workspace-wide | `gopls workspace_symbol <query>` | `go_search` | `workspaceSymbol` |
-| Go to definition | `gopls definition f:l:c` | — (use `go_file_context`/`go_package_api`) | `goToDefinition` |
-| Go to type definition | — (unsupported) | — | `goToTypeDefinition` |
-| Find all references | `gopls references f:l:c` | `go_symbol_references` | `findReferences` |
-| Implements / implemented-by | `gopls implementation f:l:c` | — | `goToImplementation` |
-| Full subtype/supertype tree | — (not yet supported) | — | Type Hierarchy |
-| Call graph (callers/callees) | `gopls call_hierarchy f:l:c` | — | Call Hierarchy |
-| File's own symbols (outline) | `gopls symbols <file>` | `go_file_context` | `documentSymbol` |
-| A package's public API | — | `go_package_api` | (hover per-symbol) |
-| A file's intra-package dependencies | — | `go_file_context` | — |
-| Hover info (type, doc, size/offset) | — | — | `hover` |
-| Signature help | `gopls signature f:l:c` | — | signature help |
-| Compiler + analyzer diagnostics | `gopls check <file>` | `go_diagnostics` | automatic, pushed after every edit |
-| Vulnerability reachability (current build) | — | `go_vulncheck` | — |
-| Safe rename (symbol, receiver, package move, signature) | `gopls rename -w f:l:c NewName` | `go_rename_symbol` | rename |
-| Organize / fix imports | `gopls imports -w <file>` | — | `source.organizeImports` code action |
-| Format | `gopls format -w <file>` | — | `textDocument/formatting` |
-| Refactor (extract, inline, fill, rewrite — see [references/features.md](references/features.md)) | `gopls codeaction -kind=<kind> -exec -w <file>` | — | code action |
-| Generate a test for a function | `gopls codelens -exec <file:line> "..."` (via `source.addTest`) | — | code action / code lens |
+Full mapping of every capability to its CLI command, MCP tool, and native `LSP` op: [references/matrix.md](references/matrix.md).
 
 ## Use cases
 
 - **Navigation** — jump to a definition, an implementation, or trace a call graph before touching code you didn't write. Details: [references/features.md](references/features.md#navigation).
 - **Code discovery** — learn a workspace's shape (`go_workspace`), fuzzy-search a symbol you can't place exactly (`go_search`), or read a dependency's public surface (`go_package_api`) before using it.
 - **Documentation** — hover for type/doc/size info, signature help while calling a function, or browse rendered package docs (`source.doc`, including internal packages pkg.go.dev never sees).
-- **Diagnostics & safety** — compiler and analyzer errors after every edit (`go_diagnostics` / automatic with `LSP`), plus a lightweight, on-demand `go_vulncheck` reachability check against the current build.
+- **Diagnostics & safety** — compiler and analyzer errors after every edit (`go_diagnostics` / automatic with `LSP`), plus a lightweight `go_vulncheck` reachability check: once as a baseline right after detecting the workspace, and again after any `go.mod` change.
 - **Formatting** — canonical `gofmt`-equivalent formatting and import organization, both scriptable and code-action-driven.
 - **Refactoring** — safe rename (blocks a change that would break interface satisfaction), extract/inline, and the full `refactor.rewrite.*` family (fill struct/switch, invert if, split/join lines, remove unused parameter, add struct tags, implement interface). Full catalog with gotchas: [references/features.md](references/features.md#transformation).
 
 ## Efficient workflows
 
-Follow the two workflows gopls's own MCP instructions prescribe — they encode the order that avoids redundant queries and half-applied edits.
+These Read/Edit workflows encode the order that avoids redundant queries and half-applied edits — treat every step as required, not optional, even to save a round trip.
+
+- **Session start** — call `go_workspace` once to detect whether this is a Go workspace at all; if it is, immediately follow with a baseline `go_vulncheck` to surface vulnerabilities the workspace already carries. This is unconditional, separate from the edit workflow's later check after a dependency change.
 
 **Read workflow** (understand before touching anything):
 
-1. `go_workspace` — learn the layout once per session.
+1. `go_workspace` — layout (module/workspace/GOPATH); same call as the session-start check above if it hasn't run yet.
 2. `go_search` — fuzzy-locate a type/function/variable by name.
-3. `go_file_context` — right after reading any Go file for the first time, see what it pulls in from the rest of its package.
-4. `go_package_api` — for a third-party dependency or a sibling package in a monorepo, see its public surface without reading every file.
+3. `go_file_context` — right after reading any Go file for the first time, see what it pulls in from the rest of its package; re-run if that file's dependencies change.
+4. `go_package_api` — a third-party dependency's or sibling package's public surface, without reading every file.
 
 **Edit workflow** (iterate until diagnostics are clean):
 
 1. Read first (workflow above).
-2. `go_symbol_references` before modifying any definition — judge the blast radius, read every referencing file that needs a matching edit.
-3. Make all planned edits, including the reference-site edits.
-4. `go_diagnostics` on every changed file — mandatory after each modification.
-5. Fix reported errors, re-run diagnostics until clean. Hint/info diagnostics unrelated to the task can be ignored.
-6. If `go.mod` dependencies changed, run `go_vulncheck` on the whole workspace once diagnostics are clean.
+2. `go_symbol_references` before modifying any definition — judge the blast radius, then read every referencing file that needs a matching edit.
+3. Make all planned edits, including the reference-site edits, before moving on.
+4. `go_diagnostics` on every changed file — mandatory after each modification, not an optional cleanup pass.
+5. Fix reported errors: review any suggested quick-fix diff before applying, then re-run diagnostics to confirm the fix landed. Ignore hint/info diagnostics unrelated to the task. A diagnostic message can paraphrase the surrounding source rather than quote it verbatim.
+6. Only if `go.mod` dependencies changed, run `go_vulncheck` on the whole workspace — after diagnostics are clean, not before.
 7. Run `go test <changed-package-paths>` — not `./...` unless explicitly asked, since a full-repo run slows the iteration loop.
 
 **Gotchas worth knowing before you rely on a result:**
@@ -110,10 +83,10 @@ Follow the two workflows gopls's own MCP instructions prescribe — they encode 
 
 ## gopls vs godig vs Context7 vs govulncheck
 
-`gopls` only reasons about code **present and resolvable in the local build** — for anything that isn't tied to that build (a package's version history, its license, who imports it across the whole public ecosystem, whether a package you haven't added yet has known CVEs), → See `samber/cc-skills-golang@golang-pkg-go-dev` skill (`godig`) — it queries pkg.go.dev directly and needs no local checkout. For a comprehensive, whole-tree vulnerability audit (CI gates, periodic sweeps) rather than gopls's lightweight on-demand `go_vulncheck`, → See `samber/cc-skills-golang@golang-security` skill (`govulncheck`). Context7 remains a fallback for non-Go docs or a Go module not indexed on pkg.go.dev. The full task-to-tool matrix lives in the `samber/cc-skills-golang@golang-how-to` skill's "`godig` vs gopls vs Context7 vs govulncheck" section.
+`gopls` only reasons about code present and resolvable in the local build:
 
----
+- For anything not tied to that build (version history, license, ecosystem-wide importers, CVEs of a package not yet added) → See `samber/cc-skills-golang@golang-pkg-go-dev` skill (`godig`) — it queries pkg.go.dev directly, no local checkout needed.
+- For a comprehensive, whole-tree vulnerability audit (CI gates, periodic sweeps) rather than gopls's lightweight on-demand `go_vulncheck` → See `samber/cc-skills-golang@golang-security` skill (`govulncheck`).
+- Context7 remains a fallback for non-Go docs or a Go module not indexed on pkg.go.dev.
 
-This skill is not exhaustive. Please refer to the official gopls documentation and code examples for current behavior and settings — the tool evolves fast and this skill's static markdown can lag.
-
-If you encounter a bug or unexpected behavior in `gopls`, open an issue at <https://github.com/golang/go/issues> (label `gopls`).
+The full task-to-tool matrix lives in the `samber/cc-skills-golang@golang-how-to` skill's "`godig` vs gopls vs Context7 vs govulncheck" section.

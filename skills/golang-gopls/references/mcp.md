@@ -2,51 +2,26 @@
 
 ## Table of contents
 
-- [Server modes](#server-modes)
+- [Starting the server](#starting-the-server)
 - [Registering with Claude Code](#registering-with-claude-code)
 - [MCP tools](#mcp-tools)
 - [The native `LSP` tool](#the-native-lsp-tool)
 - [What the MCP server can and cannot do](#what-the-mcp-server-can-and-cannot-do)
 
-## Server modes
+## Starting the server
 
-`gopls` exposes MCP through two distinct modes; they trade off visibility into unsaved state against setup simplicity.
-
-**Detached (headless)** — a standalone gopls instance speaking MCP over stdin/stdout, launched fresh per session, no LSP client attached:
+A standalone gopls instance speaking MCP over stdin/stdout, launched fresh per session, no LSP client involved:
 
 ```bash
 gopls mcp
 ```
 
-Only sees files as they exist **on disk** — an edit made through a different tool but not yet saved is invisible to it. This is the right default for an agent-only workflow with no attached editor.
-
-**Attached** — runs alongside a live LSP session, shares its in-memory state, so it also sees unsaved buffer edits made through that session:
-
-```bash
-gopls serve -mcp.listen=localhost:8092
-```
-
-Exposes an HTTP-based server using Server-Sent Events (SSE) transport, reachable at `http://localhost:8092/sessions/1`. Use this mode only when an editor or another tool is already driving a live `gopls serve` session that should stay in sync.
+Only sees files as they exist **on disk** — an edit made through a different tool but not yet saved is invisible to it. This is the right mode for an agent-only workflow with no attached editor.
 
 ## Registering with Claude Code
 
 ```bash
 claude mcp add gopls -- gopls mcp
-```
-
-Verify the registration:
-
-```bash
-claude mcp list       # view active MCP servers
-claude mcp get gopls  # inspect this server's configuration
-```
-
-Inside a session, type `/mcp` to see the tools currently exposed.
-
-gopls ships a canonical instructions file describing its own recommended workflows — useful context to load directly into an agent session that has the MCP server connected:
-
-```bash
-gopls mcp -instructions > /path/to/contextFile.md
 ```
 
 ## MCP tools

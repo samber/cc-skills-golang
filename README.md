@@ -4,9 +4,14 @@ AI agent skills are reusable instruction sets that extend your coding assistant 
 
 For generic skills, please visit [cc-skills](https://github.com/samber/cc-skills).
 
-> [!IMPORTANT] Bootstrapped with Claude Code by distilling my Go project commits. **Edited, tested, reviewed and reworked by a human**.
+<!-- prettier-ignore-start -->
+
+> [!IMPORTANT]
+> Bootstrapped with Claude Code by distilling my Go project commits. **Edited, tested, reviewed and reworked by a human**.
 >
 > **No AI slop here.** AI-made skills are useless.
+
+<!-- prettier-ignore-end -->
 
 <img width="1414" height="491" alt="image" src="https://github.com/user-attachments/assets/620b5835-c1ba-4ea9-bf47-2293b58b879e" />
 
@@ -145,7 +150,7 @@ These skills are designed as **atomic, cross-referencing units**. A skill may re
 │ safety       │ │ dep-inject   │ │ troubleshoot    │ │ CI               │
 │ structs-iface│ │ data-structs │ │ observability   │ │ stay-updated     │
 │ documentation│ │ database     │ │                 │ │ dep-management   │
-│ lint         │ │ modernize    │ │                 │ │                  │
+│ lint         │ │ modernize    │ │                 │ │ gopls            │
 │ security     │ │              │ │                 │ │                  │
 └──────────────┘ └──────────────┘ └─────────────────┘ └──────────────────┘
 
@@ -207,7 +212,7 @@ These skills are designed as **atomic, cross-referencing units**. A skill may re
 |  | ✅ `golang-lint` | ⚡ 🤖 | -41% | 98 | 1,714 | 5,493 |
 |  | ✅ `golang-observability` | ⚡ 🤖 ⚙️ | -37% | 161 | 2,921 | 18,453 |
 |  | ✅ `golang-performance` | ⚡ 🧠 🤖 | -39% | 130 | 2,190 | 18,190 |
-|  | ✅ `golang-gopls` | ⚡ | — | 219 | 2,962 | 11,669 |
+|  | ✅ `golang-gopls` | ⚡ | — | 219 | 2,308 | 12,076 |
 |  | ✅ `golang-pkg-go-dev` | ⚡ | — | 185 | 2,693 | 4,302 |
 |  | ✅ `golang-popular-libraries` | ⚡ | -30% | 61 | 893 | 4,287 |
 |  | ✅ `golang-project-layout` | ⚡ | -38% | 69 | 1,510 | 5,718 |
