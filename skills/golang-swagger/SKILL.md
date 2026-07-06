@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents. Requires go and swag CLI.
 metadata:
   author: samber
-  version: "1.0.3"
+  version: "1.0.4"
   openclaw:
     emoji: "📋"
     homepage: https://github.com/samber/cc-skills-golang
@@ -223,6 +223,6 @@ type CreateUserRequest struct {
 - → See `samber/cc-skills-golang@golang-security` for securing the Swagger UI endpoint in production (disable or gate with auth middleware).
 - → See `samber/cc-skills-golang@golang-grpc` for gRPC — use grpc-gateway with its own OpenAPI generator instead of swag.
 
-This skill is not exhaustive. Refer to the swaggo/swag documentation and code examples for up-to-date API signatures and usage patterns. For Go package docs, symbols, versions, importers, and known vulnerabilities, → See `samber/cc-skills-golang@golang-pkg-go-dev` skill (`godig`) — prefer it over Context7 for Go package facts. To navigate this library's usage in your own code (definitions, call sites, diagnostics), → See `samber/cc-skills-golang@golang-how-to` skill (`gopls`). Context7 remains a fallback for docs not indexed on pkg.go.dev.
+This skill is not exhaustive. Refer to the swaggo/swag documentation and code examples for up-to-date API signatures and usage patterns. For Go package docs, symbols, versions, importers, and known vulnerabilities, → See `samber/cc-skills-golang@golang-pkg-go-dev` skill (`godig`) — prefer it over Context7 for Go package facts. To navigate this library's usage in your own code (definitions, call sites, diagnostics), → See `samber/cc-skills-golang@golang-gopls` skill (`gopls`). Context7 remains a fallback for docs not indexed on pkg.go.dev.
 
 If you encounter a bug or unexpected behavior in swag, open an issue at <https://github.com/swaggo/swag/issues>.

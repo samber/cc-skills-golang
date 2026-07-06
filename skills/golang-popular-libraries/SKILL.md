@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.1.7"
+  version: "1.1.8"
   openclaw:
     emoji: "📚"
     homepage: https://github.com/samber/cc-skills-golang
@@ -38,7 +38,7 @@ When recommending libraries, prioritize:
 
 Find more libraries here: <https://github.com/avelino/awesome-go>
 
-This skill is not exhaustive. Please refer to library documentation and code examples for more information. When exploring a candidate library, → See `samber/cc-skills-golang@golang-pkg-go-dev` skill (`godig`) for docs, symbols, versions, importers, and known vulnerabilities — prefer it over Context7 for Go package facts. Once a candidate is added to your build, → See `samber/cc-skills-golang@golang-how-to` skill (`gopls`) to browse its actual resolved source and compare candidates side by side. Context7 remains a fallback for docs not indexed on pkg.go.dev.
+This skill is not exhaustive. Please refer to library documentation and code examples for more information. When exploring a candidate library, → See `samber/cc-skills-golang@golang-pkg-go-dev` skill (`godig`) for docs, symbols, versions, importers, and known vulnerabilities — prefer it over Context7 for Go package facts. Once a candidate is added to your build, → See `samber/cc-skills-golang@golang-gopls` skill (`gopls`) to browse its actual resolved source and compare candidates side by side. Context7 remains a fallback for docs not indexed on pkg.go.dev.
 
 ## General Guidelines
 

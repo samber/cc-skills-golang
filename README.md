@@ -4,8 +4,7 @@ AI agent skills are reusable instruction sets that extend your coding assistant 
 
 For generic skills, please visit [cc-skills](https://github.com/samber/cc-skills).
 
-> [!IMPORTANT]
-> Bootstrapped with Claude Code by distilling my Go project commits. **Edited, tested, reviewed and reworked by a human**.
+> [!IMPORTANT] Bootstrapped with Claude Code by distilling my Go project commits. **Edited, tested, reviewed and reworked by a human**.
 >
 > **No AI slop here.** AI-made skills are useless.
 
@@ -208,6 +207,7 @@ These skills are designed as **atomic, cross-referencing units**. A skill may re
 |  | ✅ `golang-lint` | ⚡ 🤖 | -41% | 98 | 1,714 | 5,493 |
 |  | ✅ `golang-observability` | ⚡ 🤖 ⚙️ | -37% | 161 | 2,921 | 18,453 |
 |  | ✅ `golang-performance` | ⚡ 🧠 🤖 | -39% | 130 | 2,190 | 18,190 |
+|  | ✅ `golang-gopls` | ⚡ | — | 219 | 2,962 | 11,669 |
 |  | ✅ `golang-pkg-go-dev` | ⚡ | — | 185 | 2,693 | 4,302 |
 |  | ✅ `golang-popular-libraries` | ⚡ | -30% | 61 | 893 | 4,287 |
 |  | ✅ `golang-project-layout` | ⚡ | -38% | 69 | 1,510 | 5,718 |
@@ -344,6 +344,10 @@ CI/CD pipeline configuration for Go projects using GitHub Actions. Build, test, 
 #### `golang-dependency-management`
 
 Go module dependency strategies. go.mod conventions, versioning, replace directives, tool dependencies, and multi-module workspaces.
+
+#### `golang-gopls`
+
+Semantic code intelligence for your local build via `gopls`, the official Go language server. Go-to-definition, find references, call/implementation hierarchy, workspace symbol search, diagnostics, safe rename, and refactors (extract/inline/fill/rewrite). Reachable via gopls's own MCP server, Claude Code's native `LSP` tool, or the `gopls` CLI.
 
 #### `golang-pkg-go-dev`
 
