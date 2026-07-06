@@ -31,7 +31,7 @@ allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(g
 
 **Thinking mode:** Use `ultrathink` for the planning/ordering step. Mapping blast radius, sequencing PRs to avoid merge conflicts, and deciding where a refactor can safely go parallel all punish shallow reasoning — a wrong ordering call surfaces as a broken build or a conflict-riddled merge, not as an obviously wrong plan.
 
-**Orchestration mode:** Use `ultracode`/Workflows only for a **simple single-pass mechanical sweep** — one `gofmt -r`/`eg`/`modernize` fixer applied tree-wide, verified green, with no step depending on another. Do NOT use Workflows for a multi-step refactor that needs progressive human review between merges: Workflows run agent-to-agent with no human checkpoint between stages, which is exactly what a staged refactor requires between every merge.
+**Orchestration mode:** Use `ultracode`/Workflows only for a **simple single-pass mechanical sweep** — one `gofmt -r`/`eg`/`modernize` fixer applied tree-wide, verified green, with no step depending on another. Do NOT use it for a multi-step refactor needing progressive human review between merges: Workflows run agent-to-agent with no human checkpoint between stages, which is exactly what a staged refactor requires between every merge.
 
 **Modes:**
 
@@ -44,39 +44,73 @@ allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(g
 
 # Go Refactoring — Safe Change at Scale
 
-Refactoring is a change to the internal structure of code that makes it easier to understand or cheaper to modify **without changing observable behavior** (Fowler). Go makes this tractable at scale because its tooling can prove several transforms are behavior-preserving _by construction_ — gopls refuses a Rename rather than risk a broken build — but that same tooling is silent on anything reflection can reach (struct tags, `text/template` field references), so a safety net still matters.
+- Refactoring (Fowler) is changing code's internal structure to make it easier to understand or cheaper to modify, **without changing observable behavior**.
+- Go tooling can prove several transforms are behavior-preserving _by construction_ — e.g. gopls refuses a Rename rather than risk a broken build.
+- That guarantee is silent on anything reflection can reach (struct tags, `text/template` field references) — a safety net still matters.
 
 ## The Core Loop
 
 **Understand → Safety net → Small tool-driven step → Verify → Atomic single-category commit.** Repeat.
 
 1. **Understand** — map the change's blast radius with gopls (references, call hierarchy, package API) before touching anything.
-2. **Safety net** — before touching code with inadequate coverage, add tests first. Gate the strategy on the _blast radius's_ test coverage, not global coverage, and treat writing that test as your own mechanism for checking the change — not a formality left for the reviewer, since a green suite you wrote yourself is what actually lets you tell "this is behavior-preserving" from "I hope this is behavior-preserving." See [safety-net.md](references/safety-net.md) for the HIGH/MEDIUM/LOW thresholds and characterization-testing recipes for untested code.
+2. **Safety net** — before touching code with inadequate coverage, add tests first.
+   - Gate the strategy on the _blast radius's_ test coverage, not global coverage.
+   - Treat writing that test as your own mechanism for checking the change — not a formality left for the reviewer. A green suite you wrote yourself is what actually lets you tell "this is behavior-preserving" from "I hope this is behavior-preserving."
+   - See [safety-net.md](references/safety-net.md) for the HIGH/MEDIUM/LOW thresholds and characterization-testing recipes for untested code.
 3. **Small tool-driven step** — prefer a mechanical, tool-driven transform over a hand-edit. See [go-tooling.md](references/go-tooling.md) and [catalog.md](references/catalog.md).
 4. **Verify** — `go build ./... && go vet ./... && go test ./...`; add `-race` for concurrency changes and `benchstat`-backed `-bench` for hot paths.
 5. **Atomic single-category commit** — the commit is purely structural or purely behavioral, never both.
 
 ## Hard Rules
 
-- **Never mix structural and behavioral changes in one commit or PR.** A reviewer scrutinizing a rename for correctness and a reviewer scrutinizing a feature for side effects need different postures — mixing them forces one reviewer to wear both hats at once, and the fast, low-scrutiny review a pure rename deserves gets lost.
-- **Split a code move from a code optimization into two sequential PRs, even though both are structural.** They need different verification — the move is proven safe by gopls plus build/test, the optimization needs benchmarks and a closer correctness read — and they touch the same code, so run them one after another rather than in parallel worktrees; parallelizing just moves the conflict to merge time. Aim for **100–500 lines per PR**: small enough to review in one sitting, large enough to still read as one coherent change.
-- **Prefer gopls Rename/Inline over LLM hand-edits.** Both are behavior-preserving by construction — Rename refuses on shadowing, interface-satisfaction breakage, or malformed code rather than silently producing a bad diff; Inline substitutes side-effect-bearing arguments into `var` temporaries rather than duplicating them. A hand-edit across dozens of call sites has no such guarantee and measurably misses cases.
-- **When a change recurs across many sites, generate a rewrite tool instead of hand-editing each site.** `gofmt -r` → `eg` → `gopatch` → a `go/analysis` fixer, in order of increasing power (see [go-tooling.md](references/go-tooling.md)). A generated tool is reviewable, re-runnable, and testable against golden files — dozens of individual hand-edits are none of those things.
-- **Use a type alias (`type A = B`) for every type moved across packages.** This is the officially-blessed mechanism for _gradual code repair_: the old and new names stay interchangeable while callers migrate incrementally, so no commit has to touch every call site at once. See [structural.md](references/structural.md).
-- **Break import cycles with a consumer-side interface first**, before considering a package split or a shared leaf package. Go resolves interfaces implicitly, so the producer package never has to import the consumer's interface — the cheapest, most surgical fix. See [structural.md](references/structural.md).
-- **Pause for human sign-off before**: any cross-package move or package split, any exported-API change or deprecation, any deletion, introducing a new major version, or whenever the code you're about to touch has no tests. These are the moves a wrong call is expensive to undo.
-- **Grep for tag and reflection references after any rename.** gopls Rename only guards against _compilation_ breakage — it cannot see a struct tag, a `text/template` field reference, or a `reflect`-driven dispatch that still points at the old name, and renaming a field silently desyncs it from its `json`/`db` tag.
-- **Load `samber/cc-skills-golang@golang-security` (and `golang-safety` for internal-correctness risk) whenever a step changes code logic, not just its shape.** A mechanical, tool-verified transform can't introduce a vulnerability, but a behavioral change can — treat "changes what the code does" as the trigger for a security-and-safety pass, not an afterthought reserved for the final review.
-- **Start every step from a clean, committed baseline, and revert rather than debug forward when it goes red.** Version control is the safety net underneath the test safety net: if a mechanical step leaves `go test` red, reverting to the last green commit and re-attempting is faster and safer than patching forward inside a state you no longer fully trust. Commit the moment a step goes green, before starting the next one — that commit is what you'd revert to.
+- **Never mix structural and behavioral changes in one commit or PR.**
+  - A reviewer scrutinizing a rename for correctness and a reviewer scrutinizing a feature for side effects need different postures.
+  - Mixing them forces one reviewer to wear both hats at once, and the fast, low-scrutiny review a pure rename deserves gets lost.
+- **Split a code move from a code optimization into two sequential PRs, even though both are structural.**
+  - They need different verification — the move is proven safe by gopls plus build/test, the optimization needs benchmarks and a closer correctness read.
+  - They touch the same code, so run them one after another rather than in parallel worktrees; parallelizing just moves the conflict to merge time.
+  - Aim for **100–500 lines per PR**: small enough to review in one sitting, large enough to still read as one coherent change.
+- **Prefer gopls Rename/Inline over LLM hand-edits.**
+  - Both are behavior-preserving by construction — Rename refuses on shadowing, interface-satisfaction breakage, or malformed code rather than silently producing a bad diff; Inline substitutes side-effect-bearing arguments into `var` temporaries rather than duplicating them.
+  - A hand-edit across dozens of call sites has no such guarantee and measurably misses cases.
+- **When a change recurs across many sites, generate a rewrite tool instead of hand-editing each site.**
+  - Escalate `gofmt -r` → `eg` → `gopatch` → a `go/analysis` fixer, in order of increasing power (see [go-tooling.md](references/go-tooling.md)).
+  - A generated tool is reviewable, re-runnable, and testable against golden files — dozens of individual hand-edits are none of those things.
+- **Use a type alias (`type A = B`) for every type moved across packages.**
+  - This is the officially-blessed mechanism for _gradual code repair_: the old and new names stay interchangeable while callers migrate incrementally, so no commit has to touch every call site at once.
+  - See [structural.md](references/structural.md).
+- **Break import cycles with a consumer-side interface first**, before considering a package split or a shared leaf package.
+  - Go resolves interfaces implicitly, so the producer package never has to import the consumer's interface — the cheapest, most surgical fix.
+  - See [structural.md](references/structural.md).
+- **Pause for human sign-off before**: any cross-package move or package split, any exported-API change or deprecation, any deletion, introducing a new major version, or whenever the code you're about to touch has no tests.
+  - These are the moves a wrong call is expensive to undo.
+- **Grep for tag and reflection references after any rename.**
+  - gopls Rename only guards against _compilation_ breakage — it cannot see a struct tag, a `text/template` field reference, or a `reflect`-driven dispatch that still points at the old name.
+  - Renaming a field silently desyncs it from its `json`/`db` tag.
+- **Load `samber/cc-skills-golang@golang-security` (and `golang-safety` for internal-correctness risk) whenever a step changes code logic, not just its shape.**
+  - A mechanical, tool-verified transform can't introduce a vulnerability, but a behavioral change can.
+  - Treat "changes what the code does" as the trigger for a security-and-safety pass, not an afterthought reserved for the final review.
+- **Start every step from a clean, committed baseline, and revert rather than debug forward when it goes red.**
+  - Version control is the safety net underneath the test safety net.
+  - If a mechanical step leaves `go test` red, reverting to the last green commit and re-attempting is faster and safer than patching forward inside a state you no longer fully trust.
+  - Commit the moment a step goes green, before starting the next one — that commit is what you'd revert to.
 
 ## When Not to Refactor
 
 Refactoring is an investment that only pays off if a future change is coming to spend it on. Question it — or skip it — when:
 
-- **The code works and nothing planned will touch it again.** A stable, rarely-read package earns nothing from being restructured for its own sake; the risk of even a small staged refactor has to be repaid by an easier next change, and there may not be one.
-- **It's critical production code with no tests.** Don't refactor it directly. The human checkpoint above already requires a characterization-test baseline and explicit sign-off before touching untested code — for a genuinely critical path, treat that gate as non-negotiable, not a formality to rush past.
-- **The deadline is tight.** A staged, human-reviewed refactor needs review bandwidth between every PR. Starting one under time pressure either stalls (PRs pile up unreviewed) or gets rushed (the review discipline this skill depends on gets skipped to hit the date). Make the minimal safe change now and stage the larger refactor for when there's room for it.
-- **There's no clear purpose.** "Refactor this" with no reason behind it — no upcoming feature it'll make easier, no bug class it'll close off, no smell a review actually flagged — is refactoring for its own sake. Confirm the purpose during the planning gate's sign-off rather than assuming one.
+- **The code works and nothing planned will touch it again.**
+  - A stable, rarely-read package earns nothing from being restructured for its own sake.
+  - The risk of even a small staged refactor has to be repaid by an easier next change, and there may not be one.
+- **It's critical production code with no tests.** Don't refactor it directly.
+  - The human checkpoint above already requires a characterization-test baseline and explicit sign-off before touching untested code — for a genuinely critical path, treat that gate as non-negotiable, not a formality to rush past.
+- **The deadline is tight.**
+  - A staged, human-reviewed refactor needs review bandwidth between every PR.
+  - Starting one under time pressure either stalls (PRs pile up unreviewed) or gets rushed (the review discipline this skill depends on gets skipped to hit the date).
+  - Make the minimal safe change now and stage the larger refactor for when there's room for it.
+- **There's no clear purpose.**
+  - "Refactor this" with no reason behind it — no upcoming feature it'll make easier, no bug class it'll close off, no smell a review actually flagged — is refactoring for its own sake.
+  - Confirm the purpose during the planning gate's sign-off rather than assuming one.
 
 ## Risk Stratification
 
@@ -90,7 +124,14 @@ Refactoring is an investment that only pays off if a future change is coming to 
 
 ## Workflow: Plan → Stage → Land
 
-A refactor of any real size does not land as one commit or even one PR — it lands as an ordered sequence of small, independently reviewable PRs, staged on a refactoring branch, with a human approving each merge. [workflow.md](references/workflow.md) covers the full choreography: the planning gate and refactoring inventory, the three interacting orderings (structural-before-behavioral, conflict-avoidance, dependency order), the `refactor/<topic>` branch and per-change worktree/PR git model, when to run steps in parallel versus sequentially, the `// REFACTOR(step N): ...` marker convention, and why Workflows/`ultracode` are the wrong tool for this — read it before planning any multi-step refactor.
+- A refactor of any real size does not land as one commit or even one PR — it lands as an ordered sequence of small, independently reviewable PRs, staged on a refactoring branch, with a human approving each merge.
+- [workflow.md](references/workflow.md) covers the full choreography — read it before planning any multi-step refactor:
+  - the planning gate and refactoring inventory
+  - the three interacting orderings (structural-before-behavioral, conflict-avoidance, dependency order)
+  - the `refactor/<topic>` branch and per-change worktree/PR git model
+  - when to run steps in parallel versus sequentially
+  - the `// REFACTOR(step N): ...` marker convention
+  - why Workflows/`ultracode` are the wrong tool for this
 
 ## Detailed References
 
