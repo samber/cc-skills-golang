@@ -55,6 +55,7 @@ For each task, load the **primary skill** and all applicable **secondary skills*
 | Monitor in production | `golang-observability` | `golang-performance` (if SLO breach) |
 | Audit security vulnerabilities | `golang-security` | `golang-safety`, `golang-lint` |
 | Review formatting and style | `golang-code-style` | `golang-naming`, `golang-lint` |
+| Refactor or restructure existing code | `golang-refactoring` | `golang-naming`, `golang-code-style`, `golang-project-layout` |
 | Configure golangci-lint | `golang-lint` | `golang-code-style` |
 | Write godoc / README / CHANGELOG | `golang-documentation` | `golang-naming` |
 | Set up a new project structure | `golang-project-layout` | `golang-design-patterns`, `golang-dependency-injection`, `golang-lint` |
@@ -116,7 +117,7 @@ Full catalog with "use when" hooks: [by-category.md](references/by-category.md)
 | Category | Skills |
 | --- | --- |
 | Code Quality | `golang-code-style` `golang-documentation` `golang-error-handling` `golang-lint` `golang-naming` `golang-safety` `golang-security` `golang-structs-interfaces` |
-| Architecture & Design | `golang-concurrency` `golang-context` `golang-data-structures` `golang-database` `golang-dependency-injection` `golang-design-patterns` `golang-modernize` |
+| Architecture & Design | `golang-concurrency` `golang-context` `golang-data-structures` `golang-database` `golang-dependency-injection` `golang-design-patterns` `golang-modernize` `golang-refactoring` |
 | QA & Performance | `golang-benchmark` `golang-observability` `golang-performance` `golang-testing` `golang-troubleshooting` |
 | Project Setup | `golang-cli` `golang-continuous-integration` `golang-dependency-management` `golang-gopls` `golang-pkg-go-dev` `golang-popular-libraries` `golang-project-layout` `golang-stay-updated` |
 | APIs | `golang-graphql` `golang-grpc` `golang-swagger` |
@@ -142,6 +143,7 @@ Key clusters and their owners:
 - **Gap — goroutine vs cancel**: `golang-concurrency` + `golang-context` — load both when cancelling goroutines via context
 - **Gap — correctness vs threat**: `golang-safety` (internal bugs) vs `golang-security` (external threats)
 - **Gap — features vs rules**: `golang-modernize` (language adoption) vs `golang-lint` (static analysis config)
+- **Gap — process vs target rules**: `golang-refactoring` (the safe, staged, at-scale _process_ of changing existing code — planning, ordering, gopls-driven mechanics, staged PRs) vs `golang-naming`/`golang-code-style`/`golang-project-layout`/`golang-design-patterns`/`golang-modernize` (what the resulting code should look like) — load `golang-refactoring` alongside whichever of these owns the target shape
 
 ## Configure mode
 

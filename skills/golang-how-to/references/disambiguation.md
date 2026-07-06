@@ -1,6 +1,6 @@
 # Competing clusters — deep disambiguation
 
-Twelve clusters where skills overlap. Each cluster includes a boundary table, concrete routing examples, and notes on gap cases not yet explicit in source skill descriptions.
+Thirteen clusters where skills overlap. Each cluster includes a boundary table, concrete routing examples, and notes on gap cases not yet explicit in source skill descriptions.
 
 ---
 
@@ -242,3 +242,28 @@ These four skills all touch "third-party packages", but each owns a different st
 > Note: this skill cross-references the other three in its body (and they reference it back). Prefer `golang-pkg-go-dev` over Context7 for any Go package fact-lookup.
 
 **Sub-boundary — `godig` vs `gopls`:** both touch third-party code, but `godig` queries the remote pkg.go.dev index (works for packages not yet added to the project, no local build needed) while `gopls` (→ `samber/cc-skills-golang@golang-gopls`, via its MCP server, the native `LSP` tool, or its CLI) reasons about your actual resolved build in `go.sum` (including `replace`d forks). "Where is `Foo` defined in my repo?" or "find every call site of this dependency's function in my code" → `golang-gopls` (`go_search`/`go_symbol_references`), not `golang-pkg-go-dev` — godig has no visibility into local, unpublished code or call sites inside your own repo. "Does this package I haven't added yet have known CVEs?" → `golang-pkg-go-dev` (`vulns`); "can my current build actually reach a vulnerability in a dependency I already use?" → `golang-gopls` (`go_vulncheck`) or `golang-security` (`govulncheck` whole-tree). See the `samber/cc-skills-golang@golang-gopls` skill for the full gopls reference, and the `samber/cc-skills-golang@golang-how-to` skill's "`godig` vs gopls vs Context7 vs govulncheck" section for the full breakdown.
+
+---
+
+## 13. golang-refactoring vs. the target-state rule skills
+
+`golang-refactoring` owns the _process_ of changing existing Go code safely at scale — planning, blast-radius mapping, ordering staged PRs, tool-driven mechanics (gopls Rename/Inline, `gofmt -r`, `eg`, `gopatch`), and the human-in-the-loop git model. It does not own what the resulting code should look like — that is split across five existing skills, each answering "refactor toward what?"
+
+| Skill | Unique territory | Does NOT own |
+| --- | --- | --- |
+| `samber/cc-skills-golang@golang-refactoring` | The safe, staged, at-scale process: blast-radius mapping, PR ordering (structural-before-behavioral, conflict-avoidance, dependency), the refactoring-branch git model, tool-driven mechanics, coverage-adaptive safety net | Naming choices, target package layout, target design patterns, idiom adoption — the _shape_ the code should end up in |
+| `samber/cc-skills-golang@golang-naming` | What to rename an identifier _to_ | How to apply a rename safely across a large codebase |
+| `samber/cc-skills-golang@golang-project-layout` | Target package/directory layout, module splits | How to move code there without breaking every caller at once (type aliases, staged migration) |
+| `samber/cc-skills-golang@golang-code-style` | Target control-flow shape (guard clauses, function size) | The mechanical transform that gets existing code to that shape |
+| `samber/cc-skills-golang@golang-design-patterns` | Target patterns: options structs, consumer-side interfaces, DI | Sequencing a multi-step migration toward one of these patterns as reviewable PRs |
+| `samber/cc-skills-golang@golang-modernize` | Version-driven idiom adoption (`interface{}`→`any`, `slices`/`maps`) — typically a single mechanical sweep | Multi-step structural refactors that need staged, human-reviewed PRs |
+
+**Overlap zone:** almost every real refactor touches both — "rename this type and move it to a new package" needs `golang-naming` (the new name) and `golang-project-layout` (the new location) for the _target_, plus `golang-refactoring` for the _how_: blast-radius mapping, the type-alias gradual-repair recipe, and whether this lands as one PR or a staged sequence. Load `golang-refactoring` together with whichever target-rule skill defines the destination shape.
+
+**Routing examples:**
+
+- "This function is too long, break it up" → `golang-code-style` (what "too long" means, target shape) + `golang-refactoring` (Extract Function mechanics, verify behavior preserved).
+- "Rename `Client.Send` to `Client.Publish` across the whole repo" → `golang-naming` (is this the right name) + `golang-refactoring` (workspace-wide gopls Rename, risk tier, PR staging).
+- "Move this type to a new package without breaking every caller" → `golang-project-layout` (target location) + `golang-refactoring` (type-alias gradual-repair recipe, ordering).
+- "Convert all `interface{}` to `any` across the module" → `golang-modernize` alone is usually sufficient (single mechanical sweep); reach for `golang-refactoring`'s staged-PR flow only if the sweep is large enough to need progressive human review.
+- "Plan a multi-week refactor to break up this god package" → `golang-refactoring` as the primary skill (planning gate, ordering, staged PRs), pulling in `golang-project-layout` and `golang-design-patterns` for the target shape at each step.

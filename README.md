@@ -151,7 +151,7 @@ These skills are designed as **atomic, cross-referencing units**. A skill may re
 │ structs-iface│ │ data-structs │ │ observability   │ │ stay-updated     │
 │ documentation│ │ database     │ │                 │ │ dep-management   │
 │ lint         │ │ modernize    │ │                 │ │ gopls            │
-│ security     │ │              │ │                 │ │                  │
+│ security     │ │ refactoring  │ │                 │ │                  │
 └──────────────┘ └──────────────┘ └─────────────────┘ └──────────────────┘
 
     ┌─────────────────────────────────────────────────────────────────────────┐
@@ -197,6 +197,7 @@ These skills are designed as **atomic, cross-referencing units**. A skill may re
 | ⭐️ | ✅ `golang-how-to` | ⚡ | — | 165 | 2,254 | 10,372 |
 | ⭐️ | ✅ `golang-modernize` | ⚡ 🤖 | -61% | 68 | 2,780 | 9,093 |
 | ⭐️ | ✅ `golang-naming` | ⚡ ⚙️ | -23% | 158 | 2,865 | 7,233 |
+| ⭐️ | ✅ `golang-refactoring` | ⚡ 🧠 🤖 ⚙️ | — | 246 | 3,639 | 19,840 |
 | ⭐️ | ✅ `golang-safety` | ⚡ | -58% | 78 | 2,457 | 5,227 |
 | ⭐️ | ✅ `golang-testing` | ⚡ 🧠 🤖 ⚙️ | -32% | 113 | 3,105 | 6,212 |
 | ⭐️ | ✅ `golang-troubleshooting` | ⚡ 🧠 🤖 | -32% | 126 | 2,735 | 15,901 |
@@ -313,6 +314,10 @@ Idiomatic Go design patterns. Functional options, constructors, builder pattern,
 #### `golang-modernize`
 
 Modernize Go code to use recent language features. Range-over-int, min/max builtins, iterators, slices/maps/cmp/slog stdlib packages, testing patterns (t.Context, b.Loop, synctest), and tooling upgrades.
+
+#### `golang-refactoring`
+
+Safe, at-scale refactoring process for existing Go code. Coverage-adaptive safety net, tool-driven behavior-preserving transforms (gopls Rename/Inline/Extract, gofmt -r, eg, gopatch), the Fowler catalog mapped to Go, breaking import cycles, type-alias gradual code repair, and a human-in-the-loop workflow of staged PRs on a refactoring branch.
 
 ### QA & Performance
 
