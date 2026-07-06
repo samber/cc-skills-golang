@@ -61,6 +61,8 @@ Claude Code's built-in editor-style integration — a different mechanism from t
 - `goToImplementation`
 - call hierarchy
 
+`goToTypeDefinition` is intentionally absent from this list — the native tool does not expose it, so type-definition navigation has no agent-invocable path (see [features.md](features.md#navigation)).
+
 Because these need a location up front, they're most efficient once you already have one — right after a grep or a file read — rather than as the first move in an investigation (that's what `go_search` on the MCP server is for).
 
 **Its unique value:** compiler diagnostics are pushed into context **automatically after every edit**, with no explicit diagnostics call needed — the MCP server's `go_diagnostics` requires an explicit invocation each time.

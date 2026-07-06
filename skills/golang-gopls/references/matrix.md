@@ -7,7 +7,7 @@ Every gopls capability, mapped to its CLI command, MCP tool, and native `LSP` to
 | Workspace layout (module/workspace/GOPATH) | `gopls stats` | `go_workspace` | — |
 | Fuzzy-find a symbol by name, workspace-wide | `gopls workspace_symbol <query>` | `go_search` | `workspaceSymbol` |
 | Go to definition | `gopls definition f:l:c` | — (use `go_file_context`/`go_package_api`) | `goToDefinition` |
-| Go to type definition | — (unsupported) | — | `goToTypeDefinition` |
+| Go to type definition | — (unsupported) | — | — (not in the native tool's fixed op list) |
 | Find all references | `gopls references f:l:c` | `go_symbol_references` | `findReferences` |
 | Implements / implemented-by | `gopls implementation f:l:c` | — | `goToImplementation` |
 | Full subtype/supertype tree | — (not yet supported) | — | Type Hierarchy |

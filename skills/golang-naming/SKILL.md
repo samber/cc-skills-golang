@@ -152,6 +152,8 @@ For complete rules, examples, and rationale, see:
 | Unnecessary import aliases | Aliases add cognitive load. Only alias on collision — `mrand "math/rand"` |
 | Inconsistent concept names | Using `user`/`account`/`person` for the same concept forces readers to track synonyms — pick one name |
 
+Applying these fixes means renaming existing identifiers — → See `samber/cc-skills-golang@golang-gopls` skill to do it safely: its rename updates every call site across the workspace and refuses a rename that would break interface satisfaction, which a grep/sed or manual Edit-based rename silently misses.
+
 ## Enforce with Linters
 
 Many naming convention issues are caught automatically by linters: `revive`, `predeclared`, `misspell`, `errname`. See `samber/cc-skills-golang@golang-lint` skill for configuration and usage.
@@ -161,3 +163,4 @@ Many naming convention issues are caught automatically by linters: `revive`, `pr
 - → See `samber/cc-skills-golang@golang-code-style` skill for broader formatting and style decisions
 - → See `samber/cc-skills-golang@golang-structs-interfaces` skill for interface naming depth and receiver design
 - → See `samber/cc-skills-golang@golang-lint` skill for automated enforcement (revive, predeclared, misspell, errname)
+- → See `samber/cc-skills-golang@golang-gopls` skill for safe rename when applying a naming fix
