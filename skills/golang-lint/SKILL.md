@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.2.3"
+  version: "1.2.4"
   openclaw:
     emoji: "🧹"
     homepage: https://github.com/samber/cc-skills-golang
@@ -33,7 +33,7 @@ allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(g
 
 **Dependencies:**
 
-- golangci-lint: `go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest`
+- golangci-lint: `go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest`
 
 # Go Linting
 
@@ -67,7 +67,7 @@ golangci-lint run --verbose ./...
 
 ## Configuration
 
-The [recommended .golangci.yml](./assets/.golangci.yml) provides a production-ready setup with 33 linters. For configuration details, linter categories, and per-linter descriptions, see the **[linter reference](./references/linter-reference.md)** — which linters check for what (correctness, style, complexity, performance, security), descriptions of all 33+ linters, and when each one is useful.
+The [recommended .golangci.yml](./assets/.golangci.yml) provides a production-ready setup with 48 linters. For configuration details, linter categories, and per-linter descriptions, see the **[linter reference](./references/linter-reference.md)** — which linters check for what (correctness, style, complexity, performance, security), descriptions of all 48 linters, and when each one is useful.
 
 ## Suppressing Lint Warnings
 

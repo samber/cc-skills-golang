@@ -32,7 +32,7 @@ viper.AddConfigPath(".")                 // search path 3 (lowest priority)
 
 // viper searches paths in order, stops at the first match
 if err := viper.ReadInConfig(); err != nil {
-    var notFound *viper.ConfigFileNotFoundError
+    var notFound viper.ConfigFileNotFoundError
     if !errors.As(err, &notFound) {
         return err  // real error (permission denied, malformed YAML, etc.)
     }

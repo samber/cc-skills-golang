@@ -23,19 +23,14 @@ Do you know your access pattern?
             |-- No
                  |
                  v
-               Is throughput critical and cache is large? (>100k items, high write rate)
-                 |-- Yes --> S3FIFO
+               Do you want self-tuning with no config? (unknown or shifting patterns)
+                 |-- Yes --> ARC (higher memory) or W-TinyLFU (lower memory)
                  |-- No
                       |
                       v
-                    Do you want self-tuning with no config? (unknown or shifting patterns)
-                      |-- Yes --> ARC (higher memory) or W-TinyLFU (lower memory)
-                      |-- No
-                           |
-                           v
-                         Is scan resistance needed with simplicity?
-                           |-- Yes --> SIEVE
-                           |-- No --> W-TinyLFU (safe default)
+                    Is scan resistance needed with simplicity?
+                      |-- Yes --> SIEVE
+                      |-- No --> W-TinyLFU (safe default)
 ```
 
 ## Algorithm Deep Dives
@@ -83,17 +78,6 @@ Adds a small "window" LRU in front of TinyLFU's admission filter. New items ente
 - **Weaknesses:** Slightly more complex internals (harder to reason about eviction order during debugging)
 - **Ideal workload:** Mixed or unknown access patterns, general-purpose caching
 - **Degrades when:** Rarely — it's the safest default. May underperform specialized algorithms on extreme workloads.
-
-### S3FIFO (Segmented Small-Size FIFO)
-
-**Constant:** `hot.S3FIFO`
-
-Three-segment FIFO design: small, main, and ghost queues. Items promoted from small to main only if accessed again. Ghost queue tracks recently evicted keys for scan resistance.
-
-- **Strengths:** Excellent throughput (FIFO operations are cheaper than linked-list manipulations). Good scan resistance. Simple eviction path.
-- **Weaknesses:** Needs enough capacity for the segmented structure to work. Less effective on small caches.
-- **Ideal workload:** High-throughput systems with large caches (>100k items), CDN-like access patterns
-- **Degrades when:** Cache is very small (<1000 items) — the segments don't have enough room to differentiate access patterns
 
 ### ARC (Adaptive Replacement Cache)
 
@@ -147,7 +131,6 @@ Evicts the oldest inserted item regardless of access pattern. No recency or freq
 | LFU | None | High (no decay) | Medium | Medium | None |
 | TinyLFU | Medium | High (with decay) | Low | Medium | None |
 | W-TinyLFU | High | High (with decay) | Low | Medium | None |
-| S3FIFO | High | Low | Medium | Very High | None |
 | ARC | High | Medium | High (2x) | Medium | None (self-tuning) |
 | TwoQueue | Medium | Medium | Medium | Medium | Low |
 | SIEVE | Medium | None | Very Low | High | None |

@@ -41,25 +41,27 @@ parsed := ro.Pipe1(rawBytes, rojson.Unmarshal[MyStruct]())
 | ICS    | `plugins/ics`  | Parse iCal files into event streams   |
 
 ```go
-import rocron "github.com/samber/ro/plugins/cron"
+import (
+    "github.com/go-co-op/gocron/v2"
+    rocron "github.com/samber/ro/plugins/cron"
+)
 
-// Emit every day at midnight
-daily := rocron.Schedule("0 0 * * *")
+// Emit every day at midnight — build a gocron.JobDefinition and pass it to NewScheduler
+daily := rocron.NewScheduler(gocron.CronJob("0 0 * * *", false))
 ```
 
 ## Network and I/O
 
 | Plugin   | Import             | Purpose                                  |
 | -------- | ------------------ | ---------------------------------------- |
-| HTTP     | `plugins/http`     | HTTP request operators (GET, POST, etc.) |
-| I/O      | `plugins/io`       | File and stream reading/writing          |
+| I/O      | `plugins/stdio`    | File and stream reading/writing          |
 | FSNotify | `plugins/fsnotify` | File system change events                |
 
 ```go
 import rofsnotify "github.com/samber/ro/plugins/fsnotify"
 
 // Watch directory for changes
-events := rofsnotify.Watch("/var/log/app/")
+events := rofsnotify.NewFSListener("/var/log/app/")
 ro.Pipe1(events, ro.Filter(func(e fsnotify.Event) bool {
     return e.Op == fsnotify.Write
 })).Subscribe(ro.OnNext(func(e fsnotify.Event) {
@@ -77,7 +79,6 @@ ro.Pipe1(events, ro.Filter(func(e fsnotify.Event) bool {
 | Slog    | `plugins/observability/slog`    | Go 1.21+ `log/slog` integration |
 | Zerolog | `plugins/observability/zerolog` | Zerolog logging                 |
 | Sentry  | `plugins/observability/sentry`  | Sentry error tracking           |
-| Oops    | `plugins/samber/oops`           | samber/oops structured errors   |
 
 ```go
 import roslog "github.com/samber/ro/plugins/observability/slog"
@@ -85,7 +86,7 @@ import roslog "github.com/samber/ro/plugins/observability/slog"
 // Log all stream events via slog
 ro.Pipe1(
     dataStream,
-    roslog.Tap[Data](logger, slog.LevelInfo),
+    roslog.Log[Data](logger, slog.LevelInfo),
 )
 ```
 
@@ -114,7 +115,7 @@ ro.Pipe1(
 import rosignal "github.com/samber/ro/plugins/signal"
 
 // Observable that emits on SIGTERM/SIGINT
-shutdown := rosignal.Notify(syscall.SIGTERM, syscall.SIGINT)
+shutdown := rosignal.NewSignalCatcher(syscall.SIGTERM, syscall.SIGINT)
 
 // Use as TakeUntil signal for graceful shutdown
 ro.Pipe1(workStream, ro.TakeUntil[Work, os.Signal](shutdown))

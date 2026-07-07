@@ -50,7 +50,7 @@ func instrumentHandler(next http.Handler) http.Handler {
         next.ServeHTTP(sw, r)
         httpRequestDuration.WithLabelValues(
             r.Method,
-            r.URL.Path,
+            routePattern(r), // normalized route template ("/users/:id"), NOT r.URL.Path — see "High-Cardinality Labels"
             strconv.Itoa(sw.status),
         ).Observe(time.Since(start).Seconds())
     })

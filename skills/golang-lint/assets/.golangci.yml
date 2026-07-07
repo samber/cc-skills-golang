@@ -130,14 +130,12 @@ linters:
       branch-max-lines: 2
 
 formatters:
+  # Formatters are off by default in v2; only those listed under `enable` run.
+  # Intentionally NOT enabled: gci/goimports (redundant with gofumpt's grouping),
+  # golines (too opinionated, can break readability), swaggo (only for swaggo users).
   enable:
     - gofmt
     - gofumpt
-  disable:
-    - gci        # import grouping/ordering — gofumpt already handles standard grouping
-    - goimports  # import management — redundant with gofumpt
-    - golines    # line wrapping — too opinionated, can break readability
-    - swaggo     # swaggo comment formatting — only for swaggo users
   settings:
     gofumpt:
       extra-rules: true

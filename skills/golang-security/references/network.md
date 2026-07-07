@@ -194,15 +194,15 @@ func startDebugServer() {
 
 ---
 
-## XXE Vulnerability — High
+## XML DTD Hardening — Low
 
-XML parsers that process external entity references.
+Go's `encoding/xml` does not expand external or internal DTD entities, so classic XXE (file inclusion via `SYSTEM`, or entity-expansion DoS) is not reachable through it — a `&xxe;` reference just fails with an "invalid character entity" error. Rejecting DTDs is therefore defense-in-depth / input hygiene, not a fix for a Go-specific vulnerability.
 
 **Bad:**
 
 ```go
 decoder := xml.NewDecoder(bytes.NewReader(xmlData))
-decoder.Decode(&person) // DON'T: May process external entities
+decoder.Decode(&person) // Safe by default, but skips DTD/size hardening
 ```
 
 **Good:**
@@ -211,10 +211,10 @@ decoder.Decode(&person) // DON'T: May process external entities
 decoder := xml.NewDecoder(bytes.NewReader(xmlData))
 decoder.Strict = true
 
-// Block DTD declarations
+// Defense-in-depth: reject DTDs even though encoding/xml won't expand entities
 xmlStr := string(xmlData)
 if strings.Contains(xmlStr, "<!DOCTYPE") || strings.Contains(xmlStr, "<!ENTITY") {
-    return errors.New("XML contains DTD - potential XXE")
+    return errors.New("XML contains DTD - rejected")
 }
 decoder.Decode(&person)
 ```

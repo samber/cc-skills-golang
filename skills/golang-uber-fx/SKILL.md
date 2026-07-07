@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.1.3"
+  version: "1.1.5"
   openclaw:
     emoji: "🏭"
     homepage: https://github.com/samber/cc-skills-golang
@@ -67,14 +67,14 @@ app := fx.New(
 app.Run() // blocks until SIGINT/SIGTERM, then runs OnStop hooks
 ```
 
-Boot stages: `fx.New` validates types (constructors do not run); `app.Start(ctx)` runs each `fx.Invoke` and fires OnStart hooks in topological order; main blocks on `app.Done()`; `app.Stop(ctx)` fires OnStop hooks in reverse order. Default timeout is **15 seconds** — override with `fx.StartTimeout` / `fx.StopTimeout`.
+Boot stages: `fx.New` builds the container and immediately runs every `fx.Invoke` (constructors run lazily, only as needed to satisfy an Invoke); `app.Start(ctx)` fires OnStart hooks in dependency order; main blocks on `app.Done()`; `app.Stop(ctx)` fires OnStop hooks in reverse order. Default timeout is **15 seconds** — override with `fx.StartTimeout` / `fx.StopTimeout`.
 
 ## Provide and Invoke
 
 ```go
 fx.New(
     fx.Provide(NewLogger, NewDatabase, NewServer),  // lazy
-    fx.Invoke(RegisterRoutes, StartMetricsExporter), // always run during Start
+    fx.Invoke(RegisterRoutes, StartMetricsExporter), // always run, eagerly, during fx.New
 )
 ```
 

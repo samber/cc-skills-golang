@@ -66,7 +66,7 @@
     "assertions": [
       {
         "id": "3.1",
-        "text": "Uses errors.As(err, &notFound) with *viper.ConfigFileNotFoundError"
+        "text": "Uses errors.As(err, &notFound) with notFound declared as viper.ConfigFileNotFoundError (value type, not pointer)"
       },
       {
         "id": "3.2",
@@ -143,13 +143,13 @@
   {
     "id": 6,
     "name": "bind-pflag-timing",
-    "description": "Tests that BindPFlag must be called before Execute() runs",
-    "prompt": "I'm integrating cobra and viper in my Go CLI. I call viper.BindPFlag in the command's RunE function to bind the --port flag. But viper.GetInt('port') always returns the default 8080, even when I pass --port 9090. Why?",
-    "trap": "Without the skill, the model may check the flag name spelling or viper setup. The root cause is binding after Execute() has already parsed the flags — BindPFlag must happen in init() or PersistentPreRunE, before the flags are resolved.",
+    "description": "Tests that BindPFlag must run before any viper.Get* call reads the key",
+    "prompt": "I'm integrating cobra and viper in my Go CLI. I call viper.BindPFlag in the command's RunE function to bind the --port flag, but I read viper.GetInt('port') in PersistentPreRunE to configure logging. viper.GetInt('port') always returns the default 8080, even when I pass --port 9090. Why?",
+    "trap": "Without the skill, the model may check the flag name spelling or viper setup, or repeat the myth that BindPFlag must run before Execute(). The real root cause: BindPFlag stores a live reference to the *pflag.Flag, so binding order relative to Execute() doesn't matter — but here PersistentPreRunE reads the key before RunE binds it, so the read falls through to the default. The bind must happen before any Get* reads the key; move BindPFlag to init().",
     "assertions": [
       {
         "id": "6.1",
-        "text": "Identifies that BindPFlag must be called before Execute() / before RunE runs"
+        "text": "Identifies that BindPFlag must be called before any viper.Get* call reads the key — here the read in PersistentPreRunE happens before the bind in RunE"
       },
       {
         "id": "6.2",
@@ -157,7 +157,7 @@
       },
       {
         "id": "6.3",
-        "text": "Explains that cobra parses flags before RunE runs — binding after parsing misses the Changed state"
+        "text": "Explains that BindPFlag stores a live reference to the flag, so binding order relative to Execute() doesn't matter — the bug is that the key is read (in PersistentPreRunE) before the bind runs"
       },
       {
         "id": "6.4",

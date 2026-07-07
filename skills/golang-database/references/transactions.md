@@ -3,7 +3,7 @@
 ## Basic transaction pattern
 
 ```go
-tx, err := db.BeginTxx(ctx, nil) // default isolation (READ COMMITTED)
+tx, err := db.BeginTxx(ctx, nil) // driver/DB default (PostgreSQL: READ COMMITTED, MySQL/MariaDB InnoDB: REPEATABLE READ)
 if err != nil {
     return fmt.Errorf("beginning transaction: %w", err)
 }
@@ -26,7 +26,7 @@ tx, err := db.BeginTxx(ctx, &sql.TxOptions{
 
 | Level | Use when |
 | --- | --- |
-| `LevelReadCommitted` | Default — good for most operations |
+| `LevelReadCommitted` | Good for most operations — the default on PostgreSQL/SQL Server (MySQL/MariaDB InnoDB default to `LevelRepeatableRead`) |
 | `LevelRepeatableRead` | Need consistent reads within a transaction |
 | `LevelSerializable` | Financial operations, inventory, anything with strict consistency |
 

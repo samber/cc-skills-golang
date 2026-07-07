@@ -90,16 +90,16 @@ if err := app.Stop(stopCtx); err != nil {
 
 ### Wiring
 
-| Option                     | Purpose                                     |
-| -------------------------- | ------------------------------------------- |
-| `fx.Provide(ctors...)`     | Register constructors                       |
-| `fx.Invoke(fns...)`        | Run functions during Start                  |
-| `fx.Supply(values...)`     | Provide pre-built values                    |
-| `fx.Replace(values...)`    | Replace previously-provided values (tests)  |
-| `fx.Decorate(fn)`          | Wrap an existing value (module-scoped)      |
-| `fx.Module(name, opts...)` | Group providers/invokes/decorators          |
-| `fx.Options(opts...)`      | Bundle options into a single value          |
-| `fx.Populate(targets...)`  | Extract typed values from the graph (tests) |
+| Option                     | Purpose                                              |
+| -------------------------- | ---------------------------------------------------- |
+| `fx.Provide(ctors...)`     | Register constructors                                |
+| `fx.Invoke(fns...)`        | Run functions eagerly during `fx.New` (before Start) |
+| `fx.Supply(values...)`     | Provide pre-built values                             |
+| `fx.Replace(values...)`    | Replace previously-provided values (tests)           |
+| `fx.Decorate(fn)`          | Wrap an existing value (module-scoped)               |
+| `fx.Module(name, opts...)` | Group providers/invokes/decorators                   |
+| `fx.Options(opts...)`      | Bundle options into a single value                   |
+| `fx.Populate(targets...)`  | Extract typed values from the graph (tests)          |
 
 ### Annotations
 
@@ -120,7 +120,7 @@ if err := app.Stop(stopCtx); err != nil {
 | `fx.StopHook(fn)` | Adapt a simple Stop function |
 | `fx.StartStopHook(start, stop)` | Pair of simple Start/Stop functions |
 | `fx.StartTimeout(d)`, `fx.StopTimeout(d)` | Override default 15s lifecycle timeouts |
-| `fx.ErrorHook(h)` | Intercept lifecycle errors (e.g. failed OnStart) for alerting or cleanup |
+| `fx.ErrorHook(h)` | Intercept invoke-stage errors during `fx.New()` (e.g. a missing/failing `fx.Invoke`) for alerting; NOT called for OnStart/OnStop lifecycle-hook failures during `app.Start()`/`app.Stop()` |
 
 ### Logging & Testing
 

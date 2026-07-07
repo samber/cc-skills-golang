@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.2.2"
+  version: "1.2.4"
   openclaw:
     emoji: "🔌"
     homepage: https://github.com/samber/cc-skills-golang
@@ -228,17 +228,21 @@ Container cloning creates an isolated copy where you override only the services 
 
 ```go
 func TestUserService_WithDo(t *testing.T) {
-    // Create a test injector with mock implementation
-    testInjector := do.New()
+    // Build the production injector with the real providers
+    prodInjector := do.New()
+    do.Provide[*slog.Logger](prodInjector, func(i do.Injector) (*slog.Logger, error) {
+        return slog.Default(), nil
+    })
+    do.Provide(prodInjector, NewUserStore)   // real UserStore
+    do.Provide(prodInjector, NewUserService) // depends on UserStore + *slog.Logger
 
-    // Provide the mock UserStore interface
+    // Clone creates an isolated copy that inherits every provider above,
+    // so *UserService still resolves after we swap the mock boundary
+    testInjector := prodInjector.Clone()
+
+    // Override only the UserStore with a mock
     do.OverrideValue[UserStore](testInjector, &MockUserStore{
         users: map[string]*User{"1": {ID: "1", Name: "Alice"}},
-    })
-
-    // Provide other real services as needed
-    do.Provide[*slog.Logger](testInjector, func(i *do.Injector) (*slog.Logger, error) {
-        return slog.Default(), nil
     })
 
     svc := do.MustInvoke[*UserService](testInjector)

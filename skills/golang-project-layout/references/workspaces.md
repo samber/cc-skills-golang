@@ -101,6 +101,6 @@ The workspace automatically resolves `shared/libs` to the local directory.
 ```bash
 go work init              # Initialize new workspace
 go work use ./path/to/mod # Add module to workspace
-go work use -rm ./path    # Remove module from workspace
+go work edit -dropuse=./path # Remove module from workspace
 go work sync              # Sync workspace with module changes
 ```

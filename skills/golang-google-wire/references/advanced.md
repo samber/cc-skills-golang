@@ -115,22 +115,21 @@ Exclude a struct field from `wire.Struct` injection by tagging it:
 type Server struct {
     Logger  *zap.Logger
     DB      *sql.DB
-    mu      sync.Mutex   `wire:"-"` // unexported — auto-excluded
+    mu      sync.Mutex   `wire:"-"` // unexported — still must be tagged to exclude
     Timeout time.Duration `wire:"-"` // exported but opt-out
 }
 
 wire.Struct(new(Server), "*") // injects Logger and DB; skips mu and Timeout
 ```
 
-Unexported fields are always skipped regardless of the tag.
+Unexported fields are not skipped automatically. With `wire.Struct(new(T), "*")`, every field — exported or not — needs a provider for its type, so an unexported field must be tagged `wire:"-"` to be excluded; otherwise wire reports `no provider found` for it.
 
 ## Common Codegen Errors
 
 | Error message | Root cause | Fix |
 | --- | --- | --- |
-| `no provider found for TYPE` | A dependency is not provided by any set in `wire.Build` | Add the missing provider or set |
+| `no provider found for TYPE` | A dependency is not provided by any set in `wire.Build` — including an interface with no `wire.Bind` mapping to a concrete type | Add the missing provider or set; for an interface, add `wire.Bind(new(Iface), new(*Impl))` to a set |
 | `multiple bindings for TYPE` | Two providers return the same type | Use named types or remove the duplicate |
-| `argument N has no provider for TYPE` | An interface is requested but no `wire.Bind` maps to it | Add `wire.Bind(new(Iface), new(*Impl))` to a set |
 | `cycle detected` | A → B → A circular dependency | Break the cycle by introducing an interface or factory |
 | `wire.Build used outside of injector function` | `wire.Build` called from a non-injector function | Only call `wire.Build` inside functions with the build tag |
 | duplicate symbol / redeclared in this block | Injector file is missing `//go:build wireinject` | Add the build tag as the first line |
@@ -139,13 +138,13 @@ Unexported fields are always skipped regardless of the tag.
 
 ```bash
 # Specify output file prefix (default: wire_gen)
-wire -output_file_prefix=init gen ./cmd/server
+wire gen -output_file_prefix=init ./cmd/server
 
 # Apply build tags during generation
-wire -tags=integration gen ./...
+wire gen -tags=integration ./...
 
 # Prepend a header file (e.g., license comment) to generated output
-wire -header_file=hack/boilerplate.go.txt gen ./...
+wire gen -header_file=hack/boilerplate.go.txt ./...
 ```
 
 ## `panic(wire.Build(...))` Alternate Syntax

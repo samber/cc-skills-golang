@@ -25,11 +25,13 @@ The `ShellCompDirective` controls shell behavior after your completion function 
 | `ShellCompDirectiveDefault` | Fall back to file completion after your results |
 | `ShellCompDirectiveNoFileComp` | Disable file completion fallback |
 | `ShellCompDirectiveNoSpace` | Don't add a space after the completion |
-| `ShellCompDirectiveFilterFileExt(exts)` | Only show files with given extensions |
-| `ShellCompDirectiveFilterDirs(dirs)` | Only show directories |
+| `ShellCompDirectiveFilterFileExt` | Only show files with the returned extensions |
+| `ShellCompDirectiveFilterDirs` | Only show directories |
 | `ShellCompDirectiveError` | Signal an error (show no completions) |
 
 Combine with bitwise OR: `cobra.ShellCompDirectiveNoFileComp | cobra.ShellCompDirectiveNoSpace`.
+
+`ShellCompDirectiveFilterFileExt` and `ShellCompDirectiveFilterDirs` are directive constants, not functions — you pass the filter values as the returned completion slice. To limit file completion to `.yaml`/`.json`, return the extensions alongside the directive: `return []string{"yaml", "json"}, cobra.ShellCompDirectiveFilterFileExt`. For `FilterDirs`, returning a directory name restricts completion to subdirectories of it.
 
 Use `ShellCompDirectiveNoFileComp` whenever your list is exhaustive — it prevents the shell from appending irrelevant files.
 

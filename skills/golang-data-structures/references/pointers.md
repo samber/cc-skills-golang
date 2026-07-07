@@ -83,7 +83,7 @@ p := unsafe.Pointer(uintptr(unsafe.Pointer(&x)) + offset)
 | `unsafe.Add(ptr, len)` | Go 1.17 | Pointer arithmetic without `uintptr` conversion |
 | `unsafe.Slice(ptr, len)` | Go 1.17 | Create slice from pointer + length |
 | `unsafe.String(ptr, len)` | Go 1.20 | Create string from pointer + length |
-| `unsafe.SliceData(s)` | Go 1.17 | Get pointer to slice's backing array |
+| `unsafe.SliceData(s)` | Go 1.20 | Get pointer to slice's backing array |
 | `unsafe.StringData(s)` | Go 1.20 | Get pointer to string's backing array |
 
 These are safer than manual `uintptr` arithmetic because they keep values as pointers (visible to GC) throughout.

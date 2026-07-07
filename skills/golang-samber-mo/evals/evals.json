@@ -263,10 +263,10 @@
     "prompt": "I have a Go map[string]User and I want to look up a key and chain transformations on the result if present. How do I bridge the map lookup with samber/mo?",
     "trap": "Without the skill, the model manually checks the ok bool from map access. TupleToOption wraps the (value, bool) tuple directly.",
     "assertions": [
-      {"id": "20.1", "text": "Uses mo.TupleToOption with the map lookup: mo.TupleToOption(m[key])"},
+      {"id": "20.1", "text": "Uses v, ok := m[key] followed by mo.TupleToOption(v, ok)"},
       {"id": "20.2", "text": "Chains Map/FlatMap on the resulting Option"},
       {"id": "20.3", "text": "Does NOT manually check ok bool and construct Some/None"},
-      {"id": "20.4", "text": "Shows the complete pattern: TupleToOption(m[key]).Map(...)"}
+      {"id": "20.4", "text": "Shows the complete pattern: mo.TupleToOption(v, ok).Map(...)"}
     ]
   },
   {
@@ -274,10 +274,10 @@
     "name": "result-try-catch-panics",
     "description": "Tests knowledge of mo.Try for wrapping a function that may return an error OR panic, and chaining the result",
     "prompt": "I'm integrating a third-party Go JSON schema validator that has two failure modes: it returns an error for invalid input, and it panics on malformed schemas. I want to call it, capture both failure modes, and then chain a transformation if validation succeeds — all without writing defer/recover boilerplate. I'm already using samber/mo in my project. Show the code.",
-    "trap": "Without the skill, the model writes a defer/recover wrapper function manually, then handles the error. With the skill, mo.Try captures both (T, error) returns and panics into a Result[T] in one call, enabling direct chaining with Map/FlatMap. The model often misses mo.Try entirely (using a hand-rolled wrapper) or uses it but forgets it also catches panics (thinking it only handles errors).",
+    "trap": "Without the skill, the model writes a defer/recover wrapper function manually, then handles the error. With the skill, the model wraps the call in mo.Do (which recovers panics) and uses mo.Try to capture the (T, error) return, turning both failure modes into an Err Result without hand-written defer/recover and enabling chaining with Map/FlatMap. The model often misses this composition, or wrongly assumes mo.Try alone catches panics (it only handles the error return — panic recovery comes from mo.Do).",
     "assertions": [
       {"id": "21.1", "text": "Uses mo.Try (not a manual defer/recover) to call the validator"},
-      {"id": "21.2", "text": "Explicitly states that mo.Try catches panics AND returned errors, converting both to Err"},
+      {"id": "21.2", "text": "Correctly states that mo.Try only converts the (T, error) return to a Result — catching the panic requires wrapping the call in mo.Do (which recovers), not mo.Try alone"},
       {"id": "21.3", "text": "Shows chaining Map or FlatMap on the Try result for the transformation step"},
       {"id": "21.4", "text": "The mo.Try callback matches the (T, error) return signature of the wrapped function"}
     ]

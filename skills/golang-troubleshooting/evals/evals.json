@@ -302,7 +302,7 @@
     "assertions": [
       {"id": "22.1", "text": "Identifies that 18% GC CPU overhead is significantly high (threshold is >10%)"},
       {"id": "22.2", "text": "Explains the heap size breakdown as heap at GC start, heap at GC end, and live heap"},
-      {"id": "22.3", "text": "Identifies the large pause times (45ms) as a likely cause of the latency spikes"},
+      {"id": "22.3", "text": "Identifies the 45ms concurrent mark-and-scan phase (not a STW pause) as consuming significant time and contributing to latency via GC assist, distinguishing it from the much shorter 2.1ms/1.2ms STW pauses"},
       {"id": "22.4", "text": "Suggests the application is over-allocating and recommends investigating allocation patterns"},
       {"id": "22.5", "text": "Recommends using pprof heap/alloc profiling to find hot allocation sites"}
     ]

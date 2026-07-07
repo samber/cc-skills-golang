@@ -33,10 +33,12 @@ oops.Local = loc                      // set timezone for error timestamps
 
 ```go
 oopsErr := err.(oops.OopsError)
+userID, userData := oopsErr.User() // User() returns (string, map[string]any)
 fmt.Println("operation failed",
     "code", oopsErr.Code(),
     "domain", oopsErr.Domain(),
-    "user_id", oopsErr.User(),
+    "user_id", userID,
+    "user_data", userData,
     "error", oopsErr,
 )
 

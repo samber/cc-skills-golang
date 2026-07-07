@@ -49,8 +49,8 @@ cmd.MarkFlagsMutuallyExclusive("json", "yaml", "table")
 // Fail if none provided
 cmd.MarkFlagsOneRequired("file", "stdin")
 
-// Require flag only if another flag is set
-cmd.MarkFlagsMutuallyExclusive("tls", "no-tls")
+// Fail unless all-or-none are provided
+cmd.MarkFlagsRequiredTogether("tls-cert", "tls-key")
 ```
 
 ## Persistent flag patterns

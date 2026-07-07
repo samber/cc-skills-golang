@@ -64,7 +64,7 @@ go list -u -m -json all | go-mod-outdated -update -direct -ci
 go list -u -m -json all | go-mod-outdated -update -direct -style markdown
 ```
 
-Output columns: MODULE, CURRENT version, WANTED (latest minor/patch), LATEST (latest overall), and VALID TIMESTAMPS (warns if an "update" is chronologically older than current).
+Output columns: MODULE, VERSION (current), NEW VERSION (available update), DIRECT (true/false), and VALID TIMESTAMPS (warns if an "update" is chronologically older than current).
 
 ## Analyzing Dependency Size with goweight
 

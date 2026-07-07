@@ -1,6 +1,6 @@
 # Golang skills — full catalog by category
 
-42 skills. Skills marked ⭐️ are recommended for all Go projects. Skills marked ⚙️ can be superseded by a company-specific skill.
+45 skills. Skills marked ⭐️ are recommended for all Go projects. Skills marked ⚙️ can be superseded by a company-specific skill.
 
 ---
 
@@ -128,6 +128,14 @@ Use when: upgrading a codebase to a newer Go version or replacing pre-generics p
 
 ---
 
+### `samber/cc-skills-golang@golang-refactoring`
+
+The safe, staged, at-scale process of changing existing Go code — blast-radius mapping, PR ordering, the refactoring-branch git model, tool-driven mechanics (gopls Rename/Inline, `gofmt -r`, `eg`, `gopatch`), and a coverage-adaptive safety net.
+
+Use when: planning or executing a refactor of existing code. It owns the _process_, not the target shape — load it alongside whichever skill owns the destination: `golang-naming`, `golang-code-style`, `golang-project-layout`, `golang-design-patterns`, or `golang-modernize`.
+
+---
+
 ## QA & Performance
 
 ### `samber/cc-skills-golang@golang-benchmark` 🧠
@@ -193,6 +201,14 @@ Use when: setting up or improving a CI pipeline for a Go project.
 Golang module dependency strategies — go.mod conventions, versioning, replace directives, tool dependencies, and multi-module workspaces.
 
 Use when: managing go.mod, dealing with replace directives, or structuring a multi-module repo.
+
+---
+
+### `samber/cc-skills-golang@golang-gopls`
+
+Semantic code intelligence for Go via gopls — go-to-definition, find references, diagnostics, package API, symbol search, and safe local refactoring, reachable through its MCP server, the native `LSP` tool, or its CLI.
+
+Use when: navigating, diagnosing, or refactoring code in your locally resolved build (definitions, references, rename). For querying the published ecosystem — versions, CVEs, importers of packages not yet added → `golang-pkg-go-dev`.
 
 ---
 

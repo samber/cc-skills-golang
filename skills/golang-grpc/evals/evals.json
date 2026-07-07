@@ -7,7 +7,7 @@
     "trap": "Without the skill, the model may return fmt.Errorf or raw errors, which become codes.Unknown. The skill requires status.Errorf with specific codes.",
     "assertions": [
       {"id": "1.1", "text": "Uses status.Errorf (or status.Error) for the not-found case with codes.NotFound"},
-      {"id": "1.2", "text": "Uses status.Errorf with codes.Internal for unexpected errors"},
+      {"id": "1.2", "text": "Uses status.Errorf (or status.Error) with codes.Internal for unexpected errors"},
       {"id": "1.3", "text": "Does NOT return a raw fmt.Errorf or errors.New as the gRPC error"},
       {"id": "1.4", "text": "Imports google.golang.org/grpc/status and google.golang.org/grpc/codes"},
       {"id": "1.5", "text": "Does NOT leak internal error details in the user-facing gRPC message for Internal errors"}

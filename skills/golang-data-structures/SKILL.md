@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.1.6"
+  version: "1.1.9"
   openclaw:
     emoji: "🗃"
     homepage: https://github.com/samber/cc-skills-golang
@@ -65,7 +65,7 @@ Key functions: `Sort`/`SortFunc`, `BinarySearch`, `Contains`, `Compact`, `Grow`.
 
 ## Map Internals
 
-Maps are hash tables with 8-entry buckets and overflow chains. They are reference types — assigning a map copies the pointer, not the data.
+Maps are hash tables with 8-slot groups (a Swiss Table since Go 1.24, open-addressed with no overflow chains). They are reference types — assigning a map copies the pointer, not the data.
 
 ### Preallocation
 
@@ -75,16 +75,16 @@ m := make(map[string]*User, len(users)) // avoids rehashing during population
 
 ### `maps` Package Quick Reference (Go 1.21+)
 
-| Function          | Purpose                      |
-| ----------------- | ---------------------------- |
-| `Collect` (1.23+) | Build map from iterator      |
-| `Insert` (1.23+)  | Insert entries from iterator |
-| `All` (1.23+)     | Iterator over all entries    |
-| `Keys`, `Values`  | Iterators over keys/values   |
+| Function                 | Purpose                      |
+| ------------------------ | ---------------------------- |
+| `Collect` (1.23+)        | Build map from iterator      |
+| `Insert` (1.23+)         | Insert entries from iterator |
+| `All` (1.23+)            | Iterator over all entries    |
+| `Keys`, `Values` (1.23+) | Iterators over keys/values   |
 
 For `Clone`, `Equal`, sorted iteration → see `samber/cc-skills-golang@golang-safety` skill.
 
-**[Map Internals Deep Dive](./references/map-internals.md)** — How Go maps store and hash data, bucket overflow chains, why maps never shrink (and what to do about it), comparing map performance to alternatives.
+**[Map Internals Deep Dive](./references/map-internals.md)** — How Go maps store and hash data as Swiss Tables (open-addressed groups, no overflow chains), memory growth via table splitting and incremental growth, preallocation, and pointer-vs-value tradeoffs.
 
 ## Arrays
 

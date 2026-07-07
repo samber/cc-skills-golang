@@ -55,7 +55,7 @@ cobra.MinimumNArgs(n int)           // requires at least n args
 cobra.MaximumNArgs(n int)           // requires at most n args
 cobra.RangeArgs(min, max int)       // requires between min and max args
 cobra.OnlyValidArgs                 // all args must be in ValidArgs list
-cobra.ExactValidArgs(n int)         // exactly n args, all in ValidArgs
+cobra.ExactValidArgs(n int)         // exactly n args, all in ValidArgs — DEPRECATED: use MatchAll(ExactArgs(n), OnlyValidArgs)
 ```
 
 ### Composing validators with MatchAll
@@ -103,7 +103,7 @@ Args: cobra.MatchAll(cobra.MinimumNArgs(1), validateAllPositive),
 
 ```go
 func init() {
-    // groups must be registered before AddCommand
+    // groups must be registered before Execute(); order vs AddCommand doesn't matter
     rootCmd.AddGroup(&cobra.Group{ID: "core", Title: "Core Commands:"})
     rootCmd.AddGroup(&cobra.Group{ID: "management", Title: "Management Commands:"})
 
@@ -148,7 +148,7 @@ var oldCmd = &cobra.Command{
 
 ## cobra.CheckErr
 
-`cobra.CheckErr(err)` is a convenience function: if `err != nil`, it prints the error to `cmd.ErrOrStderr()` and calls `os.Exit(1)`. Use it only in `main()` where you want a hard exit — not inside `RunE` where returning the error is preferred.
+`cobra.CheckErr(err)` is a convenience function: if `err != nil`, it prints the error (prefixed `Error:`) to `os.Stderr` and calls `os.Exit(1)`. Use it only in `main()` where you want a hard exit — not inside `RunE` where returning the error is preferred.
 
 ```go
 func main() {

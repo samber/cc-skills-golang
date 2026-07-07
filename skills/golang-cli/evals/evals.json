@@ -331,7 +331,7 @@
       },
       {
         "id": "12.4",
-        "text": "Uses cobra.ExactValidArgs or ValidArgs to validate completion arguments for the completion command itself"
+        "text": "Uses cobra.MatchAll(cobra.ExactArgs(n), cobra.OnlyValidArgs) or ValidArgs to validate completion arguments for the completion command itself"
       },
       {
         "id": "12.5",

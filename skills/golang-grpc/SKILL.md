@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.1.7"
+  version: "1.1.9"
   openclaw:
     emoji: "🌐"
     homepage: https://github.com/samber/cc-skills-golang
@@ -150,7 +150,8 @@ return nil, fmt.Errorf("user not found")
 if errors.Is(err, ErrNotFound) {
     return nil, status.Errorf(codes.NotFound, "user %q not found", req.UserId)
 }
-return nil, status.Errorf(codes.Internal, "lookup failed: %v", err)
+log.Printf("lookup failed: %v", err) // log detail server-side
+return nil, status.Error(codes.Internal, "internal error") // generic message to client
 ```
 
 For field-level validation errors, attach `errdetails.BadRequest` via `status.WithDetails`.

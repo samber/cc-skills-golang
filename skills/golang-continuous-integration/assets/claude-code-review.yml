@@ -53,7 +53,6 @@ jobs:
           show_full_output: true
           use_sticky_comment: true
           track_progress: true
-          sticky_comment_header: "<!-- claude-review-quality -->"
           additional_permissions: |
             actions: read
           claude_args: >-
@@ -129,7 +128,6 @@ jobs:
           show_full_output: true
           use_sticky_comment: true
           track_progress: true
-          sticky_comment_header: "<!-- claude-review-correctness -->"
           additional_permissions: |
             actions: read
           claude_args: >-
@@ -208,7 +206,6 @@ jobs:
           show_full_output: true
           use_sticky_comment: true
           track_progress: true
-          sticky_comment_header: "<!-- claude-review-security -->"
           additional_permissions: |
             actions: read
           claude_args: >-
@@ -286,7 +283,6 @@ jobs:
           show_full_output: true
           use_sticky_comment: true
           track_progress: true
-          sticky_comment_header: "<!-- claude-review-quality-depth -->"
           additional_permissions: |
             actions: read
           claude_args: >-
@@ -357,7 +353,6 @@ jobs:
           show_full_output: true
           use_sticky_comment: true
           track_progress: true
-          sticky_comment_header: "<!-- claude-review-ci-diagnosis -->"
           additional_permissions: |
             actions: read
           claude_args: >-

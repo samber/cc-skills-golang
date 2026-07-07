@@ -16,24 +16,26 @@ Decorators apply to the scope they were registered in and to that scope's descen
 
 ## Scopes
 
-A `Scope` is a child container that inherits providers from its parent and can add or override its own. Scopes let request-, tenant-, or module-level dependencies coexist with shared singletons:
+A `Scope` is a child container that inherits providers from its parent and can add or override its own. Scopes let tenant- or module-level dependencies coexist with shared singletons:
 
 ```go
 root := dig.New()
 root.Provide(NewLogger)
 root.Provide(NewDatabase)
 
-requestScope := root.Scope("request")
-requestScope.Provide(NewRequestContext)            // only visible inside requestScope
-requestScope.Decorate(func(l *zap.Logger) *zap.Logger {
-    return l.With(zap.String("scope", "request"))
+tenantScope := root.Scope("tenant")
+tenantScope.Provide(NewTenantConfig)               // only visible inside tenantScope
+tenantScope.Decorate(func(l *zap.Logger) *zap.Logger {
+    return l.With(zap.String("scope", "tenant"))
 })
 ```
+
+Reserve scopes for coarse-grained, long-lived subgraphs created once at startup (per-module or per-tenant). Don't spin up a scope per HTTP request: dig retains every child scope on its parent with no dispose API, so per-request scopes leak without bound — put per-request values in `context.Context` or an explicit request struct instead.
 
 By default, providers registered to a scope are private to that scope and its children. Pass `dig.Export(true)` to `Provide` inside a scope to make the type visible from the parent:
 
 ```go
-requestScope.Provide(NewSharedCache, dig.Export(true))
+tenantScope.Provide(NewSharedCache, dig.Export(true))
 ```
 
 ## Optional Dependencies
@@ -61,9 +63,9 @@ if err := c.Invoke(run); err != nil {
 
 Useful helpers:
 
-- `errors.As(err, &dig.Error{})` — true if the error originated inside dig
+- `var de dig.Error; errors.As(err, &de)` — true if the error originated inside dig (`dig.Error` is an interface, so pass a pointer to a variable of that type)
 - `dig.RootCause(err)` — unwrap to the original constructor error returned by user code
-- `dig.IsCycleDetected(err)` — true if the graph contains a cycle (typically reported at first `Invoke` unless `DeferAcyclicVerification` is set)
+- `dig.IsCycleDetected(err)` — true if the graph contains a cycle (reported at `Provide` time by default, or deferred to the first `Invoke` when `DeferAcyclicVerification` is set)
 - `errors.As(err, &dig.PanicError{})` — when `RecoverFromPanics` is enabled, a panicking constructor surfaces as this typed error
 
 ## Visualization

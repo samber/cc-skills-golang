@@ -73,7 +73,7 @@ Example:
 | `symbolMatcher` | enum: `FastFuzzy`\|`Fuzzy`\|`CaseSensitive`\|`CaseInsensitive` | `"FastFuzzy"` | Matching algorithm for `workspace/symbol` / `go_search` |
 | `symbolScope` | enum: `all`\|`workspace` | `"all"` | Whether symbol search covers only workspace packages or every loaded package (including dependencies) |
 | `symbolStyle` | enum | — | How matched symbols are qualified in the response (package-qualified vs. bare) |
-| `codelenses` | `map[string]bool` | — | Enables/disables individual code lenses (e.g. `generate`, `tidy`, `vendor`, `run_tests`) |
+| `codelenses` | `map[string]bool` | — | Enables/disables individual code lenses (e.g. `generate`, `tidy`, `vendor`, `test`) |
 
 ---
 

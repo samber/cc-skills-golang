@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.1.6"
+  version: "1.1.7"
   openclaw:
     emoji: "📝"
     homepage: https://github.com/samber/cc-skills-golang
@@ -151,8 +151,7 @@ README SHOULD follow this exact section order. Copy the template from [templates
 5. **Getting Started** — installation + minimal working example
 6. **Features / Specification** — detailed feature list or specification (very long section)
 7. **Contributing** — link to CONTRIBUTING.md or inline if very short
-8. **Contributors** — thank contributors (badge or list)
-9. **License** — license name + link
+8. **License** — license name + link
 
 Common badges for Go projects:
 

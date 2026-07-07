@@ -3,7 +3,7 @@
 ## Constructor
 
 ```go
-hot.NewHotCache[K comparable, V any](algorithm hot.EvictionAlgorithm, capacity int) *HotCacheBuilder[K, V]
+hot.NewHotCache[K comparable, V any](algorithm hot.EvictionAlgorithm, capacity int) hot.HotCacheConfig[K, V]
 ```
 
 **Algorithm constants:**
@@ -14,7 +14,6 @@ hot.NewHotCache[K comparable, V any](algorithm hot.EvictionAlgorithm, capacity i
 | `hot.LFU`      | Least Frequently Used                  |
 | `hot.TinyLFU`  | TinyLFU with frequency decay           |
 | `hot.WTinyLFU` | Weighted TinyLFU (recommended default) |
-| `hot.S3FIFO`   | Segmented Small-Size FIFO              |
 | `hot.ARC`      | Adaptive Replacement Cache             |
 | `hot.TwoQueue` | Two-Queue                              |
 | `hot.SIEVE`    | SIEVE eviction                         |
@@ -27,7 +26,7 @@ Call these on the builder returned by `NewHotCache()`, then finalize with `.Buil
 | Method | Description |
 | --- | --- |
 | `WithTTL(ttl time.Duration)` | Default expiration for all entries |
-| `WithJitter(lambda float64, upperBound time.Duration)` | Randomize TTL by +/-lambda (capped at upperBound) to prevent thundering herd |
+| `WithJitter(lambda float64, upperBound time.Duration)` | Shorten TTL by a random exponential-decay factor (upperBound bounds the randomization window) to desynchronize simultaneous expirations and prevent thundering herd |
 | `WithJanitor()` | Start background goroutine to evict expired entries. Mutually exclusive with `WithoutLocking()` |
 | `WithLoaders(loaders ...Loader[K, V])` | Chain of loader functions for cache misses. Execute sequentially; later loaders receive only unmapped keys |
 | `WithRevalidation(stale time.Duration, loaders ...Loader[K, V])` | Enable stale-while-revalidate. After TTL, entries become stale and trigger async refresh. Hard-expired after `stale` duration |
@@ -38,7 +37,7 @@ Call these on the builder returned by `NewHotCache()`, then finalize with `.Buil
 | `WithCopyOnRead(fn func(V) V)` | Clone values on retrieval to prevent external mutation |
 | `WithCopyOnWrite(fn func(V) V)` | Clone values on storage to capture snapshots |
 | `WithPrometheusMetrics(cacheName string)` | Enable Prometheus metrics collection |
-| `WithEvictionCallback(fn func(K, V))` | Synchronous callback on eviction |
+| `WithEvictionCallback(fn func(reason base.EvictionReason, key K, value V))` | Synchronous callback on eviction; the `reason` is a `base.EvictionReason` from `github.com/samber/hot/pkg/base` |
 | `WithoutLocking()` | Disable mutexes. Single-goroutine access only. Mutually exclusive with `WithJanitor()` |
 | `WithWarmUp(fn func() (map[K]V, []K, error))` | Pre-populate cache on build. Returns values + missing keys + error |
 | `WithWarmUpWithTimeout(timeout, fn)` | Same as WarmUp with timeout protection |

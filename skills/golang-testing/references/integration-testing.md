@@ -118,7 +118,7 @@ func (s *DatabaseTestSuite) TearDownSuite() {
 }
 
 func (s *DatabaseTestSuite) SetupTest() {
-    _, err := s.db.Exec("TRUNCATE TABLE orders, users CASCADE")
+    _, err := s.db.Exec("TRUNCATE TABLE orders, users RESTART IDENTITY CASCADE")
     if err != nil {
         s.T().Fatalf("failed to clear database: %v", err)
     }

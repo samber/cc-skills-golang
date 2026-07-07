@@ -119,7 +119,7 @@
       {"id": "9.1", "text": "Recommends embedding a noCopy sentinel struct"},
       {"id": "9.2", "text": "noCopy implements Lock() and Unlock() methods (empty bodies)"},
       {"id": "9.3", "text": "Explains that go vet will flag copies of structs containing noCopy"},
-      {"id": "9.4", "text": "Mentions this is the same technique used by sync.WaitGroup, sync.Mutex, or strings.Builder in the stdlib"},
+      {"id": "9.4", "text": "Mentions this is the same technique used by sync.WaitGroup, sync.Mutex, or sync.Pool in the stdlib"},
       {"id": "9.5", "text": "Shows that the struct should be passed by pointer after adding noCopy"}
     ]
   },

@@ -379,7 +379,7 @@
     "assertions": [
       {"id": "28.1", "text": "Identifies 'gc 14' as the GC cycle number"},
       {"id": "28.2", "text": "Identifies '@5.234s 2%' as time since program start and CPU percentage spent in GC"},
-      {"id": "28.3", "text": "Identifies '24->27->13 MB' as heap size before GC, heap size at GC trigger, and live heap after GC"},
+      {"id": "28.3", "text": "Identifies '24->27->13 MB' as heap size at GC start, heap size at GC end, and live heap after GC"},
       {"id": "28.4", "text": "Identifies '24 MB goal' as the target heap size for the next GC cycle based on the GC pacing algorithm"},
       {"id": "28.5", "text": "Assesses health: 2% CPU in GC is acceptable (generally <5% is fine); 13MB live vs 24MB goal means 46% overhead headroom"}
     ]

@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.1.3"
+  version: "1.1.4"
   openclaw:
     emoji: "🧩"
     homepage: https://github.com/samber/cc-skills-golang
@@ -346,7 +346,7 @@ type ConnPool struct {
 }
 ```
 
-`go vet` reports an error if a `ConnPool` value is copied (passed by value, assigned, etc.). This is the same technique the standard library uses for `sync.WaitGroup`, `sync.Mutex`, `strings.Builder`, and others.
+`go vet` reports an error if a `ConnPool` value is copied (passed by value, assigned, etc.). This is the same technique the standard library uses for `sync.WaitGroup`, `sync.Mutex`, `sync.Pool`, and others. (Note: `strings.Builder` does _not_ use this technique — it relies on a runtime self-referential-pointer check (`copyCheck`) that panics on copy, because `copylocks` cannot reliably discriminate its zero vs. non-zero states.)
 
 Always pass these structs by pointer:
 

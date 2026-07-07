@@ -110,13 +110,13 @@
   {
     "id": 9,
     "name": "pointer-comparison-trap",
-    "description": "Tests awareness that is.Equal(ptr1, ptr2) compares addresses, not values",
-    "prompt": "I have two *User pointers pointing to different structs with the same field values. My test `assert.Equal(t, user1, user2)` is failing. Both users have Name='Alice' and Age=30. What's wrong?",
-    "trap": "Model may suggest various debugging approaches without identifying the core issue: Equal on pointers compares addresses",
+    "description": "Tests understanding that assert.Equal uses reflect.DeepEqual on pointers (comparing pointee values including unexported fields), not addresses",
+    "prompt": "I have two *User pointers pointing to different structs. My test `assert.Equal(t, user1, user2)` is failing even though both users have Name='Alice' and Age=30. The User struct also has an unexported `createdAt time.Time` field that differs between the two. What's actually causing the failure, and how do I compare only the exported fields?",
+    "trap": "Model may claim assert.Equal on pointers compares memory addresses. It does not — Equal uses reflect.DeepEqual, which dereferences pointers and compares pointee values including unexported fields. The real cause is the differing unexported createdAt field.",
     "assertions": [
-      {"id": "9.1", "text": "Identifies that assert.Equal on pointers compares memory addresses, not struct values"},
-      {"id": "9.2", "text": "Recommends dereferencing the pointers (e.g., assert.Equal(t, *user1, *user2)) or using EqualExportedValues"},
-      {"id": "9.3", "text": "Mentions EqualExportedValues as an alternative for comparing only exported fields"}
+      {"id": "9.1", "text": "Identifies that assert.Equal uses reflect.DeepEqual, which dereferences pointers and compares pointee values (not memory addresses)"},
+      {"id": "9.2", "text": "Explains the failure is caused by the differing unexported createdAt field, which DeepEqual also compares"},
+      {"id": "9.3", "text": "Recommends EqualExportedValues to compare only exported fields (ignoring the unexported createdAt)"}
     ]
   },
   {

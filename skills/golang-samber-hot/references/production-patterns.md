@@ -16,7 +16,7 @@ cache := hot.NewHotCache[string, *Config](hot.WTinyLFU, 1_000).
     WithTTL(5 * time.Minute).                              // stale after 5min
     WithRevalidation(1 * time.Minute, refreshLoader).       // hard-expire after 6min total
     WithRevalidationErrorPolicy(hot.KeepOnError).           // keep stale value if refresh fails
-    WithJitter(0.1, 30*time.Second).                        // spread expirations
+    WithJitter(1e-10, 30*time.Second).                      // spread (shorten) expirations to desync
     WithJanitor().
     Build()
 defer cache.StopJanitor()
@@ -56,7 +56,7 @@ defer cache.StopJanitor()
 
 - Use powers of 2 (4, 8, 16, 32) for optimal hash distribution
 - Rule of thumb: shard count ~= number of CPU cores for high-contention workloads
-- Each shard gets `capacity / shards` items
+- Each shard gets the full configured `capacity`, so total effective capacity ≈ `capacity × shards` — divide your target total by the shard count before passing it to `NewHotCache` if you want a specific overall size
 - Over-sharding (>64 shards) adds overhead without benefit
 
 ## Missing Key Caching (Negative Caching)

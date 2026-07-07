@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "0.1.1"
+  version: "0.1.2"
   openclaw:
     emoji: "🔮"
     homepage: https://github.com/samber/cc-skills-golang
@@ -222,10 +222,14 @@ Production GraphQL servers require explicit limits. Without them, a single deepl
 
 ```go
 // gqlgen — wire these into every production handler
-srv := handler.NewDefaultServer(es)
+// Use handler.New (NOT NewDefaultServer, which forces introspection on)
+srv := handler.New(es)
+srv.AddTransport(transport.Options{})
+srv.AddTransport(transport.GET{})
+srv.AddTransport(transport.POST{})
 srv.Use(extension.FixedComplexityLimit(200)) // max cost per query
 
-// Gate introspection — only in non-production environments
+// Gate introspection — only registered in non-production environments
 if os.Getenv("ENV") != "production" {
     srv.Use(extension.Introspection{})
 }

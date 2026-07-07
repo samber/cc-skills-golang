@@ -233,4 +233,4 @@ If your fix doesn't work:
 
 - **< 3 failed attempts:** Return to Step 1. You misidentified the root cause. Gather more evidence.
 - **>= 3 failed attempts:** Stop fixing. The problem is likely architectural, not a simple bug. Step back and question your assumptions about how the system works. Ask: "Is the design fundamentally sound, or am I patching a broken abstraction?"
-- **Each fix reveals a new problem:** You're chasing symptoms, not the root cause. See the Red Flags section in [SKILL.md](./SKILL.md).
+- **Each fix reveals a new problem:** You're chasing symptoms, not the root cause. See the Red Flags section in [SKILL.md](../SKILL.md).

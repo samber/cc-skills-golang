@@ -1,12 +1,12 @@
 ---
 name: golang-samber-ro
-description: "Reactive streams and event-driven programming in Golang using samber/ro — ReactiveX implementation with 150+ type-safe operators, cold/hot observables, 5 subject types (Publish, Behavior, Replay, Async, Unicast), declarative pipelines via Pipe, 40+ plugins (HTTP, cron, fsnotify, JSON, logging), automatic backpressure, error propagation, and Go context integration. Apply when using or adopting samber/ro, when the codebase imports github.com/samber/ro, or when building asynchronous event-driven pipelines, real-time data processing, streams, or reactive architectures in Go. Not for finite slice transforms (→ See `samber/cc-skills-golang@golang-samber-lo` skill)."
+description: "Reactive streams and event-driven programming in Golang using samber/ro — ReactiveX implementation with 150+ type-safe operators, cold/hot observables, 5 subject types (Publish, Behavior, Replay, Async, Unicast), declarative pipelines via Pipe, 40+ plugins (cron, fsnotify, JSON, logging), automatic backpressure, error propagation, and Go context integration. Apply when using or adopting samber/ro, when the codebase imports github.com/samber/ro, or when building asynchronous event-driven pipelines, real-time data processing, streams, or reactive architectures in Go. Not for finite slice transforms (→ See `samber/cc-skills-golang@golang-samber-lo` skill)."
 user-invocable: true
 license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.1.3"
+  version: "1.1.8"
   openclaw:
     emoji: "👁"
     homepage: https://github.com/samber/cc-skills-golang
@@ -77,8 +77,8 @@ Four building blocks:
 ```go
 observable := ro.Pipe2(
     ro.RangeWithInterval(0, 5, 1*time.Second),
-    ro.Filter(func(x int) bool { return x%2 == 0 }),
-    ro.Map(func(x int) string { return fmt.Sprintf("even-%d", x) }),
+    ro.Filter(func(x int64) bool { return x%2 == 0 }),
+    ro.Map(func(x int64) string { return fmt.Sprintf("even-%d", x) }),
 )
 
 observable.Subscribe(ro.NewObserver(
@@ -103,7 +103,7 @@ values, err := ro.Collect(observable)
 | `Share()` | Cold → hot with reference counting. Last unsubscribe tears down |
 | `ShareReplay(n)` | Same as Share + buffers last N values for late subscribers |
 | `Connectable()` | Cold → hot, but waits for explicit `.Connect()` call |
-| Subjects | Natively hot — call `.Send()`, `.Error()`, `.Complete()` directly |
+| Subjects | Natively hot — call `.Next()`, `.Error()`, `.Complete()` directly |
 
 | Subject | Constructor | Replay behavior |
 | --- | --- | --- |
@@ -159,9 +159,9 @@ For the complete operator catalog (150+ operators with signatures), see [Operato
 | Category | Plugins | Import path prefix |
 | --- | --- | --- |
 | Encoding | JSON, CSV, Base64, Gob | `plugins/encoding/...` |
-| Network | HTTP, I/O, FSNotify | `plugins/http`, `plugins/io`, `plugins/fsnotify` |
+| Network | I/O, FSNotify | `plugins/stdio`, `plugins/fsnotify` |
 | Scheduling | Cron, ICS | `plugins/cron`, `plugins/ics` |
-| Observability | Zap, Slog, Zerolog, Logrus, Sentry, Oops | `plugins/observability/...`, `plugins/samber/oops` |
+| Observability | Zap, Slog, Zerolog, Logrus, Sentry | `plugins/observability/...` |
 | Rate limiting | Native, Ulule | `plugins/ratelimit/...` |
 | Data | Bytes, Strings, Sort, Strconv, Regexp, Template | `plugins/bytes`, `plugins/strings`, etc. |
 | System | Process, Signal | `plugins/proc`, `plugins/signal` |

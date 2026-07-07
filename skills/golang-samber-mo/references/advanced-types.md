@@ -87,15 +87,12 @@ result := io2.Run(1, 2)  // 3
 
 ## IOEither[T] — Synchronous Side Effects with Errors
 
-Like IO but the computation can fail. The callback must return `Either[error, R]`, not `(R, error)`.
+Like IO but the computation can fail. The callback must return `(R, error)`, not `Either[error, R]` — `Run()` is what converts the returned `(R, error)` into `Either[error, R]`.
 
 ```go
-io := mo.NewIOEither(func() mo.Either[error, string] {
+io := mo.NewIOEither(func() (string, error) {
     data, err := os.ReadFile("config.yaml")
-    if err != nil {
-        return mo.Left[error, string](err)
-    }
-    return mo.Right[error, string](string(data))
+    return string(data), err
 })
 
 either := io.Run()  // Either[error, string]
@@ -105,12 +102,9 @@ either := io.Run()  // Either[error, string]
 
 ```go
 // 1 parameter
-io1 := mo.NewIOEither1(func(path string) mo.Either[error, string] {
+io1 := mo.NewIOEither1(func(path string) (string, error) {
     data, err := os.ReadFile(path)
-    if err != nil {
-        return mo.Left[error, string](err)
-    }
-    return mo.Right[error, string](string(data))
+    return string(data), err
 })
 either := io1.Run("config.yaml")  // Either[error, string]
 

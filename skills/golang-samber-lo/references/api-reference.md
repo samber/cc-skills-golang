@@ -26,7 +26,7 @@ For up-to-date signatures, use `godig symbol doc github.com/samber/lo <Symbol>` 
 | `lo.Times(n, fn)` | Call `fn(index)` n times, collect results |
 | `lo.Chunk(s, size)` | Split into batches of `size` |
 | `lo.Window(s, size)` | Sliding window of `size` over slice |
-| `lo.Sliding(s, size)` | Sliding window (overlapping), alias for Window |
+| `lo.Sliding(s, size, step)` | Sliding windows with a custom step (Window == Sliding(s, size, 1)) |
 | `lo.Flatten(s)` | Flatten `[][]T` → `[]T` (one level) |
 | `lo.Concat(slices...)` | Concatenate multiple slices |
 | `lo.Interleave(slices...)` | Interleave elements from multiple slices |
@@ -34,21 +34,21 @@ For up-to-date signatures, use `godig symbol doc github.com/samber/lo <Symbol>` 
 | `lo.RepeatBy(n, fn)` | Create slice of `n` values from `fn(index)` |
 | `lo.Splice(s, i, elements...)` | Insert elements at index |
 | `lo.Fill(s, val)` | Fill slice with value (returns new slice) |
-| `lo.Reverse(s)` | Reverse order (returns new slice) |
-| `lo.Shuffle(s)` | Random shuffle (returns new slice) |
+| `lo.Reverse(s)` | Reverse order in place (mutates and returns the input). Deprecated — use `lom.Reverse` instead |
+| `lo.Shuffle(s)` | Random shuffle in place (Fisher-Yates; mutates and returns the input). Deprecated — use `lom.Shuffle` instead |
 | `lo.Clone(s)` | Shallow copy of slice |
 
 ### Slice-to-map conversions
 
-| Function                     | Description                                 |
-| ---------------------------- | ------------------------------------------- |
-| `lo.KeyBy(s, fn)`            | Slice to map by key extractor. `fn(T) K`    |
-| `lo.Keyify(s, fn)`           | Alias for KeyBy                             |
-| `lo.SliceToMap(s, fn)`       | Slice to map. `fn(T) (K, V)`                |
-| `lo.Associate(s, fn)`        | Alias for SliceToMap                        |
-| `lo.FilterSliceToMap(s, fn)` | Filter + slice-to-map. `fn(T) (K, V, bool)` |
-| `lo.GroupBy(s, fn)`          | Group into `map[K][]V` by key function      |
-| `lo.GroupByMap(s, fn)`       | GroupBy returning `map[K]R` with transform  |
+| Function                     | Description                                                  |
+| ---------------------------- | ------------------------------------------------------------ |
+| `lo.KeyBy(s, fn)`            | Slice to map by key extractor. `fn(T) K`                     |
+| `lo.Keyify(s)`               | Slice → set `map[T]struct{}` of unique elements              |
+| `lo.SliceToMap(s, fn)`       | Slice to map. `fn(T) (K, V)`                                 |
+| `lo.Associate(s, fn)`        | Alias for SliceToMap                                         |
+| `lo.FilterSliceToMap(s, fn)` | Filter + slice-to-map. `fn(T) (K, V, bool)`                  |
+| `lo.GroupBy(s, fn)`          | Group into `map[K][]V` by key function                       |
+| `lo.GroupByMap(s, fn)`       | Group by key, collecting transformed values into `map[K][]V` |
 
 ### Error variants
 
@@ -108,10 +108,10 @@ Most transform functions have `Err` suffixes: `MapErr`, `FlatMapErr`, `FilterErr
 | --- | --- |
 | `lo.Uniq(s)` | Remove duplicates (preserves first occurrence) |
 | `lo.UniqBy(s, fn)` | Remove duplicates by key function |
-| `lo.PartitionBy(s, fn)` | Split into groups of consecutive elements with same key |
+| `lo.PartitionBy(s, fn)` | Split into groups by key (order = first occurrence in collection; NOT limited to consecutive runs — same as GroupBy but returns `[]Slice` instead of map) |
 | `lo.Compact(s)` | Remove zero-value elements |
 | `lo.Without(s, vals...)` | Remove specific values |
-| `lo.WithoutBy(s, fn)` | Remove elements matching predicate |
+| `lo.WithoutBy(s, iteratee, exclude...)` | Remove elements whose extracted key matches any value in `exclude`. `iteratee(item T) K` |
 | `lo.WithoutEmpty(s)` | Remove zero-value elements (alias for Compact) |
 | `lo.WithoutNth(s, indices...)` | Remove elements at specific indices |
 | `lo.Union(slices...)` | Combine slices, remove duplicates |
@@ -131,24 +131,24 @@ Most transform functions have `Err` suffixes: `MapErr`, `FlatMapErr`, `FilterErr
 
 ### Slice trimming
 
-| Function                        | Description                              |
-| ------------------------------- | ---------------------------------------- |
-| `lo.Take(s, n)`                 | First n elements                         |
-| `lo.TakeWhile(s, fn)`           | Take while predicate is true             |
-| `lo.TakeFilter(s, n, fn)`       | Take first n elements matching predicate |
-| `lo.Drop(s, n)`                 | Skip first n elements                    |
-| `lo.DropRight(s, n)`            | Skip last n elements                     |
-| `lo.DropWhile(s, fn)`           | Drop while predicate is true             |
-| `lo.DropRightWhile(s, fn)`      | Drop from right while true               |
-| `lo.DropByIndex(s, indices...)` | Drop elements at specific indices        |
-| `lo.Cut(s, start, end)`         | Remove elements between start and end    |
-| `lo.CutPrefix(s, prefix)`       | Remove prefix from slice                 |
-| `lo.CutSuffix(s, suffix)`       | Remove suffix from slice                 |
-| `lo.Trim(s, fn)`                | Trim both ends while predicate is true   |
-| `lo.TrimLeft(s, fn)`            | Trim left while predicate is true        |
-| `lo.TrimRight(s, fn)`           | Trim right while predicate is true       |
-| `lo.TrimPrefix(s, prefix)`      | Remove exact prefix elements             |
-| `lo.TrimSuffix(s, suffix)`      | Remove exact suffix elements             |
+| Function                        | Description                                                                                             |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `lo.Take(s, n)`                 | First n elements                                                                                        |
+| `lo.TakeWhile(s, fn)`           | Take while predicate is true                                                                            |
+| `lo.TakeFilter(s, n, fn)`       | Take first n elements matching predicate                                                                |
+| `lo.Drop(s, n)`                 | Skip first n elements                                                                                   |
+| `lo.DropRight(s, n)`            | Skip last n elements                                                                                    |
+| `lo.DropWhile(s, fn)`           | Drop while predicate is true                                                                            |
+| `lo.DropRightWhile(s, fn)`      | Drop from right while true                                                                              |
+| `lo.DropByIndex(s, indices...)` | Drop elements at specific indices                                                                       |
+| `lo.Cut(s, separator)`          | Split slice around first occurrence of `separator`; returns `(before, after, found)` (like strings.Cut) |
+| `lo.CutPrefix(s, prefix)`       | Remove prefix from slice                                                                                |
+| `lo.CutSuffix(s, suffix)`       | Remove suffix from slice                                                                                |
+| `lo.Trim(s, cutset)`            | Remove elements present in cutset from both ends                                                        |
+| `lo.TrimLeft(s, cutset)`        | Remove elements present in cutset from the left                                                         |
+| `lo.TrimRight(s, cutset)`       | Remove elements present in cutset from the right                                                        |
+| `lo.TrimPrefix(s, prefix)`      | Remove exact prefix elements                                                                            |
+| `lo.TrimSuffix(s, suffix)`      | Remove exact suffix elements                                                                            |
 
 ## Map Operations
 
@@ -256,16 +256,16 @@ Most transform functions have `Err` suffixes: `MapErr`, `FlatMapErr`, `FilterErr
 | `lo.AttemptWithDelay(max, delay, fn)` | Retry with fixed delay between attempts |
 | `lo.AttemptWhile(fn)` | Retry while predicate returns true |
 | `lo.AttemptWhileWithDelay(delay, fn)` | AttemptWhile with delay between attempts |
-| `lo.Debounce(duration, fn)` | Debounce — execute after quiet period. Returns `(func(), func())` (trigger, cancel) |
-| `lo.DebounceBy(duration, fn)` | Debounce by key — separate debounce per key |
-| `lo.Throttle(duration, fn)` | Throttle — max one execution per duration |
-| `lo.ThrottleWithCount(duration, count, fn)` | Throttle allowing N executions per duration |
-| `lo.ThrottleBy(duration, fn)` | Throttle by key — separate throttle per key |
-| `lo.ThrottleByWithCount(duration, count, fn)` | ThrottleBy with count |
+| `lo.NewDebounce(duration, fn...)` | Debounce — execute after quiet period. Returns `(func(), func())` (trigger, cancel) |
+| `lo.NewDebounceBy(duration, fn...)` | Debounce by key — separate debounce per key |
+| `lo.NewThrottle(duration, fn...)` | Throttle — max one execution per duration. Returns `(throttle, reset func())` |
+| `lo.NewThrottleWithCount(duration, count, fn...)` | Throttle allowing N executions per duration |
+| `lo.NewThrottleBy(duration, fn...)` | Throttle by key — separate throttle per key |
+| `lo.NewThrottleByWithCount(duration, count, fn...)` | ThrottleBy with count |
 | `lo.WaitFor(fn, timeout, heartbeat)` | Poll until condition met or timeout |
 | `lo.WaitForWithContext(ctx, fn, ...)` | WaitFor with context cancellation |
 | `lo.Synchronize(mutexes...)` | Create synchronized wrapper. `sync.Locker`-based |
-| `lo.Transaction(fn)` | Execute function with rollback on error |
+| `lo.NewTransaction[T]()` | Saga-pattern builder; chain `.Then(exec, onRollback)` and run with `.Process(state)` — rolls back on error |
 
 ## Type Manipulation
 
@@ -305,7 +305,7 @@ Most transform functions have `Err` suffixes: `MapErr`, `FlatMapErr`, `FilterErr
 | Function | Description |
 | --- | --- |
 | `lo.Duration(fn)` | Measure execution time. Returns `time.Duration` |
-| `lo.Duration0(fn)` ... `lo.Duration10(fn)` | Duration with 0-10 return values — returns `(time.Duration, ...)` |
+| `lo.Duration0(fn)` ... `lo.Duration10(fn)` | Duration with 0-10 return values — returns `(..., time.Duration)` |
 
 ## Error Helpers
 
@@ -320,7 +320,7 @@ Most transform functions have `Err` suffixes: `MapErr`, `FlatMapErr`, `FilterErr
 | `lo.TryCatch(fn, catchFn)` | Try with catch handler |
 | `lo.TryWithErrorValue(fn)` | Try returning recovered error value |
 | `lo.TryCatchWithErrorValue(fn, catchFn)` | TryCatch with error value |
-| `lo.Validate(conditions...)` | Return first error from condition list |
+| `lo.Validate(ok, format, args...)` | Return a formatted error when `ok` is false, nil otherwise |
 | `lo.ErrorsAs[T](err)` | Generic wrapper for `errors.As` |
-| `lo.Assert[T](v)` | Type assertion with panic message |
-| `lo.Assertf[T](v, format, args...)` | Type assertion with formatted panic message |
+| `lo.Assert(condition, message...)` | Panic with optional message when `condition` is false |
+| `lo.Assertf(condition, format, args...)` | Panic with formatted message when `condition` is false |

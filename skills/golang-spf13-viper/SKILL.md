@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.0.4"
+  version: "1.0.6"
   openclaw:
     emoji: "🔧"
     homepage: https://github.com/samber/cc-skills-golang
@@ -62,7 +62,7 @@ This pipeline is fixed and cannot be reordered. Understanding it prevents most v
 viper.SetConfigName("config")
 viper.AddConfigPath("$HOME/.myapp")
 if err := viper.ReadInConfig(); err != nil {
-    var notFound *viper.ConfigFileNotFoundError
+    var notFound viper.ConfigFileNotFoundError
     if !errors.As(err, &notFound) {
         return fmt.Errorf("reading config: %w", err) // propagate real errors only
     }
@@ -152,7 +152,7 @@ For `t.Setenv` interactions and `Reset()` limitations, see [testing-and-isolatio
 2. **Handle `ConfigFileNotFoundError` gracefully** — a missing config file should not crash a service that runs with only flags and env vars.
 3. **Always use `mapstructure` tags on config structs** — implicit mapping silently misses nested and underscore-named fields.
 4. **Use `viper.New()` in tests, never the global** — the global accumulates state across test runs; per-test instances are isolated.
-5. **Bind flags before `Execute()`** — binding in `RunE` is too late; cobra parses flags before `RunE` runs.
+5. **Bind flags before anything reads the key** — bind in `init()` or `PersistentPreRunE`. `BindPFlag` stores a live reference to the `*pflag.Flag`, so binding order relative to `Execute()` itself doesn't matter; what matters is that no `viper.Get*` call reads the key before the bind happens.
 
 ## Common Mistakes
 

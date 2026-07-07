@@ -66,7 +66,7 @@ Viper's `GetDuration` parses duration strings (`"1h30m"`, `"500ms"`) from config
 Register a decode hook:
 
 ```go
-import "github.com/mitchellh/mapstructure"
+import "github.com/go-viper/mapstructure/v2"
 
 var cfg Config
 err := viper.Unmarshal(&cfg, func(dc *mapstructure.DecoderConfig) {
@@ -83,7 +83,7 @@ err := viper.Unmarshal(&cfg, func(dc *mapstructure.DecoderConfig) {
 ## net.IP and custom types
 
 ```go
-import "github.com/mitchellh/mapstructure"
+import "github.com/go-viper/mapstructure/v2"
 
 func stringToIPHookFunc() mapstructure.DecodeHookFunc {
     return func(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {

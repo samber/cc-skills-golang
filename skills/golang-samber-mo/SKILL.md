@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.0.7"
+  version: "1.0.8"
   openclaw:
     emoji: "🎭"
     homepage: https://github.com/samber/cc-skills-golang
@@ -236,7 +236,8 @@ err := row.Scan(&u.ID, &u.Email, &u.Phone)
 ```go
 // Convert map lookup to Option
 func MapGet[K comparable, V any](m map[K]V, key K) mo.Option[V] {
-    return mo.TupleToOption(m[key])  // m[key] returns (V, bool)
+    v, ok := m[key]  // m[key] returns (V, bool)
+    return mo.TupleToOption(v, ok)
 }
 ```
 

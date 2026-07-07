@@ -57,16 +57,16 @@
   },
   {
     "id": 5,
-    "name": "scopes-for-request-locals",
-    "description": "Tests scopes for per-request dependencies",
+    "name": "request-locals-not-per-request-scope",
+    "description": "Tests using context.Context (not a per-request dig.Scope) for request-local values",
     "prompt": "In my Go web app wired with uber-go/dig, I have global services (logger, database) and per-request data (current user, request ID). How do I keep request-scoped values from leaking across concurrent requests?",
-    "trap": "Without the skill, the model registers everything in the root container and uses context.Value for per-request data — missing dig.Scope which provides isolated child containers.",
+    "trap": "Without the skill, the model reaches for dig.Scope(\"request\") to create a child container per request — but dig never releases child scopes (root.childScopes grows unbounded with no Close/dispose API), so a scope-per-request leaks memory in a long-running server.",
     "assertions": [
-      {"id": "5.1", "text": "Uses c.Scope(\"request\") (or root.Scope) to create a child container per request"},
-      {"id": "5.2", "text": "Global services (logger, database) stay registered on the root"},
-      {"id": "5.3", "text": "Per-request providers are registered on the request scope, not on the root"},
-      {"id": "5.4", "text": "Mentions that the child scope inherits root providers"},
-      {"id": "5.5", "text": "Does NOT register per-request providers globally where they would be shared across requests"}
+      {"id": "5.1", "text": "Recommends context.Context (or an explicit request struct) for per-request values instead of a per-request dig.Scope"},
+      {"id": "5.2", "text": "Global services (logger, database) stay registered on the root container, built once at startup"},
+      {"id": "5.3", "text": "Keeps per-request data (current user, request ID) out of the dig graph"},
+      {"id": "5.4", "text": "Explains that dig retains every child scope (no Close/dispose API), so creating one per request leaks memory without bound"},
+      {"id": "5.5", "text": "Does NOT recommend creating a dig.Scope per HTTP request"}
     ]
   },
   {

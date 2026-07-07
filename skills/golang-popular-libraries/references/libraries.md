@@ -60,7 +60,7 @@
 
 **Koanf** (<https://github.com/knadh/koanf>) Lightweight, extensible library for reading config. Support for JSON, YAML, TOML, env, command line.
 
-**env** (from <https://github.com/caarlos0/env>) Parse environment variables into Go structs with defaults. Simple, type-safe, no struct tags.
+**env** (from <https://github.com/caarlos0/env>) Parse environment variables into Go structs with defaults. Simple, type-safe, tag-based (`env:"NAME"`, `envDefault:"..."`).
 
 ## Logging
 
@@ -96,7 +96,7 @@
 
 ## Rate Limiting
 
-**Tollbooth** (<https://github.com/ulule/limiter>) Rate limiting HTTP middleware. Simple, volume-based limiting, easy to use.
+**Tollbooth** (<https://github.com/didip/tollbooth>) Rate limiting HTTP middleware. Simple, volume-based limiting, easy to use.
 
 **golang.org/x/time/rate** (<https://golang.org/x/time/rate>) Standard library rate limiter. Token bucket algorithm, well-maintained.
 

@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.2.5"
+  version: "1.2.6"
   openclaw:
     emoji: "🔄"
     homepage: https://github.com/samber/cc-skills-golang
@@ -110,7 +110,7 @@ For CI tooling, govulncheck, PGO, golangci-lint v2, and AI-powered modernization
 | `golang.org/x/crypto/pbkdf2` | `crypto/pbkdf2` | Go 1.24 |
 | `testing/synctest.Run` | `testing/synctest.Test` | Go 1.25 |
 | `crypto/rsa.EncryptPKCS1v15` for new encryption use | RSA-OAEP (`rsa.EncryptOAEP` / `rsa.EncryptOAEPWithOptions`) or HPKE/KEM design | Go 1.26 |
-| `net/http/httputil.ReverseProxy.Director` | `ReverseProxy.Rewrite` | Go 1.26 |
+| `net/http/httputil.ReverseProxy.Director` | `ReverseProxy.Rewrite` | Go 1.20 |
 
 ## Migration Priority Guide
 

@@ -76,6 +76,7 @@ This is the lightest test for a constructor — no full graph, no `fx.New`.
 func TestWiring_MissingDependency(t *testing.T) {
     app := fx.New(
         fx.Provide(NewServer), // depends on *sql.DB which is not provided
+        fx.Invoke(func(*Server) {}), // forces NewServer to be built, triggering the error
         fx.NopLogger,
     )
     require.Error(t, app.Err())

@@ -100,4 +100,4 @@ viper.OnConfigChange(func(e fsnotify.Event) {
 
 ## Stopping the watcher
 
-There is no documented way to stop `WatchConfig` once started. Design your application so that the watcher's lifetime matches the process lifetime. For testing, create a new `viper.New()` instance per test — the watcher is per-instance and is garbage-collected with the instance.
+There is no documented way to stop `WatchConfig` once started. Design your application so that the watcher's lifetime matches the process lifetime. `WatchConfig` starts a background goroutine that blocks forever on fsnotify channels and closes over the `*viper.Viper` instance — it is never automatically stopped or garbage-collected, even after the instance goes out of scope. Calling `WatchConfig()` repeatedly (e.g. once per test) accumulates a leaked goroutine and open fsnotify watch per call for the life of the process. In tests, avoid calling `WatchConfig()` in a per-test loop — call it at most once per test binary (e.g. behind a `sync.Once`), or test your `OnConfigChange` logic by invoking the callback function directly instead of exercising the real filesystem watcher.

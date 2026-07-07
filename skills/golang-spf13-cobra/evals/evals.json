@@ -113,13 +113,13 @@
   {
     "id": 6,
     "name": "command-group-registration-order",
-    "description": "Tests that AddGroup must be called before AddCommand that references it",
+    "description": "Tests that command groups are registered with AddGroup (before Execute) and referenced via GroupID",
     "prompt": "I want to group my cobra subcommands in the help output under labels like 'Core Commands:' and 'Management Commands:'. How do I set this up?",
-    "trap": "Without the skill, the model calls AddCommand first and AddGroup after, which doesn't work — groups must be registered before the commands that reference them.",
+    "trap": "Without the skill, the model may set GroupID on subcommands but forget to register the group with AddGroup, so the group never renders. The fix is to call AddGroup (before Execute) for every group a GroupID references.",
     "assertions": [
       {
         "id": "6.1",
-        "text": "Calls AddGroup before AddCommand for commands that use that group"
+        "text": "Registers each referenced group with AddGroup (before Execute)"
       },
       {
         "id": "6.2",
@@ -128,7 +128,7 @@
       { "id": "6.3", "text": "Shows cobra.Group{ID: ..., Title: ...} struct" },
       {
         "id": "6.4",
-        "text": "Does NOT call AddCommand before AddGroup for the same group"
+        "text": "Does NOT leave a GroupID referencing a group that was never registered with AddGroup"
       }
     ]
   },

@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.2.0"
+  version: "1.2.1"
   openclaw:
     emoji: "💻"
     homepage: https://github.com/samber/cc-skills-golang
@@ -105,14 +105,14 @@ This ensures `viper.GetInt("port")` returns the flag value, env var `MYAPP_PORT`
 
 Cobra provides built-in validators for positional arguments. See [assets/examples/args.go](assets/examples/args.go) for both built-in and custom validation examples.
 
-| Validator                   | Description                          |
-| --------------------------- | ------------------------------------ |
-| `cobra.NoArgs`              | Fails if any args provided           |
-| `cobra.ExactArgs(n)`        | Requires exactly n args              |
-| `cobra.MinimumNArgs(n)`     | Requires at least n args             |
-| `cobra.MaximumNArgs(n)`     | Allows at most n args                |
-| `cobra.RangeArgs(min, max)` | Requires between min and max         |
-| `cobra.ExactValidArgs(n)`   | Exactly n args, must be in ValidArgs |
+| Validator                                                 | Description                          |
+| --------------------------------------------------------- | ------------------------------------ |
+| `cobra.NoArgs`                                            | Fails if any args provided           |
+| `cobra.ExactArgs(n)`                                      | Requires exactly n args              |
+| `cobra.MinimumNArgs(n)`                                   | Requires at least n args             |
+| `cobra.MaximumNArgs(n)`                                   | Allows at most n args                |
+| `cobra.RangeArgs(min, max)`                               | Requires between min and max         |
+| `cobra.MatchAll(cobra.ExactArgs(n), cobra.OnlyValidArgs)` | Exactly n args, must be in ValidArgs |
 
 ## Configuration with Viper
 

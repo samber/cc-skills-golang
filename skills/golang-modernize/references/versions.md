@@ -288,7 +288,7 @@ func AllUsers(db *sql.DB) iter.Seq2[User, error] {
 
 ```go
 // Sorted keys via iterator
-for k := range slices.Sorted(maps.Keys(m)) {
+for _, k := range slices.Sorted(maps.Keys(m)) {
     fmt.Println(k, m[k])
 }
 
@@ -636,9 +636,9 @@ Use `t.ArtifactDir()`, `b.ArtifactDir()`, and `f.ArtifactDir()` for files create
 
 For simple fan-out to multiple slog handlers, prefer stdlib `slog.NewMultiHandler` before adding third-party handler-composition dependencies.
 
-### Go 1.26+ ReverseProxy
+### ReverseProxy `Rewrite` hook _(Go 1.20+)_
 
-For new reverse proxy code, prefer `httputil.ReverseProxy{Rewrite: ...}`. Do not generate new `Director`-based proxy code unless preserving old compatibility.
+`ReverseProxy.Rewrite` and `ProxyRequest` (`SetURL` / `SetXForwarded`) are Go 1.20+ APIs — re-highlighted here, not new in Go 1.26. For new reverse proxy code, prefer `httputil.ReverseProxy{Rewrite: ...}`. Do not generate new `Director`-based proxy code unless preserving old compatibility.
 
 ```go
 proxy := &httputil.ReverseProxy{

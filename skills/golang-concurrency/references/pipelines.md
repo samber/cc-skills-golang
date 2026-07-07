@@ -229,7 +229,7 @@ Use goroutine+channel pipelines when:
 import "github.com/samber/ro"
 
 emails, _ := ro.Collect( // ignore error
-    ro.Pipe(
+    ro.Pipe[User, string]( // explicit type args: Last can't be inferred from ...any operators
         ro.FromSlice(users),
         ro.Filter(func(u User) bool { return u.Active }),
         ro.Map(func(u User) string { return u.Email }),

@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.2.5"
+  version: "1.2.6"
   openclaw:
     emoji: "📊"
     homepage: https://github.com/samber/cc-skills-golang
@@ -68,7 +68,7 @@ func BenchmarkAlloc(b *testing.B) {
 `b.ReportMetric()` adds custom metrics (e.g., throughput):
 
 ```go
-b.ReportMetric(float64(totalBytes)/b.Elapsed().Seconds(), "bytes/s") // b.Elapsed() is only valid inside b.Loop()
+b.ReportMetric(float64(totalBytes)/b.Elapsed().Seconds(), "bytes/s") // call after the loop; b.Elapsed() reports total measured time
 ```
 
 ### Sub-benchmarks and table-driven

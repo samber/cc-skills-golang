@@ -189,13 +189,18 @@ func (h *PrivacyHandler) HandleDataDeletion(w http.ResponseWriter, r *http.Reque
         return
     }
 
-    // 2. Delete from analytics platform
-    if err := h.posthog.DeleteUser(ctx, userID); err != nil {
+    // 2. Delete from analytics platform.
+    // The posthog-go SDK is enqueue-only — it has no DeleteUser. Person
+    // deletion must go through PostHog's separate Admin API
+    // (DELETE /api/person/); wrap that HTTP call in your own helper.
+    if err := h.posthogAdmin.DeletePerson(ctx, userID); err != nil {
         slog.ErrorContext(ctx, "failed to delete analytics data", "user_id", userID, "error", err)
     }
 
-    // 3. Delete from CDP
-    if err := h.segment.DeleteUser(ctx, userID); err != nil {
+    // 3. Delete from CDP.
+    // The analytics-go SDK is enqueue-only too — no DeleteUser. Use Segment's
+    // "Suppress and Delete" (User Deletion) API via a custom helper.
+    if err := h.segmentAdmin.SuppressAndDelete(ctx, userID); err != nil {
         slog.ErrorContext(ctx, "failed to delete CDP data", "user_id", userID, "error", err)
     }
 

@@ -28,7 +28,7 @@ handler := slogdatadog.Option{
 defer handler.(interface{ Stop(context.Context) error }).Stop(context.Background()) // REQUIRED: flush buffered logs
 ```
 
-**Batch mode** is the default — logs are buffered and sent periodically (default 5s). Call `Stop(ctx)` on shutdown or buffered logs are lost. The handler also exposes `Flush(ctx)` for mid-lifecycle flushes. For synchronous delivery, check the Option configuration.
+**Batching is disabled by default** — each record is dispatched immediately in its own background goroutine. Set `Batching: true` (with `BatchDuration`, default 5s) to buffer records and send them periodically. Either way, call `Stop(ctx)` on shutdown to wait for in-flight/buffered sends or those logs are lost. The handler also exposes `Flush(ctx)` for mid-lifecycle flushes.
 
 ### Sentry — `slog-sentry`
 
@@ -241,7 +241,7 @@ Handlers that buffer records internally and MUST be closed on shutdown:
 
 | Handler | Shutdown method | What happens without it |
 | --- | --- | --- |
-| `slog-datadog` | `handler.Stop(ctx)` | Buffered logs lost (default 5s batch) |
+| `slog-datadog` | `handler.Stop(ctx)` | In-flight async sends dropped (or buffered batch lost if `Batching: true`) |
 | `slog-loki` | `lokiClient.Stop()` | Pending push requests dropped |
 | `slog-kafka` | `writer.Close()` | Pending messages never sent |
 | `slog-parquet` | `buffer.Flush(true)` | Partial Parquet file not flushed to storage |

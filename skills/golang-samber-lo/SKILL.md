@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.1.3"
+  version: "1.1.8"
   openclaw:
     emoji: "🧰"
     homepage: https://github.com/samber/cc-skills-golang
@@ -22,7 +22,7 @@ allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(g
 
 # samber/lo — Functional Utilities for Go
 
-Lodash-inspired, generics-first utility library with 500+ type-safe helpers for slices, maps, strings, math, channels, tuples, and concurrency. Zero external dependencies. Immutable by default.
+Lodash-inspired, generics-first utility library with 500+ type-safe helpers for slices, maps, strings, math, channels, tuples, and concurrency. One external dependency (`golang.org/x/text`, for string-casing helpers); otherwise stdlib-only. Immutable by default.
 
 **Official Resources:**
 
@@ -39,7 +39,7 @@ Go's stdlib `slices` and `maps` packages cover ~10 basic helpers (sort, contains
 - **Type-safe generics** — no `interface{}` casts, no reflection, compile-time checking, no interface boxing overhead
 - **Immutable by default** — returns new collections, safe for concurrent reads, easier to reason about
 - **Composable** — functions take and return slices/maps, so they chain without wrapper types
-- **Zero dependencies** — only Go stdlib, no transitive dependency risk
+- **Minimal dependencies** — one external module, `golang.org/x/text` (used by the string-casing helpers); otherwise stdlib-only, so negligible transitive dependency risk
 - **Progressive complexity** — start with `lo`, upgrade to `lop`/`lom`/`loi` only when profiling demands it
 - **Error variants** — most functions have `Err` suffixes (`MapErr`, `FilterErr`, `ReduceErr`) that stop on first error
 
@@ -55,7 +55,9 @@ go get github.com/samber/lo
 | Parallel | `github.com/samber/lo/parallel` | `lop` | 1.18+ |
 | Mutable | `github.com/samber/lo/mutable` | `lom` | 1.18+ |
 | Iterator | `github.com/samber/lo/it` | `loi` | 1.23+ |
-| SIMD (experimental) | `github.com/samber/lo/exp/simd` | — | 1.25+ (amd64 only) |
+| SIMD (experimental) | `github.com/samber/lo/exp/simd` | — | 1.26+ (amd64 only, requires goexperiment.simd) |
+
+> **Note:** `lo/exp/simd` is a separate nested Go module — `go get github.com/samber/lo` does **not** fetch it. Install it explicitly with `go get github.com/samber/lo/exp/simd`.
 
 ## Choose the Right Package
 
@@ -166,7 +168,7 @@ results, err := lo.MapErr(urls, func(url string, _ int) (Response, error) {
 | `lo.ToPtr` / `lo.FromPtr` | Pointer helpers |
 | `lo.Must` / `lo.Try` | Panic-on-error / recover-as-bool |
 | `lo.Async` / `lo.Attempt` | Async execution / retry with backoff |
-| `lo.Debounce` / `lo.Throttle` | Rate limiting |
+| `lo.NewDebounce` / `lo.NewThrottle` | Rate limiting |
 | `lo.ChannelDispatcher` | Fan-out to multiple channels |
 
 For the complete function catalog (300+ functions), see [API Reference](./references/api-reference.md).

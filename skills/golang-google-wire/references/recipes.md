@@ -162,18 +162,20 @@ func InitApp() (*App, func(), error) {
 Use `-output_file_prefix` to write separate output files — both commands would otherwise overwrite the same `wire_gen.go`:
 
 ```bash
-wire -tags dev -output_file_prefix=wire_gen_dev gen .
-wire -output_file_prefix=wire_gen_prod gen .
+wire gen -tags dev -output_file_prefix=wire_gen_dev_ .
+wire gen -output_file_prefix=wire_gen_prod_ .
 ```
 
-Add build constraints to the generated files so only one compiles per build:
+Note: `-output_file_prefix` is prepended to the literal `wire_gen.go`, so these commands write `wire_gen_dev_wire_gen.go` and `wire_gen_prod_wire_gen.go` (the prefix is not a full filename). Wire already stamps each generated file with `//go:build !wireinject`, so **merge** the variant tag into that existing line — do not add a second `//go:build` comment (Go rejects multiple `//go:build` blocks in one file):
 
 ```go
-// wire_gen_prod.go — add at the top (after wire writes it)
-//go:build !dev
+// wire_gen_prod_wire_gen.go — merge !dev into wire's existing tag line
+//go:build !wireinject && !dev
+// +build !wireinject,!dev
 
-// wire_gen_dev.go — add at the top
-//go:build dev
+// wire_gen_dev_wire_gen.go — merge dev into wire's existing tag line
+//go:build !wireinject && dev
+// +build !wireinject,dev
 ```
 
 Commit both generated files. At build time, only the matching file is compiled.

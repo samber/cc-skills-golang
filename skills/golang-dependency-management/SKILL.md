@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.2.4"
+  version: "1.2.5"
   openclaw:
     emoji: "📦"
     homepage: https://github.com/samber/cc-skills-golang
@@ -161,7 +161,7 @@ Rule: Go 1.24+ = `tool` directives. Go <1.24 = `tools.go` fallback.
 
 ### Go 1.26+ module target note
 
-When using a Go 1.26 or newer toolchain, `go mod init` may create a module with an older default `go` directive. If the project intentionally targets Go 1.26+ APIs, update the directive deliberately:
+`go mod init` sets the `go` directive to the version of the toolchain that created the module. Use `go mod edit -go=X` only when the module should target a *different* minimum version than that toolchain — for example, deliberately raising it to use newer APIs, or pinning an older minimum for broader compatibility:
 
 ```bash
 go mod edit -go=1.26

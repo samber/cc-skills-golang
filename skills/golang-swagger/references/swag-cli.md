@@ -58,7 +58,7 @@ func main() {
 }
 ```
 
-## Generics (swag v2)
+## Generics (requires Go 1.18+; supported in swag v1.16+ and v2)
 
 Single type parameter:
 
@@ -110,7 +110,7 @@ func CreateUser(c *gin.Context) {
 | Alias                   | Content-Type                      |
 | ----------------------- | --------------------------------- |
 | `json`                  | application/json                  |
-| `xml`                   | application/xml                   |
+| `xml`                   | text/xml                          |
 | `plain`                 | text/plain                        |
 | `html`                  | text/html                         |
 | `mpfd`                  | multipart/form-data               |

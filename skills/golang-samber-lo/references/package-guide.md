@@ -37,14 +37,14 @@ active := lo.Filter(users, func(u User, _ int) bool {
 
 ## `lo/parallel` (lop) — Concurrent Transforms
 
-Parallel variants of core functions. Each element is processed in a separate goroutine with automatic worker pooling.
+Parallel variants of core functions. Each element is processed in its own goroutine — one unbounded goroutine per element, synchronized by `sync.WaitGroup` (no worker pool or semaphore bounding).
 
 **Available functions:** `Map`, `ForEach`, `Times`, `GroupBy`, `PartitionBy`
 
 **Characteristics:**
 
 - Results preserve original order despite concurrent execution
-- Internal goroutine pool manages concurrency (not configurable via API — one goroutine per element)
+- One unbounded goroutine per element (not configurable via API — no worker pool bounding; a 1M-element slice launches 1M goroutines)
 - Synchronization via `sync.WaitGroup`
 
 **Use when:**
@@ -72,7 +72,7 @@ parsed := lop.Map(rawDocs, func(doc []byte, _ int) *Document {
 
 Modify the original slice directly. Zero allocation overhead.
 
-**Available functions:** `Filter`, `Map`, `Shuffle`, `Reverse`, `Replace`
+**Available functions:** `Filter`, `FilterI`, `Map`, `MapI`, `Reverse`, `Shuffle`
 
 **Characteristics:**
 
@@ -96,7 +96,7 @@ Modify the original slice directly. Zero allocation overhead.
 
 ```go
 // In-place filter — modifies 'items' directly
-items = lom.Filter(items, func(item Item, _ int) bool {
+items = lom.Filter(items, func(item Item) bool {
     return item.Price > 0
 })
 ```
@@ -172,4 +172,4 @@ Start with lo.Map/Filter/Reduce (immutable, safe)
 | Input modified | No | No | Yes | No | Varies |
 | Concurrent-safe | Read-safe | Read-safe | Not safe | Read-safe | Varies |
 | API stability | Stable | Stable | Stable | Stable | Experimental |
-| Go version | 1.18+ | 1.18+ | 1.18+ | 1.23+ | 1.25+ |
+| Go version | 1.18+ | 1.18+ | 1.18+ | 1.23+ | 1.26+ |

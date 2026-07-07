@@ -22,10 +22,10 @@ Pass mocks directly as constructor arguments. No wire, no container, no file to 
 
 ## Test Injectors: Swapping Providers
 
-For integration or component tests where you want the full wired graph but with selected dependencies replaced, create a test-only injector in a `_test.go` file.
+For integration or component tests where you want the full wired graph but with selected dependencies replaced, create a test-only injector in a regular `.go` file (not a `_test.go` file — wire's package scan excludes test files, so an injector defined in `_test.go` is silently never generated).
 
 ```go
-// app_test.go
+// testinject.go
 //go:build wireinject
 
 package main
@@ -51,7 +51,8 @@ func InitTestApp(t *testing.T) (*App, func(), error) {
 
 ```go
 // app_integration_test.go
-//go:build !wireinject  // compiles when the wireinject tag is NOT set
+// compiles when the wireinject tag is NOT set
+//go:build !wireinject
 
 package main
 
@@ -67,7 +68,7 @@ func TestApp_GetUser(t *testing.T) {
 }
 ```
 
-Run `wire ./...` to generate `wire_gen.go` — the test injector is included because the `_test.go` file is compiled as part of the package during `go test`.
+Run `wire ./...` to generate `wire_gen.go` — the test injector is picked up because it lives in a regular `.go` file, not a `_test.go` one. Wire's package scan runs at codegen time without `Tests: true`, so it never reads `_test.go` files; an injector defined there is silently skipped. The generated `InitTestApp` lands in `wire_gen.go` (which wire stamps with the negated `//go:build !wireinject` constraint) and is callable from the `!wireinject` test during `go test`.
 
 **Key pattern from upstream best practices:** Prefer creating a test-only provider set over passing mocks as injector arguments (though both work). The set approach keeps the test injector composable.
 

@@ -54,7 +54,7 @@
         "Recommends BehaviorSubject (not PublishSubject or ReplaySubject)",
         "Explains that BehaviorSubject replays the last value to new subscribers",
         "Shows NewBehaviorSubject[Config](initialConfig) constructor with initial value",
-        "Shows .Send() for pushing updates and .Subscribe() for consuming",
+        "Shows .Next() for pushing updates and .Subscribe() for consuming",
         "Does NOT recommend PublishSubject (late subscribers would miss the current value)"
       ]
     },
@@ -100,9 +100,9 @@
       "prompt": "I'm calling an unreliable external API via samber/ro. I want to retry up to 3 times with exponential backoff starting at 500ms, with a max delay of 10 seconds. If all retries fail, return a cached default value. Write the code.",
       "assertions": [
         "Uses ro.RetryWithConfig (not ro.Retry which retries infinitely)",
-        "Sets Max: 3 in RetryConfig",
-        "Sets Delay: 500ms and BackoffMultiplier: 2.0 in RetryConfig",
-        "Sets MaxDelay: 10*time.Second in RetryConfig",
+        "Sets MaxRetries: 3 in RetryConfig",
+        "Sets Delay: 500 * time.Millisecond in RetryConfig",
+        "Notes that RetryConfig has no BackoffMultiplier or MaxDelay field — exponential backoff/max-delay must be hand-rolled outside RetryConfig (only a fixed Delay plus optional ResetOnSuccess exist)",
         "Chains OnErrorReturn or Catch after RetryWithConfig for the fallback",
         "Orders operators correctly: source → RetryWithConfig → fallback (retry BEFORE fallback)"
       ]
@@ -159,7 +159,7 @@
       "prompt": "I need a samber/ro observable that emits an event every day at midnight for a daily report generation job. What plugin should I use and how?",
       "assertions": [
         "Knows about the cron plugin (plugins/cron)",
-        "Uses cron.Schedule or similar with a cron expression like `0 0 * * *`",
+        "Uses rocron.NewScheduler with a gocron.JobDefinition (e.g. gocron.CronJob(`0 0 * * *`, false)) for the cron expression",
         "Shows the correct import path for the cron plugin",
         "Chains the cron observable with Map or FlatMap to trigger report generation"
       ]
@@ -216,7 +216,7 @@
       "prompt": "I need a resilient data pipeline in samber/ro: first retry transient failures 2 times, then try a secondary data source, and if everything fails, return a cached default. Write the error recovery chain.",
       "assertions": [
         "Chains recovery operators in the correct order: RetryWithConfig FIRST, then Catch/OnErrorResumeNextWith, then OnErrorReturn",
-        "Uses RetryWithConfig with Max: 2 (not infinite Retry)",
+        "Uses RetryWithConfig with MaxRetries: 2 (not infinite Retry)",
         "Uses Catch or OnErrorResumeNextWith to switch to the secondary source",
         "Uses OnErrorReturn for the final cached default",
         "Orders the operators correctly in the Pipe chain (retry → fallback source → default value)"
@@ -253,7 +253,7 @@
       "assertions": [
         "Recommends Connectable (not Share or ShareReplay)",
         "Shows ro.Connectable[T](source) to create a ConnectableObservable",
-        "Shows setting up all 5 subscribers before calling .Connect(ctx)",
+        "Shows setting up all 5 subscribers before calling .Connect() (no arguments; use ConnectWithContext(ctx) only if context propagation is needed)",
         "Explains that Connect() explicitly starts the shared execution",
         "Explains why Share() is wrong: it starts on first subscribe, so sub2-5 might miss early events"
       ]

@@ -261,7 +261,7 @@ type ServerParams struct {
 func NewServer(p ServerParams) *Server {
     s := &Server{log: p.Logger}
     if p.Tracer == nil {
-        s.tracer = trace.NewNoopTracerProvider().Tracer("noop")
+        s.tracer = noop.NewTracerProvider().Tracer("noop") // import go.opentelemetry.io/otel/trace/noop
     } else {
         s.tracer = p.Tracer
     }

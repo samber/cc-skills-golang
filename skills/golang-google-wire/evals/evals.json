@@ -88,10 +88,10 @@
     "name": "injector-parameter-vs-value-provider",
     "description": "Tests using wire.Value or injector parameters for pre-built values instead of wrapper constructors",
     "prompt": "In my Go app using google/wire, I parse a *Config struct from command-line flags in main() before calling InitApp. I tried writing a no-op provider:\n\n```go\nvar parsedCfg *Config\n\nfunc ProvideConfig() *Config { return parsedCfg }\n\nvar AppSet = wire.NewSet(ProvideConfig, ...)\n```\n\nThis works but feels wrong — I'm using a global variable. Is there a cleaner way to pass a pre-built *Config into the wire graph?",
-    "trap": "Without the skill, the model might suggest keeping the global variable pattern or using init(), missing both wire.Value and the injector-parameter patterns.",
+    "trap": "Without the skill, the model might suggest keeping the global variable pattern or using init(), missing the injector-parameter pattern.",
     "assertions": [
       {"id": "7.1", "text": "Shows the injector-parameter approach: func InitApp(cfg *Config) (*App, func(), error) with wire.Build"},
-      {"id": "7.2", "text": "OR shows wire.Value(cfg) inside wire.Build — both are valid answers"},
+      {"id": "7.2", "text": "Does NOT present wire.Value(cfg) as an equally valid answer — wire.Value snapshots a package-scope expression at init time and cannot carry a *Config parsed from flags at runtime"},
       {"id": "7.3", "text": "Explains that injector parameters are treated as pre-built providers by wire"},
       {"id": "7.4", "text": "Does NOT use a global variable as the recommended solution"},
       {"id": "7.5", "text": "Does NOT suggest using init() to set the value"}
@@ -101,14 +101,14 @@
     "id": 8,
     "name": "fields-of-struct",
     "description": "Tests wire.FieldsOf to expose struct fields as individual graph nodes",
-    "prompt": "I have a single Config struct in my Go app with google/wire:\n\n```go\ntype Config struct {\n    DatabaseDSN  string\n    CacheAddress string\n    APIKey       string\n}\n\nfunc NewConfig() *Config { return loadFromEnv() }\n```\n\nNewDB needs a DatabaseDSN string, NewCache needs a CacheAddress string, NewExternalClient needs an APIKey string — but all three are plain strings. How do I make these available to the wire graph without creating three separate provider functions?",
-    "trap": "Without the skill, the model will suggest three named-type wrappers or three extraction functions, missing wire.FieldsOf which promotes struct fields directly.",
+    "prompt": "I have a single Config struct in my Go app with google/wire:\n\n```go\ntype DatabaseDSN string\ntype CacheAddress string\ntype APIKey string\n\ntype Config struct {\n    DatabaseDSN  DatabaseDSN\n    CacheAddress CacheAddress\n    APIKey       APIKey\n}\n\nfunc NewConfig() *Config { return loadFromEnv() }\n```\n\nNewDB needs a DatabaseDSN, NewCache needs a CacheAddress, NewExternalClient needs an APIKey — the fields are already distinct named types. How do I make these available to the wire graph without creating three separate provider functions?",
+    "trap": "Without the skill, the model will suggest three extraction functions, missing wire.FieldsOf which promotes struct fields directly.",
     "assertions": [
       {"id": "8.1", "text": "Uses wire.FieldsOf(new(Config), \"DatabaseDSN\", \"CacheAddress\", \"APIKey\") or a subset"},
       {"id": "8.2", "text": "Places wire.FieldsOf inside the provider set or wire.Build"},
-      {"id": "8.3", "text": "Updates NewDB, NewCache, NewExternalClient to accept the string fields as parameters (or uses named types alongside FieldsOf)"},
+      {"id": "8.3", "text": "Updates NewDB, NewCache, NewExternalClient to accept the named-type fields as parameters"},
       {"id": "8.4", "text": "Explains that wire.FieldsOf promotes struct fields as individual graph nodes without manual extraction functions"},
-      {"id": "8.5", "text": "Does NOT suggest writing three separate func GetDatabaseDSN(c *Config) string extractor functions as the primary recommendation"}
+      {"id": "8.5", "text": "Does NOT suggest writing three separate func GetDatabaseDSN(c *Config) DatabaseDSN extractor functions as the primary recommendation"}
     ]
   },
   {
@@ -119,7 +119,7 @@
     "trap": "Without the skill, the model may suggest monkey-patching, a global variable for the mailer, or a runtime DI container for tests — missing the test-injector pattern with a test-only wire.NewSet and wire.Bind.",
     "assertions": [
       {"id": "9.1", "text": "Creates a test-only provider set (e.g., TestMailerSet) with NewFakeMailer and wire.Bind(new(Mailer), new(*FakeMailer))"},
-      {"id": "9.2", "text": "Creates a test injector function in a _test.go file with //go:build wireinject"},
+      {"id": "9.2", "text": "Creates a test injector function in a normal (non-_test.go) file with //go:build wireinject (wire's package scan excludes _test.go files, so an injector defined there is never generated)"},
       {"id": "9.3", "text": "The test injector's wire.Build composes the production sets with the test-only set"},
       {"id": "9.4", "text": "Does NOT suggest global variables, monkey-patching, or a runtime DI container for tests"},
       {"id": "9.5", "text": "Mentions that wire ./... (or go generate) must be run to produce the test-injector generated code"}

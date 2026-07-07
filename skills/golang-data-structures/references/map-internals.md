@@ -2,21 +2,20 @@
 
 ## Hash Table Structure
 
-Go maps use hash tables with bucket-based collision resolution. The map header holds:
+Go maps are hash tables. Since Go 1.24 the built-in map is implemented as a Swiss Table (based on Abseil's design); earlier releases used a bucket array with overflow chains. The map header holds:
 
 - `count` — number of entries
-- `B` — log₂ of bucket count (2^B buckets total)
-- `buckets` — pointer to bucket array
-- `oldbuckets` — pointer to old buckets during growth
+- a directory of tables, each holding one or more groups
+- each group holds 8 slots plus a 64-bit control word (one control byte per slot) for fast probing
 
-Each bucket holds 8 key-value pairs. Keys and values are stored in separate arrays within buckets to minimize padding waste.
+Each group holds 8 key-value slots. Keys and values are stored in separate arrays within a group to minimize padding waste. Collisions are resolved by open addressing (probing within and across groups), not by overflow chains.
 
 ## Memory Growth and Capacity
 
-- **Load factor threshold**: 6.5 entries per bucket triggers growth (sweet spot between memory efficiency and collision performance)
-- **Overflow bucket chains** also trigger growth if too long (prevents O(1)→O(n) degradation)
-- **Bucket count doubles**: 2^B → 2^(B+1) (efficient rehashing with powers of 2)
-- **Incremental evacuation**: Old and new buckets coexist during growth; entries move lazily during operations to avoid GC pauses
+- **Load factor threshold**: growth triggers near a 7/8 per-group max load (`maxAvgGroupLoad`), the sweet spot between memory efficiency and probe length
+- **Open addressing, no overflow chains**: a full group probes forward instead of chaining, so no single chain can degrade O(1)→O(n)
+- **Table splitting**: when a table fills it splits into two tables in the directory, rather than doubling one global bucket array
+- **Incremental growth**: splits happen per-table, so a single insert never rehashes the whole map, avoiding large GC pauses
 - **No `cap()` function**: Capacity depends on hash distribution and load factor, not a fixed limit. Preallocation (`make(map[string]int, expectedSize)`) is worthwhile for large maps to avoid repeated growth cycles
 
 ## Preallocation
@@ -29,7 +28,7 @@ m := map[string]int{}
 m := make(map[string]int, expectedSize)
 ```
 
-Preallocation avoids repeated growths. The hint is approximate — Go allocates 2^B buckets where 2^B \* 6.5 >= hint.
+Preallocation avoids repeated growths. The hint is approximate — Go allocates enough groups to hold about `hint` entries before the 7/8 load factor forces a split.
 
 ## Pointers vs Values
 

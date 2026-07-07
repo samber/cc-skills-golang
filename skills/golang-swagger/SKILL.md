@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents. Requires go and swag CLI.
 metadata:
   author: samber
-  version: "1.0.4"
+  version: "1.0.5"
   openclaw:
     emoji: "📋"
     homepage: https://github.com/samber/cc-skills-golang
@@ -146,7 +146,7 @@ Optional attributes on `@Param`: `default(v)`, `minimum(n)`, `maximum(n)`, `minL
 | `{array}`            | Slice of structs |
 | `string` / `integer` | Primitive        |
 
-**Generics** (swag v2): `@Success 200 {object} api.Response[model.User]`
+**Generics** (Go 1.18+; swag v1.16+ and v2): `@Success 200 {object} api.Response[model.User]`
 
 **Nested composition**: `@Success 200 {object} api.Response{data=model.User}`
 
@@ -168,8 +168,8 @@ Define once at the API level (in main.go), apply per endpoint with `@Security`.
 // Basic auth
 // @securityDefinitions.basic BasicAuth
 
-// OAuth2 authorization code
-// @securityDefinitions.oauth2.authorizationCode OAuth2
+// OAuth2 authorization code (access code)
+// @securityDefinitions.oauth2.accessCode OAuth2
 // @authorizationUrl https://example.com/oauth/authorize
 // @tokenUrl https://example.com/oauth/token
 // @scope.read Read access
@@ -202,7 +202,7 @@ type CreateUserRequest struct {
 | --- | --- |
 | `example` | Example value shown in Swagger UI |
 | `enums` | Comma-separated allowed values |
-| `swaggertype` | Override detected type (e.g., `"primitive,integer"` for `time.Time`) |
+| `swaggertype` | Override detected type (e.g., `"string"`+`format:"date-time"` on a custom time wrapper; plain `time.Time` already renders as `string` with no override) |
 | `swaggerignore:"true"` | Exclude field from the generated schema |
 | `extensions` | Add OpenAPI extensions: `extensions:"x-nullable,x-deprecated=true"` |
 
@@ -212,10 +212,10 @@ type CreateUserRequest struct {
 | --- | --- | --- |
 | Missing `_ "yourmodule/docs"` import | Schema not registered; UI loads empty | Add blank import in main.go or server init |
 | Stale `docs/` after code changes | Docs diverge from implementation; consumers get wrong schema | Re-run `swag init` after every annotation change |
-| `@Param body` with primitive type | swag cannot derive schema from `string`; generation fails | Always use a named struct for body params |
+| `@Param body` with a bare primitive type | Generates a valid but bare `{"type": "string"}` schema — unusual and less self-documenting, not a failure | Prefer a named struct for body params |
 | No `@Security` on protected routes | Swagger UI shows no lock icon; testers send unauthenticated requests | Apply `@Security` to every authenticated endpoint |
 | General info annotations in the wrong file | swag silently skips them; spec has no title/host | Use `-g <file>` flag or move annotations to `main.go` |
-| Using `{object}` with a map type | swag cannot generate a schema for `map[string]any` without help | Use a named struct or annotate with `swaggertype` |
+| Expecting a precise schema from `{object} map[string]any` | swag emits a generic `additionalProperties: true` schema — valid but loosely typed | Use a named struct when you want a precise, self-documenting schema |
 | Multi-word `@Tags` without quotes | Tags split on spaces, producing malformed grouping | Quote tags with spaces: `@Tags "user accounts"` |
 
 ## Cross-References

@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.0.6"
+  version: "1.0.11"
   openclaw:
     emoji: "🪡"
     homepage: https://github.com/samber/cc-skills-golang
@@ -32,7 +32,7 @@ allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(g
 
 Code-generation DI toolkit. Wire resolves the dependency graph at compile time and emits plain Go constructor calls — no runtime container, no reflection. Errors appear when you run `wire ./...`, not at first request.
 
-Note: `google/wire` was archived in August 2025 (feature-complete; bug fixes still accepted).
+Note: `google/wire` was archived in August 2025 (feature-complete; no longer accepting issues or PRs).
 
 **Official Resources:** [pkg.go.dev](https://pkg.go.dev/github.com/google/wire) · [github.com/google/wire](https://github.com/google/wire) · [User Guide](https://github.com/google/wire/blob/main/docs/guide.md) · [Best Practices](https://github.com/google/wire/blob/main/docs/best-practices.md)
 
@@ -108,7 +108,7 @@ func InitApp() (*App, func(), error) {
 }
 ```
 
-The `//go:build wireinject` tag prevents the stub from being compiled into the binary — only `wire_gen.go` (which has no such tag) makes it through `go build`. Without this tag, both files define the same function, causing a compile error.
+The `//go:build wireinject` tag prevents the stub from being compiled into the binary — only `wire_gen.go` (which wire stamps with the negated `//go:build !wireinject` constraint) makes it through `go build`. Without this tag, both files define the same function, causing a compile error.
 
 Alternative syntax when a dummy return is inconvenient:
 
@@ -226,4 +226,4 @@ Wire generates plain Go constructors, so unit tests use manual injection — no 
 - → See `samber/cc-skills-golang@golang-structs-interfaces` skill for interface design patterns
 - → See `samber/cc-skills-golang@golang-testing` skill for general testing patterns
 
-If you encounter a bug or unexpected behavior in google/wire, open an issue at <https://github.com/google/wire/issues>.
+Because `google/wire` is archived and read-only, its issue tracker no longer accepts new reports — fork the repo to patch a bug locally, or for an actively maintained alternative → See `samber/cc-skills-golang@golang-uber-fx` / `golang-uber-dig` skills.

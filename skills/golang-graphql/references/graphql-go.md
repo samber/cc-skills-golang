@@ -63,7 +63,7 @@ Return resolver wrapper structs, not domain models directly — keeps GraphQL pr
 |`[T]`|`[]*T` or `[]T`||
 |Nullable `T`|`*T`|pointer = nullable|
 |Non-null `T!`|`T`|non-pointer|
-|Custom scalar|implement `UnmarshalGraphQL(input any) error` + `MarshalJSON() ([]byte, error)`||
+|Custom scalar|implement `ImplementsGraphQLType(name string) bool` + `UnmarshalGraphQL(input any) error` (+ `MarshalJSON() ([]byte, error)` for output)||
 |Enum|typed string alias||
 |Input|exported struct with field tags optional||
 |Interface/Union|Go interface returned; `ToConcreteType() (*T, bool)` discriminators||
@@ -86,6 +86,8 @@ Forgetting `*` on a nullable argument causes unmarshal failure when clients send
 
 ```go
 type DateTime struct{ time.Time }
+
+func (DateTime) ImplementsGraphQLType(name string) bool { return name == "DateTime" }
 
 func (d *DateTime) UnmarshalGraphQL(input any) error {
     s, ok := input.(string)

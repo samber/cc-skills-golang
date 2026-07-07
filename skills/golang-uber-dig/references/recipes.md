@@ -184,6 +184,8 @@ func handle(w http.ResponseWriter, req *http.Request) {
 
 The decorator only applies inside the request scope — sibling scopes (other in-flight requests) keep their own logger.
 
+Caveat: dig retains every child scope on its parent (`root.childScopes` grows on each `Scope` call) and there is no `Close`/dispose API to release one, so creating a scope per request leaks memory without bound. Reserve scopes for coarse-grained, long-lived subgraphs (per-module or per-tenant, created once at startup); for per-request values prefer `context.Context` or an explicit request struct instead.
+
 ## Optional dependency for graceful degradation
 
 ```go
@@ -199,7 +201,7 @@ func NewWorker(p WorkerParams) *Worker {
     if p.Tracer != nil {
         w.tracer = p.Tracer
     } else {
-        w.tracer = trace.NewNoopTracerProvider().Tracer("noop")
+        w.tracer = noop.NewTracerProvider().Tracer("noop") // go.opentelemetry.io/otel/trace/noop
     }
     return w
 }

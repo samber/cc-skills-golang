@@ -30,25 +30,26 @@ Create observables from various sources. Typically the first argument to `Pipe`.
 | `Of` | `Of[T](values ...T) Observable[T]` | Alias for Just |
 | `FromSlice` | `FromSlice[T](items []T) Observable[T]` | Create from existing slice |
 | `FromChannel` | `FromChannel[T](ch <-chan T) Observable[T]` | Wrap Go channel as observable |
-| `Range` | `Range(start, end int) Observable[int]` | Emit integer sequence |
-| `RangeWithStep` | `RangeWithStep(start, end, step int) Observable[int]` | Integer sequence with custom step |
-| `RangeWithInterval` | `RangeWithInterval(start, end int, d time.Duration) Observable[int]` | Integers with delay between each |
-| `RangeWithStepAndInterval` | `RangeWithStepAndInterval(start, end, step int, d time.Duration) Observable[int]` | Step + interval combined |
+| `Range` | `Range(start, end int64) Observable[int64]` | Emit integer sequence |
+| `RangeWithStep` | `RangeWithStep(start, end, step float64) Observable[float64]` | Numeric sequence with custom step |
+| `RangeWithInterval` | `RangeWithInterval(start, end int64, d time.Duration) Observable[int64]` | Integers with delay between each |
+| `RangeWithStepAndInterval` | `RangeWithStepAndInterval(start, end, step float64, d time.Duration) Observable[float64]` | Step + interval combined |
 | `Interval` | `Interval(d time.Duration) Observable[int64]` | Emit sequential integers at intervals (infinite) |
 | `IntervalWithInitial` | `IntervalWithInitial(initial, d time.Duration) Observable[int64]` | Interval with initial delay |
-| `Timer` | `Timer(d time.Duration) Observable[int64]` | Single emission after delay |
+| `Timer` | `Timer(d time.Duration) Observable[time.Duration]` | Single emission after delay |
 | `Repeat` | `Repeat[T](item T, count int64) Observable[T]` | Repeat item N times |
 | `RepeatWithInterval` | `RepeatWithInterval[T](item T, count int64, d time.Duration) Observable[T]` | Repeat with delay |
 | `Defer` | `Defer[T](factory func() Observable[T]) Observable[T]` | Lazily create observable on subscription |
 | `Future` | `Future[T](factory func() (T, error)) Observable[T]` | Single async value from function |
-| `Start` | `Start(cb func() (any, error)) Observable[any]` | Execute callback and emit result |
+| `Start` | `Start[T any](cb func() T) Observable[T]` | Execute callback and emit result |
 | `Empty` | `Empty[T]() Observable[T]` | Complete immediately, no values |
-| `Never` | `Never[T]() Observable[T]` | Never emit or complete |
+| `Never` | `Never() Observable[struct{}]` | Never emit or complete |
 | `Throw` | `Throw[T](err error) Observable[T]` | Immediately error |
 
 ```go
 // Custom observable with direct control
-obs := ro.NewObservable[int](func(ctx context.Context, observer ro.Observer[int]) error {
+// Callback receives the observer and returns a Teardown (cleanup func), not an error
+obs := ro.NewObservable[int](func(observer ro.Observer[int]) ro.Teardown {
     observer.Next(1)
     observer.Next(2)
     observer.Complete()
@@ -182,16 +183,16 @@ ro.CombineLatest2(priceStream, quantityStream)
 | `OnErrorReturn[T](value T)` | Replace error with fallback value |
 | `OnErrorResumeNextWith[T](obs ...Observable[T])` | Continue with fallback observables on error |
 | `Retry[T]()` | Retry indefinitely on error |
-| `RetryWithConfig[T](cfg RetryConfig)` | Retry with max attempts, delay, backoff |
+| `RetryWithConfig[T](cfg RetryConfig)` | Retry with max attempts, fixed delay, optional reset-on-success |
 | `ThrowIfEmpty[T](fn func() error)` | Error if stream completes empty |
 
 ```go
-// RetryConfig for exponential backoff
+// RetryConfig: fixed delay with optional reset-on-success
+// (no built-in exponential backoff or max-delay cap)
 ro.RetryWithConfig[Response](ro.RetryConfig{
-    Max:               3,
-    Delay:             time.Second,
-    BackoffMultiplier: 2.0,
-    MaxDelay:          10 * time.Second,
+    MaxRetries:     3,
+    Delay:          500 * time.Millisecond,
+    ResetOnSuccess: true,
 })
 ```
 
@@ -243,7 +244,7 @@ All have `WithContext` variants. `Do`, `DoOnNext`, `DoOnError`, `DoOnComplete`, 
 ro.ShareConfig[T]{
     ResetOnComplete:       true,  // re-subscribe on complete
     ResetOnError:          true,  // re-subscribe on error
-    ResetOnReferenceCount: true,  // re-subscribe when count drops to 0
+    ResetOnRefCountZero:   true,  // re-subscribe when count drops to 0
 }
 ```
 
@@ -298,8 +299,9 @@ observer := ro.NoopObserver[T]()   // discard all events
 sub := observable.Subscribe(observer)
 sub.Wait()          // block until complete or error
 sub.Unsubscribe()   // cancel and cleanup
-sub.IsActive()      // check if still running
-sub.GetError()      // get terminal error
+sub.IsClosed()      // check if unsubscribed/terminated
+// note: no error accessor on Subscription; capture the terminal
+// error via the observer's onError callback instead
 ```
 
 ## Scheduling

@@ -202,12 +202,12 @@
       "id": 16,
       "name": "lo-zero-dependencies",
       "prompt": "My team is concerned about adding samber/lo as a dependency. They worry about transitive dependencies and supply chain risk. What dependencies does samber/lo pull in?",
-      "expected_output": "Should state that samber/lo has zero external runtime dependencies — it relies only on Go's standard library.",
+      "expected_output": "Should state that samber/lo has a single external dependency, golang.org/x/text (used by the string-casing helpers), and otherwise relies only on Go's standard library. Should note that x/text pulls in no further transitive dependencies, so supply-chain risk is minimal.",
       "assertions": [
-        {"text": "States that samber/lo has zero external/runtime dependencies", "type": "semantic"},
-        {"text": "Mentions it relies only on Go's standard library", "type": "semantic"},
-        {"text": "Addresses the supply chain concern by noting minimal transitive dependency risk", "type": "semantic"},
-        {"text": "Does NOT claim lo has external dependencies", "type": "semantic"}
+        {"text": "Identifies golang.org/x/text as samber/lo's one external (non-stdlib) dependency", "type": "semantic"},
+        {"text": "Notes that apart from golang.org/x/text it relies only on Go's standard library", "type": "semantic"},
+        {"text": "Addresses the supply chain concern by noting x/text adds no further transitive dependencies, so risk is minimal", "type": "semantic"},
+        {"text": "Does NOT falsely claim lo has zero external dependencies", "type": "semantic"}
       ]
     },
     {

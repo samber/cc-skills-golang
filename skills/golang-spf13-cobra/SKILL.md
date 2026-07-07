@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.0.4"
+  version: "1.0.5"
   openclaw:
     emoji: "🐍"
     homepage: https://github.com/samber/cc-skills-golang
@@ -70,7 +70,7 @@ var rootCmd = &cobra.Command{
 }
 ```
 
-Use `AddGroup` to label subcommands in help output — register groups **before** the `AddCommand` calls that reference them; cobra does not retroactively assign groups.
+Use `AddGroup` to label subcommands in help output — register groups (`AddGroup`) **before** `Execute()` is called; ordering relative to `AddCommand` is irrelevant, since cobra only validates group membership at execution time.
 
 ## The Run\* family
 
@@ -92,7 +92,7 @@ For the full lifecycle and inheritance rules, see [commands-and-args.md](referen
 
 Cobra validates positional arguments before `RunE` runs. Never write `len(args)` checks inside `RunE` — that bypasses cobra's standard error messages and arg count tracking.
 
-Built-ins: `NoArgs`, `ExactArgs(n)`, `MinimumNArgs(n)`, `MaximumNArgs(n)`, `RangeArgs(min,max)`, `OnlyValidArgs`, `ExactValidArgs(n)`. Compose with `MatchAll(v1, v2)`. Custom validator: `func(cmd *cobra.Command, args []string) error`.
+Built-ins: `NoArgs`, `ExactArgs(n)`, `MinimumNArgs(n)`, `MaximumNArgs(n)`, `RangeArgs(min,max)`, `OnlyValidArgs`. Compose with `MatchAll(v1, v2)`. Custom validator: `func(cmd *cobra.Command, args []string) error`. (`ExactValidArgs(n)` is deprecated — use `MatchAll(ExactArgs(n), OnlyValidArgs)` instead.)
 
 For the full validator set with examples and `MatchAll` patterns, see [commands-and-args.md](references/commands-and-args.md).
 

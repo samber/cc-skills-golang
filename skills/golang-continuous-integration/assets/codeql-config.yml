@@ -5,4 +5,4 @@ queries:
 
 query-filters:
   - exclude:
-      id: go/unused-result
+      id: go/useless-assignment-to-local

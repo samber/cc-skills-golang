@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.2.3"
+  version: "1.2.4"
   openclaw:
     emoji: "✅"
     homepage: https://github.com/samber/cc-skills-golang
@@ -183,7 +183,7 @@ Suite methods like `s.Equal()` behave like `assert`. For require: `s.Require().N
 - **Swapped argument order** — testify assumes `(expected, actual)`. Swapping produces backwards diffs
 - **`assert` for guards** — test continues after failure and panics on nil dereference. Use `require`
 - **Missing `suite.Run()`** — without the launcher function, zero tests execute silently
-- **Comparing pointers** — `is.Equal(ptr1, ptr2)` compares addresses. Dereference or use `EqualExportedValues`
+- **Comparing pointers** — `is.Equal(ptr1, ptr2)` uses `reflect.DeepEqual`, so it compares pointee values (including unexported fields), not addresses. A failure means a field genuinely differs — check unexported fields too, or use `EqualExportedValues` to compare only exported ones. For actual address identity, use `is.Same`
 
 ## Linters
 

@@ -76,7 +76,7 @@ Bind an entire flag set:
 viper.BindPFlags(rootCmd.PersistentFlags())
 ```
 
-**Timing rule:** Bind flags in `init()` or in `PersistentPreRunE`. The binding call must happen before `Execute()` parses flags — specifically, before any `viper.Get*` call on a flag-backed key. Binding after `Execute()` causes the flag's `Changed` state to be unknown, so viper may not promote the flag value to the correct precedence layer.
+**Timing rule:** Bind flags in `init()` or in `PersistentPreRunE`. The binding call must happen before any `viper.Get*` call reads that key — not literally before `Execute()` parses flags. In practice this means `init()` or `PersistentPreRunE`, since `PersistentPreRunE` runs before a command's `RunE` and before most application config reads. Binding inside `RunE` is unsafe only if something else (e.g. `PersistentPreRunE`) reads the key first.
 
 ## How pflag binding interacts with precedence
 

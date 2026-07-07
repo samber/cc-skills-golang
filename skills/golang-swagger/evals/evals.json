@@ -16,11 +16,10 @@
     {
       "id": 2,
       "prompt": "Our GET /settings endpoint returns a dynamic set of feature flags as a map: `map[string]bool`. Document this endpoint for Swagger so the response schema is visible in the UI.",
-      "expected_output": "Defines a named struct for the response or uses swaggertype annotation — swag cannot generate a schema for map[string]bool directly. The trap is using `{object} map[string]bool` in @Success which fails generation.",
+      "expected_output": "Documents the endpoint so the map schema shows in the UI. `// @Success 200 {object} map[string]bool` generates a valid `{\"type\": \"object\", \"additionalProperties\": {\"type\": \"boolean\"}}` schema directly; a named struct is an optional alternative for a more self-documenting shape.",
       "assertions": [
-        "Does NOT use `{object} map[string]bool` directly in @Success",
-        "Defines a named struct for the response OR acknowledges a swaggertype workaround is needed",
-        "@Success annotation uses a named type (not a raw map literal)",
+        "Documents the response schema so it renders in the UI (either `{object} map[string]bool` directly or a named struct)",
+        "@Success annotation is present with the map or a named type",
         "@Router annotation is present with [get] method",
         "@Produce annotation specifies json"
       ]
@@ -28,13 +27,13 @@
     {
       "id": 3,
       "prompt": "Document this Go struct for Swagger. We need the docs to look correct:\n\n```go\ntype AuditRecord struct {\n    CreatedAt time.Time\n    UpdatedAt time.Time\n    Payload   []byte\n}\n```",
-      "expected_output": "Uses swaggertype tag to override time.Time (which becomes an object by default) and []byte (which becomes a base64 string). Without the skill the model leaves the types as-is, producing wrong schemas.",
+      "expected_output": "time.Time already renders as a bare `string` with no format; adding `swaggertype:\"string\"` with `format:\"date-time\"` produces a more precise, self-documenting schema. []byte renders as a base64 string, best documented with `swaggertype:\"string\"` and `format:\"base64\"`. The model should not tag time.Time as an integer, which would misrepresent the RFC3339 string value.",
       "assertions": [
-        "Adds swaggertype tag to CreatedAt field (e.g., `swaggertype:\"string\"` with format:\"date-time\" or `swaggertype:\"primitive,integer\"`)",
-        "Adds swaggertype tag to UpdatedAt field with the same treatment",
+        "Adds `swaggertype:\"string\"` with `format:\"date-time\"` to the CreatedAt field (does NOT use `swaggertype:\"primitive,integer\"`)",
+        "Adds the same `swaggertype:\"string\"` / `format:\"date-time\"` treatment to the UpdatedAt field",
         "Adds swaggertype:\"string\" and format:\"base64\" to the Payload []byte field",
         "Preserves the json tags (does not remove them)",
-        "Does not leave time.Time fields without any swaggertype override"
+        "Does not tag time.Time fields as an integer (which would misrepresent the RFC3339 string value)"
       ]
     },
     {
