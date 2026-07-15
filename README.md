@@ -1,5 +1,7 @@
 # Agent Skills for production-ready Golang projects
 
+![tokens](https://img.shields.io/endpoint?url=https://gittokens.rsamf.com/badge/samber/cc-skills-golang)
+
 AI agent skills are reusable instruction sets that extend your coding assistant with domain-specific expertise, loaded on demand so they don't bloat your context. This repository covers **Go-specific** skills only (language, testing, security, observability, etc.); for dev workflow skills (git conventions, CI/CD, PR reviews) you'll want to add a separate skills plugin.
 
 For generic skills, please visit [cc-skills](https://github.com/samber/cc-skills).
