@@ -124,6 +124,34 @@ func TestCalculatePrice(t *testing.T) {
 }
 ```
 
+## Common Pitfall: Assert Scope Leaking into Subtests
+
+Never create a testify `assert`/`require` instance in the parent test function and reuse it inside `t.Run` closures. `assert.New(t)` captures the exact `*testing.T` it was built with, so if that `t` belongs to the parent, every failure raised inside the subtest gets attributed to the *parent* test in `go test` output — the failing subtest itself still reports `--- PASS`, silently hiding which case broke. This happens whether or not the subtest calls `t.Parallel()`.
+
+```go
+// WRONG -- `is` is bound to the parent's t
+func TestCalculatePrice(t *testing.T) {
+    is := assert.New(t)
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            is.Equal(tt.expected, CalculatePrice(tt.quantity, tt.unitPrice)) // misattributed on failure
+        })
+    }
+}
+
+// RIGHT -- each subtest builds its own instance from its own t
+func TestCalculatePrice(t *testing.T) {
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            is := assert.New(t)
+            is.Equal(tt.expected, CalculatePrice(tt.quantity, tt.unitPrice))
+        })
+    }
+}
+```
+
+Verify with a deliberately-broken case: if `go test -v -run TestName` shows `--- FAIL: TestName` but every `--- PASS: TestName/subtest_name` line still says PASS, the assert scope is leaking.
+
 ## Unit Tests
 
 Unit tests should be fast (< 1ms), isolated (no external dependencies), and deterministic.
