@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.2.4"
+  version: "1.2.5"
   openclaw:
     emoji: "🧪"
     homepage: https://github.com/samber/cc-skills-golang
@@ -57,6 +57,8 @@ This skill guides the creation of production-ready tests for Go applications. Fo
 9. Keep unit tests fast (< 1ms), use build tags for integration tests
 10. Run tests with race detection in CI
 11. Include examples as executable documentation
+12. Test files MUST be named after the source file under test, not after the function or method being tested
+13. Test functions SHOULD appear in the same order as the functions/methods they test in the source file
 
 ## Test Structure and Organization
 
@@ -69,6 +71,20 @@ package mypackage
 // mypackage_test.go - tests in test package (black-box, public API only)
 package mypackage_test
 ```
+
+Name the test file after the source file it tests, not after the function or method under test. Go's convention is one test file per source file (`foo.go` -> `foo_test.go`), because tools (`go test`, coverage reports, IDE "jump to test" navigation, `gotests`) and reviewers all resolve tests by source file, not by symbol. A source file usually declares several functions/methods; splitting its tests by symbol name scatters them across many files and breaks that file-to-file mapping.
+
+```
+// ✓ Good — one test file per source file
+helloworld.go       -> helloworld_test.go   // contains TestHelloWorld, TestAbcd, TestXyz, ...
+
+// ✗ Bad — test file named after the function/method instead of the source file
+helloworld.go       -> abcd_test.go         // wrong: should be helloworld_test.go
+```
+
+Exception: very large source files MAY be split into multiple `_test.go` files by concern (e.g. `foo_test.go` + `foo_edgecases_test.go`), but each split file's name MUST still be derived from the source file name, never from an individual function name. Prefer keeping a single `_test.go` file per source file even when it grows large — splitting adds navigation overhead and is rarely worth it; reach for the exception only when a single file becomes genuinely unwieldy to browse or review.
+
+Within a test file, order test functions to match the order their tested functions/methods appear in the source file. A reader (human or agent) scrolling `foo.go` alongside `foo_test.go` can then find the matching test by position instead of searching; drift between the two orderings compounds every time either file grows.
 
 ### Naming Conventions
 

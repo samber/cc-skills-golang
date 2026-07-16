@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.2.5"
+  version: "1.2.6"
   openclaw:
     emoji: "📊"
     homepage: https://github.com/samber/cc-skills-golang
@@ -36,6 +36,12 @@ Performance improvement does not exist without measures — if you can measure i
 This skill covers the full measurement workflow: write a benchmark, run it, profile the result, compare before/after with statistical rigor, and track regressions in CI. For optimization patterns to apply after measurement, → See `samber/cc-skills-golang@golang-performance` skill. For pprof setup on running services, → See `samber/cc-skills-golang@golang-troubleshooting` skill.
 
 ## Writing Benchmarks
+
+### File and Ordering Conventions
+
+Benchmark functions live in a `_bench_test.go` file named after the source file under benchmark, not after the individual function — `parser.go` -> `parser_bench_test.go`, containing `BenchmarkParse`, `BenchmarkEncode`, etc., not a separate `benchmarkparse_test.go` per function. Keeping benchmarks in their own file (instead of mixed into `parser_test.go`) lets `go test -run . -short` skip the package's regular test run without also compiling benchmark-only fixtures, and keeps `go test -bench=. ./pkg/parser` output free of unrelated `Test*` noise. The file still follows Go's one-test-file-per-source-file convention (→ See `samber/cc-skills-golang@golang-testing` skill), just with the `_bench` suffix marking its narrower purpose.
+
+Order `Benchmark*` functions inside `parser_bench_test.go` to mirror the order of the functions/methods they measure in `parser.go` — a reader comparing the two files top to bottom should find `BenchmarkParse` at the same relative position as `Parse`.
 
 ### `b.Loop()` (Go 1.24+) — preferred
 
