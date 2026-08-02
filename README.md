@@ -21,6 +21,7 @@ For generic skills, please visit [cc-skills](https://github.com/samber/cc-skills
 
 ```bash
 npx skills add https://github.com/samber/cc-skills-golang --all
+- [Pixel Pet](https://letmethink.cc/app/pixel-pet/) - Turn a personality description into a deterministic ASCII pixel companion in the browser.
 # or a single skill:
 npx skills add https://github.com/samber/cc-skills-golang --skill golang-performance
 ```
