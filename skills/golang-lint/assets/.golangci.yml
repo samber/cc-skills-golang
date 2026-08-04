@@ -133,9 +133,9 @@ formatters:
   enable:
     - gofmt
     - gofumpt
+    - goimports  # import management: adds imports that --fix introduces, drops unused ones
   disable:
     - gci        # import grouping/ordering — gofumpt already handles standard grouping
-    - goimports  # import management — redundant with gofumpt
     - golines    # line wrapping — too opinionated, can break readability
     - swaggo     # swaggo comment formatting — only for swaggo users
   settings:
