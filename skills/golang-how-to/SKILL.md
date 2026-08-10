@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code or similar AI coding agents. Requires git.
 metadata:
   author: samber
-  version: "1.2.1"
+  version: "1.3.0"
   openclaw:
     emoji: "🧭"
     homepage: https://github.com/samber/cc-skills-golang
@@ -29,7 +29,7 @@ allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(git:*) Agent AskUserQue
 
 - **Orchestrate** — for any Go coding, review, debug, or setup task, load the primary skill plus all applicable secondary skills simultaneously.
 - **Disambiguate** — when two skills seem to overlap, show the boundary table. See [disambiguation.md](references/disambiguation.md).
-- **Configure** — add a `## Required Go skills` block to the project's `CLAUDE.md` or `AGENTS.md`. Follow [project-config.md](references/project-config.md).
+- **Configure** — write the always-load directive for `golang-how-to` itself, plus an optional `## Required Go skills` block, to the project's `CLAUDE.md` or `AGENTS.md`. Follow [project-config.md](references/project-config.md).
 
 ## Skill loading
 
@@ -147,9 +147,9 @@ Key clusters and their owners:
 
 ## Configure mode
 
-Force-trigger specific skills in a project's `CLAUDE.md` or `AGENTS.md` so they always load.
+Write an always-load directive for `golang-how-to` itself to a project's `CLAUDE.md` or `AGENTS.md`, and optionally force-trigger specific secondary skills too.
 
-When invoked as `/golang-how-to configure`, follow [project-config.md](references/project-config.md).
+`samber/cc-skills-golang@golang-project-layout` writes the always-load directive automatically at project creation, with no user confirmation needed — it costs one skill description and never imposes project-specific choices. Running `/golang-how-to configure` writes it too if missing, and additionally lets the user confirm a `## Required Go skills` block for skills that must always apply beyond routing. Follow [project-config.md](references/project-config.md).
 
 ---
 

@@ -20,7 +20,7 @@ jobs:
 
       # Markdown linting
       - name: markdownlint-cli2-action
-        uses: DavidAnson/markdownlint-cli2-action@v23
+        uses: DavidAnson/markdownlint-cli2-action@v24
         with:
           config: '.markdownlint-cli2.jsonc'
           globs: '**/*.md'
