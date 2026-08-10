@@ -134,6 +134,7 @@ formatters:
     - gofumpt    # superset of gofmt: applies gofmt's rules first, then its own
     - goimports  # import management: adds imports that --fix introduces, drops unused ones
   disable:
+    - gofmt
     - gci        # import grouping/ordering — gofumpt already handles standard grouping
     - golines    # line wrapping — too opinionated, can break readability
     - swaggo     # swaggo comment formatting — only for swaggo users
