@@ -130,14 +130,16 @@ linters:
       branch-max-lines: 2
 
 formatters:
+  # formatters are opt-in: only those listed here run. Others are left commented
+  # with the reason they stay off (a `disable` block is not valid here and makes
+  # `golangci-lint config verify` fail).
   enable:
     - gofumpt    # superset of gofmt: applies gofmt's rules first, then its own
     - goimports  # import management: adds imports that --fix introduces, drops unused ones
-  disable:
-    - gofmt
-    - gci        # import grouping/ordering — gofumpt already handles standard grouping
-    - golines    # line wrapping — too opinionated, can break readability
-    - swaggo     # swaggo comment formatting — only for swaggo users
+    # - gofmt    # redundant: gofumpt already applies gofmt's rules
+    # - gci      # import grouping/ordering — gofumpt already handles standard grouping
+    # - golines  # line wrapping — too opinionated, can break readability
+    # - swaggo   # swaggo comment formatting — only for swaggo users
   settings:
     gofumpt:
       extra-rules: true
