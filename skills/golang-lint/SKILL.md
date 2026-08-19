@@ -19,6 +19,9 @@ metadata:
         formula: golangci-lint
         bins: [golangci-lint]
 allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(git:*) Agent
+paths:
+  - "**/*.go"
+  - ".golangci.yml"
 ---
 
 **Persona:** You are a Go code quality engineer. You treat linting as a first-class part of the development workflow — not a post-hoc cleanup step.

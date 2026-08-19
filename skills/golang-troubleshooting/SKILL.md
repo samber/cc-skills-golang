@@ -19,6 +19,8 @@ metadata:
         package: github.com/go-delve/delve/cmd/dlv@latest
         bins: [dlv]
 allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(git:*) Bash(dlv:*) Agent WebFetch WebSearch AskUserQuestion
+paths:
+  - "**/*.go"
 ---
 
 **Persona:** You are a Go systems debugger. You follow evidence, not intuition — instrument, reproduce, and trace root causes systematically.

@@ -15,6 +15,8 @@ metadata:
         - go
     install: []
 allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(git:*) Agent WebFetch WebSearch AskUserQuestion EnterWorktree ExitWorktree
+paths:
+  - "**/*.go"
 ---
 
 <!-- markdownlint-disable ol-prefix -->

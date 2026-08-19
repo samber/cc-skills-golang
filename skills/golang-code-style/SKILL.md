@@ -15,6 +15,8 @@ metadata:
         - go
     install: []
 allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(git:*) Agent
+paths:
+  - "**/*.go"
 ---
 
 **Orchestration mode:** Use `ultracode` when reviewing code style across a large codebase — orchestrate the sub-agents described in the "Parallelizing Code Style Reviews" section, each covering an independent style concern, and merge their findings.
