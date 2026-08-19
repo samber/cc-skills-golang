@@ -75,8 +75,8 @@ If any answer is yes, the two rows are sequential. Only when every answer is no 
 The shape:
 
 1. Create a long-lived `refactor/<topic>` branch off `main`, and seed it with `// REFACTOR(step N): ...` markers for the plan itself — see Step 5.
-2. For each atomic change in the inventory, in the order established in Step 2, **dispatch it to a sub-agent via the `Agent` tool** rather than executing it directly in the orchestrating session. The sub-agent, scoped to a fresh worktree, does the work:
-   - Enter a fresh worktree with `EnterWorktree`.
+2. For each atomic change in the inventory, in the order established in Step 2, **dispatch it to a sub-agent** rather than executing it directly in the orchestrating session. The sub-agent, scoped to a fresh worktree, does the work:
+   - Enter a fresh, isolated worktree.
    - Create a branch for that one change, based on the current tip of `refactor/<topic>`.
    - Apply the single change — and nothing else. If the inventory row is turning out larger than **~100–500 lines**, that's a signal it's actually two rows: split it before it grows into a diff nobody can review in one sitting.
    - Verify: `go build ./... && go vet ./... && go test ./...` (add `-race` or `benchstat`-backed `-bench` per the Risk Stratification table in `SKILL.md`).
