@@ -3,7 +3,7 @@
 ## Table of contents
 
 - [Starting the server](#starting-the-server)
-- [Registering with Claude Code](#registering-with-claude-code)
+- [Registering the MCP server](#registering-the-mcp-server)
 - [MCP tools](#mcp-tools)
 - [The native `LSP` tool](#the-native-lsp-tool)
 - [What the MCP server can and cannot do](#what-the-mcp-server-can-and-cannot-do)
@@ -18,11 +18,15 @@ gopls mcp
 
 Only sees files as they exist **on disk** — an edit made through a different tool but not yet saved is invisible to it. This is the right mode for an agent-only workflow with no attached editor.
 
-## Registering with Claude Code
+## Registering the MCP server
+
+The underlying command that starts the server (`gopls mcp`) is harness-agnostic — any MCP-capable host can point at it. Claude Code registers it via its own CLI:
 
 ```bash
 claude mcp add gopls -- gopls mcp
 ```
+
+Other MCP-capable harnesses (Cursor, Windsurf, and others) each have their own MCP server registration — an entry in their respective settings file pointing at `gopls mcp` as the launch command, not a shared config format.
 
 ## MCP tools
 
