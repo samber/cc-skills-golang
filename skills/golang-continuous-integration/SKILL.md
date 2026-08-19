@@ -225,6 +225,8 @@ Add AI agents as PR reviewers alongside traditional static analysis. When loaded
 
 > **Cost note:** AI review agents run concurrently per PR. For cost control, remove jobs you don't need or raise the PR trigger filter to specific branches only.
 
+Each subsection below is a generated artifact targeting one specific reviewer — the linked asset file runs on a CI runner, not the developer's local harness, so its tool names and permission flags are deliberately literal rather than capability prose.
+
 ### Claude Code
 
 `.github/workflows/ai-review.yml` — see [claude-code-review.yml](./assets/claude-code-review.yml)
