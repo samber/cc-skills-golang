@@ -5,7 +5,7 @@
 
 ## 1. The Planning Gate (mandatory, before any edit)
 
-**Thinking mode:** use `ultrathink` here. A wrong ordering call does not surface as an obviously wrong plan — it surfaces later as a broken build or a conflict-riddled merge, once several PRs are already in flight. Getting the sequencing right up front is cheaper than untangling it after the fact.
+**Thinking mode:** reason as thoroughly as possible here — on Claude Code, use `ultrathink` to trigger extended thinking explicitly. A wrong ordering call does not surface as an obviously wrong plan — it surfaces later as a broken build or a conflict-riddled merge, once several PRs are already in flight. Getting the sequencing right up front is cheaper than untangling it after the fact.
 
 - Before touching a single line of code, map the blast radius with gopls:
   - find every reference to the symbols you intend to change

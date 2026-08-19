@@ -189,7 +189,7 @@ func Transform[T any, U any](slice []T, fn func(T) U) []U {
 
 ### Playground Links
 
-Add a `Play:` line linking to a runnable Go Playground example of a public library. Use the samber/go-playground-mcp tool to create and share playground URLs when available:
+Add a `Play:` line linking to a runnable Go Playground example of a public library. Use a Go Playground integration to create and share playground URLs when one is available:
 
 ```go
 // Map applies a function to each element of a slice.

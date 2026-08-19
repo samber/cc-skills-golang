@@ -31,7 +31,7 @@ allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(git:*) Agent AskUserQue
 
 **Questions:** In Configure mode, ask the user through the environment's question tool — never as plain-text prose. One question at a time, wait for the answer. If the environment has no question tool, ask in prose with the same options.
 
-**Dependencies:** `gopls` — `go install golang.org/x/tools/gopls@latest`; the built-in `LSP` tool also needs `ENABLE_LSP_TOOL=1` and a Go language server wired (see [Code navigation with gopls](#code-navigation-with-gopls)).
+**Dependencies:** `gopls` — `go install golang.org/x/tools/gopls@latest`; Claude Code's built-in `LSP` tool also needs `ENABLE_LSP_TOOL=1` and a Go language server wired (see [Code navigation with gopls](#code-navigation-with-gopls)).
 
 ## Skill loading
 

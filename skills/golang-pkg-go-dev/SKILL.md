@@ -52,7 +52,7 @@ go install github.com/samber/godig/cmd/godig@latest
 
 ### Register the MCP server (optional)
 
-`godig mcp` runs over **stdio** by default, or **streamable HTTP** with `--transport http`.
+`godig mcp` runs over **stdio** by default, or **streamable HTTP** with `--transport http`. The command is harness-agnostic — any MCP-capable host can point at it. Claude Code registers it via its own CLI:
 
 stdio (the client launches godig on demand):
 
@@ -72,6 +72,8 @@ Hosted instance (no install needed) — a public server runs at `https://godig.s
 ```bash
 claude mcp add --transport http pkg-go-dev https://godig.samber.dev/mcp
 ```
+
+Other MCP-capable harnesses (Cursor, Windsurf, and others) each have their own MCP server registration — an entry in their respective settings file pointing at the same `godig mcp` command or hosted URL, not a shared config format.
 
 The CLI and the MCP server expose the **same** operations under matching names. Prefer the CLI when `godig` is installed; the hosted instance is a fallback when it is not.
 

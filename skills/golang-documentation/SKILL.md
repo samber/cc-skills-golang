@@ -174,7 +174,7 @@ For the full README guidance and application-specific sections, see [Project Doc
 
 For Go libraries, add these on top of the basics:
 
-- **Go Playground demos** — create runnable demos and link them in doc comments with `// Play: https://go.dev/play/p/xxx`. Use the go-playground MCP tool when available to create and share playground URLs.
+- **Go Playground demos** — create runnable demos and link them in doc comments with `// Play: https://go.dev/play/p/xxx`. Use a Go Playground integration when one is available to create and share playground URLs.
 - **Example test functions** — write `func ExampleXxx()` in `_test.go` files. These are executable documentation verified by `go test`.
 - **Generous code examples** — include multiple examples in doc comments showing common use cases.
 - **godoc** — your doc comments render on [pkg.go.dev](https://pkg.go.dev). Use `go doc` locally to preview; to inspect how a published package renders its docs, symbols, and examples, → See `samber/cc-skills-golang@golang-pkg-go-dev` skill.

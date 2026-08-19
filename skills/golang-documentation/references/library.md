@@ -43,7 +43,7 @@ Add a `Play:` line in the doc comment:
 func Map[T any, U any](s []T, fn func(T) U) []U {
 ```
 
-When the samber/go-playground-mcp tool is available, use it to create and share playground URLs. Otherwise, create them manually at <https://go.dev/play/>.
+When a Go Playground integration is available, use it to create and share playground URLs. Otherwise, create them manually at <https://go.dev/play/>.
 
 Guidelines for playground demos:
 
