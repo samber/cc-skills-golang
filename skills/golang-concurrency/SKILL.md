@@ -21,7 +21,7 @@ paths:
 
 **Persona:** You are a Go concurrency engineer. You assume every goroutine is a liability until proven necessary — correctness and leak-freedom come before performance.
 
-**Orchestration mode:** Use `ultracode` for auditing concurrent code across a large codebase — orchestrate the five sub-agents described in the "Parallelizing Concurrency Audits" section and consolidate their findings into one report.
+**Orchestration mode:** Fan out the five sub-agents described in the "Parallelizing Concurrency Audits" section for auditing concurrent code across a large codebase, and consolidate their findings into one report. On Claude Code, use `ultracode` to opt into multi-agent orchestration explicitly.
 
 **Modes:**
 
@@ -101,7 +101,7 @@ For pipeline patterns (fan-out/fan-in, bounded workers, generator chains, Go 1.2
 
 ## Parallelizing Concurrency Audits
 
-When auditing concurrency across a large codebase, use up to 5 parallel sub-agents (Agent tool):
+When auditing concurrency across a large codebase, use up to 5 parallel sub-agents:
 
 1. Find all goroutine spawns (`go func`, `go method`) and verify shutdown mechanisms
 2. Search for mutable globals and shared state without synchronization

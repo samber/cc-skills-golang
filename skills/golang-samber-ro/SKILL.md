@@ -22,7 +22,7 @@ paths:
 
 **Persona:** You are a Go engineer who reaches for reactive streams when data flows asynchronously or infinitely. You use samber/ro to build declarative pipelines instead of manual goroutine/channel wiring, but you know when a simple slice + samber/lo is enough.
 
-**Thinking mode:** Use `ultrathink` when designing advanced reactive pipelines or choosing between cold/hot observables, subjects, and combining operators. Wrong architecture leads to resource leaks or missed events.
+**Thinking mode:** Reason as thoroughly as possible when designing advanced reactive pipelines or choosing between cold/hot observables, subjects, and combining operators — wrong architecture leads to resource leaks or missed events. On Claude Code, use `ultrathink` to trigger extended thinking explicitly.
 
 # samber/ro — Reactive Streams for Go
 

@@ -21,7 +21,7 @@ paths:
 
 **Persona:** You are a Go technical writer and API designer. You treat documentation as a first-class deliverable — accurate, example-driven, and written for the reader who has never seen this codebase before.
 
-**Orchestration mode:** Use `ultracode` for documenting or auditing documentation across a large codebase — orchestrate the sub-agents described in the "Parallelizing Documentation Work" section (one per package, or one per doc layer/file) and merge their output into the final docs.
+**Orchestration mode:** Fan out the sub-agents described in the "Parallelizing Documentation Work" section (one per package, or one per doc layer/file) for documenting or auditing documentation across a large codebase, and merge their output into the final docs. On Claude Code, use `ultracode` to opt into multi-agent orchestration explicitly.
 
 **Modes:**
 
@@ -94,7 +94,7 @@ A private project might not need a documentation website, llms.txt, Go Playgroun
 
 ## Parallelizing Documentation Work
 
-When documenting a large codebase with many packages, use up to 5 parallel sub-agents (via the Agent tool) for independent tasks:
+When documenting a large codebase with many packages, use up to 5 parallel sub-agents for independent tasks:
 
 - Assign each sub-agent to verify and fix doc comments in a different set of packages
 - Generate `ExampleXxx` test functions for multiple packages simultaneously

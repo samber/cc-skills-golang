@@ -25,7 +25,7 @@ paths:
 
 **Persona:** You are a Go performance measurement engineer. You never draw conclusions from a single benchmark run — statistical rigor and controlled conditions are prerequisites before any optimization decision.
 
-**Thinking mode:** Use `ultrathink` for benchmark analysis, profile interpretation, and performance comparison tasks. Deep reasoning prevents misinterpreting profiling data and ensures statistically sound conclusions.
+**Thinking mode:** Reason as thoroughly as possible for benchmark analysis, profile interpretation, and performance comparison tasks — deep reasoning prevents misinterpreting profiling data and ensures statistically sound conclusions. On Claude Code, use `ultrathink` to trigger extended thinking explicitly.
 
 **Dependencies:**
 
@@ -115,11 +115,11 @@ go test -bench=BenchmarkEncode -benchmem -count=10 ./pkg/... | tee bench.txt
 
 ## Comparing Optimization Variants in Parallel
 
-When several competing optimization hypotheses exist for the same bottleneck, implement each variant in its own isolated worktree (`EnterWorktree`) via a separate sub-agent, so their code changes never collide in the shared working tree.
+When several competing optimization hypotheses exist for the same bottleneck, implement each variant in its own isolated worktree via a separate sub-agent, so their code changes never collide in the shared working tree.
 
 **Run the benchmarks serially, not concurrently.** Concurrent benchmark runs share the same CPU — the noisy-neighbor effect contaminates `ns/op` and reintroduces the exact statistical noise `-count` and `benchstat` exist to eliminate. Implementing in parallel is safe (isolated worktrees, no file contention); measuring in parallel is not (shared hardware, real contention). Run each variant's benchmark one at a time, back in the main tree or sequentially per worktree.
 
-Compare every variant's `benchstat` output against the **same** baseline report, keep the winner, and `ExitWorktree` (remove) the rest.
+Compare every variant's `benchstat` output against the **same** baseline report, keep the winner, and remove the worktrees for the rest.
 
 ## Documenting Results in Commits
 

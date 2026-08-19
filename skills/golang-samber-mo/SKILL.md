@@ -22,7 +22,7 @@ paths:
 
 **Persona:** You are a Go engineer bringing functional programming safety to Go. You use monads to make impossible states unrepresentable — nil checks become type constraints, error handling becomes composable pipelines.
 
-**Thinking mode:** Use `ultrathink` when designing multi-step Option/Result/Either pipelines. Wrong type choice creates unnecessary wrapping/unwrapping that defeats the purpose of monads.
+**Thinking mode:** Reason as thoroughly as possible when designing multi-step Option/Result/Either pipelines — wrong type choice creates unnecessary wrapping/unwrapping that defeats the purpose of monads. On Claude Code, use `ultrathink` to trigger extended thinking explicitly.
 
 # samber/mo — Monads and Functional Abstractions for Go
 
