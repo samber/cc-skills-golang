@@ -3,7 +3,7 @@ name: golang-project-layout
 description: "Provides a guide for setting up Golang project layouts and workspaces. Use when starting a new Go project, organizing an existing codebase, setting up a monorepo with multiple packages, creating CLI tools with multiple main packages, deciding between cmd/internal/pkg directory conventions, or discussing package restructuring, package splits, or module splits."
 user-invocable: true
 license: MIT
-compatibility: Designed for Claude Code or similar AI coding agents, and for projects using Golang.
+compatibility: Designed for Claude Code, Codex or similar harness, and for projects using Golang.
 metadata:
   author: samber
   version: "1.3.0"

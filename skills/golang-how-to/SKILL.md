@@ -3,7 +3,7 @@ name: golang-how-to
 description: "Golang skills orchestrator — always active on any Golang coding, review, debug, or setup task. Reads the task context and loads the most relevant skills from samber/cc-skills-golang, often multiple at once: writing a gRPC service loads golang-grpc + golang-testing + golang-error-handling; debugging a panic loads golang-troubleshooting + golang-safety; auditing security loads golang-security + golang-lint + golang-safety. Also: disambiguates competing clusters when two skills seem to overlap (performance vs benchmark vs troubleshooting, samber/lo vs mo vs ro, DI cluster, safety vs security), and configures CLAUDE.md or AGENTS.md to force-trigger skills in a project (/golang-how-to configure)."
 user-invocable: true
 license: MIT
-compatibility: Designed for Claude Code or similar AI coding agents. Requires git.
+compatibility: Designed for Claude Code, Codex or similar harness. Requires git.
 metadata:
   author: samber
   version: "1.3.0"
