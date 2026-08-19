@@ -31,10 +31,14 @@ New skills go in `skills/<skill-name>/SKILL.md`. Each SKILL.md has YAML frontmat
 | `name` | Spec-required | 1-64 chars. Lowercase `a-z`, digits, hyphens. No leading/trailing/consecutive hyphens. **Must match parent directory name.** |
 | `description` | Spec-required | 1-1024 chars. Describes what the skill does **and when to use it** — this is the primary triggering mechanism. Be specific and slightly "pushy" to avoid under-triggering. |
 | `license` | Project-required | License name or reference to a bundled license file. Use `MIT` for this project. |
-| `compatibility` | Project-required | 1-500 chars. Describe actual requirements. Base: `Designed for Claude Code or similar AI coding agents.` Extend when needed: add `Requires git`, `Requires internet access`, `Requires Python 3.14+ and uv`, etc. Skills with no special requirements use the base string only. |
-| `metadata` | Project-required | Must include `author` (string), `version` (semver `a.b.c` string, e.g. `"1.0.0"`), and `openclaw` (object — see below). |
+| `compatibility` | Project-required | 1-500 chars. Describe actual requirements as **capabilities, never tool names** — `Requires internet access`, not `Requires WebSearch`; the capability holds on every harness, the tool name only on Claude Code. Base: `Designed for Claude Code, Codex or similar harness.` Extend when needed: add `Requires git`, `Requires internet access`, `Requires Python 3.14+ and uv`, etc. Skills with no special requirements use the base string only. |
+| `metadata` | Project-required | Must include `author` (string), `version` (semver `a.b.c` string, e.g. `"1.0.0"`), and `openclaw` (object — see below). Caution: some harnesses (e.g. OpenCode) parse `metadata` as a flat string→string map and may not preserve the nested `openclaw` object — don't assume every field survives outside Claude Code. |
 | `user-invocable` | Project-required | Boolean. `true` for skills invocable as slash commands (e.g. `/golang-security`), `false` (default) for contextual skills that auto-trigger. |
 | `allowed-tools` | Project-required | Space-delimited list of pre-approved tools. See "Allowed tools" below. |
+| `paths` | Optional | Glob(s) scoping the skill to specific files/directories (e.g. `**/*.go`). Recognized by Cursor only — a no-op elsewhere. Add it for skills tied to Go source files to sharpen triggering there; skip it for skills with no natural file-type scope (setup, CI, ecosystem-lookup skills). |
+| `dependencies` | Optional, experimental | List of `owner/repo@skill` identifiers this skill should always load alongside. Formalizes an existing `→ See` cross-reference as a machine-enforced co-load instead of prose the model might skip. Currently recognized by Antigravity only (third-party-documented, not yet confirmed in Google's official docs) — verify before relying on it, and keep the prose `→ See` reference regardless since it's what every other harness actually reads. |
+
+Do not add a `turbo_safe`-style field (seen on Antigravity, marks a skill safe for unattended execution) — it conflicts with this project's confirm-before-risky-action policy. The same restriction applies to any harness-specific equivalent, e.g. Mistral Vibe's per-tool `permission = "always"` in generated agent configs (`.vibe/agents/*.toml`) — default write/shell/exec permissions to `"ask"`, not `"always"`, even when the harness makes unattended execution easy to opt into.
 
 ### ClawHub metadata (`metadata.openclaw`)
 
@@ -56,7 +60,7 @@ name: golang-example
 description: "Golang skill for X. Use when doing Y."
 user-invocable: false
 license: MIT
-compatibility: Designed for Claude Code or similar AI coding agents. Requires go compiler and git.
+compatibility: Designed for Claude Code, Codex or similar harness. Requires go compiler and git.
 metadata:
   author: samber
   version: "1.0.0"
@@ -160,6 +164,32 @@ Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(git:*) Agent
 
 When creating a new skill, suggest a tailored `allowed-tools` list based on the skill's purpose.
 
+### Tool names belong in frontmatter, not in the body
+
+These names are declared here, in `allowed-tools`, and nowhere else. **Skill body prose names capabilities, never tool identifiers.** `allowed-tools` is the machine-readable declaration each harness resolves to its own tool set (Claude Code's `Agent` is Codex's Task tool is Cursor's subagent is Gemini CLI's subagent, all under different names) — restating a Claude Code tool name in prose is redundant where it works and breaks where it doesn't. This is the same discipline the "Snyk agent scanner compliance" section already applies to MCP function names to avoid Snyk's prompt-injection rule; it now applies to every tool.
+
+| Capability | Write in the body | Never write | Declare in `allowed-tools` |
+| --- | --- | --- | --- |
+| Asking the user | "the question tool" / "ask the user" | `AskUserQuestion` | `AskUserQuestion` |
+| Parallel work | "spawn N parallel sub-agents" | "the Agent tool", "the Task tool" | `Agent` |
+| Web access | "web search", "fetch the page" | `WebSearch`, `WebFetch` | `WebFetch WebSearch` |
+| File I/O | "read/write the file" | "the Read tool", "the Write tool", `Glob`, `Edit` | `Read Edit Write Glob` |
+| Isolated workspace | "an isolated worktree" | "`EnterWorktree`" as an instruction | `EnterWorktree ExitWorktree` |
+
+Two exceptions:
+
+- **Generated artifacts.** A fenced block or `assets/` file the skill writes to disk as a harness-specific file (e.g. a Claude Code GitHub Action workflow, a Copilot instructions file, an MCP registration command) is allowed to name real tools — genericizing the artifact's content would produce a broken file. Label the block with the harness it targets and, where feasible, note the equivalent for other harnesses.
+- **`Bash(cmd:*)`-style scoping** in `allowed-tools` only has effect on Claude Code. Cursor, Copilot CLI, OpenCode, and Antigravity each use a different permission syntax in a separate settings/permissions file, not in SKILL.md — treat this scoping as documentation for Claude Code, not a portable guarantee.
+
+Before committing, grep skill bodies for leftover hardcoded names:
+
+```bash
+grep -rn 'AskUserQuestion\|WebSearch\|WebFetch\|Agent tool\|Task tool\|`Glob`\|`Edit`\|`Read` tool\|`Write` tool\|EnterWorktree\|ExitWorktree' \
+  skills/*/SKILL.md skills/*/references/
+```
+
+Expected hits: `allowed-tools:` lines and labeled generated-artifact blocks only.
+
 ## Skill Body
 
 The body contains step-by-step instructions. Use secondary markdown files in `references/` for depth (referenced via relative links like `[Details](references/details.md)`). Keep file references one level deep from SKILL.md — avoid deeply nested reference chains.
@@ -188,12 +218,13 @@ Place these directives at the very top of the body, before the first heading, in
 | Directive | Required | Format | When to include |
 | --- | --- | --- | --- |
 | **Persona** | Optional | `**Persona:** You are a <role>. <mindset or goal>.` | Analytical/generative/multi-mode skills |
-| **Thinking mode** | Optional | `**Thinking mode:** Use \`ultrathink\` for <task>. <Why deep reasoning matters>.` | Deep analysis: profiling, security auditing, root cause analysis |
-| **Orchestration mode** | Optional | `**Orchestration mode:** Use \`ultracode\` for <task>. <Why fan-out orchestration helps here>.` | Skills with a parallel fan-out audit/scan/cleanup mode (up to N sub-agents) |
+| **Thinking mode** | Optional | `**Thinking mode:** Reason as thoroughly as possible for <task> — <why deep reasoning matters>. On Claude Code, use \`ultrathink\` to trigger extended thinking explicitly.` | Deep analysis: profiling, security auditing, root cause analysis |
+| **Orchestration mode** | Optional | `**Orchestration mode:** Fan out N parallel sub-agents for <task> — <why fan-out orchestration helps here>. On Claude Code, use \`ultracode\` to opt into multi-agent orchestration explicitly.` | Skills with a parallel fan-out audit/scan/cleanup mode (up to N sub-agents) |
 | **Modes** | Optional | `**Modes:**` section listing each invocation mode and its sub-agent strategy | Skills invoked in distinct contexts (audit, coding, review, code understanding...) |
+| **Questions** | Optional | `**Questions:** Ask the user through the environment's question tool — never as plain-text prose. One question at a time, 2–4 tappable options, wait for the answer. If the environment has no question tool, ask in prose with the same options, one at a time.` | Interactive skills that ask the user more than twice. Declare once here; downstream mentions drop the tool name and just say "ask the user" — repeating the full clause at every question dilutes it into boilerplate and burns the token budget. Reserve up to 3 re-assertions of "ask via the question tool" for steps where a skipped or wrong answer is destructive or irreversible. |
 | **Dependencies** | Optional | `**Dependencies:**` list of required binaries with install commands | Skills that require external tools beyond `go` (e.g. `benchstat`, `dlv`, `golangci-lint`) |
 
-All five are optional. A short procedural skill may have none. A complex orchestrating skill may have all five.
+All six are optional. A short procedural skill may have none. A complex orchestrating skill may have all six.
 
 The **Dependencies** block lists only non-trivial developer tools — skip universal system utilities (e.g. `curl`, `git`). Prefer `go install` over `brew install` when the tool provides a Go install path; use `brew install` only for tools without one (e.g. `protoc`). Place this block last among the top-of-body directives, just before the first `#` heading.
 
@@ -262,27 +293,31 @@ Sub-agents can be used in three complementary ways:
 
 **Write / generate mode** — follow the skill's sequential instructions unless background agents are explicitly used for non-blocking analysis.
 
-### Ultrathink policy
+### Advanced thinking mode policy
 
-Skills that require deep analytical reasoning (profiling interpretation, root cause analysis, security auditing) include a **Thinking mode:** `ultrathink` instruction in their SKILL.md body. When you encounter this instruction, activate maximum extended thinking — these tasks punish shallow reasoning with wrong conclusions.
+Skills that require deep analytical reasoning (profiling interpretation, root cause analysis, security auditing) include a **Thinking mode:** instruction in their SKILL.md body. When you encounter this instruction, reason as thoroughly as the task warrants — these tasks punish shallow reasoning with wrong conclusions. On Claude Code, `ultrathink` is the explicit trigger for maximum extended thinking; treat it as the mechanism, not the instruction.
 
 When creating or modifying a skill that involves deep analysis, profiling, debugging methodology, or security auditing, add this line in the top-of-body directives block, after **Persona** (if present) and before the first heading:
 
 ```
-**Thinking mode:** Use `ultrathink` for <task description>. <Why deep reasoning matters for this skill>.
+**Thinking mode:** Reason as thoroughly as possible for <task description> — <why deep reasoning matters for this skill>. On Claude Code, use `ultrathink` to trigger extended thinking explicitly.
 ```
 
-Update the README.md Ultrathink column (🧠 emoji) to keep track of skills requiring ultrathink mode.
+Lead with the reasoning instruction in plain language, since that's what every harness actually acts on — a model told to "reason as thoroughly as possible" does so regardless of vendor. `ultrathink` is a Claude Code-specific accelerator layered on top, not the instruction itself; mentioning it after the fact costs one clause and loses nothing elsewhere.
+
+Update the README.md Ultrathink column (🧠 emoji) to keep track of skills requiring this mode.
 
 ### Ultracode policy
 
-Skills that already describe a full-codebase audit/scan/cleanup mode with several parallel sub-agents (e.g. "launch up to 5 parallel sub-agents") include an **Orchestration mode:** `ultracode` instruction in their SKILL.md body. When you encounter this instruction and the user is requesting a broad, codebase-wide sweep, escalate to multi-agent fan-out orchestration instead of a single sequential pass.
+Skills that already describe a full-codebase audit/scan/cleanup mode with several parallel sub-agents (e.g. "launch up to 5 parallel sub-agents") include an **Orchestration mode:** instruction in their SKILL.md body. When you encounter this instruction and the user is requesting a broad, codebase-wide sweep, escalate to multi-agent fan-out orchestration instead of a single sequential pass. On Claude Code, `ultracode` is the explicit trigger for this; treat it as the mechanism, not the instruction.
 
 When creating or modifying a skill whose audit/scan/cleanup mode already fans out to parallel sub-agents, add this line in the top-of-body directives block, after **Thinking mode** (if present, otherwise after **Persona**) and before **Modes**:
 
 ```
-**Orchestration mode:** Use `ultracode` for <full-codebase audit/scan/cleanup task>. <Why fan-out orchestration helps here>.
+**Orchestration mode:** Fan out N parallel sub-agents for <full-codebase audit/scan/cleanup task> — <why fan-out orchestration helps here>. On Claude Code, use `ultracode` to opt into multi-agent orchestration explicitly.
 ```
+
+Same principle as Thinking mode: lead with "fan out N parallel sub-agents," which every researched harness supports under its own delegation mechanism (→ See "Tool names belong in frontmatter, not in the body" under Allowed Tools) — `ultracode` is Claude Code's explicit opt-in for it, mentioned second, not the whole instruction.
 
 Update the README.md Ultracode column (🤖 emoji) to keep track of skills requiring ultracode mode.
 
@@ -358,7 +393,7 @@ Some skills are community defaults, not mandates. They include a note at the top
 
 > This skill supersedes `samber/cc-skills-golang@<skill-name>` skill for [company] projects.
 
-The override is skill-specific: your company skill must name each generic skill it supersedes. Plugin-wide override (`samber/cc-skills-golang`) is not supported — be explicit. The README skills table (Override column) lists which skills support this.
+The override is skill-specific: your company skill must name each generic skill it supersedes. Plugin-wide override (`samber/cc-skills-golang`) is not supported — be explicit. The README skills table marks overridable skills with the ⚙️ flag.
 
 ### Cross-skill references
 
@@ -384,11 +419,15 @@ Always use the fully-qualified `owner/repo@skill` form in backticks, even for re
 
 ### Large repository research
 
-When a skill requires broad codebase understanding (e.g. migration, refactoring, architecture review), it SHOULD recommend using parallel sub-agents (up to 5) via the Agent tool to explore different areas of the repository simultaneously. Each sub-agent should target a distinct search scope (e.g. different packages, file patterns, or concerns). This dramatically reduces research time on large codebases.
+When a skill requires broad codebase understanding (e.g. migration, refactoring, architecture review), it SHOULD recommend spawning up to 5 parallel sub-agents to explore different areas of the repository simultaneously. Each sub-agent should target a distinct search scope (e.g. different packages, file patterns, or concerns). This dramatically reduces research time on large codebases.
 
 ## Writing Guidelines
 
 When editing skill files, fix grammar mistakes if you find some.
+
+### Write for every harness by default
+
+Skills ship to Claude Code, Codex, Gemini CLI, Cursor, Copilot, and OpenCode (see the README install instructions). This is not a special mode to opt into — it's the default posture for every skill body, the same way "Avoid duplicating linter rules" and "Teach reasoning, not only rules" below are defaults, not checklist items to remember on request. Concretely: name capabilities in prose, name tools only in `allowed-tools` (see "Tool names belong in frontmatter, not in the body" under Allowed Tools).
 
 ### Avoid duplicating linter rules
 
@@ -573,15 +612,17 @@ After making changes, suggest the following as next steps for the developer to r
 > **If the skill's scope changed** (new topic added, topic moved to another skill) **or if a skill was added/removed**: update `skills/golang-how-to/SKILL.md` — the skill loading table and the competing clusters section must reflect the current state of the plugin.
 
 1. ~~Validate against the spec: `skills-ref validate ./skills/{name}`~~ (disabled — [skills-ref doesn't support `user-invocable` yet](https://github.com/agentskills/agentskills/issues/105))
-2. Reformat markdowns with `npx prettier --write *.md "**/*.md"` then lint with `markdownlint-cli2 --config .markdownlint-cli2.jsonc ./` — run before measuring tokens, as formatting changes token counts 2b. Run `SNYK_TOKEN=<token> uvx snyk-agent-scan@latest skills/<name>/` and fix any W011/W012/W001 warnings before proceeding (see [Snyk agent scanner compliance](#snyk-agent-scanner-compliance))
-3. Measure token counts:
+2. Run the portability grep from "Tool names belong in frontmatter, not in the body" (under Allowed Tools) against the changed skill(s). Fix any hit that isn't an `allowed-tools:` line or a labeled generated-artifact block.
+3. Reformat markdowns with `npx prettier --write *.md "**/*.md"` then lint with `markdownlint-cli2 --config .markdownlint-cli2.jsonc ./` — run before measuring tokens, as formatting changes token counts
+4. Run `SNYK_TOKEN=<token> uvx snyk-agent-scan@latest skills/<name>/` and fix any W011/W012/W001 warnings before proceeding (see [Snyk agent scanner compliance](#snyk-agent-scanner-compliance))
+5. Measure token counts:
    - **Description (tok)**: `awk 'NR==1 && /^---$/{found=1; next} found && /^---$/{exit} found && /^description:/{print}' skills/{name}/SKILL.md | tiktoken-cli`
    - **SKILL.md (tok)**: `tiktoken-cli skills/{name}/SKILL.md`
    - **Directory (tok)**: `tiktoken-cli --exclude "evals" skills/{name}/` (exclude `evals/` subdirectory)
-4. Update the README.md table with the measured token counts, update the total rows, and update the **Error rate gap** column (`Without - With`, expressed as a negative percentage, e.g. `-39%`)
-5. Increment `metadata.version` in the changed SKILL.md and the plugin version in `.claude-plugin/plugin.json`, `.cursor-plugin/plugin.json` and `gemini-extension.json` — all three plugin files MUST have the same version
-6. Run skill evaluation via `/skill-creator`: 10+ evals, run them with and without the skill via parallel subagents, grade with LLM-as-judge (no human in the loop), print results, suggest improvements if needed, and append/update the report to `EVALUATIONS.md` following the format in [Evaluation Reporting](#evaluation-reporting)
-7. Depending on evaluation final report, suggest improvements and loop
+6. Update the README.md table with the measured token counts, update the total rows, and update the **Error rate gap** column (`Without - With`, expressed as a negative percentage, e.g. `-39%`)
+7. Increment `metadata.version` in the changed SKILL.md and the plugin version in `.claude-plugin/plugin.json`, `.cursor-plugin/plugin.json` and `gemini-extension.json` — all three plugin files MUST have the same version
+8. Run skill evaluation via `/skill-creator`: 10+ evals, run them with and without the skill via parallel subagents, grade with LLM-as-judge (no human in the loop), print results, suggest improvements if needed, and append/update the report to `EVALUATIONS.md` following the format in [Evaluation Reporting](#evaluation-reporting)
+9. Depending on evaluation final report, suggest improvements and loop
 
 For initial evaluation of skills, use Human-as-Judge.
 
@@ -589,7 +630,7 @@ For initial evaluation of skills, use Human-as-Judge.
 
 After writing a new skill body, run the description optimization loop before marking it ready:
 
-1. Check whether any existing skill should reference the new skill: dispatch parallel sub-agents (via the Agent tool, split by scope — e.g. one per group of `skills/*/SKILL.md`) to read the other skills in full and judge whether the new skill's topic, adjacent concepts, or libraries overlap with what they already cover. Where an existing skill touches the same ground, add a `→ See samber/cc-skills-golang@<new-skill>` cross-reference (in its description and/or body) instead of leaving the two skills to drift apart — see [Atomic skills and deduplication](#atomic-skills-and-deduplication). Bump the `metadata.version` of every skill file edited this way.
+1. Check whether any existing skill should reference the new skill: dispatch parallel sub-agents (split by scope — e.g. one per group of `skills/*/SKILL.md`) to read the other skills in full and judge whether the new skill's topic, adjacent concepts, or libraries overlap with what they already cover. Where an existing skill touches the same ground, add a `→ See samber/cc-skills-golang@<new-skill>` cross-reference (in its description and/or body) instead of leaving the two skills to drift apart — see [Atomic skills and deduplication](#atomic-skills-and-deduplication). Bump the `metadata.version` of every skill file edited this way.
 2. Verify the description against quality criteria: contains "Golang", has "Use when"/"Apply when" trigger clause with specific scenarios, no broad anti-patterns (`whenever writing Go code`, `Essential for ANY`, `proactively`), FQN cross-refs for competing skills (`samber/cc-skills-golang@<skill>`), library skills use `Apply when the codebase imports github.com/...` pattern. Description must stay ≤ 1,000 characters.
 3. Follow the [After updating a skill](#after-updating-a-skill) checklist.
 
