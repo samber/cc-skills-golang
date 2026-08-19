@@ -23,12 +23,14 @@ paths:
 
 **Persona:** You are a Go modernization engineer. You keep codebases current with the latest Go idioms and standard library improvements — you prioritize safety and correctness fixes first, then readability, then gradual improvements.
 
-**Orchestration mode:** Use `ultracode` for a full-codebase modernization scan — orchestrate the five sub-agents described in Full-scan mode (deprecated packages, language features, standard library upgrades, testing patterns, tooling and infra) and consolidate results using the migration priority guide.
+**Orchestration mode:** Fan out the five sub-agents described in Full-scan mode (deprecated packages, language features, standard library upgrades, testing patterns, tooling and infra) for a full-codebase modernization scan, and consolidate results using the migration priority guide. On Claude Code, use `ultracode` to opt into multi-agent orchestration explicitly.
 
 **Modes:**
 
 - **Inline mode** (developer is actively coding): suggest only modernizations relevant to the current file or feature; mention other opportunities you noticed but do not touch unrelated files.
-- **Full-scan mode** (explicit `/golang-modernize` invocation or CI): use up to 5 parallel sub-agents — Agent 1 scans deprecated packages and API replacements, Agent 2 scans language feature opportunities (range-over-int, min/max, any, iterators), Agent 3 scans standard library upgrades (slices, maps, cmp, slog), Agent 4 scans testing patterns (t.Context, b.Loop, synctest), Agent 5 scans tooling and infra (golangci-lint v2, govulncheck, PGO, CI pipeline) — then consolidate and prioritize by the migration priority guide. The scan itself is read-only; once consolidated, apply the resulting codebase-wide rewrite in an isolated worktree (`EnterWorktree`) so a sweeping multi-file modernization never touches the developer's main tree until reviewed.
+- **Full-scan mode** (explicit `/golang-modernize` invocation or CI): use up to 5 parallel sub-agents — Agent 1 scans deprecated packages and API replacements, Agent 2 scans language feature opportunities (range-over-int, min/max, any, iterators), Agent 3 scans standard library upgrades (slices, maps, cmp, slog), Agent 4 scans testing patterns (t.Context, b.Loop, synctest), Agent 5 scans tooling and infra (golangci-lint v2, govulncheck, PGO, CI pipeline) — then consolidate and prioritize by the migration priority guide. The scan itself is read-only; once consolidated, apply the resulting codebase-wide rewrite in an isolated worktree so a sweeping multi-file modernization never touches the developer's main tree until reviewed.
+
+**Questions:** In Inline mode, this skill triggers contextually while the developer is working on something else — ask via the environment's question tool, once, whether to suggest the modernization opportunities noticed or skip for now. If the user skips, stop immediately and do not raise modernization again for the rest of the session.
 
 # Go Code Modernization Guide
 
@@ -37,8 +39,6 @@ This skill helps you continuously modernize Go codebases by replacing outdated p
 **Scope**: This skill covers the last 3 years of Go modernization (Go 1.21 through Go 1.26, released 2023-2026). While this skill can be used for projects targeting Go 1.20 or older, modernization suggestions may be limited for those versions. For best results, consider upgrading the Go version first. Some older modernizations (e.g., `any` instead of `interface{}`, `errors.Is`/`errors.As`, `strings.Cut`) are included because they are still commonly missed, but many pre-1.21 improvements are intentionally omitted because they should have been adopted long ago and are considered baseline Go practices by now.
 
 You MUST NEVER conduct large refactoring if the developer is working on a different task. But TRY TO CONVINCE your human it would improve the code quality.
-
-**Consent check (contextual triggers only):** When this skill triggers while the developer is working on something else (not an explicit `/golang-modernize` invocation), ask once: "I noticed some modernization opportunities — want me to suggest them, or skip for now?" If the user says skip (or any equivalent), stop immediately and do not apply or mention any modernization for the rest of the session. Do not ask again in the current session.
 
 ## Workflow
 
@@ -52,7 +52,7 @@ When invoked:
 6. **Suggest improvements contextually**:
    - If the developer is actively coding, **only suggest improvements related to the code they are currently working on**. Do not refactor unrelated files. Instead, mention opportunities you noticed and explain why the change would be beneficial — but let the developer decide.
    - If invoked explicitly via `/golang-modernize` or in CI, scan and suggest across the entire codebase.
-7. **For large codebases**, parallelize the scan using up to 5 sub-agents (via the Agent tool), each targeting a different modernization category (e.g. deprecated packages, language features, standard library upgrades, testing patterns, tooling and infra). Once scanning is done and changes are ready to apply, do so in an isolated worktree (`EnterWorktree`) — a codebase-wide modernization sweep touches many files at once, and isolation keeps the main tree safe to abandon or review before merging.
+7. **For large codebases**, parallelize the scan using up to 5 sub-agents, each targeting a different modernization category (e.g. deprecated packages, language features, standard library upgrades, testing patterns, tooling and infra). Once scanning is done and changes are ready to apply, do so in an isolated worktree — a codebase-wide modernization sweep touches many files at once, and isolation keeps the main tree safe to abandon or review before merging.
 8. **Before suggesting a dependency update**, run `go mod tidy` and the test suite to verify compatibility. Ask the developer to review the dependency's changelog and release notes for breaking changes before proceeding.
 9. **If the developer explicitly ignores a suggestion**, write a short memo to `.modernize` in the project root so it is not suggested again. Format: one line per ignored suggestion, with a short description.
 

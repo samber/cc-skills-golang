@@ -146,13 +146,7 @@ grep -rn "REFACTOR(" .
 
 ## 7. Human Checkpoints
 
-Pause and get explicit sign-off before proceeding past any of the following, even mid-refactor after the planning gate has already been cleared once:
-
-- Any cross-package move or package split.
-- Any exported-API change or deprecation.
-- Any deletion of code, especially anything that might still have external callers you haven't found.
-- Introducing a new major version (`/vN`).
-- Touching code that has no tests — get sign-off on the characterization-test baseline (see [safety-net.md](safety-net.md)) before refactoring it, not after.
+The same triggers as `SKILL.md`'s "Pause for human sign-off before" list apply here — cross-package moves, exported-API changes, deletions, new major versions, untested code — and they're not one-time: get sign-off on each one again if it comes up mid-refactor, even after the planning gate has already been cleared once. For untested code specifically, that means sign-off on the characterization-test baseline (see [safety-net.md](safety-net.md)) before refactoring it, not after.
 
 Structural-only PRs are reversible and low-risk by construction (Beck's separation is the whole reason they're safe to move fast on) and can be fast-reviewed. Behavioral PRs — anything that changes what the code does, not just how it's shaped — get full scrutiny every time, regardless of how small the diff looks.
 
