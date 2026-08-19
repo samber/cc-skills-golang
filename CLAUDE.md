@@ -307,7 +307,7 @@ Lead with the reasoning instruction in plain language, since that's what every h
 
 Update the README.md Ultrathink column (🧠 emoji) to keep track of skills requiring this mode.
 
-### Ultracode policy
+### Deep thinking over parallel sub-agents policy
 
 Skills that already describe a full-codebase audit/scan/cleanup mode with several parallel sub-agents (e.g. "launch up to 5 parallel sub-agents") include an **Orchestration mode:** instruction in their SKILL.md body. When you encounter this instruction and the user is requesting a broad, codebase-wide sweep, escalate to multi-agent fan-out orchestration instead of a single sequential pass. On Claude Code, `ultracode` is the explicit trigger for this; treat it as the mechanism, not the instruction.
 
