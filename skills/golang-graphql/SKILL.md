@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code, Codex or similar harness, and for projects using Golang.
 metadata:
   author: samber
-  version: "0.1.2"
+  version: "0.1.1"
   openclaw:
     emoji: "🔮"
     homepage: https://github.com/samber/cc-skills-golang
