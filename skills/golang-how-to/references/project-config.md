@@ -1,6 +1,6 @@
 # Configure mode — force-trigger Go skills in a project
 
-This workflow writes two independent things to the project's agent-config file(s):
+This workflow writes two independent things to the project's agent-config file(s) (CLAUDE.md, AGENTS.md, or equivalent):
 
 1. An **always-load directive** for `golang-how-to` itself — a single sentence, unconditional, no user confirmation needed.
 2. An optional `## Required Go skills` block that force-triggers a specific, user-confirmed set of secondary skills.
