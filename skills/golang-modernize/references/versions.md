@@ -571,7 +571,7 @@ import _ "go.uber.org/automaxprocs"
 
 ### `encoding/json/v2` (experimental) _(Go 1.25+, GOEXPERIMENT=jsonv2)_
 
-Major JSON revision. **Experimental** — evaluate for new code, don't migrate production yet.
+Major JSON revision. **Experimental** in Go 1.25–1.26 — evaluate for new code, don't migrate production yet. Stable since Go 1.27 — see the Go 1.27 section.
 
 ### Go 1.25 additions to prefer when target allows
 
@@ -663,7 +663,7 @@ proxy := &httputil.ReverseProxy{
 
 ### Go 1.26+ goroutine leak profile
 
-For Go 1.26 diagnostics, there is an experimental goroutine leak profile. It is useful for production-oriented leak investigation, but is gated by `GOEXPERIMENT=goroutineleakprofile`; do not rely on it as default stable behavior.
+For Go 1.26 diagnostics, there is an experimental goroutine leak profile. It is useful for production-oriented leak investigation, but is gated by `GOEXPERIMENT=goroutineleakprofile`; do not rely on it as default stable behavior. Generally available since Go 1.27 without the experiment flag — see the Go 1.27 section.
 
 ### Go 1.26+ documentation command
 
@@ -687,6 +687,110 @@ Go 1.26 rewrote `go fix` to apply a subset of modernize-style analyzers automati
 ```bash
 go fix ./...  # applies the enabled safe transformations
 ```
+
+---
+
+## Go 1.27 Modernizations (August 2026)
+
+Changelog: <https://go.dev/doc/go1.27>
+
+### Use generic methods _(Go 1.27+)_
+
+Methods may now declare their own type parameters. Move package-level generic helper functions that operate on one type into methods on that type — this puts the operation in the type's namespace instead of the whole package's:
+
+```go
+// Before: package-scoped generic helper tied to one type
+func Map[T, U any](s *Set[T], f func(T) U) *Set[U] { ... }
+out := Map(mySet, f)
+
+// After (Go 1.27+): method with its own type parameter
+func (s *Set[T]) Map[U any](f func(T) U) *Set[U] { ... }
+out := mySet.Map(f)
+```
+
+Caveats: interface methods may not declare type parameters, and a generic method cannot satisfy an interface — keep the package-level function when the operation must be part of an interface contract. Stdlib example: `math/rand/v2` gained the generic method `(*Rand).N[Int]()`, matching the top-level `rand.N[Int]()` function.
+
+### `encoding/json/v2` is stable _(Go 1.27+)_
+
+`encoding/json/v2` and `encoding/json/jsontext` are now stable (experimental since Go 1.25 via `GOEXPERIMENT=jsonv2`). The v1 `encoding/json` package is now backed by the v2 implementation: v1 behavior is preserved, unmarshal is significantly faster, and v1 gained `Options` to selectively adopt v2 semantics without a full migration. v2 uses stricter, more interoperable defaults — it rejects invalid UTF-8 in strings and duplicate object member names. The v1 API remains supported; migration is not required. `GOEXPERIMENT=nojsonv2` restores the original v1 implementation if a compatibility problem appears.
+
+### Use stdlib `uuid` instead of `github.com/google/uuid` _(Go 1.27+)_
+
+```go
+// Before
+import "github.com/google/uuid"
+id := uuid.NewString()
+
+// After (Go 1.27+)
+import "uuid"
+id := uuid.New().String()
+```
+
+The stdlib generators (`uuid.New()`, `uuid.NewV4()`, `uuid.NewV7()`) return values without errors, and v7 UUIDs are time-ordered — prefer them for database primary keys. Keep `github.com/google/uuid` only if the project relies on features the stdlib package lacks, such as SQL `Scanner`/`driver.Valuer` integration.
+
+### Use `strings.CutLast` and `bytes.CutLast` _(Go 1.27+)_
+
+```go
+// Before
+if i := strings.LastIndex(path, "/"); i >= 0 {
+    dir, file := path[:i], path[i+1:]
+    _ = dir
+    _ = file
+}
+
+// After (Go 1.27+)
+if dir, file, ok := strings.CutLast(path, "/"); ok {
+    _ = dir
+    _ = file
+}
+```
+
+### Use `url.Clone` for deep copies _(Go 1.27+)_
+
+```go
+// Before: struct copy still shares the User pointer and other references
+u2 := *u
+
+// After (Go 1.27+): true deep copy
+u2 := u.Clone()
+vals := values.Clone() // url.Values deep copy
+```
+
+### Use `synctest.Sleep` and `httptest.NewTestServer` in tests _(Go 1.27+)_
+
+```go
+// Before (Go 1.25–1.26): two calls inside a synctest bubble
+time.Sleep(time.Second)
+synctest.Wait()
+
+// After (Go 1.27+): Sleep + Wait combined
+synctest.Sleep(time.Second)
+```
+
+`httptest.NewTestServer` creates a test server on an in-memory fake network, so HTTP client/server tests can run inside a `synctest` bubble with instant, deterministic time.
+
+### Goroutine leak profile is stable _(Go 1.27+)_
+
+The experimental Go 1.26 goroutine leak profile is now stable as the `goroutineleak` profile in `runtime/pprof` and at the `/debug/pprof/goroutineleak` endpoint — no `GOEXPERIMENT` needed. It reports goroutines blocked on a concurrency primitive that can never be unblocked. Limitation: leaks through primitives reachable from global variables or runnable goroutines are not detected.
+
+### `go fix` gains new modernizers _(Go 1.27+)_
+
+New analyzers: `atomictypes`, `embedlit`, `slicesbackward`, `unsafefuncs`. The `waitgroup` analyzer was renamed to `waitgroupgo`, and `fmtappendf` was removed for stylistic reasons. Run `go fix ./...` after upgrading the toolchain.
+
+### `go test` runs the `stdversion` vet check _(Go 1.27+)_
+
+`go test` now reports uses of standard library symbols that are too new for the file's effective Go version (the `go` directive in `go.mod` plus build tags). If CI starts failing after a toolchain upgrade, either bump the module's `go` directive or gate the newer API behind build tags.
+
+### `go mod tidy` merges duplicate require blocks _(Go 1.27+)_
+
+For modules with `go 1.27` or later in `go.mod`, `go mod tidy` consolidates duplicate `require` blocks into the standard two-block layout (one direct, one indirect). Run it once after bumping the `go` directive to clean up blocks left by manual edits and merge conflicts.
+
+### Small Go 1.27+ API preferences
+
+- `hash/maphash.Hasher` and `maphash.ComparableHasher`: contracts between a type and future hash-based data structures (hash tables, Bloom filters).
+- `math/big.Int.Divide`: quotient and remainder with explicit rounding modes (`Trunc`, `Floor`, `Round`, `Ceil`).
+- `database/sql.ConvertAssign` and `driver.RowsColumnScanner`: for database driver authors.
+- `runtime/secret.Do`: goroutines started in secret mode now execute in secret mode themselves.
 
 ---
 

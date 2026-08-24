@@ -178,6 +178,56 @@
         { "id": "13.1", "text": "Uses errors.AsType[*os.PathError](err) or similar generic form instead of var+errors.As" },
         { "id": "13.2", "text": "Replaces the ptr[T] helper function with new() that accepts an initial value (e.g., new(30 * time.Second))" }
       ]
+    },
+    {
+      "id": 14,
+      "name": "go127-stdlib-uuid",
+      "prompt": "Modernize this Go 1.27 code. We'd like to reduce third-party dependencies where the standard library is sufficient.\n\n```go\n// go.mod\nmodule example.com/orders\ngo 1.27\n\nrequire github.com/google/uuid v1.6.0\n\n// ids.go\npackage orders\n\nimport \"github.com/google/uuid\"\n\nfunc NewOrderID() string {\n    return uuid.NewString()\n}\n\nfunc NewSortableOrderID() (string, error) {\n    // we want roughly time-ordered IDs for our database primary keys\n    id, err := uuid.NewV7()\n    if err != nil {\n        return \"\", err\n    }\n    return id.String(), nil\n}\n\nfunc ParseOrderID(s string) (uuid.UUID, error) {\n    return uuid.Parse(s)\n}\n```\n\nProvide the updated code and go.mod changes.",
+      "trap": "Training data is saturated with github.com/google/uuid, so the model defaults to keeping it. Go 1.27 added a stdlib uuid package whose API differs: generators return values without errors, there is no NewString() (use uuid.New().String()), and the import path is just \"uuid\". Without the skill the model either keeps google/uuid or hallucinates uuid.NewString() on the stdlib package.",
+      "assertions": [
+        { "id": "14.1", "text": "Replaces github.com/google/uuid with the stdlib uuid package (import \"uuid\")" },
+        { "id": "14.2", "text": "Uses uuid.New().String() — does NOT call uuid.NewString() (does not exist in stdlib)" },
+        { "id": "14.3", "text": "Knows stdlib generators return values without errors (no id, err := uuid.NewV7() error handling)" },
+        { "id": "14.4", "text": "Uses uuid.NewV7() for the time-ordered database ID case" },
+        { "id": "14.5", "text": "Removes github.com/google/uuid from go.mod (e.g. via go mod tidy)" }
+      ]
+    },
+    {
+      "id": 15,
+      "name": "go127-generic-methods",
+      "prompt": "We're on Go 1.27. This generic container library grew organically and the package-level helper functions are awkward to discover. Improve the API ergonomics.\n\n```go\npackage set\n\ntype Set[T comparable] struct {\n    items map[T]struct{}\n}\n\nfunc New[T comparable](items ...T) *Set[T] {\n    s := &Set[T]{items: make(map[T]struct{}, len(items))}\n    for _, it := range items {\n        s.items[it] = struct{}{}\n    }\n    return s\n}\n\nfunc (s *Set[T]) Add(v T) { s.items[v] = struct{}{} }\n\nfunc (s *Set[T]) Contains(v T) bool { _, ok := s.items[v]; return ok }\n\nfunc (s *Set[T]) ForEach(f func(T)) {\n    for v := range s.items {\n        f(v)\n    }\n}\n\n// MapSet applies f to every element and returns a new set.\nfunc MapSet[T comparable, U comparable](s *Set[T], f func(T) U) *Set[U] {\n    out := New[U]()\n    s.ForEach(func(v T) { out.Add(f(v)) })\n    return out\n}\n\n// FilterSet returns the elements of s for which keep returns true.\nfunc FilterSet[T comparable](s *Set[T], keep func(T) bool) *Set[T] {\n    out := New[T]()\n    s.ForEach(func(v T) {\n        if keep(v) {\n            out.Add(v)\n        }\n    })\n    return out\n}\n\ntype Iteratable[T comparable] interface {\n    ForEach(f func(T))\n}\n\nvar _ Iteratable[int] = (*Set[int])(nil)\n```\n\nProvide the improved code.",
+      "trap": "For 15+ years Go did not support generic methods, so the model's strong prior is that methods cannot have their own type parameters. Go 1.27 allows them. Without the skill, the model keeps the package-level functions or wrongly claims the conversion is impossible. The interface member ForEach must stay a non-generic method because generic methods cannot satisfy interfaces.",
+      "assertions": [
+        { "id": "15.1", "text": "Converts MapSet to a generic method with its own type parameter (e.g. func (s *Set[T]) Map[U comparable](f func(T) U) *Set[U])" },
+        { "id": "15.2", "text": "Converts FilterSet to a method on *Set[T]" },
+        { "id": "15.3", "text": "Does NOT claim generic methods are impossible or unsupported in Go" },
+        { "id": "15.4", "text": "Keeps ForEach as a non-generic method so Set still satisfies the Iteratable interface (or explicitly notes generic methods cannot satisfy interfaces)" }
+      ]
+    },
+    {
+      "id": 16,
+      "name": "go127-cutlast",
+      "prompt": "Modernize this Go 1.27 code that splits strings around their last separator.\n\n```go\npackage paths\n\nimport \"strings\"\n\n// SplitPath splits a slash-separated path into directory and file name.\nfunc SplitPath(path string) (dir, file string) {\n    if i := strings.LastIndex(path, \"/\"); i >= 0 {\n        return path[:i], path[i+1:]\n    }\n    return \"\", path\n}\n\n// StripExt removes the extension from a file name.\nfunc StripExt(name string) string {\n    if i := strings.LastIndex(name, \".\"); i > 0 {\n        return name[:i]\n    }\n    return name\n}\n\n// EnvValue splits a KEY=value assignment.\nfunc EnvValue(assignment string) (key, value string, ok bool) {\n    i := strings.LastIndex(assignment, \"=\")\n    if i < 0 {\n        return \"\", \"\", false\n    }\n    return assignment[:i], assignment[i+1:], true\n}\n```\n\nProvide the modernized code.",
+      "trap": "Go 1.27 added strings.CutLast/bytes.CutLast which slice around the LAST occurrence of a separator, mirroring the widely-known strings.Cut. The model knows Cut but is very unlikely to know CutLast exists, so without the skill it keeps manual LastIndex arithmetic.",
+      "assertions": [
+        { "id": "16.1", "text": "Uses strings.CutLast for at least one of the functions" },
+        { "id": "16.2", "text": "Uses the 3-result form (before, after, found) of CutLast correctly" },
+        { "id": "16.3", "text": "Uses CutLast in EnvValue to simplify the ok-returning split" },
+        { "id": "16.4", "text": "Does NOT keep manual strings.LastIndex slicing arithmetic where CutLast applies" }
+      ]
+    },
+    {
+      "id": 17,
+      "name": "go127-synctest-http",
+      "prompt": "This Go 1.27 HTTP handler test is flaky in CI because of real timeouts. Make it deterministic and fast.\n\n```go\npackage api\n\nimport (\n    \"io\"\n    \"net/http\"\n    \"net/http/httptest\"\n    \"testing\"\n    \"time\"\n)\n\nfunc Handler(w http.ResponseWriter, r *http.Request) {\n    time.Sleep(100 * time.Millisecond) // simulates slow backend\n    w.Write([]byte(\"ok\"))\n}\n\nfunc TestHandlerResponds(t *testing.T) {\n    srv := httptest.NewServer(http.HandlerFunc(Handler))\n    defer srv.Close()\n\n    client := &http.Client{Timeout: 5 * time.Second}\n    resp, err := client.Get(srv.URL)\n    if err != nil {\n        t.Fatal(err)\n    }\n    defer resp.Body.Close()\n    body, _ := io.ReadAll(resp.Body)\n    if string(body) != \"ok\" {\n        t.Fatalf(\"got %q\", body)\n    }\n}\n\nfunc TestHandlerClientTimeout(t *testing.T) {\n    srv := httptest.NewServer(http.HandlerFunc(Handler))\n    defer srv.Close()\n\n    client := &http.Client{Timeout: 50 * time.Millisecond} // shorter than handler sleep\n    _, err := client.Get(srv.URL)\n    if err == nil {\n        t.Fatal(\"expected timeout error\")\n    }\n}\n```\n\nProvide the fixed tests. Do not just increase timeouts.",
+      "trap": "testing/synctest makes time-based tests deterministic, but a plain httptest.NewServer uses the real network, which stalls inside a synctest bubble (the bubble's fake clock waits forever on real I/O). Go 1.27 added httptest.NewTestServer, which runs on an in-memory fake network designed for synctest. Without the skill, the model either avoids synctest (retries/channels) or combines synctest with httptest.NewServer, producing a hanging test.",
+      "assertions": [
+        { "id": "17.1", "text": "Wraps tests in synctest.Test" },
+        { "id": "17.2", "text": "Uses httptest.NewTestServer instead of httptest.NewServer" },
+        { "id": "17.3", "text": "Explains that real-network servers do not work inside a synctest bubble (in-memory/fake network rationale)" },
+        { "id": "17.4", "text": "Does NOT leave a plain httptest.NewServer inside a synctest bubble" },
+        { "id": "17.5", "text": "Keeps both tests working (response test and client-timeout test) with deterministic time" }
+      ]
     }
   ]
 }
