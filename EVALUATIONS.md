@@ -18,6 +18,7 @@
 | `golang-naming`                 | v1.0.0  | 51         | 94%        | **71%**       | +24pp     | 1.32×     | **Low delta, high without** |
 | `golang-swagger`                | v1.0.0  | 60         | 97%        | **72%**       | +25pp     | 1.35×     | **Low delta, high without** |
 | `golang-error-handling`         | v1.0.0  | 60         | 98%        | **72%**       | +27pp     | 1.36×     | **Low delta, high without** |
+| `golang-modernize`              | v1.4.0  | 92         | 99%        | **70%**       | +29pp     | 1.42×     | **Low delta, high without** |
 | `golang-popular-libraries`      | v1.0.0  | 54         | 100%       | **70%**       | +30pp     | 1.43×     | **Low delta, high without** |
 | `golang-security`               | v1.0.0  | 110        | 100%       | **68%**       | +32pp     | 1.47×     | **Low delta, high without** |
 | `golang-testing`                | v1.0.0  | 65         | 92%        | 60%           | +32pp     | 1.53×     | **Low delta**               |
@@ -47,7 +48,6 @@
 | `golang-safety`                 | v1.0.0  | 151        | 99%        | 41%           | +58pp     | 2.41×     |                             |
 | `golang-continuous-integration` | v1.0.0  | 66         | 100%       | 41%           | +59pp     | 2.44×     |                             |
 | `golang-samber-oops`            | v1.0.0  | 52         | 94%        | 35%           | +60pp     | 2.69×     |                             |
-| `golang-modernize`              | v1.0.0  | 76         | 95%        | 34%           | +61pp     | 2.79×     |                             |
 | `golang-samber-slog`            | v1.0.0  | 62         | 92%        | **73%**       | +19pp     | 1.26×     | **Low delta, high without** |
 | `golang-samber-lo`              | v1.0.0  | 86         | 97%        | 57%           | +40pp     | 1.70×     |                             |
 | `golang-uber-fx`                | v1.0.0  | 21         | 100%       | **95%**       | +5pp      | 1.05×     | **Low delta, high without** |
@@ -55,7 +55,7 @@
 | `golang-google-wire`            | v1.0.0  | 50         | 98%        | **82%**       | +16pp     | 1.20×     | **Low delta, high without** |
 | `golang-graphql`                | v0.0.2  | 59         | 100%       | **83%**       | +17pp     | 1.20×     | **Low delta, high without** |
 | `golang-samber-do`              | v1.0.0  | 53         | 100%       | 19%           | +81pp     | 5.26×     |                             |
-| **Total (41 skills)**           |         | **3395**   | **98%**    | **56%**       | **+41pp** | **1.73×** |                             |
+| **Total (41 skills)**           |         | **3411**   | **98%**    | **57%**       | **+40pp** | **1.71×** |                             |
 
 ## `golang-naming` — v1.0.0
 
@@ -795,6 +795,133 @@
 | 12.5 | Does NOT remove `ticker.Stop()` in PeriodicTask (needed for correctness)           | <span class="g">✓</span>       | <span class="g">✓</span>                                    |
 | 12.6 | Suggests `go fix ./...` for automated modernization                                | <span class="g">✓</span>       | <span class="r">✗</span>                                    |
 | 12.7 | Correctly distinguishes Stop for GC vs Stop for correctness                        | <span class="g">✓</span>       | <span class="g">✓</span>                                    |
+
+</details>
+
+## `golang-modernize` — v1.4.0
+
+|             | With Skill      | Without Skill   | Delta     |
+| ----------- | --------------- | --------------- | --------- |
+| **Overall** | **91/92 (99%)** | **64/92 (70%)** | **+29pp** |
+
+<details>
+<summary>Full breakdown (92 assertions)</summary>
+
+**Model:** Kimi K3 (fireworks-ai/accounts/fireworks/models/kimi-k3) | **Runs:** 17 adversarial evals × 2 configs = 34 subagents | **Grading:** LLM-as-judge
+
+Note: re-run adds 4 Go 1.27 evals (14–17) and eval 13 (previously added to evals.json but never executed). This model already knows much of the Go 1.21–1.26 content (evals 3, 5, 6, 9, 13 pass fully without the skill); the remaining uplift concentrates in the Go 1.27 evals (with 18/18, without 4/18).
+
+| #    | Assertion                                                                        | With                           | Without                                                          |
+| ---- | -------------------------------------------------------------------------------- | ------------------------------ | ---------------------------------------------------------------- |
+|      | **1. version-constraint-1.21** — Go 1.21 project with 1.22+ patterns             | **<span class="g">7/7</span>** | **<span class="r">6/7</span>**                                   |
+| 1.1  | Suggests min/max builtins (Go 1.21)                                              | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 1.2  | Suggests slices.Sort or slices.Contains (Go 1.21)                                | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 1.3  | Suggests sync.OnceValue (Go 1.21)                                                | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 1.4  | Does NOT suggest range-over-int (requires 1.22+)                                 | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 1.5  | Does NOT suggest removing loop var shadow copy (requires 1.22+)                  | <span class="g">✓</span>       | <span class="r">✗</span> drops `v := v` via param passing        |
+| 1.6  | Does NOT suggest math/rand/v2 (requires 1.22+)                                   | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 1.7  | Does NOT suggest cmp.Or (requires 1.22+)                                         | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+|      | **2. rand-v2-api-renames** — math/rand → math/rand/v2 function renames           | **<span class="g">6/6</span>** | **<span class="r">5/6</span>**                                   |
+| 2.1  | Renames `Intn` to `IntN` (capital N)                                             | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 2.2  | Renames `Int63n` to `Int64N`                                                     | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 2.3  | Removes all `rand.Seed` calls                                                    | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 2.4  | Replaces `rand.Read` with `crypto/rand` usage                                    | <span class="g">✓</span>       | <span class="r">✗</span> PRNG `Uint64` loop, not `crypto/rand`   |
+| 2.5  | Import changes to `math/rand/v2`                                                 | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 2.6  | No old-style function names in output                                            | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+|      | **3. safety-over-cosmetic** — path traversal vs interface{} → any                | **<span class="g">6/6</span>** | **<span class="g">6/6</span>**                                   |
+| 3.1  | Suggests `os.Root`/`os.OpenRoot` for user-supplied paths                         | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 3.2  | Mentions path traversal risk or CWE-22                                           | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 3.3  | Prioritizes safety fix over cosmetic changes                                     | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 3.4  | Also suggests `interface{}` → `any`                                              | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 3.5  | Also suggests `min` builtin or `net.JoinHostPort`                                | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 3.6  | Does NOT only address cosmetic issues                                            | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+|      | **4. omitzero-vs-omitempty** — time.Time and bool JSON tags                      | **<span class="g">6/6</span>** | **<span class="r">5/6</span>**                                   |
+| 4.1  | Identifies `omitempty` doesn't omit zero `time.Time`                             | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 4.2  | Suggests `omitzero` for all `time.Time` fields                                   | <span class="g">✓</span>       | <span class="r">✗</span> `AccountCreated` missing `omitzero`     |
+| 4.3  | Identifies `omitempty` treats `false` as empty for bool                          | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 4.4  | Addresses bool issue correctly (removes tag or uses omitzero)                    | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 4.5  | Correctly notes `omitzero` requires Go 1.24+                                     | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 4.6  | Does NOT suggest `omitzero` for string/int fields                                | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+|      | **5. benchmark-b-loop** — b.Loop() replaces b.N pattern                          | **<span class="g">5/5</span>** | **<span class="g">5/5</span>**                                   |
+| 5.1  | Replaces `for i := 0; i < b.N; i++` with `for b.Loop()`                          | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 5.2  | Replaces `for n := 0; n < b.N; n++` variant too                                  | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 5.3  | Replaces b.N loop in all benchmarks                                              | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 5.4  | No `b.N` iteration pattern remains                                               | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 5.5  | Preserves benchmark function names and logic                                     | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+|      | **6. automaxprocs-removal** — Go 1.25 built-in container GOMAXPROCS              | **<span class="g">5/5</span>** | **<span class="g">5/5</span>**                                   |
+| 6.1  | Suggests removing `go.uber.org/automaxprocs` import                              | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 6.2  | Explains Go 1.25 has built-in container-aware GOMAXPROCS                         | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 6.3  | Suggests `sync.WaitGroup.Go`                                                     | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 6.4  | Does NOT suggest keeping automaxprocs                                            | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 6.5  | Suggests removing from go.mod                                                    | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+|      | **7. cmp-or-chained-defaults** — cmp.Or for default value chains (Go 1.22)       | **<span class="g">6/6</span>** | **<span class="r">4/6</span>**                                   |
+| 7.1  | Uses `cmp.Or` for at least one default value chain                               | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 7.2  | Collapses 3-step host default to single `cmp.Or` call                            | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 7.3  | Import includes `cmp` package                                                    | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 7.4  | All multi-step defaults converted to `cmp.Or`                                    | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 7.5  | Result is functionally equivalent (same fallback order)                          | <span class="g">✓</span>       | <span class="r">✗</span> falsely claims `cmp.Or` is lazy         |
+| 7.6  | Does NOT introduce a custom helper function                                      | <span class="g">✓</span>       | <span class="r">✗</span> defines `envOr` helper                  |
+|      | **8. addcleanup-vs-setfinalizer** — runtime.AddCleanup (Go 1.24)                 | **<span class="g">5/5</span>** | **<span class="r">4/5</span>**                                   |
+| 8.1  | Replaces `runtime.SetFinalizer` with `runtime.AddCleanup`                        | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 8.2  | Cleanup function receives resource as separate argument                          | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 8.3  | Explains SetFinalizer cycle restriction preventing GC                            | <span class="g">✓</span>       | <span class="r">✗</span> cycle restriction not explained         |
+| 8.4  | Does NOT pass wrapper struct as the resource                                     | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 8.5  | Attributes `runtime.AddCleanup` to Go 1.24                                       | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+|      | **9. http-mux-migration** — gorilla/mux → stdlib ServeMux (Go 1.22)              | **<span class="g">6/6</span>** | **<span class="g">6/6</span>**                                   |
+| 9.1  | Uses `http.NewServeMux()` instead of `mux.NewRouter()`                           | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 9.2  | Uses method prefix in patterns like `GET /api/users/{id}`                        | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 9.3  | Uses `r.PathValue("id")` instead of `mux.Vars(r)`                                | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 9.4  | All 6 routes migrated with correct method prefixes                               | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 9.5  | No gorilla/mux import remains                                                    | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 9.6  | Return type changes to `*http.ServeMux`                                          | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+|      | **10. synctest-flaky-fix** — testing/synctest for flaky concurrent tests         | **<span class="g">6/6</span>** | **<span class="r">2/6</span>**                                   |
+| 10.1 | Uses `synctest.Test` (not old `synctest.Run`)                                    | <span class="g">✓</span>       | <span class="r">✗</span> synctest only in optional side example  |
+| 10.2 | Uses `synctest.Wait()` for goroutine synchronization                             | <span class="g">✓</span>       | <span class="r">✗</span> `Wait()` only in optional example       |
+| 10.3 | Removes all `time.Sleep` calls                                                   | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 10.4 | No flaky timing dependencies remain                                              | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 10.5 | Correctly imports `testing/synctest`                                             | <span class="g">✓</span>       | <span class="r">✗</span> no synctest import in main fix          |
+| 10.6 | Both tests converted                                                             | <span class="g">✓</span>       | <span class="r">✗</span> tests keep channel-timeout approach     |
+|      | **11. waitgroup-go-loopvar** — WaitGroup.Go, loop vars, t.Context (1.22–1.25)    | **<span class="g">7/7</span>** | **<span class="r">6/7</span>**                                   |
+| 11.1 | Replaces Add/go func/Done pattern with `wg.Go`                                   | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 11.2 | Removes `wg.Add(1)` calls                                                        | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 11.3 | Removes `defer wg.Done()` calls                                                  | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 11.4 | Removes `item := item` loop variable shadow copies                               | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 11.5 | Explains Go 1.22+ loop variable semantics                                        | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 11.6 | Replaces `context.Background()` with `t.Context()` in test                       | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 11.7 | Preserves `WaitGroup.Wait()` call                                                | <span class="g">✓</span>       | <span class="r">✗</span> `ProcessAll` switched to errgroup       |
+|      | **12. timer-gc-greenteagc** — Timer GC change + Green Tea GC (Go 1.26)           | **<span class="r">6/7</span>** | **<span class="r">4/7</span>**                                   |
+| 12.1 | Identifies some `defer timer.Stop()` calls as unnecessary                        | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 12.2 | Explains Go 1.23+ timer/ticker GC behavior change                                | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 12.3 | Suggests reviewing GC tuning due to Green Tea GC                                 | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 12.4 | Mentions Green Tea GC 10-40% overhead reduction                                  | <span class="r">✗</span> no percentage figure | <span class="g">✓</span>                            |
+| 12.5 | Does NOT remove `ticker.Stop()` in PeriodicTask (needed for correctness)         | <span class="g">✓</span>       | <span class="r">✗</span> drops ticker `Stop()` in rewrite        |
+| 12.6 | Suggests `go fix ./...` for automated modernization                              | <span class="g">✓</span>       | <span class="r">✗</span> no `go fix` mention                     |
+| 12.7 | Correctly distinguishes Stop for GC vs Stop for correctness                      | <span class="g">✓</span>       | <span class="r">✗</span> misclassifies ticker Stop               |
+|      | **13. go126-errors-astype-enhanced-new** — errors.AsType + new(expr) (Go 1.26)   | **<span class="g">2/2</span>** | **<span class="g">2/2</span>**                                   |
+| 13.1 | Uses `errors.AsType[*os.PathError](err)` instead of var+errors.As                | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 13.2 | Replaces `ptr[T]` helper with `new()` accepting an initial value                 | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+|      | **14. go127-stdlib-uuid** — stdlib uuid replaces github.com/google/uuid          | **<span class="g">5/5</span>** | **<span class="r">1/5</span>**                                   |
+| 14.1 | Replaces `github.com/google/uuid` with stdlib `uuid`                             | <span class="g">✓</span>       | <span class="r">✗</span> claims no stdlib uuid; hand-rolls       |
+| 14.2 | Uses `uuid.New().String()` — no `uuid.NewString()`                               | <span class="g">✓</span>       | <span class="r">✗</span> no stdlib uuid usage at all             |
+| 14.3 | Knows generators return values without errors                                    | <span class="g">✓</span>       | <span class="r">✗</span> keeps `(string, error)` error branch    |
+| 14.4 | Uses `uuid.NewV7()` for time-ordered DB ID                                       | <span class="g">✓</span>       | <span class="r">✗</span> hand-rolled v7 bit layout               |
+| 14.5 | Removes `github.com/google/uuid` from go.mod                                     | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+|      | **15. go127-generic-methods** — generic methods with own type parameters         | **<span class="g">4/4</span>** | **<span class="r">1/4</span>**                                   |
+| 15.1 | Converts `MapSet` to generic method (own type param)                             | <span class="g">✓</span>       | <span class="r">✗</span> `Map` kept package-level                |
+| 15.2 | Converts `FilterSet` to a method on `*Set[T]`                                    | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 15.3 | Does NOT claim generic methods are impossible                                    | <span class="g">✓</span>       | <span class="r">✗</span> claims methods can't declare type params |
+| 15.4 | Keeps `ForEach` non-generic to satisfy the interface                             | <span class="g">✓</span>       | <span class="r">✗</span> drops `ForEach`/`Iteratable` entirely   |
+|      | **16. go127-cutlast** — strings.CutLast for last-separator splits                | **<span class="g">4/4</span>** | **<span class="r">1/4</span>**                                   |
+| 16.1 | Uses `strings.CutLast` for at least one function                                 | <span class="g">✓</span>       | <span class="r">✗</span> claims "no `strings.CutLast` exists"    |
+| 16.2 | Uses the 3-result form (before, after, found) correctly                          | <span class="g">✓</span>       | <span class="r">✗</span> no `CutLast` usage at all               |
+| 16.3 | Uses `CutLast` in `EnvValue` to simplify the ok-returning split                  | <span class="g">✓</span>       | <span class="r">✗</span> uses `strings.Cut`, changes semantics   |
+| 16.4 | Does NOT keep manual `LastIndex` slicing where `CutLast` applies                 | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+|      | **17. go127-synctest-http** — httptest.NewTestServer inside synctest bubbles     | **<span class="g">5/5</span>** | **<span class="r">1/5</span>**                                   |
+| 17.1 | Wraps tests in `synctest.Test`                                                   | <span class="g">✓</span>       | <span class="g">✓</span>                                         |
+| 17.2 | Uses `httptest.NewTestServer` instead of `httptest.NewServer`                    | <span class="g">✓</span>       | <span class="r">✗</span> uses `httptest.NewServer` in both tests |
+| 17.3 | Explains real-network servers don't work in a synctest bubble                    | <span class="g">✓</span>       | <span class="r">✗</span> falsely claims `NewServer` bubble-aware |
+| 17.4 | Does NOT leave a plain `httptest.NewServer` inside a bubble                      | <span class="g">✓</span>       | <span class="r">✗</span> `NewServer` left inside bubble          |
+| 17.5 | Keeps both tests working with deterministic time                                 | <span class="g">✓</span>       | <span class="r">✗</span> real-socket server, non-deterministic   |
 
 </details>
 

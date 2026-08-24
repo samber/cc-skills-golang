@@ -197,7 +197,7 @@ These skills are designed as **atomic, cross-referencing units**. A skill may re
 | ⭐️ | ✅ `golang-documentation` | ⚡ 🤖 ⚙️ | -53% | 75 | 3,094 | 11,193 |
 | ⭐️ | ✅ `golang-error-handling` | ⚡ 🤖 ⚙️ | -26% | 141 | 1,734 | 4,693 |
 | ⭐️ | ✅ `golang-how-to` | ⚡ | — | 183 | 4,196 | 15,197 |
-| ⭐️ | ✅ `golang-modernize` | ⚡ 🤖 | -61% | 68 | 3,194 | 10,890 |
+| ⭐️ | ✅ `golang-modernize` | ⚡ 🤖 | -29% | 68 | 3,194 | 10,890 |
 | ⭐️ | ✅ `golang-naming` | ⚡ ⚙️ | -23% | 159 | 3,031 | 7,399 |
 | ⭐️ | ✅ `golang-refactoring` | ⚡ 🧠 🤖 ⚙️ | — | 245 | 3,835 | 20,330 |
 | ⭐️ | ✅ `golang-safety` | ⚡ | -58% | 78 | 2,614 | 5,384 |
@@ -247,7 +247,7 @@ These skills are designed as **atomic, cross-referencing units**. A skill may re
 
 |             | With Skill          | Without Skill       | Delta     |
 | ----------- | ------------------- | ------------------- | --------- |
-| **Overall** | **3315/3395 (98%)** | **1915/3395 (56%)** | **+41pp** |
+| **Overall** | **3334/3411 (98%)** | **1953/3411 (57%)** | **+40pp** |
 
 See [EVALUATIONS.md](./EVALUATIONS.md) for the full per-skill breakdown.
 
