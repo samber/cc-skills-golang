@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code, Codex or similar harness, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.2.0"
+  version: "1.3.0"
   openclaw:
     emoji: "📝"
     homepage: https://github.com/samber/cc-skills-golang
@@ -36,7 +36,7 @@ Write documentation that serves both humans and AI agents. Good documentation ma
 
 ## Cross-References
 
-See `samber/cc-skills-golang@golang-naming` skill for naming conventions in doc comments. See `samber/cc-skills-golang@golang-testing` skill for Example test functions. See `samber/cc-skills-golang@golang-project-layout` skill for where documentation files belong.
+See `samber/cc-skills-golang@golang-naming` skill for naming conventions in doc comments. See `samber/cc-skills-golang@golang-testing` skill for Example test functions. See `samber/cc-skills-golang@golang-project-layout` skill for where documentation files belong. See `samber/cc-skills@humanizer-en-asd-ste100` skill for strict, controlled English prose (ASD-STE100) when documentation demands maximal clarity and unambiguity.
 
 ## Writing Principles
 
@@ -51,6 +51,8 @@ Apply to every piece of documentation you write or review:
 **Preserve meaning when editing** — keep modality intact (`must`/`should`/`may` are different obligations). Preserve conditions, warnings, required actions. A cleaner sentence that changes obligations is wrong.
 
 **Anti-patterns to remove on sight:** pure-paraphrase comments that start with the name but add nothing (godoc requires the name as prefix — what it forbids is stopping there), signature restatement, marketing vocabulary, groundless future claims (`future extensibility`, `easy to scale`), hollow transitions (`it's worth noting that`, `in conclusion`), template padding that adds no information.
+
+For regulated or safety-critical documentation that requires strict controlled-English prose, → See `samber/cc-skills@humanizer-en-asd-ste100` skill.
 
 ## Step 1: Detect Project Type
 
