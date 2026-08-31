@@ -2,6 +2,23 @@
 
 Representative `-o md` output for each command, captured against `godig` v0.2.0. Empty cells are shown as `—`. Field sets mirror the underlying APIs — pkg.go.dev for most commands, the Go vulnerability database (`vuln.go.dev`, OSV) for `vulns` — and may grow over time.
 
+## Table of Contents
+
+- [overview](#overview)
+- [search](#search)
+- [package info](#package-info)
+- [package imports](#package-imports)
+- [versions](#versions)
+- [major-versions](#major-versions)
+- [imported-by](#imported-by)
+- [vulns](#vulns)
+- [dependencies](#dependencies)
+- [module info](#module-info)
+- [packages](#packages)
+- [symbols](#symbols)
+- [symbol doc](#symbol-doc)
+- [Raw / large output](#raw-large-output)
+
 ## overview
 
 `godig overview github.com/samber/ro -o md`

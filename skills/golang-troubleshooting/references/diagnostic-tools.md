@@ -1,5 +1,19 @@
 # Diagnostic Tools
 
+## Table of Contents
+
+- [Runtime Diagnostics (GODEBUG)](#runtime-diagnostics-godebug)
+  - [Go documentation command](#go-documentation-command)
+  - [GC Tracing](#gc-tracing)
+  - [Scheduler Tracing](#scheduler-tracing)
+  - [GOTRACEBACK](#gotraceback)
+- [Delve Debugger](#delve-debugger)
+  - [Installation](#installation)
+  - [Basic Usage](#basic-usage)
+  - [Common Commands](#common-commands)
+  - [IDE Integration](#ide-integration)
+- [Advanced Analysis](#advanced-analysis)
+
 ## Runtime Diagnostics (GODEBUG)
 
 ### Go documentation command

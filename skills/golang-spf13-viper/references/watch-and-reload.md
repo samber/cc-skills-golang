@@ -1,5 +1,14 @@
 # Viper WatchConfig and Hot Reload
 
+## Table of Contents
+
+- [Basic setup](#basic-setup)
+- [The atomic-rename trap](#the-atomic-rename-trap)
+- [Race-safe reload pattern](#race-safe-reload-pattern)
+- [Debouncing rapid changes](#debouncing-rapid-changes)
+- [Validating config before applying](#validating-config-before-applying)
+- [Stopping the watcher](#stopping-the-watcher)
+
 ## Basic setup
 
 ```go

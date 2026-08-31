@@ -9,6 +9,16 @@ Third-party monitoring and analytics services can inadvertently transmit sensiti
 
 ---
 
+## Table of Contents
+
+- [Overview](#overview)
+- [Common Vulnerable Services](#common-vulnerable-services)
+- [Error Tracking Services — Medium](#error-tracking-services-medium)
+- [Analytics/Monitoring Services — Medium](#analyticsmonitoring-services-medium)
+- [Data Filtering Layer](#data-filtering-layer)
+- [Review Checklist](#review-checklist)
+- [CWE References](#cwe-references)
+
 ## Overview
 
 These rules detect Go code that sends data to third-party services. Always review what data is being transmitted and ensure it complies with privacy regulations (GDPR, CCPA, etc.).

@@ -1,5 +1,15 @@
 # Cobra Documentation and Scaffolding Generators
 
+## Table of Contents
+
+- [Doc generation](#doc-generation)
+  - [Markdown](#markdown)
+  - [Man pages](#man-pages)
+  - [YAML](#yaml)
+  - [RST (reStructuredText)](#rst-restructuredtext)
+- [cobra-cli scaffolder](#cobra-cli-scaffolder)
+- [Help and usage template customization](#help-and-usage-template-customization)
+
 ## Doc generation
 
 Cobra can generate documentation from your command tree in multiple formats. Import the `cobra/doc` sub-package:

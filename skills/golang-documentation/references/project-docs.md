@@ -2,6 +2,19 @@
 
 → See `samber/cc-skills-golang@golang-continuous-integration` skill for automating changelog generation and release workflows.
 
+## Table of Contents
+
+- [README.md](#readmemd)
+  - [Section Order](#section-order)
+- [CONTRIBUTING.md](#contributingmd)
+  - [The 10-Minute Rule](#the-10-minute-rule)
+- [Changelog](#changelog)
+  - [Format](#format)
+  - [Change Categories](#change-categories)
+  - [GitHub Releases as Alternative](#github-releases-as-alternative)
+- [Distribution](#distribution)
+  - [Dockerfile Best Practices](#dockerfile-best-practices)
+
 ## README.md
 
 A LICENSE file MUST exist in every project. A README is the front page of your project. Make it simple, clear, and scannable. A copy-paste template with empty sections is available at [templates/README.md](./templates/README.md).

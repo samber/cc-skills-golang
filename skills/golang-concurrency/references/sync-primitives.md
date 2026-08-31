@@ -1,5 +1,21 @@
 # Sync Primitives Deep Dive
 
+## Table of Contents
+
+- [sync.Mutex](#syncmutex)
+  - [Embedding Convention](#embedding-convention)
+- [sync.RWMutex](#syncrwmutex)
+- [sync/atomic](#syncatomic)
+- [sync.Map](#syncmap)
+- [sync.Pool](#syncpool)
+- [sync.Once](#synconce)
+- [sync.WaitGroup](#syncwaitgroup)
+  - [Go 1.25+: `wg.Go`](#go-125-wggo)
+  - [Go <1.25 fallback](#go-125-fallback)
+- [golang.org/x/sync/singleflight](#golangorgxsyncsingleflight)
+- [golang.org/x/sync/errgroup](#golangorgxsyncerrgroup)
+  - [Bounded Concurrency with SetLimit](#bounded-concurrency-with-setlimit)
+
 ## sync.Mutex
 
 Protects shared state with exclusive access. MUST hold the lock for the shortest time possible — NEVER hold a mutex across I/O, network calls, or channel operations.

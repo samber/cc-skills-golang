@@ -12,6 +12,28 @@ Cryptography vulnerabilities threaten confidentiality and integrity of sensitive
 
 ---
 
+## Table of Contents
+
+- [Algorithm Selection Guide](#algorithm-selection-guide)
+  - [Key Size Requirements](#key-size-requirements)
+- [Key Rotation Pattern](#key-rotation-pattern)
+- [Common Cryptographic Mistakes](#common-cryptographic-mistakes)
+  - [Mistake 1: AES-ECB reveals patterns — High](#mistake-1-aes-ecb-reveals-patterns-high)
+  - [Mistake 2: Reusing nonces — Critical](#mistake-2-reusing-nonces-critical)
+  - [Mistake 3: Non-constant-time comparison for secrets — Medium](#mistake-3-non-constant-time-comparison-for-secrets-medium)
+- [Insecure TLS Configuration — High](#insecure-tls-configuration-high)
+- [DES Encryption — High](#des-encryption-high)
+- [Insecure SSH Host Key Verification — High](#insecure-ssh-host-key-verification-high)
+- [MD5 Hash — High](#md5-hash-high)
+- [RC4 Cipher — High](#rc4-cipher-high)
+- [SHA1 Hash — Medium](#sha1-hash-medium)
+- [Weak Cryptographic Algorithms — Medium](#weak-cryptographic-algorithms-medium)
+- [Insufficient Key Strength — Medium](#insufficient-key-strength-medium)
+- [Weak Random Number Generators — High](#weak-random-number-generators-high)
+- [Weak TLS Versions — High](#weak-tls-versions-high)
+- [Password Hashing — High](#password-hashing-high)
+- [CWE References](#cwe-references)
+
 ## Algorithm Selection Guide
 
 Choose the right algorithm for the job — using the wrong primitive (e.g. SHA256 for passwords) is as dangerous as using a broken one:

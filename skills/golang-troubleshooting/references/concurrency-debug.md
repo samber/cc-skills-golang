@@ -1,5 +1,11 @@
 # Concurrency Debugging
 
+## Table of Contents
+
+- [Goroutine Leaks](#goroutine-leaks)
+- [Race Conditions](#race-conditions)
+- [Deadlocks](#deadlocks)
+
 ## Goroutine Leaks
 
 **Symptoms:** Memory slowly increasing, goroutine count growing, no obvious CPU spike.

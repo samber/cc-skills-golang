@@ -4,6 +4,22 @@ Thirteen clusters where skills overlap. Each cluster includes a boundary table, 
 
 ---
 
+## Table of Contents
+
+- [1. Performance cluster](#1-performance-cluster)
+- [2. Dependency injection cluster](#2-dependency-injection-cluster)
+- [3. samber/\* functional cluster](#3-samber-functional-cluster)
+- [4. Error handling cluster](#4-error-handling-cluster)
+- [5. Style / naming / lint / docs cluster](#5-style-naming-lint-docs-cluster)
+- [6. CLI cluster](#6-cli-cluster)
+- [7. Testing cluster](#7-testing-cluster)
+- [8. design-patterns vs structs-interfaces](#8-design-patterns-vs-structs-interfaces)
+- [9. concurrency vs context](#9-concurrency-vs-context)
+- [10. safety vs security](#10-safety-vs-security)
+- [11. modernize vs lint](#11-modernize-vs-lint)
+- [12. Package lookup / discovery cluster](#12-package-lookup-discovery-cluster)
+- [13. golang-refactoring vs. the target-state rule skills](#13-golang-refactoring-vs-the-target-state-rule-skills)
+
 ## 1. Performance cluster
 
 Four skills form a "deep analysis" cluster. `golang-observability` is the always-on counterpart; the other three are activated on demand.

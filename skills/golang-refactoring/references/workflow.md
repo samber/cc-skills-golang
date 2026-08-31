@@ -3,6 +3,18 @@
 - A refactor of any real size is a choreography problem before it is a coding problem.
 - This file covers: how to plan the sequence, order the steps so they don't collide, stage them as small human-reviewed PRs, and persist the plan itself — in the code, not just in a conversation that will eventually run out of context — for the intermediate states that are deliberately imperfect and for the ideas that would otherwise be lost.
 
+## Table of Contents
+
+- [1. The Planning Gate (mandatory, before any edit)](#1-the-planning-gate-mandatory-before-any-edit)
+- [2. Three Interacting Orderings](#2-three-interacting-orderings)
+  - [Parallel vs. sequential — decision checklist](#parallel-vs-sequential-decision-checklist)
+- [3. The Git Model](#3-the-git-model)
+- [4. Parallel vs. Sequential Execution](#4-parallel-vs-sequential-execution)
+- [5. The `// REFACTOR(step N): ...` Marker Convention](#5-the-refactorstep-n-marker-convention)
+- [6. Workflows (`ultracode`) vs. Human-in-the-Loop](#6-workflows-ultracode-vs-human-in-the-loop)
+- [7. Human Checkpoints](#7-human-checkpoints)
+- [Cross-References](#cross-references)
+
 ## 1. The Planning Gate (mandatory, before any edit)
 
 **Thinking mode:** reason as thoroughly as possible here — on Claude Code, use `ultrathink` to trigger extended thinking explicitly. A wrong ordering call does not surface as an obviously wrong plan — it surfaces later as a broken build or a conflict-riddled merge, once several PRs are already in flight. Getting the sequencing right up front is cheaper than untangling it after the fact.

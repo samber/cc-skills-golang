@@ -2,6 +2,15 @@
 
 dig containers are cheap to create. Build a fresh one per test, override what you need, drive the system with `Invoke`.
 
+## Table of Contents
+
+- [Per-test container](#per-test-container)
+- [Shared test wiring](#shared-test-wiring)
+- [Validate the production graph in CI](#validate-the-production-graph-in-ci)
+- [Detecting cycles before deploy](#detecting-cycles-before-deploy)
+- [Asserting a constructor's error path](#asserting-a-constructors-error-path)
+- [Recovering from constructor panics](#recovering-from-constructor-panics)
+
 ## Per-test container
 
 ```go

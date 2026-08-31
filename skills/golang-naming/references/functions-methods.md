@@ -1,5 +1,13 @@
 # Functions, Methods & Options
 
+## Table of Contents
+
+- [Functions and Methods](#functions-and-methods)
+  - [Getters and Setters](#getters-and-setters)
+  - [Constructors](#constructors)
+  - [Named Return Values](#named-return-values)
+- [Functional Options Pattern](#functional-options-pattern)
+
 ## Functions and Methods
 
 Functions returning a value are named like **nouns** (what they return). Functions performing actions are named like **verbs** (what they do).

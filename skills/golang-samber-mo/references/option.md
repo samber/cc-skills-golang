@@ -1,5 +1,22 @@
 # Option[T] API Reference
 
+## Table of Contents
+
+- [Constructors](#constructors)
+- [Query Methods](#query-methods)
+- [Value Extraction](#value-extraction)
+- [Transformations](#transformations)
+  - [Map — transform the value if present](#map-transform-the-value-if-present)
+  - [MapValue — transform without filter](#mapvalue-transform-without-filter)
+  - [MapNone — provide value when absent](#mapnone-provide-value-when-absent)
+  - [FlatMap — chain Options (same type)](#flatmap-chain-options-same-type)
+  - [Match — handle both cases](#match-handle-both-cases)
+  - [ForEach — side effect on present value](#foreach-side-effect-on-present-value)
+- [Equality](#equality)
+- [Serialization](#serialization)
+- [Database Support](#database-support)
+- [Go 1.24+ omitzero Support](#go-124-omitzero-support)
+
 ## Constructors
 
 | Function | Description |

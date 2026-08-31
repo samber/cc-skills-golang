@@ -1,5 +1,15 @@
 # Channels and Select Patterns
 
+## Table of Contents
+
+- [Goroutine Lifecycle](#goroutine-lifecycle)
+  - [Panic Recovery at Goroutine Boundaries](#panic-recovery-at-goroutine-boundaries)
+- [Channel Direction](#channel-direction)
+- [Channel Closing](#channel-closing)
+- [Buffer Size](#buffer-size)
+- [Select for Non-Blocking Communication](#select-for-non-blocking-communication)
+- [Avoid Repeated `time.After` in Hot Loops](#avoid-repeated-timeafter-in-hot-loops)
+
 ## Goroutine Lifecycle
 
 NEVER start a goroutine without knowing how it stops. Every goroutine MUST answer: **how will it stop?**

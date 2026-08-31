@@ -2,6 +2,17 @@
 
 Cobra generates shell completion scripts for bash, zsh, fish, and PowerShell automatically. Subcommand names and flag names are completed for free. You add completions for flag values and positional arguments.
 
+## Table of Contents
+
+- [Built-in completion command](#built-in-completion-command)
+- [ShellCompDirective](#shellcompdirective)
+- [Static arg completions](#static-arg-completions)
+- [Dynamic arg completions](#dynamic-arg-completions)
+- [Flag value completions](#flag-value-completions)
+- [Completion annotations](#completion-annotations)
+- [Testing completions](#testing-completions)
+- [Disabling the completion command](#disabling-the-completion-command)
+
 ## Built-in completion command
 
 Cobra registers a `completion` subcommand automatically:

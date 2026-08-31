@@ -1,5 +1,22 @@
 # Database Performance
 
+## Table of Contents
+
+- [Connection Pool Sizing](#connection-pool-sizing)
+  - [Configuration](#configuration)
+  - [Monitoring](#monitoring)
+  - [Prometheus Metrics](#prometheus-metrics)
+- [Batch Processing](#batch-processing)
+  - [Sweet spot: 100–1,000 rows per batch](#sweet-spot-1001000-rows-per-batch)
+  - [Batch INSERT with sqlx](#batch-insert-with-sqlx)
+  - [Bulk INSERT with pgx (PostgreSQL COPY protocol)](#bulk-insert-with-pgx-postgresql-copy-protocol)
+  - [Cursor-based pagination (avoid OFFSET)](#cursor-based-pagination-avoid-offset)
+- [Indexing Strategy](#indexing-strategy)
+  - [Use SQL MCP to check existing indexes](#use-sql-mcp-to-check-existing-indexes)
+  - [When to suggest adding indexes](#when-to-suggest-adding-indexes)
+  - [When to suggest removing indexes](#when-to-suggest-removing-indexes)
+- [Query Performance Tips](#query-performance-tips)
+
 ## Connection Pool Sizing
 
 ### Configuration

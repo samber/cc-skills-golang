@@ -2,6 +2,21 @@
 
 Tools and techniques for **temporary deep-dive performance investigation** — not everyday monitoring. These are things you enable for hours or days while debugging a specific issue, then disable.
 
+## Table of Contents
+
+- [Setting Up a Session](#setting-up-a-session)
+- [Prometheus Go Runtime Collector](#prometheus-go-runtime-collector)
+  - [Key Series](#key-series)
+- [PromQL Deep-Dive Queries](#promql-deep-dive-queries)
+  - [GC pressure](#gc-pressure)
+  - [Memory leak detection](#memory-leak-detection)
+  - [Goroutine leak detection](#goroutine-leak-detection)
+  - [CPU saturation](#cpu-saturation)
+  - [Post-deploy regression detection](#post-deploy-regression-detection)
+  - [Example alerting rules](#example-alerting-rules)
+- [Host-Level Correlation](#host-level-correlation)
+- [Cost Warnings](#cost-warnings)
+
 ## Setting Up a Session
 
 Before diving into profiles, set up the environment to collect high-resolution data:

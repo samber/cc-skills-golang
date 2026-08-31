@@ -4,6 +4,42 @@ Complete listing of Go runtime metrics **actually exposed as Prometheus metrics*
 
 ---
 
+## Table of Contents
+
+- [Important Clarification](#important-clarification)
+- [Quick Reference](#quick-reference)
+  - [Metrics with Labels](#metrics-with-labels)
+  - [All Other Metrics](#all-other-metrics)
+- [Default Go Metrics (Always Exposed)](#default-go-metrics-always-exposed)
+  - [Memory Allocation](#memory-allocation)
+  - [Heap State](#heap-state)
+  - [Stack and Metadata](#stack-and-metadata)
+  - [Allocation and Free Counters](#allocation-and-free-counters)
+  - [GC Configuration and Timing](#gc-configuration-and-timing)
+  - [GC Pause Duration (with labels)](#gc-pause-duration-with-labels)
+  - [Runtime State](#runtime-state)
+  - [Version Information (with labels)](#version-information-with-labels)
+- [Optional Go Metrics (Opt-in, Go 1.17+)](#optional-go-metrics-opt-in-go-117)
+  - [GC Cycles](#gc-cycles)
+  - [Additional Heap Metrics](#additional-heap-metrics)
+  - [GC Pauses Distribution](#gc-pauses-distribution)
+  - [CPU Classes](#cpu-classes)
+  - [Memory Classes](#memory-classes)
+  - [Scheduler Metrics](#scheduler-metrics)
+  - [CGO Metrics](#cgo-metrics)
+- [Process Metrics](#process-metrics)
+  - [CPU and Memory](#cpu-and-memory)
+  - [File Descriptors](#file-descriptors)
+  - [Process Information](#process-information)
+  - [Page Faults](#page-faults)
+- [Common PromQL Queries](#common-promql-queries)
+  - [Memory Leak Detection](#memory-leak-detection)
+  - [GC Pressure](#gc-pressure)
+  - [Goroutine Leaks](#goroutine-leaks)
+  - [CPU Usage](#cpu-usage)
+  - [File Descriptor Leaks](#file-descriptor-leaks)
+- [References](#references)
+
 ## Important Clarification
 
 **`runtime/metrics` are NOT Prometheus metrics.** They're Go runtime data structures.

@@ -2,6 +2,26 @@
 
 > **Run these tools in CI only, not on local machines.** Local benchmark results are noisy due to background processes, thermal throttling, and inconsistent CPU frequency — regressions detected locally are unreliable and waste developer time. Even shared CI runners can produce significant variance (5-10%); use statistical methods like `benchstat` with multiple iterations and relative comparisons to filter noise, or invest in dedicated benchmark runners for critical paths.
 
+## Table of Contents
+
+- [benchdiff](#benchdiff)
+- [cob](#cob)
+- [gobenchdata](#gobenchdata)
+  - [CLI commands](#cli-commands)
+  - [GitHub Action setup](#github-action-setup)
+  - [Regression gating on PRs](#regression-gating-on-prs)
+  - [Dashboard configuration](#dashboard-configuration)
+- [Tool Selection Guide](#tool-selection-guide)
+- [Noisy Neighbor Mitigation](#noisy-neighbor-mitigation)
+  - [Why CI benchmarks are noisy](#why-ci-benchmarks-are-noisy)
+  - [Strategies](#strategies)
+- [System Tuning for Self-Hosted Runners](#system-tuning-for-self-hosted-runners)
+  - [Disable CPU frequency scaling](#disable-cpu-frequency-scaling)
+  - [Disable Turbo Boost](#disable-turbo-boost)
+  - [Pin benchmarks to specific CPU cores](#pin-benchmarks-to-specific-cpu-cores)
+  - [Disable SMT (Hyper-Threading)](#disable-smt-hyper-threading)
+  - [Combined CI setup script](#combined-ci-setup-script)
+
 ## benchdiff
 
 Runs Go benchmarks on two git refs and uses `benchstat` to display deltas. Caches results for non-worktree refs so re-runs are fast. Prevents macOS sleep during benchmarks.

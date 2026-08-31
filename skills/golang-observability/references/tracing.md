@@ -4,6 +4,17 @@
 
 When using the OpenTelemetry Go SDK, refer to the library's official documentation for up-to-date API signatures and examples.
 
+## Table of Contents
+
+- [Why Tracing](#why-tracing)
+- [OTel SDK Setup](#otel-sdk-setup)
+- [Creating Spans](#creating-spans)
+- [HTTP Middleware with `otelhttp`](#http-middleware-with-otelhttp)
+- [Span Status and Recording Errors](#span-status-and-recording-errors)
+- [Structured Errors with `samber/oops`](#structured-errors-with-samberoops)
+- [Trace Sampling](#trace-sampling)
+- [Cost of Tracing](#cost-of-tracing)
+
 ## Why Tracing
 
 When a request crosses multiple services, logs from each service are isolated. Tracing connects them: a single trace shows the full request path with timing for every operation. This is how you answer "why was this request slow?" in a microservices architecture.

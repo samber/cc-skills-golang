@@ -1,5 +1,15 @@
 # Viper Test Isolation
 
+## Table of Contents
+
+- [The global state problem](#the-global-state-problem)
+- [viper.New() per test (correct approach)](#vipernew-per-test-correct-approach)
+- [Injecting viper into your app](#injecting-viper-into-your-app)
+- [Reading config files in tests](#reading-config-files-in-tests)
+- [t.Setenv interactions](#tsetenv-interactions)
+- [viper.Reset() — use with caution](#viperreset-use-with-caution)
+- [Snapshot and restore pattern](#snapshot-and-restore-pattern)
+
 ## The global state problem
 
 The top-level `viper.*` functions operate on a global `*viper.Viper` instance shared across all tests in the same process. Tests that call `viper.SetConfigFile`, `viper.Set`, or `viper.ReadInConfig` pollute this global state, causing flaky test ordering.

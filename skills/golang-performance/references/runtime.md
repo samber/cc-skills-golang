@@ -2,6 +2,23 @@
 
 Runtime settings control garbage collection frequency, memory limits, CPU scheduling, and compiler optimizations. Tune them after profiling — the defaults are well-chosen for most workloads.
 
+## Table of Contents
+
+- [Garbage Collector Tuning](#garbage-collector-tuning)
+  - [GOGC (default: 100)](#gogc-default-100)
+  - [GOMEMLIMIT (Go 1.19+)](#gomemlimit-go-119)
+  - [Programmatic control](#programmatic-control)
+  - [Ballast pattern (pre-Go 1.19)](#ballast-pattern-pre-go-119)
+- [GC Profiling and Diagnostics](#gc-profiling-and-diagnostics)
+  - [GODEBUG=gctrace=1](#godebuggctrace1)
+  - [runtime.ReadMemStats](#runtimereadmemstats)
+  - [GC pacing](#gc-pacing)
+- [Allocation Rate Reduction](#allocation-rate-reduction)
+- [GOMAXPROCS in Containers](#gomaxprocs-in-containers)
+- [Profile-Guided Optimization (PGO)](#profile-guided-optimization-pgo)
+- [Logging Overhead in Hot Paths](#logging-overhead-in-hot-paths)
+- [Panic/Recover Cost](#panicrecover-cost)
+
 ## Garbage Collector Tuning
 
 **Diagnose:** 1- `GODEBUG=gctrace=1` — print one line per GC cycle; look for high GC frequency (cycles/s), high CPU% (>5% means GC is competing for CPU), or heap growing faster than expected 2- `runtime.ReadMemStats` — inspect `Alloc`, `TotalAlloc`, `NumGC`, `PauseNs`; compare `Alloc` vs `Sys` to see how much memory the GC is reclaiming vs how much the OS allocated 3- `go tool trace` — visualize GC stop-the-world pauses and GC assist stealing CPU from application goroutines; look for long STW bars or frequent assist marks 4- `debug.ReadGCStats` — get pause time percentiles (p50, p95, p99); high p99 pauses indicate large heap scans or too many pointers 5- `runtime/metrics` — programmatic access to GC stats for dashboards; monitor `/gc/cycles/total`, `/gc/heap/allocs`, `/gc/pauses` 6- `GODEBUG=gcpacertrace=1` — trace the GC pacer's decisions; useful to understand why GC triggers earlier or later than expected 7- Prometheus `rate(go_gc_duration_seconds_count[5m])` — monitor GC frequency in production; >2 cycles/s sustained suggests excessive allocation rate

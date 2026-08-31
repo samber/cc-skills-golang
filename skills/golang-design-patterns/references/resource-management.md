@@ -1,5 +1,12 @@
 # Resource Management Patterns
 
+## Table of Contents
+
+- [Defer Close Immediately](#defer-close-immediately)
+- [`runtime.AddCleanup` over `runtime.SetFinalizer`](#runtimeaddcleanup-over-runtimesetfinalizer)
+- [Resource Pools](#resource-pools)
+- [Graceful Shutdown](#graceful-shutdown)
+
 ## Defer Close Immediately
 
 `defer Close()` MUST be called immediately after opening — NEVER delay. This prevents leaks when code is modified later and new return paths are added:

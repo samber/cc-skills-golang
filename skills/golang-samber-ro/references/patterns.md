@@ -2,6 +2,18 @@
 
 Real-world patterns for building production reactive pipelines with samber/ro.
 
+## Table of Contents
+
+- [Pattern 1: Remote Call with Retry and Timeout](#pattern-1-remote-call-with-retry-and-timeout)
+- [Pattern 2: Continuous Event Stream (Hot Observable)](#pattern-2-continuous-event-stream-hot-observable)
+- [Pattern 3: Fan-In from Multiple Sources](#pattern-3-fan-in-from-multiple-sources)
+- [Pattern 4: Dependent Data Combination](#pattern-4-dependent-data-combination)
+- [Pattern 5: Running Aggregation with Scan](#pattern-5-running-aggregation-with-scan)
+- [Pattern 6: Error Recovery Cascade](#pattern-6-error-recovery-cascade)
+- [Pattern 7: File System Watcher](#pattern-7-file-system-watcher)
+- [Pattern 8: Graceful Shutdown](#pattern-8-graceful-shutdown)
+- [Pattern 9: Event-Driven Pipeline with Logging](#pattern-9-event-driven-pipeline-with-logging)
+
 ## Pattern 1: Remote Call with Retry and Timeout
 
 Wrap a remote call (HTTP, gRPC, database) with automatic retry, exponential backoff, timeout, and fallback.

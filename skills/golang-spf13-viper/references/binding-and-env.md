@@ -1,5 +1,15 @@
 # Viper Env Binding and Flag Binding
 
+## Table of Contents
+
+- [The binding interaction model](#the-binding-interaction-model)
+- [AutomaticEnv vs BindEnv](#automaticenv-vs-bindenv)
+- [SetEnvKeyReplacer in depth](#setenvkeyreplacer-in-depth)
+- [AllowEmptyEnv](#allowemptyenv)
+- [Flag binding](#flag-binding)
+- [How pflag binding interacts with precedence](#how-pflag-binding-interacts-with-precedence)
+- [Debugging binding](#debugging-binding)
+
 ## The binding interaction model
 
 Three settings control how viper maps environment variables to keys. They must be set together:

@@ -2,6 +2,15 @@
 
 Wire generates plain Go constructor calls, so tests work directly on the constructor layer — no container API to learn.
 
+## Table of Contents
+
+- [Unit Tests: Plain Constructor Injection](#unit-tests-plain-constructor-injection)
+- [Test Injectors: Swapping Providers](#test-injectors-swapping-providers)
+- [Passing Mocks as Injector Arguments](#passing-mocks-as-injector-arguments)
+- [CI: Detecting Stale `wire_gen.go`](#ci-detecting-stale-wire_gengo)
+- [Testing Interface Bindings](#testing-interface-bindings)
+- [Table-Driven Tests Without Wire](#table-driven-tests-without-wire)
+
 ## Unit Tests: Plain Constructor Injection
 
 The generated code has no wire dependency. Test constructors directly:

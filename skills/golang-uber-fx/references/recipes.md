@@ -2,6 +2,17 @@
 
 End-to-end examples that go beyond the SKILL.md basics. Each recipe is self-contained and shows a real wiring problem.
 
+## Table of Contents
+
+- [Full HTTP service with database, metrics, and graceful shutdown](#full-http-service-with-database-metrics-and-graceful-shutdown)
+- [Background worker with graceful drain](#background-worker-with-graceful-drain)
+- [Multiple implementations of the same interface](#multiple-implementations-of-the-same-interface)
+- [fx.Supply for config and secrets](#fxsupply-for-config-and-secrets)
+- [Module-scoped decorator](#module-scoped-decorator)
+- [Optional dependency for tracing](#optional-dependency-for-tracing)
+- [Manual lifecycle for embedding fx in a CLI](#manual-lifecycle-for-embedding-fx-in-a-cli)
+- [Custom event logger that filters noise](#custom-event-logger-that-filters-noise)
+
 ## Full HTTP service with database, metrics, and graceful shutdown
 
 ```go

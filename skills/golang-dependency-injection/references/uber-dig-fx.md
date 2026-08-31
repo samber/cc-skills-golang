@@ -6,6 +6,18 @@
 
 Before writing dig/fx code, refer to the library's official documentation for up-to-date API signatures and examples.
 
+## Table of Contents
+
+- [dig — Basic Container](#dig-basic-container)
+  - [Named Dependencies](#named-dependencies)
+  - [dig Tradeoffs](#dig-tradeoffs)
+- [fx — Full Application Framework](#fx-full-application-framework)
+  - [Basic Application](#basic-application)
+  - [Lifecycle Hooks](#lifecycle-hooks)
+  - [Modules](#modules)
+  - [Testing with fx](#testing-with-fx)
+  - [fx Tradeoffs](#fx-tradeoffs)
+
 ## dig — Basic Container
 
 ```go

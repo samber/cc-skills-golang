@@ -9,6 +9,44 @@ Use the execution tracer when:
 - You need to understand goroutine scheduling and contention
 - You want to see the wall-clock timeline of concurrent operations
 
+## Table of Contents
+
+- [Generating Traces](#generating-traces)
+  - [From benchmarks](#from-benchmarks)
+  - [From running service](#from-running-service)
+  - [From tests](#from-tests)
+  - [From code (programmatic)](#from-code-programmatic)
+- [Full Command Reference](#full-command-reference)
+  - [Opening traces](#opening-traces)
+  - [Extracting pprof profiles from traces](#extracting-pprof-profiles-from-traces)
+  - [Full capture-to-analysis workflows](#full-capture-to-analysis-workflows)
+  - [`go tool trace` flags summary](#go-tool-trace-flags-summary)
+  - [HTTP endpoints served by the web UI](#http-endpoints-served-by-the-web-ui)
+- [Web UI](#web-ui)
+  - [Main views](#main-views)
+  - [Navigating the trace viewer](#navigating-the-trace-viewer)
+  - [Reading the timeline](#reading-the-timeline)
+- [What to Look For](#what-to-look-for)
+  - [Goroutine states](#goroutine-states)
+  - [GC phases](#gc-phases)
+  - [Scheduling latency](#scheduling-latency)
+  - [Network/sync blocking](#networksync-blocking)
+  - [Goroutine creation and destruction](#goroutine-creation-and-destruction)
+- [Custom Annotations](#custom-annotations)
+  - [Tasks](#tasks)
+  - [Regions](#regions)
+  - [Log messages](#log-messages)
+  - [When to use annotations](#when-to-use-annotations)
+- [Flight Recorder (Go 1.25+)](#flight-recorder-go-125)
+  - [Setup](#setup)
+  - [Snapshot on error](#snapshot-on-error)
+  - [Trigger patterns](#trigger-patterns)
+  - [Analyzing a snapshot](#analyzing-a-snapshot)
+  - [Constraints](#constraints)
+  - [When to use flight recorder vs regular tracing](#when-to-use-flight-recorder-vs-regular-tracing)
+- [Overhead and Practical Limits](#overhead-and-practical-limits)
+- [Trace vs pprof: When to Use Which](#trace-vs-pprof-when-to-use-which)
+
 ## Generating Traces
 
 ### From benchmarks

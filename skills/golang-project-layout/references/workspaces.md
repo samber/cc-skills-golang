@@ -2,6 +2,13 @@
 
 # Go Workspaces for Multi-Package Repositories
 
+## Table of Contents
+
+- [When to Use Workspaces](#when-to-use-workspaces)
+- [Workspace Structure](#workspace-structure)
+- [Creating a Workspace](#creating-a-workspace)
+- [Workspace Commands](#workspace-commands)
+
 ## When to Use Workspaces
 
 Use Go workspaces (`go.work`) when:

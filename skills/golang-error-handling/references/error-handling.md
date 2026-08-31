@@ -1,5 +1,14 @@
 # Error Handling Patterns and Logging
 
+## Table of Contents
+
+- [The Single Handling Rule](#the-single-handling-rule)
+- [Panic and Recover](#panic-and-recover)
+  - [When to panic](#when-to-panic)
+  - [Recovering from panics](#recovering-from-panics)
+- [Why Use `samber/oops`](#why-use-samberoops)
+- [Logging Errors with `slog`](#logging-errors-with-slog)
+
 ## The Single Handling Rule
 
 An error MUST be handled exactly once: either log it or return it, never both. Doing both causes duplicate log entries and makes debugging harder.

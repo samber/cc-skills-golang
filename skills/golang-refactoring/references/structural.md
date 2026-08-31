@@ -2,6 +2,22 @@
 
 Go enforces a handful of structural rules at compile time that other languages leave to convention or linting. This file covers the load-bearing ones: why import cycles are a hard error rather than a warning, how to design a package boundary so it doesn't need to be redesigned again, the officially-blessed mechanism for moving a type across packages without breaking every caller at once, and how to evolve an exported API without a flag day.
 
+## Table of Contents
+
+- [Breaking Import Cycles](#breaking-import-cycles)
+  - [1. Consumer-side interface (dependency inversion)](#1-consumer-side-interface-dependency-inversion)
+  - [2. Extract shared types to a new/lower package](#2-extract-shared-types-to-a-newlower-package)
+  - [3. `internal/` packages](#3-internal-packages)
+  - [4. Mediator/bridge package](#4-mediatorbridge-package)
+- [Package Boundary Design](#package-boundary-design)
+  - [Splitting a god package](#splitting-a-god-package)
+- [Moving Types Across Packages: Type Aliases for Gradual Code Repair](#moving-types-across-packages-type-aliases-for-gradual-code-repair)
+- [Exported API Surface and Versioning](#exported-api-surface-and-versioning)
+- [`init()`, Global State, and Package-Level Vars as a Refactoring Target](#init-global-state-and-package-level-vars-as-a-refactoring-target)
+- [Generics — When a Refactor Toward Them Is Warranted](#generics-when-a-refactor-toward-them-is-warranted)
+- [Common Mistakes](#common-mistakes)
+- [Cross-References](#cross-references)
+
 ## Breaking Import Cycles
 
 - Go compiles packages leaf-to-root in dependency order: before compiling package `X`, the compiler must have already finished compiling everything `X` imports, because it needs their compiled type information to type-check `X`.

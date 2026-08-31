@@ -1,5 +1,14 @@
 # Testing Database Code
 
+## Table of Contents
+
+- [Unit Tests with Mocks](#unit-tests-with-mocks)
+  - [Mock for service-layer tests](#mock-for-service-layer-tests)
+- [sqlmock for Query-Level Testing](#sqlmock-for-query-level-testing)
+- [Integration Tests](#integration-tests)
+  - [Test database with testcontainers-go](#test-database-with-testcontainers-go)
+- [What to Test](#what-to-test)
+
 ## Unit Tests with Mocks
 
 Define a repository interface so business logic can be tested without a database. Mock the interface with `testify/mock`:

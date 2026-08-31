@@ -2,6 +2,18 @@
 
 Systematic methodology for identifying and prioritizing security threats in Go applications.
 
+## Table of Contents
+
+- [STRIDE Methodology](#stride-methodology)
+  - [STRIDE per Element Matrix](#stride-per-element-matrix)
+  - [Go-Specific STRIDE Analysis](#go-specific-stride-analysis)
+- [DREAD Risk Scoring](#dread-risk-scoring)
+  - [Example: SQL Injection in Login Handler](#example-sql-injection-in-login-handler)
+- [Trust Boundary Analysis](#trust-boundary-analysis)
+- [OWASP Top 10 Mapping for Go](#owasp-top-10-mapping-for-go)
+- [Conducting a Threat Model](#conducting-a-threat-model)
+- [Vulnerability Severity Matrix](#vulnerability-severity-matrix)
+
 ## STRIDE Methodology
 
 Apply STRIDE to every element in your system's data flow diagram. Each element type is susceptible to specific threat categories:

@@ -2,6 +2,19 @@
 
 → See `samber/cc-skills-golang@golang-testing` skill for writing effective Example test functions.
 
+## Table of Contents
+
+- [Public vs Private Libraries](#public-vs-private-libraries)
+- [Go Playground Demos](#go-playground-demos)
+- [Example Test Functions](#example-test-functions)
+- [Code Examples in Doc Comments](#code-examples-in-doc-comments)
+- [godoc and pkg.go.dev](#godoc-and-pkggodev)
+- [Documentation Website](#documentation-website)
+  - [Recommended Frameworks](#recommended-frameworks)
+  - [Recommended Sections](#recommended-sections)
+  - [llms.txt](#llmstxt)
+  - [Register for Discoverability](#register-for-discoverability)
+
 ## Public vs Private Libraries
 
 Not all documentation applies equally. Adapt to your audience:

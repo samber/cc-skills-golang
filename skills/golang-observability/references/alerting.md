@@ -2,6 +2,18 @@
 
 > See [metrics.md](metrics.md) for multi-window burn-rate SLO alerting and PromQL patterns for application metrics.
 
+## Table of Contents
+
+- [The Four Golden Signals](#the-four-golden-signals)
+- [Awesome Prometheus Alerts](#awesome-prometheus-alerts)
+  - [Categories](#categories)
+  - [How to Use It](#how-to-use-it)
+  - [Integration Example](#integration-example)
+  - [Workflow for New Dependencies](#workflow-for-new-dependencies)
+- [Go Runtime Alerts](#go-runtime-alerts)
+- [Alert Severity Levels](#alert-severity-levels)
+- [Common Mistakes](#common-mistakes)
+
 ## The Four Golden Signals
 
 Alert on what matters to users. Google's SRE book defines four golden signals — every Go service SHOULD have alerts covering all four:

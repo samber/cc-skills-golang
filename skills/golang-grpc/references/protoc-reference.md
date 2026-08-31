@@ -1,5 +1,18 @@
 # Protobuf & Code Generation Reference
 
+## Table of Contents
+
+- [Directory Layout](#directory-layout)
+- [Proto File Conventions](#proto-file-conventions)
+  - [`go_package` conventions](#go_package-conventions)
+- [Code Generation with `protoc`](#code-generation-with-protoc)
+  - [Common `protoc` flags](#common-protoc-flags)
+- [Code Generation with `buf`](#code-generation-with-buf)
+  - [`buf.gen.yaml`](#bufgenyaml)
+  - [`buf.yaml`](#bufyaml)
+  - [Common `buf` commands](#common-buf-commands)
+- [Generated Code Patterns](#generated-code-patterns)
+
 ## Directory Layout
 
 Organize proto files by domain with versioned directories. Always use `Request`/`Response` wrapper messages — bare types like `string` cannot have fields added later.

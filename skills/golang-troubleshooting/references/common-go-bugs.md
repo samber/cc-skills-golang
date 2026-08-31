@@ -2,6 +2,41 @@
 
 → See `samber/cc-skills-golang@golang-safety` skill for in-depth nil, slice, and map safety patterns.
 
+## Table of Contents
+
+- [Nil Pointer Dereference](#nil-pointer-dereference)
+- [Interface Nil Gotcha](#interface-nil-gotcha)
+- [Variable Shadowing with `:=`](#variable-shadowing-with)
+- [Slice and Map Gotchas](#slice-and-map-gotchas)
+- [Defer Gotchas](#defer-gotchas)
+- [Error Handling Pitfalls](#error-handling-pitfalls)
+- [Context Misuse](#context-misuse)
+- [Concurrent Map Read/Write (Fatal)](#concurrent-map-readwrite-fatal)
+- [Copying sync Types](#copying-sync-types)
+- [WaitGroup.Add Inside Goroutine](#waitgroupadd-inside-goroutine)
+- [Missing Return After HTTP Error Response](#missing-return-after-http-error-response)
+- [JSON Pitfalls](#json-pitfalls)
+  - [Numbers into `interface{}` become `float64`](#numbers-into-interface-become-float64)
+  - [Unexported fields silently ignored](#unexported-fields-silently-ignored)
+- [`strings.Trim` vs `strings.TrimPrefix`](#stringstrim-vs-stringstrimprefix)
+- [String Length and Indexing](#string-length-and-indexing)
+- [`break` in `select`/`switch` Inside `for` Loop](#break-in-selectswitch-inside-for-loop)
+- [Enum Zero Value with `iota`](#enum-zero-value-with-iota)
+- [`recover()` Only Works in the Same Goroutine](#recover-only-works-in-the-same-goroutine)
+- [`os.Exit` Skips Deferred Functions](#osexit-skips-deferred-functions)
+- [`time.Time` Comparison: `==` vs `.Equal()`](#timetime-comparison-vs-equal)
+- [`sql.Rows` Must Be Closed](#sqlrows-must-be-closed)
+- [Writing to a Closed Channel Panics](#writing-to-a-closed-channel-panics)
+- [Closed Channel in `select` Causes Busy Loop](#closed-channel-in-select-causes-busy-loop)
+- [`select` with `default` Can Spin CPU](#select-with-default-can-spin-cpu)
+- [Integer Conversion Silently Truncates](#integer-conversion-silently-truncates)
+- [`filepath.Join` Does Not Prevent Path Traversal](#filepathjoin-does-not-prevent-path-traversal)
+- [Pointer Receiver Interface Satisfaction](#pointer-receiver-interface-satisfaction)
+- [`regexp.MustCompile` in Hot Path](#regexpmustcompile-in-hot-path)
+- [`init()` Ordering Is Fragile](#init-ordering-is-fragile)
+- [Map Iteration Order Is Random](#map-iteration-order-is-random)
+- [`fallthrough` in `switch` Executes Unconditionally](#fallthrough-in-switch-executes-unconditionally)
+
 ## Nil Pointer Dereference
 
 Pointers from external sources MUST be checked before dereferencing.

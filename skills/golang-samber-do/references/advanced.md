@@ -1,5 +1,23 @@
 # Advanced Usage
 
+## Table of Contents
+
+- [Scopes (Module Tree)](#scopes-module-tree)
+- [Explicit Service Aliasing](#explicit-service-aliasing)
+- [Struct Injection](#struct-injection)
+- [Lifecycle Management](#lifecycle-management)
+  - [Health Checks](#health-checks)
+  - [Graceful Shutdown](#graceful-shutdown)
+- [Debugging](#debugging)
+  - [List Services](#list-services)
+  - [Explain Injector](#explain-injector)
+- [Migration from Manual DI](#migration-from-manual-di)
+- [Quick Reference](#quick-reference)
+  - [Aliasing](#aliasing)
+  - [Lifecycle & Health](#lifecycle-health)
+  - [Container Management](#container-management)
+  - [Debugging](#debugging-1)
+
 ## Scopes (Module Tree)
 
 Scopes SHOULD be used to organize services by module:

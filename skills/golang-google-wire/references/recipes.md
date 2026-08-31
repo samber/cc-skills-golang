@@ -2,6 +2,14 @@
 
 End-to-end examples. Each recipe is self-contained.
 
+## Table of Contents
+
+- [HTTP Server with Postgres and Redis](#http-server-with-postgres-and-redis)
+- [Multiple Build Variants (Prod vs Dev)](#multiple-build-variants-prod-vs-dev)
+- [Cleanup-Heavy Graph](#cleanup-heavy-graph)
+- [Embedding Wire in a CLI](#embedding-wire-in-a-cli)
+- [Passing External Values to Wire](#passing-external-values-to-wire)
+
 ## HTTP Server with Postgres and Redis
 
 A typical service: parsed config → DB (with cleanup) → Redis (with cleanup) → repo → service → HTTP server.

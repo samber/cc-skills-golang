@@ -2,6 +2,19 @@
 
 Detail topics that are referenced from `SKILL.md`. Each section is self-contained.
 
+## Table of Contents
+
+- [Decorate](#decorate)
+- [Scopes](#scopes)
+- [Optional Dependencies](#optional-dependencies)
+- [Error Handling](#error-handling)
+- [Visualization](#visualization)
+- [Quick Reference](#quick-reference)
+  - [Container](#container)
+  - [Provide options](#provide-options)
+  - [Container options](#container-options)
+  - [Errors](#errors)
+
 ## Decorate
 
 `Decorate` modifies a value already provided in the container — the decorator receives the original instance and returns a replacement. Common uses: enriching a logger with context, wrapping a metrics scope with tags, swapping a real client for a recording one in a child scope.

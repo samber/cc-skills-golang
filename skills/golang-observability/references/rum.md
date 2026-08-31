@@ -1,5 +1,21 @@
 # Real User Monitoring (RUM) and Product Observability
 
+## Table of Contents
+
+- [What RUM Is](#what-rum-is)
+- [RUM Capabilities](#rum-capabilities)
+- [Identity Key: Use `user_id`, Never Email](#identity-key-use-user_id-never-email)
+- [Backend Role in RUM](#backend-role-in-rum)
+  - [1. Server-Side Event Tracking](#1-server-side-event-tracking)
+  - [2. Connecting Frontend Sessions to Backend Traces](#2-connecting-frontend-sessions-to-backend-traces)
+  - [3. CDP Event Ingestion](#3-cdp-event-ingestion)
+- [GDPR and CCPA Compliance](#gdpr-and-ccpa-compliance)
+  - [Consent Management](#consent-management)
+  - [Data Subject Rights Endpoints](#data-subject-rights-endpoints)
+  - [Privacy Checklist](#privacy-checklist)
+- [Self-Hosted vs SaaS](#self-hosted-vs-saas)
+- [Cost of RUM](#cost-of-rum)
+
 ## What RUM Is
 
 Backend observability (logs, metrics, traces, profiles) tells you how your **system** behaves. RUM tells you how your **users** experience it. While frontend SDKs capture browser-side signals, the Go backend plays a critical role: tracking server-side business events, feeding Customer Data Platforms, and correlating user sessions with backend traces.

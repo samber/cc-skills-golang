@@ -1,5 +1,15 @@
 # Architecture Patterns
 
+## Table of Contents
+
+- [Choose the Right Level of Architecture](#choose-the-right-level-of-architecture)
+- [Keep Domain Pure](#keep-domain-pure)
+- [Fail Fast — Validate at Boundaries](#fail-fast-validate-at-boundaries)
+- [Make Illegal States Unrepresentable](#make-illegal-states-unrepresentable)
+- [Detailed Architecture Guides](#detailed-architecture-guides)
+- [12-Factor App Principles](#12-factor-app-principles)
+- [Explicit Over Implicit](#explicit-over-implicit)
+
 ## Choose the Right Level of Architecture
 
 Architecture complexity MUST match project scope — don't over-architect small projects. When starting a new project, ask the developer what architecture they prefer:

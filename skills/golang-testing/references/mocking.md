@@ -1,5 +1,12 @@
 # Mocking and Test Fixtures
 
+## Table of Contents
+
+- [Mocks with testify/mock](#mocks-with-testifymock)
+- [Mock Organization](#mock-organization)
+- [Test Fixtures](#test-fixtures)
+- [Time Mocking](#time-mocking)
+
 ## Mocks with testify/mock
 
 Create interfaces for your dependencies, then mock them.

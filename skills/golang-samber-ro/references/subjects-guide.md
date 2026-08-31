@@ -2,6 +2,22 @@
 
 Subjects are both Observable and Observer — they can receive values (via `Send`, `Error`, `Complete`) and be subscribed to. Subjects are natively **hot**: subscribers share a single execution, and late subscribers only see future emissions (unless replay is configured).
 
+## Table of Contents
+
+- [When to Use Subjects vs Cold Observables](#when-to-use-subjects-vs-cold-observables)
+- [Subject Types](#subject-types)
+  - [PublishSubject](#publishsubject)
+  - [BehaviorSubject](#behaviorsubject)
+  - [ReplaySubject](#replaysubject)
+  - [AsyncSubject](#asyncsubject)
+  - [UnicastSubject](#unicastsubject)
+- [Cold to Hot Conversion](#cold-to-hot-conversion)
+  - [Share](#share)
+  - [ShareReplay](#sharereplay)
+  - [Connectable Observable](#connectable-observable)
+- [Subject Decision Table](#subject-decision-table)
+- [Common Subject Mistakes](#common-subject-mistakes)
+
 ## When to Use Subjects vs Cold Observables
 
 | Use case | Approach |

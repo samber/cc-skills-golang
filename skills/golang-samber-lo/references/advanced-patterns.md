@@ -1,5 +1,19 @@
 # Advanced Patterns
 
+## Table of Contents
+
+- [Composing Transformations](#composing-transformations)
+- [lo + stdlib Interop](#lo-stdlib-interop)
+- [lo + samber/mo Integration](#lo-sambermo-integration)
+- [Iterator Patterns (loi)](#iterator-patterns-loi)
+  - [Eager vs lazy comparison](#eager-vs-lazy-comparison)
+  - [Building lazy pipelines](#building-lazy-pipelines)
+- [Performance-Sensitive Patterns](#performance-sensitive-patterns)
+  - [When to switch from lo to lom](#when-to-switch-from-lo-to-lom)
+  - [Parallel transforms](#parallel-transforms)
+- [Testing with lo](#testing-with-lo)
+- [Slice-to-Map Conversion](#slice-to-map-conversion)
+
 ## Composing Transformations
 
 Chain lo functions to build multi-step pipelines. Each function returns a new collection that feeds into the next.

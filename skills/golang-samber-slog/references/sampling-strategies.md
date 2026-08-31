@@ -1,5 +1,18 @@
 # Sampling Strategies
 
+## Table of Contents
+
+- [Why Sample](#why-sample)
+- [Strategy Comparison](#strategy-comparison)
+- [Uniform Sampling](#uniform-sampling)
+- [Threshold Sampling](#threshold-sampling)
+- [Absolute Sampling](#absolute-sampling)
+- [Custom Sampling](#custom-sampling)
+- [Matchers — Record Grouping](#matchers-record-grouping)
+- [Chaining Multiple Strategies](#chaining-multiple-strategies)
+- [Pipeline Ordering](#pipeline-ordering)
+- [Hook Functions — Observability on Sampling](#hook-functions-observability-on-sampling)
+
 ## Why Sample
 
 High-throughput services generate enormous log volumes. At 10k RPS with 1KB per log entry, you produce 10MB/s — 864GB/day. Sampling reduces cost, network bandwidth, and storage without losing visibility into critical events.

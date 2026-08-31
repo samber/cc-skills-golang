@@ -1,5 +1,19 @@
 # Hexagonal Architecture (Ports & Adapters) in Go
 
+## Table of Contents
+
+- [When to Use](#when-to-use)
+- [Core Concepts](#core-concepts)
+- [Project Structure](#project-structure)
+- [Code Examples](#code-examples)
+  - [Domain — pure business logic](#domain-pure-business-logic)
+  - [Ports — interfaces defined separately from implementations](#ports-interfaces-defined-separately-from-implementations)
+  - [Service — implements primary port, depends on secondary ports](#service-implements-primary-port-depends-on-secondary-ports)
+  - [Primary Adapter — HTTP handler calls the service port](#primary-adapter-http-handler-calls-the-service-port)
+  - [Secondary Adapter — implements a driven port](#secondary-adapter-implements-a-driven-port)
+- [Multiple Entry Points](#multiple-entry-points)
+- [Wiring](#wiring)
+
 ## When to Use
 
 Apply hexagonal architecture when a service interacts with multiple external systems (databases, APIs, message queues, caches) and you want the domain logic fully decoupled from all of them. Particularly effective when the same business logic needs multiple entry points (HTTP, gRPC, CLI, message consumer). Do NOT use for simple CRUD apps or libraries.

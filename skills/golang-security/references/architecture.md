@@ -2,6 +2,17 @@
 
 Defense-in-depth, Zero Trust, and authentication patterns for Go services.
 
+## Table of Contents
+
+- [Defense-in-Depth Layers](#defense-in-depth-layers)
+  - [Go Implementation by Layer](#go-implementation-by-layer)
+- [Zero Trust Principles](#zero-trust-principles)
+- [Authentication Pattern Selection](#authentication-pattern-selection)
+  - [JWT Validation — Complete Example](#jwt-validation-complete-example)
+  - [Password Hashing — Argon2id](#password-hashing-argon2id)
+- [HTTP Security Headers](#http-security-headers)
+- [Security Anti-Patterns](#security-anti-patterns)
+
 ## Defense-in-Depth Layers
 
 Multiple security controls ensure that failure of one layer doesn't compromise the system:
