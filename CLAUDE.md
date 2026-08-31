@@ -222,13 +222,25 @@ The body contains step-by-step instructions. Use secondary markdown files in `re
 
 Polanyi's paradox: most operational knowledge is tacit and resists explicit description. The skills that work aren't the ones with the most rules, they're the ones that capture a posture. Markdown is the iceberg's tip.
 
+### Body writing style
+
+- **Write imperatively, verb first** — `Run`, `Reject`, `Validate`. (→ See [Format 5: Imperative Prose](#format-5-imperative-prose-recommended-by-skill-creator).)
+- **Explain why, not just what** — reasoning-based instructions let the model handle edge cases you did not foresee. (→ See [Teach reasoning, not only rules](#teach-reasoning-not-only-rules), which also rules on caps-lock imperatives.)
+- **Use one term per concept** — mixing "field"/"box"/"element" for the same thing costs accuracy.
+- **Give one default with an escape hatch**, never a menu of five libraries. State the pick, then the condition that justifies deviating.
+- **Assume competence** — cut any paragraph explaining a well-known technology. Same principle as [Avoid duplicating linter rules](#avoid-duplicating-linter-rules), applied to the reader instead of the tooling.
+- **Prefer tables and checklists over prose** for enumerable content. (→ See [Formats](#formats) for the concrete patterns.)
+- **Match specificity to fragility** — high freedom (prose) where many approaches work; low freedom (an exact command, "do not add flags") where the operation is destructive or order-dependent.
+- **Give a copyable progress list for multi-step work** — the model tracks state against it and skips nothing.
+- **Prefer feedback loops over descriptions** — `run validator → fix → repeat` beats enumerating the rules the validator already encodes. The `Diagnose:` line is this loop applied to diagnostic tools.
+
 ### Token budgets
 
 - **~100 tokens per description** — loaded at startup for all skills
 - **≤ 1,000 characters per description** — hard limit; keep descriptions focused and scannable
 - **< 5.000 tokens per SKILL.md** (spec recommendation) — keep focused on essentials
 - **< 2.500 tokens per SKILL.md** (project recommendation)
-- **< 500 lines per SKILL.md** — move detailed reference material to `references/`
+- **< 500 lines per SKILL.md** — move detailed reference material to `references/`; aim for under 250, and note the official median is 147 lines
 - **Use secondary markdown files for depth** — Claude reads these on demand, so they don't count against context until needed
 - **2-4 skills loaded simultaneously** in a typical session
 - **Stay below ~10k tokens of total loaded SKILL.md** to avoid degrading response quality
@@ -459,7 +471,9 @@ Skills should NOT re-explain rules that are already enforced by linters (e.g. go
 
 ### Teach reasoning, not only rules
 
-Skills MUST teach Claude how to think about problems, not just list prescriptive rules. Every recommendation needs a "why" — what goes wrong without it, what consequence the reader avoids. Bare imperatives like "NEVER do X" without rationale are not acceptable.
+Skills MUST teach Claude how to think about problems, not just list prescriptive rules. Every recommendation needs a "why" — what goes wrong without it, what consequence the reader avoids.
+
+Treat ALWAYS/NEVER in caps as a smell. Reserve them for genuinely order-dependent or destructive steps, where a wrong sequence loses data or breaks the build. Reframe every other bare imperative as reasoning, so the model can apply it to cases the rule never anticipated.
 
 When a recommendation addresses a problem that can be confirmed with a diagnostic tool, add a **`Diagnose:`** line indicating which tool(s) to use to validate the hypothesis before applying the fix. This is essential in performance-oriented skills (`samber/cc-skills-golang@golang-performance`) but also useful in any skill where a tool can confirm the root cause (e.g. race detector for concurrency, `go vet` for safety, `govulncheck` for security). The diagnostic tool must NOT apply the fix automatically (e.g. never use `--fix` flags) — let the LLM interpret the diagnostic output and perform the improvement itself, so changes are tracked and can include explanatory comments.
 
