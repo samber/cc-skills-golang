@@ -99,7 +99,18 @@ metadata:
 
 ### Description quality
 
-Descriptions are the primary triggering mechanism — they determine whether a skill activates or stays silent. A poorly calibrated description wastes context (too broad) or never fires (too vague).
+The description is the only thing the model reads before deciding to load a skill. Nothing else in the file matters if selection fails.
+
+1. State what the skill does, then when to use it — in that order.
+2. Write third person. ❌ "I can help you…", ❌ "You can use this to…" — mixed point of view degrades discovery.
+3. Name the concrete nouns a user would actually type: file extensions, tool names, import paths, directory paths, domain terms.
+4. Be pushy inside the skill's own concern — under-triggering is the documented default failure: "Use whenever the user mentions X, Y, or Z, even if they don't say 'X' explicitly."
+5. Scope against siblings — when two skills overlap, say what each is _not_ for.
+6. Front-load the key use case: Claude Code truncates the description and its trigger clauses at 1,536 combined characters, and drops descriptions entirely for least-used skills once the listing exceeds ~1% of the context window.
+7. Never summarise the workflow. A description that lists ordered steps makes the agent act on the description and skip the body — describe _what_ and _when_, never _how_.
+8. Add a negative clause naming the near-miss sibling: `Do NOT use for X — use <sibling> instead.` (→ See Overlap below.)
+
+**Length calibration** — reserve long descriptions (≈900–1,050 chars) for _moment-triggered_ skills, which fire on a conversational state rather than a topic and open with the interrupt condition: "Before finishing any reply that …". Every skill in this plugin is topic- or library-triggered today; one creeping past ~900 chars is a signal to prune scenario lists and cross-references, not licence to keep growing. The hard character cap lives in [Token budgets](#token-budgets).
 
 **Too vague** (under-triggering) — one-liner descriptions without "Use when..." clauses. The model cannot match user intent to the skill. Fix by adding specific trigger scenarios, API names, and import paths.
 
@@ -111,7 +122,7 @@ description: Implements X in Golang using library/foo
 description: Implements X in Golang using library/foo — feature A, feature B, and feature C. Apply when using or adopting library/foo, or when the codebase imports `github.com/library/foo`.
 ```
 
-**Too broad** (over-triggering) — phrases like "whenever writing Go code", "when naming any identifier", "essential for ANY conversation". These match virtually all Go work and flood the context with irrelevant skills. Fix by narrowing to the specific concern the skill uniquely addresses.
+**Too broad** (over-triggering) — phrases like "whenever writing Go code", "when naming any identifier", "essential for ANY conversation". These match virtually all Go work and flood the context with irrelevant skills. Fix by narrowing to the specific concern the skill uniquely addresses. Rule 4 pushes on the _number of trigger scenarios_ listed inside that concern, never on the width of the concern itself.
 
 ```yaml
 # Bad — triggers on all Go work
@@ -121,11 +132,24 @@ description: Use when writing code, reviewing style, or writing comments in Gola
 description: Golang code style conventions. Use when the user explicitly asks about formatting, style review, or project coding standards.
 ```
 
-**Overlap** (competing triggers) — when two skills claim the same trigger keywords, the model may load the wrong one. Fix by adding explicit boundary disclaimers with `→ See` cross-references, following the performance skill cluster pattern.
+**Overlap** (competing triggers) — when two skills claim the same trigger keywords, the model may load the wrong one. Fix by naming the sibling in a boundary clause, using the fully-qualified identifier (→ See [Cross-skill references](#cross-skill-references)). Both phrasings are equally acceptable.
 
 ```yaml
-# Good — clear boundary
-description: "...Not for measurement methodology (→ See golang-benchmark skill)."
+# Good — arrow form
+description: "...Not for measurement methodology (→ See `samber/cc-skills-golang@golang-benchmark` skill)."
+
+# Good — negative-clause form
+description: "...Do NOT use for measurement methodology — use `samber/cc-skills-golang@golang-benchmark` instead."
+```
+
+**Workflow leakage** — a description that narrates ordered steps gets executed as the procedure, and the body never loads. State the scope and the triggers; leave the steps to the body. The example below is illustrative, not a real skill description.
+
+```yaml
+# Bad — ordered steps; the agent runs these and skips SKILL.md
+description: Golang benchmarking. Write the benchmark, run it with -benchmem, save the baseline, apply the change, re-run, then compare with benchstat.
+
+# Good — what and when only
+description: Golang benchmark measurement methodology — benchstat comparison, profiling interpretation, CI regression detection. Use when measuring Go performance, writing benchmarks, or interpreting benchmark output.
 ```
 
 **Library-specific skills** follow a consistent pattern: describe what the library does, list key API surface, then "Apply when using or adopting X, or when the codebase imports Y." This is the gold standard for contextual (non-user-invocable) skills.
