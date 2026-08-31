@@ -131,7 +131,7 @@ Change one thing, measure, confirm. If you change three things at once, you lear
 
 ### 5. Find the Root Cause — No Workarounds
 
-A band-aid fix that masks the symptom IS NOT ACCEPTABLE. You MUST understand **why** the bug happens before writing a fix.
+You MUST understand **why** the bug happens before writing a fix. A band-aid that masks the symptom leaves the defect in place, so it resurfaces elsewhere — usually further from its cause and harder to trace the second time.
 
 When you don't understand the issue:
 

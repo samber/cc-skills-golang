@@ -25,7 +25,7 @@ allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(g
 
 ## Architecture Decision: Ask First
 
-When starting a new project, **ask the developer** what software architecture they prefer (clean architecture, hexagonal, DDD, flat structure, etc.). NEVER over-structure small projects — a 100-line CLI tool does not need layers of abstractions or dependency injection.
+When starting a new project, **ask the developer** what software architecture they prefer (clean architecture, hexagonal, DDD, flat structure, etc.). Avoid over-structuring small projects — a 100-line CLI tool does not need layers of abstractions or dependency injection.
 
 → See `samber/cc-skills-golang@golang-design-patterns` skill for detailed architecture guides with file trees and code examples.
 

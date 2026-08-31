@@ -256,14 +256,6 @@ if s, ok := reflect.TypeAssert[string](v); ok {
 }
 ```
 
-## Cross-References
-
-- → See `samber/cc-skills-golang@golang-concurrency` skill for concurrent access patterns and sync primitives
-- → See `samber/cc-skills-golang@golang-data-structures` skill for slice/map internals, capacity growth, and container/ packages
-- → See `samber/cc-skills-golang@golang-error-handling` skill for nil error interface trap
-- → See `samber/cc-skills-golang@golang-security` skill for security-relevant safety issues (memory safety, integer overflow)
-- → See `samber/cc-skills-golang@golang-troubleshooting` skill for debugging panics and race conditions
-
 ## Common Mistakes
 
 | Mistake | Fix |
@@ -282,4 +274,9 @@ if s, ok := reflect.TypeAssert[string](v); ok {
 
 ## Cross-References
 
+- → See `samber/cc-skills-golang@golang-concurrency` skill for concurrent access patterns and sync primitives
+- → See `samber/cc-skills-golang@golang-data-structures` skill for slice/map internals, capacity growth, and container/ packages
+- → See `samber/cc-skills-golang@golang-error-handling` skill for nil error interface trap
+- → See `samber/cc-skills-golang@golang-security` skill for security-relevant safety issues (memory safety, integer overflow)
+- → See `samber/cc-skills-golang@golang-troubleshooting` skill for debugging panics and race conditions
 - → See `samber/cc-skills-golang@golang-continuous-integration` skill for automated AI-driven code review in CI using these guidelines
