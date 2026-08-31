@@ -14,7 +14,7 @@
 - [Migration from Manual DI](#migration-from-manual-di)
 - [Quick Reference](#quick-reference)
   - [Aliasing](#aliasing)
-  - [Lifecycle & Health](#lifecycle-health)
+  - [Lifecycle & Health](#lifecycle--health)
   - [Container Management](#container-management)
   - [Debugging](#debugging-1)
 

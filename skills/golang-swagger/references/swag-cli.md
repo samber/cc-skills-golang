@@ -2,8 +2,8 @@
 
 ## Table of Contents
 
-- [swag init — Generate Documentation](#swag-init-generate-documentation)
-- [swag fmt — Format Annotations](#swag-fmt-format-annotations)
+- [swag init — Generate Documentation](#swag-init--generate-documentation)
+- [swag fmt — Format Annotations](#swag-fmt--format-annotations)
 - [Framework Integration Packages](#framework-integration-packages)
 - [Dynamic Configuration](#dynamic-configuration)
 - [Generics (swag v2)](#generics-swag-v2)

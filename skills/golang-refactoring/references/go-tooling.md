@@ -4,14 +4,14 @@ This file is the tool reference for `samber/cc-skills-golang@golang-refactoring`
 
 ## Table of Contents
 
-- [1. gopls — the Primary Actuator](#1-gopls-the-primary-actuator)
+- [1. gopls — the Primary Actuator](#1-gopls--the-primary-actuator)
 - [2. Bulk Mechanical Rewrite Tools](#2-bulk-mechanical-rewrite-tools)
-  - [`gofmt -r` — syntactic, single-expression](#gofmt--r-syntactic-single-expression)
-  - [`eg` — type-aware, example-based](#eg-type-aware-example-based)
-  - [`gopatch` — statement-level, import-aware](#gopatch-statement-level-import-aware)
-  - [`go/analysis` + SuggestedFixes — bespoke, testable](#goanalysis-suggestedfixes-bespoke-testable)
-  - [`go fix` — the `go/analysis`-based fixer suite](#go-fix-the-goanalysis-based-fixer-suite)
-  - [`dave/dst` — comment- and formatting-preserving AST edits](#davedst-comment--and-formatting-preserving-ast-edits)
+  - [`gofmt -r` — syntactic, single-expression](#gofmt--r--syntactic-single-expression)
+  - [`eg` — type-aware, example-based](#eg--type-aware-example-based)
+  - [`gopatch` — statement-level, import-aware](#gopatch--statement-level-import-aware)
+  - [`go/analysis` + SuggestedFixes — bespoke, testable](#goanalysis--suggestedfixes--bespoke-testable)
+  - [`go fix` — the `go/analysis`-based fixer suite](#go-fix--the-goanalysis-based-fixer-suite)
+  - [`dave/dst` — comment- and formatting-preserving AST edits](#davedst--comment--and-formatting-preserving-ast-edits)
   - [Always run after a bulk rewrite](#always-run-after-a-bulk-rewrite)
 - [4. Structure-Discovery Tools (blast-radius mapping)](#4-structure-discovery-tools-blast-radius-mapping)
 - [Cross-References](#cross-references)

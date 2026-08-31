@@ -12,7 +12,7 @@ samber/ro provides 150+ operators organized by category. All operators are gener
 - [Math and Aggregation](#math-and-aggregation)
 - [Error Handling](#error-handling)
 - [Timing and Buffering](#timing-and-buffering)
-- [Side Effects (Tap / Do)](#side-effects-tap-do)
+- [Side Effects (Tap / Do)](#side-effects-tap--do)
 - [Connectable and Sharing](#connectable-and-sharing)
 - [Context Operators](#context-operators)
 - [Conditional Operators](#conditional-operators)

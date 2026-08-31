@@ -10,9 +10,9 @@
   - [2. Railway-Oriented Error Handling (Result)](#2-railway-oriented-error-handling-result)
   - [3. Composable Pipelines](#3-composable-pipelines)
 - [The Three Core Monads](#the-three-core-monads)
-  - [Option — Represents Absence](#option-represents-absence)
-  - [Result — Represents Fallibility](#result-represents-fallibility)
-  - [Either — Represents Alternatives](#either-represents-alternatives)
+  - [Option — Represents Absence](#option--represents-absence)
+  - [Result — Represents Fallibility](#result--represents-fallibility)
+  - [Either — Represents Alternatives](#either--represents-alternatives)
 - [When to Use mo vs Plain Go](#when-to-use-mo-vs-plain-go)
 
 ## What is Functional Programming?

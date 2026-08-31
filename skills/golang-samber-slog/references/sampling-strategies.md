@@ -8,10 +8,10 @@
 - [Threshold Sampling](#threshold-sampling)
 - [Absolute Sampling](#absolute-sampling)
 - [Custom Sampling](#custom-sampling)
-- [Matchers — Record Grouping](#matchers-record-grouping)
+- [Matchers — Record Grouping](#matchers--record-grouping)
 - [Chaining Multiple Strategies](#chaining-multiple-strategies)
 - [Pipeline Ordering](#pipeline-ordering)
-- [Hook Functions — Observability on Sampling](#hook-functions-observability-on-sampling)
+- [Hook Functions — Observability on Sampling](#hook-functions--observability-on-sampling)
 
 ## Why Sample
 

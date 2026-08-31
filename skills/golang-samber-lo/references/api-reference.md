@@ -14,7 +14,7 @@ For up-to-date signatures, use `godig symbol doc github.com/samber/lo <Symbol>` 
   - [Slice trimming](#slice-trimming)
 - [Map Operations](#map-operations)
 - [String Operations](#string-operations)
-- [Math & Comparison](#math-comparison)
+- [Math & Comparison](#math--comparison)
   - [Conditionals](#conditionals)
 - [Tuples](#tuples)
 - [Channel Operations](#channel-operations)

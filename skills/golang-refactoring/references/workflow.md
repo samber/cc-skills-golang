@@ -7,10 +7,10 @@
 
 - [1. The Planning Gate (mandatory, before any edit)](#1-the-planning-gate-mandatory-before-any-edit)
 - [2. Three Interacting Orderings](#2-three-interacting-orderings)
-  - [Parallel vs. sequential — decision checklist](#parallel-vs-sequential-decision-checklist)
+  - [Parallel vs. sequential — decision checklist](#parallel-vs-sequential--decision-checklist)
 - [3. The Git Model](#3-the-git-model)
 - [4. Parallel vs. Sequential Execution](#4-parallel-vs-sequential-execution)
-- [5. The `// REFACTOR(step N): ...` Marker Convention](#5-the-refactorstep-n-marker-convention)
+- [5. The `// REFACTOR(step N): ...` Marker Convention](#5-the--refactorstep-n--marker-convention)
 - [6. Workflows (`ultracode`) vs. Human-in-the-Loop](#6-workflows-ultracode-vs-human-in-the-loop)
 - [7. Human Checkpoints](#7-human-checkpoints)
 - [Cross-References](#cross-references)

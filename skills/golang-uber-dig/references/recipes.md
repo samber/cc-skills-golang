@@ -5,7 +5,7 @@ End-to-end examples that go beyond the SKILL.md basics. Each recipe is self-cont
 ## Table of Contents
 
 - [HTTP server with route group](#http-server-with-route-group)
-- [Two databases (read-write + read-only)](#two-databases-read-write-read-only)
+- [Two databases (read-write + read-only)](#two-databases-read-write--read-only)
 - [Provide as interface (`dig.As`) to hide concrete types](#provide-as-interface-digas-to-hide-concrete-types)
 - [Request-scoped dependencies](#request-scoped-dependencies)
 - [Optional dependency for graceful degradation](#optional-dependency-for-graceful-degradation)

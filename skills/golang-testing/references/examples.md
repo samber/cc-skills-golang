@@ -20,11 +20,11 @@ func ExampleCalculatePrice_singleItem() {
 
 The suffix decides where godoc attaches the example, so a typo silently detaches it from its symbol:
 
-| Function name              | Documents                          |
-| -------------------------- | ---------------------------------- |
-| `Example()`                | The package itself                 |
-| `ExampleCalculatePrice()`  | The `CalculatePrice` function      |
-| `ExampleStore_Get()`       | The `Get` method of `Store`        |
+| Function name               | Documents                          |
+| --------------------------- | ---------------------------------- |
+| `Example()`                 | The package itself                 |
+| `ExampleCalculatePrice()`   | The `CalculatePrice` function      |
+| `ExampleStore_Get()`        | The `Get` method of `Store`        |
 | `ExampleStore_Get_cached()` | A named variant of the same method |
 
 The suffix after the second underscore MUST start with a lowercase letter — otherwise Go reads it as a type or method name and the example is orphaned.

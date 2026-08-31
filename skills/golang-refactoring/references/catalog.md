@@ -4,20 +4,20 @@ Each entry below follows the same structure: **Motivation** (why the refactoring
 
 ## Table of Contents
 
-- [Extract Function / Extract Method](#extract-function-extract-method)
-- [Inline Function / Inline Call](#inline-function-inline-call)
-- [Extract Variable / Inline Variable, Extract Constant](#extract-variable-inline-variable-extract-constant)
+- [Extract Function / Extract Method](#extract-function--extract-method)
+- [Inline Function / Inline Call](#inline-function--inline-call)
+- [Extract Variable / Inline Variable, Extract Constant](#extract-variable--inline-variable-extract-constant)
 - [Rename](#rename)
 - [Change Function Declaration (Signature)](#change-function-declaration-signature)
-- [Move Function / Move Field / Move Type](#move-function-move-field-move-type)
-- [Split Package / Merge Package](#split-package-merge-package)
+- [Move Function / Move Field / Move Type](#move-function--move-field--move-type)
+- [Split Package / Merge Package](#split-package--merge-package)
 - [Replace Nested Conditional with Guard Clauses](#replace-nested-conditional-with-guard-clauses)
 - [Introduce Parameter Object](#introduce-parameter-object)
 - [Replace Conditional with Polymorphism](#replace-conditional-with-polymorphism)
-- [Hide Delegate / Remove Middle Man](#hide-delegate-remove-middle-man)
-- [Sprout Method / Wrap Method](#sprout-method-wrap-method)
+- [Hide Delegate / Remove Middle Man](#hide-delegate--remove-middle-man)
+- [Sprout Method / Wrap Method](#sprout-method--wrap-method)
 - [Replace Temp with Query](#replace-temp-with-query)
-- [Smell → Refactoring Quick Reference](#smell-refactoring-quick-reference)
+- [Smell → Refactoring Quick Reference](#smell--refactoring-quick-reference)
 - [Cross-References](#cross-references)
 
 ## Extract Function / Extract Method

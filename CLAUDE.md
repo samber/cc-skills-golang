@@ -44,7 +44,7 @@ New skills go in `skills/<skill-name>/SKILL.md`. Each SKILL.md has YAML frontmat
 
 - **Stay within the spec's field set.** The Agent Skills spec defines exactly six fields: `name`, `description`, `license`, `compatibility`, `metadata`, `allowed-tools`. Everything else in the table above (`user-invocable`, `paths`, `dependencies`) is a harness-specific extension, and validators that check strictly against the spec reject them — that is why `skills-ref` is disabled here (→ See [Validation](#validation)). Verify support before adding any field beyond the table above.
 - **Nest `version` under `metadata`.** A top-level `version:` key is not a spec field and fails packaging on strict validators.
-- **Quote the description.** A value containing `: ` (colon-space) or starting with `[`, `]`, `<`, `>` breaks YAML parsing, and the skill drops out of the listing without an error. This is why the examples below wrap it in `"..."`; use a `>-` block scalar for long ones.
+- **Quote the description.** A value containing a colon followed by a space (`:` + space) or starting with `[`, `]`, `<`, `>` breaks YAML parsing, and the skill drops out of the listing without an error. This is why the examples below wrap it in `"..."`; use a `>-` block scalar for long ones.
 
 Do not add a `turbo_safe`-style field (seen on Antigravity, marks a skill safe for unattended execution) — it conflicts with this project's confirm-before-risky-action policy. The same restriction applies to any harness-specific equivalent, e.g. Mistral Vibe's per-tool `permission = "always"` in generated agent configs (`.vibe/agents/*.toml`) — default write/shell/exec permissions to `"ask"`, not `"always"`, even when the harness makes unattended execution easy to opt into.
 
@@ -601,7 +601,7 @@ Index of failure modes. Each row points at the section that owns the rule.
 | Vague description | Never triggers | Concrete nouns + pushy "use when" (→ [Description quality](#description-quality)) |
 | First-person description | Erratic triggering | Rewrite in third person (→ [Description quality](#description-quality)) |
 | Workflow steps in the description | Agent acts on the description, skips the body | Describe what + when only (→ [Description quality](#description-quality)) |
-| Unquoted `: ` or `[ ] < >` in description | Skill silently dropped from the listing | Quote it, or use a `>-` block scalar (→ [Frontmatter](#frontmatter)) |
+| Unquoted colon-space or `[ ] < >` in description | Skill silently dropped from the listing | Quote it, or use a `>-` block scalar (→ [Frontmatter](#frontmatter)) |
 | Extra frontmatter fields | Hard error on strict validators | Restrict to the spec's six (→ [Frontmatter](#frontmatter)) |
 | Top-level `version:` | Hard-fails packaging | Move to `metadata.version` (→ [Frontmatter](#frontmatter)) |
 | Monolithic 600-line body | Token bloat, ignored tail | Split into `references/` (→ [Token budgets](#token-budgets)) |

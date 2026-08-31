@@ -8,10 +8,10 @@ Before writing dig/fx code, refer to the library's official documentation for up
 
 ## Table of Contents
 
-- [dig — Basic Container](#dig-basic-container)
+- [dig — Basic Container](#dig--basic-container)
   - [Named Dependencies](#named-dependencies)
   - [dig Tradeoffs](#dig-tradeoffs)
-- [fx — Full Application Framework](#fx-full-application-framework)
+- [fx — Full Application Framework](#fx--full-application-framework)
   - [Basic Application](#basic-application)
   - [Lifecycle Hooks](#lifecycle-hooks)
   - [Modules](#modules)

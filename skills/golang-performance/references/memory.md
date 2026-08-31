@@ -5,7 +5,7 @@ Allocation reduction is the single highest-ROI optimization in most Go programs.
 ## Table of Contents
 
 - [Allocation Patterns](#allocation-patterns)
-  - [Reuse slices via append(s[:0], ...)](#reuse-slices-via-appends0)
+  - [Reuse slices via append(s[:0], ...)](#reuse-slices-via-appends0-)
   - [Direct indexing vs append](#direct-indexing-vs-append)
   - [Eliminate redundant map lookups](#eliminate-redundant-map-lookups)
   - [Map size hints](#map-size-hints)

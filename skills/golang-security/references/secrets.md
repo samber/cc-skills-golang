@@ -12,8 +12,8 @@ Hardcoded secrets, credentials, and sensitive data in source code is a major sec
 
 ## Table of Contents
 
-- [Hardcoded Secrets and Credentials — Critical](#hardcoded-secrets-and-credentials-critical)
-- [Hardcoded Database Passwords — Critical](#hardcoded-database-passwords-critical)
+- [Hardcoded Secrets and Credentials — Critical](#hardcoded-secrets-and-credentials--critical)
+- [Hardcoded Database Passwords — Critical](#hardcoded-database-passwords--critical)
 - [Secrets Storage Best Practices](#secrets-storage-best-practices)
   - [Environment Variables](#environment-variables)
   - [Secret Managers](#secret-managers)

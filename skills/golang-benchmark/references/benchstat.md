@@ -14,7 +14,7 @@
   - [Step 4: Compare](#step-4-compare)
 - [Reading the Output](#reading-the-output)
   - [Unit normalization](#unit-normalization)
-  - [When the `~` symbol appears](#when-the-symbol-appears)
+  - [When the `~` symbol appears](#when-the--symbol-appears)
 - [Flags Reference](#flags-reference)
   - [Projection flags](#projection-flags)
   - [Filter flag](#filter-flag)

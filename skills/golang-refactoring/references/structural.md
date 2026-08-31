@@ -14,7 +14,7 @@ Go enforces a handful of structural rules at compile time that other languages l
 - [Moving Types Across Packages: Type Aliases for Gradual Code Repair](#moving-types-across-packages-type-aliases-for-gradual-code-repair)
 - [Exported API Surface and Versioning](#exported-api-surface-and-versioning)
 - [`init()`, Global State, and Package-Level Vars as a Refactoring Target](#init-global-state-and-package-level-vars-as-a-refactoring-target)
-- [Generics — When a Refactor Toward Them Is Warranted](#generics-when-a-refactor-toward-them-is-warranted)
+- [Generics — When a Refactor Toward Them Is Warranted](#generics--when-a-refactor-toward-them-is-warranted)
 - [Common Mistakes](#common-mistakes)
 - [Cross-References](#cross-references)
 

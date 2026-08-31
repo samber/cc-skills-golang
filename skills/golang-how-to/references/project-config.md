@@ -13,14 +13,14 @@ This workflow writes two independent things to the project's agent-config file(s
   - [When it gets written](#when-it-gets-written)
   - [Insertion point](#insertion-point)
   - [Idempotency](#idempotency)
-- [Step 1 — Detect the project config file(s)](#step-1-detect-the-project-config-files)
-- [Step 2 — Idempotency check](#step-2-idempotency-check)
-- [Step 3 — Confirm the skill set with the user](#step-3-confirm-the-skill-set-with-the-user)
-- [Step 4 — Write the block](#step-4-write-the-block)
+- [Step 1 — Detect the project config file(s)](#step-1--detect-the-project-config-files)
+- [Step 2 — Idempotency check](#step-2--idempotency-check)
+- [Step 3 — Confirm the skill set with the user](#step-3--confirm-the-skill-set-with-the-user)
+- [Step 4 — Write the block](#step-4--write-the-block)
   - [Markdown targets (CLAUDE.md, AGENTS.md, GEMINI.md, copilot-instructions.md)](#markdown-targets-claudemd-agentsmd-geminimd-copilot-instructionsmd)
   - [Cursor target (`.cursor/rules/*.mdc`)](#cursor-target-cursorrulesmdc)
-- [Step 5 — Confirm to the user](#step-5-confirm-to-the-user)
-- [Notes on company overrides (⚙️ skills)](#notes-on-company-overrides-skills)
+- [Step 5 — Confirm to the user](#step-5--confirm-to-the-user)
+- [Notes on company overrides (⚙️ skills)](#notes-on-company-overrides--skills)
 
 ## When to use
 

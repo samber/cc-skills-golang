@@ -11,7 +11,7 @@
 - [Logging with Context](#logging-with-context)
 - [Adding Request-Scoped Attributes](#adding-request-scoped-attributes)
 - [Log Sinks and the `slog` Ecosystem](#log-sinks-and-the-slog-ecosystem)
-- [Migrating from zap / logrus / zerolog](#migrating-from-zap-logrus-zerolog)
+- [Migrating from zap / logrus / zerolog](#migrating-from-zap--logrus--zerolog)
 - [Common Logging Mistakes](#common-logging-mistakes)
 
 ## Why Structured Logging

@@ -9,7 +9,7 @@
   - [Shared missing cache](#shared-missing-cache)
   - [Manual missing key marking](#manual-missing-key-marking)
 - [Loader Chains](#loader-chains)
-- [Copy-on-Read / Copy-on-Write](#copy-on-read-copy-on-write)
+- [Copy-on-Read / Copy-on-Write](#copy-on-read--copy-on-write)
 - [Prometheus Monitoring](#prometheus-monitoring)
   - [Setup](#setup)
   - [Key PromQL Queries](#key-promql-queries)

@@ -12,11 +12,11 @@ Cookie security is critical for preventing session hijacking and XSS exploitatio
 
 ## Table of Contents
 
-- [HTTP-Only Flag Missing — Medium](#http-only-flag-missing-medium)
-- [Insecure Cookie Configuration (Missing Secure Flag) — Medium](#insecure-cookie-configuration-missing-secure-flag-medium)
-- [SameSite Cookie Protection — Medium](#samesite-cookie-protection-medium)
-- [Cookie Prefix Examples — Low](#cookie-prefix-examples-low)
-- [Gorilla Sessions Cookie Security — High](#gorilla-sessions-cookie-security-high)
+- [HTTP-Only Flag Missing — Medium](#http-only-flag-missing--medium)
+- [Insecure Cookie Configuration (Missing Secure Flag) — Medium](#insecure-cookie-configuration-missing-secure-flag--medium)
+- [SameSite Cookie Protection — Medium](#samesite-cookie-protection--medium)
+- [Cookie Prefix Examples — Low](#cookie-prefix-examples--low)
+- [Gorilla Sessions Cookie Security — High](#gorilla-sessions-cookie-security--high)
 - [Cookie Best Practices Checklist](#cookie-best-practices-checklist)
 - [CWE References](#cwe-references)
 

@@ -6,11 +6,11 @@
 
 - [CLI Help Text](#cli-help-text)
 - [Configuration Documentation](#configuration-documentation)
-- [Architecture & design decisions](#architecture-design-decisions)
+- [Architecture & design decisions](#architecture--design-decisions)
 - [API Documentation](#api-documentation)
-  - [REST APIs — OpenAPI / Swagger](#rest-apis-openapi-swagger)
-  - [Event-Driven — AsyncAPI](#event-driven-asyncapi)
-  - [gRPC — Protobuf](#grpc-protobuf)
+  - [REST APIs — OpenAPI / Swagger](#rest-apis--openapi--swagger)
+  - [Event-Driven — AsyncAPI](#event-driven--asyncapi)
+  - [gRPC — Protobuf](#grpc--protobuf)
   - [When to Use Each Format](#when-to-use-each-format)
 
 ## CLI Help Text

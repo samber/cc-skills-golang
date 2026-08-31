@@ -11,8 +11,8 @@
 - [Standard Library Clone Helpers (Go 1.21+)](#standard-library-clone-helpers-go-121)
 - [Map Iteration Order](#map-iteration-order)
 - [Deleting During Iteration](#deleting-during-iteration)
-  - [Maps — safe](#maps-safe)
-  - [Slices — needs care](#slices-needs-care)
+  - [Maps — safe](#maps--safe)
+  - [Slices — needs care](#slices--needs-care)
 - [Comparing Slices and Maps](#comparing-slices-and-maps)
 
 ## Range Loop Variable Capture

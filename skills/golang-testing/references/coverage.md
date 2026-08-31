@@ -32,11 +32,11 @@ go test -cover ./internal/store
 
 ## Modes
 
-| Mode     | Records                          | Use when                                    |
-| -------- | -------------------------------- | ------------------------------------------- |
-| `set`    | Statement executed (default)     | Normal runs                                 |
-| `count`  | Execution count per statement    | Finding never-taken branches in hot paths   |
-| `atomic` | Count, race-safe                 | Any run combined with `-race` or `t.Parallel()` |
+| Mode | Records | Use when |
+| --- | --- | --- |
+| `set` | Statement executed (default) | Normal runs |
+| `count` | Execution count per statement | Finding never-taken branches in hot paths |
+| `atomic` | Count, race-safe | Any run combined with `-race` or `t.Parallel()` |
 
 ## Pitfalls
 

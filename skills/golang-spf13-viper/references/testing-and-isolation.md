@@ -7,7 +7,7 @@
 - [Injecting viper into your app](#injecting-viper-into-your-app)
 - [Reading config files in tests](#reading-config-files-in-tests)
 - [t.Setenv interactions](#tsetenv-interactions)
-- [viper.Reset() — use with caution](#viperreset-use-with-caution)
+- [viper.Reset() — use with caution](#viperreset--use-with-caution)
 - [Snapshot and restore pattern](#snapshot-and-restore-pattern)
 
 ## The global state problem

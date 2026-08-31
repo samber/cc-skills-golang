@@ -13,19 +13,19 @@ Injection vulnerabilities allow attackers to execute arbitrary code, queries, or
 
 ## Table of Contents
 
-- [SQL Injection — Critical](#sql-injection-critical)
+- [SQL Injection — Critical](#sql-injection--critical)
   - [Dynamic IN clauses](#dynamic-in-clauses)
   - [Dynamic column names and ORDER BY](#dynamic-column-names-and-order-by)
   - [Dynamic WHERE filters](#dynamic-where-filters)
   - [Prefer `sqlx` or `pgx` over raw `database/sql`](#prefer-sqlx-or-pgx-over-raw-databasesql)
-- [XPath Injection — High](#xpath-injection-high)
-- [Code Injection — Critical](#code-injection-critical)
-- [Command Injection — Critical](#command-injection-critical)
-- [Template Injection — High](#template-injection-high)
-- [Cross-Site Scripting (XSS) — High](#cross-site-scripting-xss-high)
-- [HTML Tag Injection — High](#html-tag-injection-high)
-- [Server-Side Request Forgery (SSRF) — High](#server-side-request-forgery-ssrf-high)
-- [Unsafe Deserialization — Critical](#unsafe-deserialization-critical)
+- [XPath Injection — High](#xpath-injection--high)
+- [Code Injection — Critical](#code-injection--critical)
+- [Command Injection — Critical](#command-injection--critical)
+- [Template Injection — High](#template-injection--high)
+- [Cross-Site Scripting (XSS) — High](#cross-site-scripting-xss--high)
+- [HTML Tag Injection — High](#html-tag-injection--high)
+- [Server-Side Request Forgery (SSRF) — High](#server-side-request-forgery-ssrf--high)
+- [Unsafe Deserialization — Critical](#unsafe-deserialization--critical)
 - [CWE References](#cwe-references)
 
 ## SQL Injection — Critical

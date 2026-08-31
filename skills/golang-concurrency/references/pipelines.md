@@ -3,7 +3,7 @@
 ## Table of Contents
 
 - [Pipeline Pattern](#pipeline-pattern)
-- [Fan-Out / Fan-In](#fan-out-fan-in)
+- [Fan-Out / Fan-In](#fan-out--fan-in)
 - [Worker Pool with errgroup](#worker-pool-with-errgroup)
 - [Bounded Concurrency with Semaphore](#bounded-concurrency-with-semaphore)
 - [Pipeline Alternatives](#pipeline-alternatives)

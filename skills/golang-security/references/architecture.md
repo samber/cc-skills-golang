@@ -8,8 +8,8 @@ Defense-in-depth, Zero Trust, and authentication patterns for Go services.
   - [Go Implementation by Layer](#go-implementation-by-layer)
 - [Zero Trust Principles](#zero-trust-principles)
 - [Authentication Pattern Selection](#authentication-pattern-selection)
-  - [JWT Validation — Complete Example](#jwt-validation-complete-example)
-  - [Password Hashing — Argon2id](#password-hashing-argon2id)
+  - [JWT Validation — Complete Example](#jwt-validation--complete-example)
+  - [Password Hashing — Argon2id](#password-hashing--argon2id)
 - [HTTP Security Headers](#http-security-headers)
 - [Security Anti-Patterns](#security-anti-patterns)
 

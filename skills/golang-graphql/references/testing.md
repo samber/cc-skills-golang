@@ -2,10 +2,10 @@
 
 ## Table of Contents
 
-- [gqlgen — Client Harness](#gqlgen-client-harness)
-- [gqlgen — Testing with DataLoaders](#gqlgen-testing-with-dataloaders)
-- [gqlgen — Testing Subscriptions](#gqlgen-testing-subscriptions)
-- [graph-gophers — gqltesting](#graph-gophers-gqltesting)
+- [gqlgen — Client Harness](#gqlgen--client-harness)
+- [gqlgen — Testing with DataLoaders](#gqlgen--testing-with-dataloaders)
+- [gqlgen — Testing Subscriptions](#gqlgen--testing-subscriptions)
+- [graph-gophers — gqltesting](#graph-gophers--gqltesting)
 - [Testing Error Handling](#testing-error-handling)
 - [Testing Auth Directives (gqlgen)](#testing-auth-directives-gqlgen)
 - [Table-Driven Tests](#table-driven-tests)

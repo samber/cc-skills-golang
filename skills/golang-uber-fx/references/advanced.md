@@ -13,7 +13,7 @@ Detail topics referenced from `SKILL.md`. Each section is self-contained.
   - [Wiring](#wiring)
   - [Annotations](#annotations)
   - [Lifecycle](#lifecycle)
-  - [Logging & Testing](#logging-testing)
+  - [Logging & Testing](#logging--testing)
 
 ## fx.Supply, fx.Replace, fx.Decorate
 

@@ -6,7 +6,7 @@
 
 - [Nil Pointer Dereference](#nil-pointer-dereference)
 - [Interface Nil Gotcha](#interface-nil-gotcha)
-- [Variable Shadowing with `:=`](#variable-shadowing-with)
+- [Variable Shadowing with `:=`](#variable-shadowing-with-)
 - [Slice and Map Gotchas](#slice-and-map-gotchas)
 - [Defer Gotchas](#defer-gotchas)
 - [Error Handling Pitfalls](#error-handling-pitfalls)
@@ -24,7 +24,7 @@
 - [Enum Zero Value with `iota`](#enum-zero-value-with-iota)
 - [`recover()` Only Works in the Same Goroutine](#recover-only-works-in-the-same-goroutine)
 - [`os.Exit` Skips Deferred Functions](#osexit-skips-deferred-functions)
-- [`time.Time` Comparison: `==` vs `.Equal()`](#timetime-comparison-vs-equal)
+- [`time.Time` Comparison: `==` vs `.Equal()`](#timetime-comparison--vs-equal)
 - [`sql.Rows` Must Be Closed](#sqlrows-must-be-closed)
 - [Writing to a Closed Channel Panics](#writing-to-a-closed-channel-panics)
 - [Closed Channel in `select` Causes Busy Loop](#closed-channel-in-select-causes-busy-loop)

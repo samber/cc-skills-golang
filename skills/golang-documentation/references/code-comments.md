@@ -4,7 +4,7 @@
 
 ## Table of Contents
 
-- [Function & Method Doc Comments](#function-method-doc-comments)
+- [Function & Method Doc Comments](#function--method-doc-comments)
   - [Why, Not What](#why-not-what)
   - [Anti-Patterns to Remove on Sight](#anti-patterns-to-remove-on-sight)
   - [Format](#format)
@@ -16,7 +16,7 @@
   - [Method Comments on Structs](#method-comments-on-structs)
   - [Inline Code Examples in Comments](#inline-code-examples-in-comments)
   - [Playground Links](#playground-links)
-- [File & Package Comments](#file-package-comments)
+- [File & Package Comments](#file--package-comments)
   - [Package Comment](#package-comment)
   - [File-Level Description](#file-level-description)
   - [When to Add File Descriptions](#when-to-add-file-descriptions)

@@ -3,8 +3,8 @@
 ## Table of Contents
 
 - [Composing Transformations](#composing-transformations)
-- [lo + stdlib Interop](#lo-stdlib-interop)
-- [lo + samber/mo Integration](#lo-sambermo-integration)
+- [lo + stdlib Interop](#lo--stdlib-interop)
+- [lo + samber/mo Integration](#lo--sambermo-integration)
 - [Iterator Patterns (loi)](#iterator-patterns-loi)
   - [Eager vs lazy comparison](#eager-vs-lazy-comparison)
   - [Building lazy pipelines](#building-lazy-pipelines)

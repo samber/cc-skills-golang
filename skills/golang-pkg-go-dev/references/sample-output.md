@@ -17,7 +17,7 @@ Representative `-o md` output for each command, captured against `godig` v0.2.0.
 - [packages](#packages)
 - [symbols](#symbols)
 - [symbol doc](#symbol-doc)
-- [Raw / large output](#raw-large-output)
+- [Raw / large output](#raw--large-output)
 
 ## overview
 

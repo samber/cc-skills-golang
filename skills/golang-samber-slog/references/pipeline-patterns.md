@@ -4,14 +4,14 @@ Complete code examples for every `slog-multi` composition pattern.
 
 ## Table of Contents
 
-- [Fanout — Broadcast to All](#fanout-broadcast-to-all)
-- [Router — Predicate-Based Routing](#router-predicate-based-routing)
-- [FirstMatch — Short-Circuit Routing](#firstmatch-short-circuit-routing)
-- [Failover — Sequential Fallback](#failover-sequential-fallback)
-- [Pool — Load-Balanced Dispatch](#pool-load-balanced-dispatch)
-- [Pipe — Middleware Chain](#pipe-middleware-chain)
+- [Fanout — Broadcast to All](#fanout--broadcast-to-all)
+- [Router — Predicate-Based Routing](#router--predicate-based-routing)
+- [FirstMatch — Short-Circuit Routing](#firstmatch--short-circuit-routing)
+- [Failover — Sequential Fallback](#failover--sequential-fallback)
+- [Pool — Load-Balanced Dispatch](#pool--load-balanced-dispatch)
+- [Pipe — Middleware Chain](#pipe--middleware-chain)
 - [Inline Handlers and Middleware](#inline-handlers-and-middleware)
-- [AttrFromContext — Request-Scoped Attributes](#attrfromcontext-request-scoped-attributes)
+- [AttrFromContext — Request-Scoped Attributes](#attrfromcontext--request-scoped-attributes)
 - [Full Production Pipeline](#full-production-pipeline)
 
 ## Fanout — Broadcast to All
