@@ -216,7 +216,7 @@ Expected hits: `allowed-tools:` lines and labeled generated-artifact blocks only
 
 ## Skill Body
 
-The body contains step-by-step instructions. Use secondary markdown files in `references/` for depth (referenced via relative links like `[Details](references/details.md)`). Keep file references one level deep from SKILL.md — avoid deeply nested reference chains.
+The body contains step-by-step instructions. Use secondary markdown files in `references/` for depth (referenced via relative links like `[Details](references/details.md)`). Keep file references one level deep from SKILL.md — avoid deeply nested reference chains. A nested chain gets partially read (`head -100`) and silently truncated, so the deepest content never reaches the model and nothing signals the loss.
 
 **Important:** When including non-markdown content (configuration files, scripts, templates, linter configs, etc.), create them as separate files in `assets/` rather than embedding them directly in markdown. Reference these files from your markdown using relative links (e.g., `[View config](assets/example.yml)`). This keeps markdown files clean, makes assets reusable, and allows proper syntax highlighting when the files are viewed separately.
 
@@ -244,6 +244,7 @@ Polanyi's paradox: most operational knowledge is tacit and resists explicit desc
 - **Use secondary markdown files for depth** — Claude reads these on demand, so they don't count against context until needed
 - **2-4 skills loaded simultaneously** in a typical session
 - **Stay below ~10k tokens of total loaded SKILL.md** to avoid degrading response quality
+- **Only the first ~5,000 tokens of a skill survive auto-compaction**, out of a ~25,000-token budget shared by all loaded skills — put load-bearing rules before examples and edge cases
 
 This is a budget. A 100 lines SKILL.md is even better. Feel free to stay far below the limits.
 
@@ -378,17 +379,16 @@ Link to this reference from the main SKILL.md using relative markdown links.
 
 ### Progressive disclosure
 
-Skills are structured for efficient context use:
+Everything in the body is a **recurring** cost: once the skill is invoked, the rendered content stays in context across every turn and is never re-read. Everything in `references/` is paid once, and only if actually loaded. Split on that asymmetry.
 
-1. **Metadata** (~100 tokens): `name` and `description` are loaded at startup for all skills
-2. **Instructions** (< 5.000 tokens recommended by AgentMD specification): full SKILL.md body loaded when skill activates
-3. **Instructions** (< 2.500 tokens recommended by me): SKILL.md body loaded when skill activates
-4. **Instructions** (< 10.000 tokens recommended by me): full SKILL.md body + secondary files loaded when skill activates
-5. **Resources** (as needed): files in `scripts/`, `references/`, `assets/` loaded only when required
+Three layers: **metadata** (`name` + `description`) loaded at startup for every skill → **body** loaded on activation → **resources** (`scripts/`, `references/`, `assets/`) loaded only when the body points at them. Per-layer limits live in [Token budgets](#token-budgets).
 
-Keep SKILL.md under 500 lines. Move detailed reference material to separate files.
-
-This is a budget. A 100 lines SKILL.md is even better. Feel free to stay far below the limits.
+- **Move detail to `references/` once the body crosses the line threshold** (→ See [Token budgets](#token-budgets)) — split it out instead of compressing prose.
+- **Keep references one level deep** — see the truncation failure mode under [Skill Body](#skill-body).
+- **Add a table of contents to any reference file over 100 lines**, so a partial read still reveals the full scope.
+- **Organise references by domain** (`references/aws.md`, `references/gcp.md`) so only the relevant one loads. [Tool reference sections](#tool-reference-sections) applies the same split, one file per tool.
+- **Point explicitly and say when to load** — `For the full field list, read references/schema.md.` A bare link gets skipped.
+- **Put load-bearing rules early** — auto-compaction keeps only the head of a skill (→ See [Token budgets](#token-budgets)).
 
 ### Validation
 
