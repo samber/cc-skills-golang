@@ -377,6 +377,18 @@ When the tool has **sub-commands, flags, or configuration files**, showcase them
 
 Link to this reference from the main SKILL.md using relative markdown links.
 
+### Bundling scripts
+
+Prefer a script in `scripts/` whenever an operation is deterministic, repeated, or fragile. Script bodies never enter context — only their output. This is the executable counterpart of [Tool reference sections](#tool-reference-sections): that one documents commands for a reader to run by hand, this one ships code the agent runs as-is.
+
+- **Signal to bundle** — across test runs the model keeps rewriting the same helper. Write it once, ship it.
+- **Handle errors inside the script** — never defer failure to the model. Exit non-zero with a message naming what to fix.
+- **Justify every constant in a comment.** No magic numbers.
+- **Forward slashes only**, on every platform.
+- **State dependencies explicitly** — assume nothing is installed. Mirror them in `metadata.openclaw.requires.bins` (→ See [ClawHub metadata](#clawhub-metadata-metadataopenclaw)).
+- **Say whether to execute or read** — "Run `scripts/x.py`" versus "See `scripts/x.py` for the algorithm". A bare path gets guessed at.
+- **Use plan → validate → execute for batch or destructive work** — the first pass writes a machine-checkable intermediate file, the second validates it, only the third mutates anything. That file is the review point and the rollback record.
+
 ### Progressive disclosure
 
 Everything in the body is a **recurring** cost: once the skill is invoked, the rendered content stays in context across every turn and is never re-read. Everything in `references/` is paid once, and only if actually loaded. Split on that asymmetry.
@@ -509,6 +521,17 @@ This skill is not exhaustive. Please refer to library documentation and code exa
 ```
 
 The `mcp__context7__*` tools may still be listed in `allowed-tools` frontmatter — only the body instructions are restricted.
+
+### Security
+
+Apply the **Principle of Lack of Surprise**: nothing a skill does may surprise a user who read only its description. The rules below all follow from it.
+
+- **Never handle credentials or exfiltrate data.** A skill that reads secrets or ships repository content outward is out of scope, whatever the justification.
+- **Never fetch instructions from a URL at runtime.** Fetched content is untrusted and can carry injections. → See [Snyk agent scanner compliance](#snyk-agent-scanner-compliance) for the concrete patterns and their safe reformulations.
+- **Mark anything read from the outside world as data, never instructions** — web pages, tool output, files from a cloned repository. The MCP tool-calling ban under [Library-specific skills](#library-specific-skills) is one concrete instance of this rule.
+- **`allowed-tools` grants without prompting, even in untrusted directories.** A project skill in a repository someone else wrote applies its grants the moment an agent runs there — read the field before running an agent in any cloned repo.
+- **Grant least privilege.** A skill needing `Bash(*)` needs redesign; scope to `Bash(go:*)`-style prefixes instead (→ See [Allowed Tools](#allowed-tools)).
+- **Audit every bundled file before installing a third-party skill** — `scripts/`, `assets/` and `references/` too, not just SKILL.md. The body is the part reviewers read; the payload is the part they skip.
 
 ### Snyk agent scanner compliance
 
