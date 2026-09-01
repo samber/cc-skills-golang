@@ -153,7 +153,7 @@ SIMD (Single Instruction Multiple Data) optimized operations for numeric types o
 
 **Use when:** Bulk numeric operations after benchmarking confirms the bottleneck. Very specialized.
 
-**Warning:** This package is experimental. API may break between minor versions. Not covered by semver stability guarantees. Do not use in production without version pinning.
+**Warning:** This package is experimental and not covered by semver stability guarantees, so its API may break between minor versions. Do not use in production without version pinning.
 
 ## Decision Flowchart
 

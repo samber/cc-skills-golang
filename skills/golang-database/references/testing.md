@@ -213,6 +213,9 @@ func (s *UserRepoSuite) SetupSuite() {
 | Constraint violations     |                  |        ✓         |
 | Query performance         |                  | ✓ (with EXPLAIN) |
 
-Unit tests MUST use mocks (interface mocks or sqlmock) — no real database connections. Integration tests MUST use build tags (`//go:build integration`) to separate from unit tests. Integration tests SHOULD use testcontainers-go for reproducible database environments in CI. NEVER test against production databases.
+- Unit tests MUST use mocks (interface mocks or sqlmock) — no real database connections.
+- Integration tests MUST use build tags (`//go:build integration`) to separate from unit tests.
+- Integration tests SHOULD use testcontainers-go for reproducible database environments in CI.
+- NEVER test against production databases.
 
 → See `samber/cc-skills-golang@golang-testing` skill for general test patterns and CI configuration.

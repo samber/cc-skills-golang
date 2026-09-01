@@ -40,7 +40,7 @@ for _, v := range []string{"a", "b", "c"} {
 
 ### Go 1.22+: per-iteration scoping
 
-Go 1.22 changed loop variable semantics — each iteration creates a new variable. The closure bug no longer occurs. However, if your module targets `go 1.21` or earlier in `go.mod`, the old behavior applies. Check your `go.mod` version.
+Go 1.22 changed loop variable semantics — each iteration creates a new variable, so the closure bug no longer occurs. However, the old behavior applies if your module targets `go 1.21` or earlier in `go.mod` — check your `go.mod` version.
 
 ## Storing Pointer to Loop Variable
 

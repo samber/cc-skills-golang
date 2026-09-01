@@ -850,23 +850,23 @@ The function itself is the bottleneck. It does expensive work directly (tight lo
 
 ### Flat low + cum high
 
-The function calls slow things but does little work itself. It's a coordinator or dispatcher. Drill into callees with `list` or `peek`. The fix is usually in the called functions, or reducing how often they're called.
+The function calls slow things but does little work itself — it's a coordinator or dispatcher. Drill into callees with `list` or `peek`. The fix is usually in the called functions, or reducing how often they're called.
 
 ### `alloc_objects` high, `inuse_space` low
 
-Short-lived allocations creating GC churn. Objects are allocated and freed rapidly — each one is cheap individually but the aggregate volume triggers frequent GC cycles. Common sources: `fmt.Errorf` in hot paths (allocates every call), interface boxing (`any` arguments), string-to-byte conversions, slice growth without preallocation. → See `samber/cc-skills-golang@golang-performance` skill for allocation reduction patterns.
+Short-lived allocations creating GC churn — objects are allocated and freed rapidly, each cheap individually but the aggregate volume triggers frequent GC cycles. Common sources: `fmt.Errorf` in hot paths (allocates every call), interface boxing (`any` arguments), string-to-byte conversions, slice growth without preallocation. → See `samber/cc-skills-golang@golang-performance` skill for allocation reduction patterns.
 
 ### `inuse_space` growing over time
 
-Memory leak. Take two heap snapshots minutes apart and compare with `-base` (see Comparing Profiles above). Growing types reveal the leak source. Common causes: unbounded caches, maps that never shrink (Go maps don't release bucket memory on delete), goroutine leaks holding references.
+Memory leak. Take two heap snapshots minutes apart and compare with `-base` (see Comparing Profiles above) — growing types reveal the leak source. Common causes: unbounded caches, maps that never shrink (Go maps don't release bucket memory on delete), goroutine leaks holding references.
 
 ### Mutex/block profile hot
 
-Contention, not CPU. The CPU is waiting, not working. The goroutines are all trying to acquire the same lock or read from the same channel. Reduce critical section scope, shard locks across multiple mutexes, or use lock-free structures (`sync/atomic`, `sync.Map` for read-heavy workloads). → See `samber/cc-skills-golang@golang-concurrency` skill.
+Contention, not CPU — the goroutines are all waiting to acquire the same lock or read from the same channel instead of working. Reduce critical section scope, shard locks across multiple mutexes, or use lock-free structures (`sync/atomic`, `sync.Map` for read-heavy workloads). → See `samber/cc-skills-golang@golang-concurrency` skill.
 
 ### Many goroutines blocked on same channel/mutex
 
-Serialization bottleneck. All work funnels through a single point. The throughput ceiling is the speed of that single point. Consider worker pools with multiple independent queues, sharding the work, or buffered channels to smooth bursts.
+Serialization bottleneck — all work funnels through a single point, so the throughput ceiling is the speed of that single point. Consider worker pools with multiple independent queues, sharding the work, or buffered channels to smooth bursts.
 
 ### `runtime.mallocgc` dominates CPU profile
 

@@ -204,7 +204,7 @@
 
 ## API Documentation
 
-**swag** (<https://github.com/swaggo/swag>) Auto-generate OpenAPI/Swagger specs from Go code annotations. Parses comment-based annotations (`@Summary`, `@Param`, `@Success`, `@Router`, etc.) on handler functions to produce `swagger.json`/`swagger.yaml`. Integrates with Gin (`gin-swagger`), Echo (`echo-swagger`), Fiber (`fiber-swagger`), Chi, and net/http. Supports Swagger 2.0 and OpenAPI 3.x output.
+**swag** (<https://github.com/swaggo/swag>) Auto-generate OpenAPI/Swagger specs from Go code annotations, parsing comment-based annotations (`@Summary`, `@Param`, `@Success`, `@Router`, etc.) on handler functions to produce `swagger.json`/`swagger.yaml`. Integrates with Gin (`gin-swagger`), Echo (`echo-swagger`), Fiber (`fiber-swagger`), Chi, and net/http, with Swagger 2.0 and OpenAPI 3.x output.
 
 ## Dependency Injection
 

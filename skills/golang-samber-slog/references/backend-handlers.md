@@ -52,7 +52,11 @@ handler := slogdatadog.Option{
 defer handler.(interface{ Stop(context.Context) error }).Stop(context.Background()) // REQUIRED: flush buffered logs
 ```
 
-**Batch mode** is the default — logs are buffered and sent periodically (default 5s). Call `Stop(ctx)` on shutdown or buffered logs are lost. The handler also exposes `Flush(ctx)` for mid-lifecycle flushes. For synchronous delivery, check the Option configuration.
+**Batch mode** is the default — logs are buffered and sent periodically (default 5s):
+
+- Call `Stop(ctx)` on shutdown or buffered logs are lost.
+- `Flush(ctx)` triggers a mid-lifecycle flush.
+- For synchronous delivery, check the Option configuration.
 
 ### Sentry — `slog-sentry`
 

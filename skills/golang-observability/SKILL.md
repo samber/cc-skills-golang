@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code, Codex or similar harness, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.3.1"
+  version: "1.3.2"
   openclaw:
     emoji: "📡"
     homepage: https://github.com/samber/cc-skills-golang
@@ -55,7 +55,11 @@ When using observability libraries (Prometheus client, OpenTelemetry SDK, vendor
 
 ## Cross-References
 
-See `samber/cc-skills-golang@golang-error-handling` skill for the single handling rule. See `samber/cc-skills-golang@golang-troubleshooting` skill for using observability signals to diagnose production issues. See `samber/cc-skills-golang@golang-security` skill for protecting pprof endpoints and avoiding PII in logs. See `samber/cc-skills-golang@golang-context` skill for propagating trace context across service boundaries. See `samber/cc-skills@promql-cli` skill for querying and exploring PromQL expressions against Prometheus from the CLI.
+- → See `samber/cc-skills-golang@golang-error-handling` skill for the single handling rule.
+- → See `samber/cc-skills-golang@golang-troubleshooting` skill for using observability signals to diagnose production issues.
+- → See `samber/cc-skills-golang@golang-security` skill for protecting pprof endpoints and avoiding PII in logs.
+- → See `samber/cc-skills-golang@golang-context` skill for propagating trace context across service boundaries.
+- → See `samber/cc-skills@promql-cli` skill for querying and exploring PromQL expressions against Prometheus from the CLI.
 
 ### Go 1.26+: slog multi-handler
 

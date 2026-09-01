@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code, Codex or similar harness. Requires the gopls binary (go install golang.org/x/tools/gopls@latest) v0.20+ on PATH.
 metadata:
   author: samber
-  version: "1.1.0"
+  version: "1.1.1"
   openclaw:
     emoji: "🛰️"
     homepage: https://github.com/samber/cc-skills-golang

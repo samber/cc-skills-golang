@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code, Codex or similar harness, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.2.1"
+  version: "1.2.2"
   openclaw:
     emoji: "⛏"
     homepage: https://github.com/samber/cc-skills-golang
@@ -31,7 +31,11 @@ Reflection-based DI toolkit, designed to power application frameworks (it is the
 - [pkg.go.dev/go.uber.org/dig](https://pkg.go.dev/go.uber.org/dig)
 - [github.com/uber-go/dig](https://github.com/uber-go/dig)
 
-This skill is not exhaustive. Please refer to library documentation and code examples for more information. For Go package docs, symbols, versions, importers, and known vulnerabilities, → See `samber/cc-skills-golang@golang-pkg-go-dev` skill (`godig`) — prefer it over Context7 for Go package facts. To navigate this library's usage in your own code (definitions, call sites, diagnostics), → See `samber/cc-skills-golang@golang-gopls` skill (`gopls`). Context7 remains a fallback for docs not indexed on pkg.go.dev.
+This skill is not exhaustive — refer to library documentation and code examples for more information:
+
+- For Go package docs, symbols, versions, importers, and known vulnerabilities, → See `samber/cc-skills-golang@golang-pkg-go-dev` skill (`godig`), preferred over Context7 for Go package facts.
+- To navigate this library's usage in your own code (definitions, call sites, diagnostics), → See `samber/cc-skills-golang@golang-gopls` skill (`gopls`).
+- Context7 remains a fallback for docs not indexed on pkg.go.dev.
 
 ```bash
 go get go.uber.org/dig
@@ -82,7 +86,7 @@ err = c.Invoke(func(db *sql.DB) error {
 
 Constructors are **lazy** and **memoized**: each output type is built once and shared (singleton per container). `Provide` errors at registration if the constructor is malformed; `Invoke` returns the constructor's error wrapped with the dependency path that triggered it.
 
-A dig constructor is any function. Inputs are dependencies, outputs are provided types. `error` (last return) signals construction failure. Follow "accept interfaces, return structs".
+A dig constructor is any function whose inputs are dependencies and whose outputs are provided types. `error` (last return) signals construction failure. Follow "accept interfaces, return structs".
 
 ## Parameter Objects with `dig.In`
 

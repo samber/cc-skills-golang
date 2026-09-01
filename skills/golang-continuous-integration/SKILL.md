@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code, Codex or similar harness, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.4.1"
+  version: "1.4.2"
   openclaw:
     emoji: "🚀"
     homepage: https://github.com/samber/cc-skills-golang
@@ -118,7 +118,10 @@ Create `.golangci.yml` at the root of the project. See the `samber/cc-skills-gol
 
 `.github/workflows/security.yml` — see [security.yml](./assets/security.yml)
 
-CI MUST run `govulncheck`. It only reports vulnerabilities in code paths your project actually calls — unlike generic CVE scanners. CodeQL results appear in the repository's Security tab. Bearer is good at detecting sensitive data flow issues.
+CI MUST run `govulncheck` — it only reports vulnerabilities in code paths your project actually calls, unlike generic CVE scanners.
+
+- CodeQL results appear in the repository's Security tab.
+- Bearer is good at detecting sensitive data flow issues.
 
 ### CodeQL Configuration
 

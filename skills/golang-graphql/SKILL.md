@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code, Codex or similar harness, and for projects using Golang.
 metadata:
   author: samber
-  version: "0.2.1"
+  version: "0.2.2"
   openclaw:
     emoji: "🔮"
     homepage: https://github.com/samber/cc-skills-golang
@@ -33,7 +33,11 @@ paths:
 
 Both major libraries are schema-first: write SDL (`.graphql` files), bind Go resolvers. Choose based on project size and team preferences.
 
-This skill is not exhaustive. Refer to each library's official documentation and code examples for current API signatures. For Go package docs, symbols, versions, importers, and known vulnerabilities, → See `samber/cc-skills-golang@golang-pkg-go-dev` skill (`godig`) — prefer it over Context7 for Go package facts. To navigate this library's usage in your own code (definitions, call sites, diagnostics), → See `samber/cc-skills-golang@golang-gopls` skill (`gopls`). Context7 remains a fallback for docs not indexed on pkg.go.dev.
+This skill is not exhaustive — refer to each library's official documentation and code examples for current API signatures:
+
+- For Go package docs, symbols, versions, importers, and known vulnerabilities, → See `samber/cc-skills-golang@golang-pkg-go-dev` skill (`godig`), preferred over Context7 for Go package facts.
+- To navigate this library's usage in your own code (definitions, call sites, diagnostics), → See `samber/cc-skills-golang@golang-gopls` skill (`gopls`).
+- Context7 remains a fallback for docs not indexed on pkg.go.dev.
 
 ## Library Choice
 

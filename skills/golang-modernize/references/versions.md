@@ -126,7 +126,7 @@ slog.Info("request handled", "method", r.Method, "status", status)
 slog.Info("request handled", slog.String("method", r.Method), slog.Int("status", status))
 ```
 
-**Migration guidance**: For existing projects heavily invested in third-party loggers, migration is optional. For new projects, prefer `slog`. The `samber/slog-*` ecosystem provides handlers for routing slog output to various backends. Go 1.24 added `slog.DiscardHandler` for silent loggers.
+**Migration guidance**: For existing projects heavily invested in third-party loggers, migration is optional; for new projects, prefer `slog`. The `samber/slog-*` ecosystem provides handlers for routing slog output to various backends. Go 1.24 added `slog.DiscardHandler` for silent loggers.
 
 ### Use `slices` package instead of `sort` and manual loops _(Go 1.21+)_
 
@@ -415,7 +415,7 @@ type Result[T any] = struct { Value T; Err error }
 
 ### Use `os.Root` for directory-scoped file access _(Go 1.24+)_
 
-**Security-critical**: `os.Root` prevents path traversal attacks (CWE-22) at the OS level. Replace all manual `filepath.Clean` + `strings.HasPrefix` validation with `os.Root` when handling user-supplied paths. Symlinks resolving outside the root are rejected. Supports `Open`, `Create`, `Stat`, `OpenFile`, `Mkdir`, `Remove`, and more.
+**Security-critical**: `os.Root` prevents path traversal attacks (CWE-22) at the OS level. Replace all manual `filepath.Clean` + `strings.HasPrefix` validation with `os.Root` when handling user-supplied paths. It rejects symlinks resolving outside the root and supports `Open`, `Create`, `Stat`, `OpenFile`, `Mkdir`, `Remove`, and more.
 
 ```go
 // Before: manual path validation (risk of path traversal)
@@ -703,7 +703,7 @@ For new encryption use, avoid `crypto/rsa.EncryptPKCS1v15`. Prefer RSA-OAEP (`rs
 
 ### Green Tea GC enabled by default _(Go 1.26+)_
 
-Re-evaluate GC and allocation tuning under Go 1.26 Green Tea GC using profiles and benchmarks. Remove legacy tuning only when data supports it. Keep `GOMEMLIMIT` when it represents a real container or service memory ceiling. Remove third-party `automaxprocs` workarounds unless the project has a measured reason, because Go 1.25+ makes `GOMAXPROCS` container-aware by default.
+Re-evaluate GC and allocation tuning under Go 1.26 Green Tea GC using profiles and benchmarks, removing legacy tuning only when data supports it. Keep `GOMEMLIMIT` when it represents a real container or service memory ceiling. Remove third-party `automaxprocs` workarounds unless the project has a measured reason, because Go 1.25+ makes `GOMAXPROCS` container-aware by default.
 
 ### Go 1.26+ test artifacts
 

@@ -44,7 +44,7 @@ defer root.Close()
 f, err := root.Open(filename) // cannot escape root directory
 ```
 
-`os.Root` prevents ordinary path traversal at the OS level. All operations (`Open`, `Create`, `Stat`, `OpenFile`, etc.) are confined to the root directory, and symlinks that resolve outside the root are rejected. It is not a full sandbox: it does not by itself block bind mounts, special device files, or all `/proc`-style filesystem behavior. For archive extraction and uploads, still reject special files and choose a root without attacker-controlled mounts.
+`os.Root` prevents ordinary path traversal at the OS level — all operations (`Open`, `Create`, `Stat`, `OpenFile`, etc.) are confined to the root directory, and symlinks that resolve outside the root are rejected. It is not a full sandbox: it does not by itself block bind mounts, special device files, or all `/proc`-style filesystem behavior. For archive extraction and uploads, still reject special files and choose a root without attacker-controlled mounts.
 
 **Good (pre-Go 1.24 fallback):**
 

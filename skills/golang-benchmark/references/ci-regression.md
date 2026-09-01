@@ -91,7 +91,11 @@ cob -bench-args "test -run '^$' -bench . -benchmem -benchtime=3s ./..."
 # Skip cob for a specific commit: include [skip cob] in commit message
 ```
 
-**Caution:** `cob` uses `git reset` internally, which can cause data loss if uncommitted changes exist. Always commit your work before running. Additionally, `cob` requires all benchmarks to pass; it skips CI gating if any benchmark fails. For safety, run only in CI pipelines, not locally. Note that `cob` compares single runs without `benchstat`-style statistics, making it more susceptible to noise than `benchdiff`.
+**Caution:** `cob` uses `git reset` internally, which can cause data loss if uncommitted changes exist — always commit your work before running.
+
+- For safety, run only in CI pipelines, not locally.
+- `cob` requires all benchmarks to pass; it skips CI gating if any benchmark fails.
+- `cob` compares single runs without `benchstat`-style statistics, making it more susceptible to noise than `benchdiff`.
 
 Best for: simple post-commit regression gating in CI where statistical rigor is less critical than fast feedback.
 

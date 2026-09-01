@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code, Codex or similar harness, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.2.1"
+  version: "1.2.2"
   openclaw:
     emoji: "🗃"
     homepage: https://github.com/samber/cc-skills-golang
@@ -23,7 +23,11 @@ paths:
 
 # Go Data Structures
 
-Built-in and standard library data structures: internals, correct usage, and selection guidance. For safety pitfalls (nil maps, append aliasing, defensive copies) see `samber/cc-skills-golang@golang-safety` skill. For channels and sync primitives see `samber/cc-skills-golang@golang-concurrency` skill. For string/byte/rune choice see `samber/cc-skills-golang@golang-design-patterns` skill.
+Built-in and standard library data structures: internals, correct usage, and selection guidance.
+
+- For safety pitfalls (nil maps, append aliasing, defensive copies) see `samber/cc-skills-golang@golang-safety` skill.
+- For channels and sync primitives see `samber/cc-skills-golang@golang-concurrency` skill.
+- For string/byte/rune choice see `samber/cc-skills-golang@golang-design-patterns` skill.
 
 ## Best Practices Summary
 
@@ -158,7 +162,11 @@ For advanced data structures (trees, sets, queues, stacks) beyond the standard l
 - **`deckarep/golang-set`** — thread-safe and non-thread-safe set implementations
 - **`gammazero/deque`** — fast double-ended queue
 
-When using third-party libraries, refer to their official documentation and code examples for current API signatures. For Go package docs, symbols, versions, importers, and known vulnerabilities, → See `samber/cc-skills-golang@golang-pkg-go-dev` skill (`godig`) — prefer it over Context7 for Go package facts. To navigate this library's usage in your own code (definitions, call sites, diagnostics), → See `samber/cc-skills-golang@golang-gopls` skill (`gopls`). Context7 remains a fallback for docs not indexed on pkg.go.dev.
+When using third-party libraries, refer to their official documentation and code examples for current API signatures.
+
+- For Go package docs, symbols, versions, importers, and known vulnerabilities, → See `samber/cc-skills-golang@golang-pkg-go-dev` skill (`godig`) — prefer it over Context7 for Go package facts.
+- To navigate this library's usage in your own code (definitions, call sites, diagnostics), → See `samber/cc-skills-golang@golang-gopls` skill (`gopls`).
+- Context7 remains a fallback for docs not indexed on pkg.go.dev.
 
 ## Cross-References
 

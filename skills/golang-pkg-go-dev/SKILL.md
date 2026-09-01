@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code, Codex or similar harness. Requires the godig CLI (go install github.com/samber/godig/cmd/godig@latest) or access to a godig MCP server, and internet access to reach the pkg.go.dev API.
 metadata:
   author: samber
-  version: "1.4.1"
+  version: "1.4.2"
   openclaw:
     emoji: "🔎"
     homepage: https://github.com/samber/cc-skills-golang
@@ -26,7 +26,7 @@ allowed-tools: Read Edit Write Glob Grep Bash(go:*) Bash(golangci-lint:*) Bash(g
 
 **Dependencies:** `godig` — `go install github.com/samber/godig/cmd/godig@latest` (or use a registered godig MCP server / the hosted instance instead).
 
-`godig` queries the [pkg.go.dev](https://pkg.go.dev) API. Use it to answer questions about Go packages and modules: docs, symbols, versions, importers and vulnerabilities. It works as a CLI and as an MCP server. All operations are **read-only** and need no authentication.
+`godig` queries the [pkg.go.dev](https://pkg.go.dev) API. Use it to answer questions about Go packages and modules: docs, symbols, versions, importers and vulnerabilities. It works as a CLI and as an MCP server, and all operations are **read-only** and need no authentication.
 
 ## When to use this skill
 

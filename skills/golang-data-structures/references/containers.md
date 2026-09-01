@@ -91,7 +91,7 @@ avg := sum / float64(r.Len())
 
 ## strings.Builder vs bytes.Buffer
 
-**strings.Builder:** Optimized for building strings. `String()` returns the accumulated string without copying. Use for concatenating string parts. `Reset()` discards the buffer.
+**strings.Builder:** Optimized for building strings by concatenating parts — `String()` returns the accumulated string without copying. `Reset()` discards the buffer.
 
 **bytes.Buffer:** Implements both `io.Reader` and `io.Writer`. Use for I/O operations, encoding/decoding, or when you need both read and write. `Reset()` reuses the allocated memory.
 

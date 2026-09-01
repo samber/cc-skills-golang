@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code, Codex or similar harness, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.2.1"
+  version: "1.2.2"
   openclaw:
     emoji: "🌐"
     homepage: https://github.com/samber/cc-skills-golang
@@ -40,7 +40,11 @@ paths:
 
 Treat gRPC as a pure transport layer — keep it separate from business logic. The official Go implementation is `google.golang.org/grpc`.
 
-This skill is not exhaustive. Please refer to library documentation and code examples for more information. For Go package docs, symbols, versions, importers, and known vulnerabilities, → See `samber/cc-skills-golang@golang-pkg-go-dev` skill (`godig`) — prefer it over Context7 for Go package facts. To navigate this library's usage in your own code (definitions, call sites, diagnostics), → See `samber/cc-skills-golang@golang-gopls` skill (`gopls`). Context7 remains a fallback for docs not indexed on pkg.go.dev.
+This skill is not exhaustive — refer to library documentation and code examples for more information:
+
+- For Go package docs, symbols, versions, importers, and known vulnerabilities, → See `samber/cc-skills-golang@golang-pkg-go-dev` skill (`godig`), preferred over Context7 for Go package facts.
+- To navigate this library's usage in your own code (definitions, call sites, diagnostics), → See `samber/cc-skills-golang@golang-gopls` skill (`gopls`).
+- Context7 remains a fallback for docs not indexed on pkg.go.dev.
 
 ## Quick Reference
 

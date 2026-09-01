@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code, Codex or similar harness, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.1.1"
+  version: "1.1.2"
   openclaw:
     emoji: "🔧"
     homepage: https://github.com/samber/cc-skills-golang
@@ -31,7 +31,11 @@ Viper resolves configuration values from multiple sources in a fixed precedence 
 - [pkg.go.dev/github.com/spf13/viper](https://pkg.go.dev/github.com/spf13/viper)
 - [github.com/spf13/viper](https://github.com/spf13/viper)
 
-This skill is not exhaustive. Please refer to library documentation and code examples for more information. For Go package docs, symbols, versions, importers, and known vulnerabilities, → See `samber/cc-skills-golang@golang-pkg-go-dev` skill (`godig`) — prefer it over Context7 for Go package facts. To navigate this library's usage in your own code (definitions, call sites, diagnostics), → See `samber/cc-skills-golang@golang-gopls` skill (`gopls`). Context7 remains a fallback for docs not indexed on pkg.go.dev.
+This skill is not exhaustive — refer to library documentation and code examples for more information:
+
+- For Go package docs, symbols, versions, importers, and known vulnerabilities, → See `samber/cc-skills-golang@golang-pkg-go-dev` skill (`godig`), preferred over Context7 for Go package facts.
+- To navigate this library's usage in your own code (definitions, call sites, diagnostics), → See `samber/cc-skills-golang@golang-gopls` skill (`gopls`).
+- Context7 remains a fallback for docs not indexed on pkg.go.dev.
 
 ```bash
 go get github.com/spf13/viper@latest
@@ -39,7 +43,11 @@ go get github.com/spf13/viper@latest
 
 ## Viper vs. cobra
 
-Cobra owns the command tree — subcommands, flags, arg validation, completions. Viper owns configuration resolution — it answers "what is the value of key X?" by walking its source layers. Viper has no user-facing surface; it is purely a key-value resolver. Use cobra alone for flag-only CLIs; viper alone for config-file daemons; both when you need both, binding flags at `PersistentPreRunE` via `BindPFlag`.
+Cobra owns the command tree — subcommands, flags, arg validation, completions. Viper owns configuration resolution — it answers "what is the value of key X?" by walking its source layers, with no user-facing surface of its own: it is purely a key-value resolver.
+
+- **Cobra alone** — flag-only CLIs.
+- **Viper alone** — config-file daemons.
+- **Both** — bind flags at `PersistentPreRunE` via `BindPFlag`.
 
 → See `samber/cc-skills-golang@golang-spf13-cobra` for the cobra side of this integration.
 
@@ -134,7 +142,7 @@ viper.WatchConfig()
 viper.OnConfigChange(func(e fsnotify.Event) { /* re-apply changed values */ })
 ```
 
-`WatchConfig` uses fsnotify and watches inodes. Editors that write atomically via rename (vim, neovim) replace the inode — the callback may not fire. Test hot-reload with `echo >> config.yaml`, not editor saves. For race-safe reload patterns, see [watch-and-reload.md](references/watch-and-reload.md).
+`WatchConfig` uses fsnotify and watches inodes, so editors that write atomically via rename (vim, neovim) replace the inode and the callback may not fire. Test hot-reload with `echo >> config.yaml`, not editor saves. For race-safe reload patterns, see [watch-and-reload.md](references/watch-and-reload.md).
 
 ## Test isolation
 
