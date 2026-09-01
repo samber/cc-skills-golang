@@ -103,7 +103,11 @@ metadata:
         bins: [protoc]
 ```
 
-**Version discipline:** Versions follow semver (`a.b.c`). New skills start at `1.0.0`. When modifying a skill, the developer must increment its `metadata.version` and the plugin version in `.claude-plugin/plugin.json` before merging. CI enforces both checks on PRs. Do not auto-increment versions — remind the developer as a next step.
+**Version discipline:**
+
+- Versions follow semver (`a.b.c`); new skills start at `1.0.0`
+- When modifying a skill, the developer must increment its `metadata.version` and the plugin version in `.claude-plugin/plugin.json` before merging — CI enforces both checks on PRs
+- Do not auto-increment versions — remind the developer as a next step
 
 ### Description quality
 
@@ -130,7 +134,7 @@ description: Implements X in Golang using library/foo
 description: Implements X in Golang using library/foo — feature A, feature B, and feature C. Apply when using or adopting library/foo, or when the codebase imports `github.com/library/foo`.
 ```
 
-**Too broad** (over-triggering) — phrases like "whenever writing Go code", "when naming any identifier", "essential for ANY conversation". These match virtually all Go work and flood the context with irrelevant skills. Fix by narrowing to the specific concern the skill uniquely addresses. Rule 4 pushes on the _number of trigger scenarios_ listed inside that concern, never on the width of the concern itself.
+**Too broad** (over-triggering) — phrases like "whenever writing Go code", "when naming any identifier", "essential for ANY conversation". These match virtually all Go work and flood the context with irrelevant skills, so narrow to the specific concern the skill uniquely addresses. Rule 4 pushes on the _number of trigger scenarios_ listed inside that concern, never on the width of the concern itself.
 
 ```yaml
 # Bad — triggers on all Go work
@@ -226,7 +230,7 @@ Expected hits: `allowed-tools:` lines and labeled generated-artifact blocks only
 
 ## Skill Body
 
-The body contains step-by-step instructions. Use secondary markdown files in `references/` for depth (referenced via relative links like `[Details](references/details.md)`). Keep file references one level deep from SKILL.md — avoid deeply nested reference chains. A nested chain gets partially read (`head -100`) and silently truncated, so the deepest content never reaches the model and nothing signals the loss.
+The body contains step-by-step instructions. Use secondary markdown files in `references/` for depth (referenced via relative links like `[Details](references/details.md)`). Keep file references one level deep from SKILL.md — a nested chain gets partially read (`head -100`) and silently truncated, so the deepest content never reaches the model and nothing signals the loss.
 
 **Important:** When including non-markdown content (configuration files, scripts, templates, linter configs, etc.), create them as separate files in `assets/` rather than embedding them directly in markdown. Reference these files from your markdown using relative links (e.g., `[View config](assets/example.yml)`). This keeps markdown files clean, makes assets reusable, and allows proper syntax highlighting when the files are viewed separately.
 
@@ -234,7 +238,7 @@ Polanyi's paradox: most operational knowledge is tacit and resists explicit desc
 
 ### Body writing style
 
-- **Write imperatively, verb first** — `Run`, `Reject`, `Validate`. (→ See [Format 5: Imperative Prose](#format-5-imperative-prose-recommended-by-skill-creator).)
+- **Write imperatively, verb first** — `Run`, `Reject`, `Validate`. (→ See [Format 5: Imperative Prose](#format-5-imperative-prose).)
 - **Explain why, not just what** — reasoning-based instructions let the model handle edge cases you did not foresee. (→ See [Teach reasoning, not only rules](#teach-reasoning-not-only-rules), which also rules on caps-lock imperatives.)
 - **Use one term per concept** — mixing "field"/"box"/"element" for the same thing costs accuracy.
 - **Give one default with an escape hatch**, never a menu of five libraries. State the pick, then the condition that justifies deviating.
@@ -248,16 +252,24 @@ Polanyi's paradox: most operational knowledge is tacit and resists explicit desc
 
 ### Token budgets
 
-- **~100 tokens per description** — loaded at startup for all skills
-- **≤ 1,000 characters per description** — hard limit; keep descriptions focused and scannable
-- **< 5.000 tokens per SKILL.md** (spec recommendation) — keep focused on essentials
-- **< 2.500 tokens per SKILL.md** (project recommendation)
-- **< 500 lines per SKILL.md** — move detailed reference material to `references/`; aim for under 250, and note the official median is 147 lines
-- **Use secondary markdown files for depth** — Claude reads these on demand, so they don't count against context until needed
-- **2-4 skills loaded simultaneously** in a typical session
-- **Stay below ~10k tokens of total loaded SKILL.md** to avoid degrading response quality
-- **Only the first ~5,000 tokens of a skill survive auto-compaction**, out of a ~25,000-token budget shared by all loaded skills — put load-bearing rules before examples and edge cases
-- **Discovery degrades past ~20-50 installed skills** — every description loads at startup, so a crowded listing dilutes triggering for all of them, not just the newest; prune unused skills rather than only shrinking each one
+Budgets measure three different units — **one paragraph**, **one file**, and **everything loaded at once**. None supersedes another: a SKILL.md inside its per-file budget still blows the total when three other skills load beside it.
+
+| Budget | Unit | Governs |
+| --- | --- | --- |
+| ~100 tokens | per description | Startup cost, paid for every installed skill |
+| ≤ 1,000 characters | per description | Hard limit — keep descriptions focused and scannable |
+| ≤ 3 sentences | per prose paragraph | Standalone prose only; tables, bullets and checklists are exempt |
+| < 5,000 tokens | per SKILL.md | The Agent Skills spec's own recommended ceiling |
+| < 2,500 tokens | per SKILL.md | This project's tighter recommendation — the number to actually hit |
+| < 500 lines | per SKILL.md | Past it, move detail to `references/`; aim under 250 (official median: 147) |
+| ~10,000 tokens | total loaded | Steady-state sum of the 2-4 SKILL.md files in context; past it, response quality degrades |
+| ~25,000 tokens | total loaded | Shared by all loaded skills at auto-compaction, and only each skill's first ~5,000 tokens survive — put load-bearing rules before examples and edge cases |
+| ~20-50 skills | total installed | Discovery degrades past it: every description loads at startup, diluting triggering for all skills, not just the newest |
+
+- **Cap standalone prose at 3 sentences, and carry the "why" as a clause inside the rule's own sentence** rather than a second sentence explaining the first (→ See [Teach reasoning, not only rules](#teach-reasoning-not-only-rules)). Long paragraphs quietly reintroduce the verbosity the per-file budgets exist to prevent, and nothing flags them — line and token counts only trip once the whole file is already bloated. Enumerable content belongs in a table, bullet list or checklist, never in longer prose (→ See [Formats](#formats)).
+- **Check density mechanically** — `python3 scripts/check_prose_density.py skills/<name>/SKILL.md` flags every paragraph over the cap.
+- **Use secondary markdown files for depth** — Claude reads these on demand, so they don't count against context until needed.
+- **Prune installed skills rather than only shrinking each one** — the startup listing is a shared budget too.
 
 This is a budget. A 100 lines SKILL.md is even better. Feel free to stay far below the limits.
 
@@ -444,7 +456,11 @@ The first three form a "deep analysis" cluster for temporary focused investigati
 
 ### Atomic skills and deduplication
 
-Concept drift between skills creates confusion when the agent loads the wrong one — or two competing ones. Each concept MUST live in exactly one skill (the "owner"). All other skills cross-reference the owner with `→ See` using the fully-qualified `owner/repo@skill` identifier. When splitting or merging skills, update every cross-reference to the affected skills. Prefer small, focused skills over large monolithic ones.
+Concept drift between skills creates confusion when the agent loads the wrong one — or two competing ones. Prefer small, focused skills over large monolithic ones.
+
+- Each concept MUST live in exactly one skill (the "owner")
+- All other skills cross-reference the owner with `→ See` using the fully-qualified `owner/repo@skill` identifier
+- When splitting or merging skills, update every cross-reference to the affected skills
 
 ### Company override convention
 
@@ -498,7 +514,7 @@ Skills should NOT re-explain rules that are already enforced by linters (e.g. go
 
 ### Teach reasoning, not only rules
 
-Skills MUST teach Claude how to think about problems, not just list prescriptive rules. Every recommendation needs a "why" — what goes wrong without it, what consequence the reader avoids.
+Skills MUST teach Claude how to think about problems, not just list prescriptive rules. Every recommendation needs a "why" — what goes wrong without it, what consequence the reader avoids — riding in the same sentence as the rule via an em dash or "because", never as a separate follow-up sentence. A "why" promoted to its own sentence doubles every rule and pushes the paragraph past the 3-sentence prose cap (→ See [Token budgets](#token-budgets)).
 
 Treat ALWAYS/NEVER in caps as a smell. Reserve them for genuinely order-dependent or destructive steps, where a wrong sequence loses data or breaks the build. Reframe every other bare imperative as reasoning, so the model can apply it to cases the rule never anticipated.
 
@@ -514,7 +530,7 @@ Diagnostic tools include CLI commands (pprof, fieldalignment, benchstat), runtim
 
 Transformation patterns:
 
-- **Best Practices items**: embed the tradeoff in one sentence — "Naked returns help in short functions but become confusing when readers must scroll to find what's returned"
+- **Best Practices items**: embed the tradeoff in the rule's own sentence — "Naked returns help in short functions — they confuse once readers must scroll to find what's returned"
 - **Common Mistakes tables**: inject the "because" into the Fix column — "`math/rand` output is predictable; an attacker can reproduce the sequence. Use `crypto/rand`"
 - **Code example comments**: carry the reasoning — `// ✗ Bad — nil map has no backing storage; writing panics at runtime`
 - **Section intros**: add a 1-2 sentence framing paragraph that establishes the mental model before listing specifics
@@ -702,7 +718,12 @@ See `EVALUATIONS.md` for the canonical format.
 
 After updating `EVALUATIONS.md` sum all the skill reports and update the table in `Skill evaluations` section of README.md.
 
-Also update the **Summary table** at the top of `EVALUATIONS.md`: add a new row for the skill (or update the existing row if re-running), then recompute the **Total** row by summing all numerators and denominators across all skills. The table is ordered by Delta ascending (low → high). Populate the Concern column using these rules: "Low delta" (≤32pp), "High without" (Without ≥65%), "Low with-skill score" (With ≤90%) — combine when multiple apply. Use bold on Concern values to draw attention. The **Uplift** column shows `With / Without` rounded to 2 decimal places and suffixed with `×` (e.g. `1.64×`); recompute it for every row including the Total.
+Also update the **Summary table** at the top of `EVALUATIONS.md`, which is ordered by Delta ascending (low → high):
+
+- Add a new row for the skill, or update the existing row when re-running
+- Recompute the **Total** row by summing all numerators and denominators across all skills
+- Populate the Concern column — "Low delta" (≤32pp), "High without" (Without ≥65%), "Low with-skill score" (With ≤90%) — combining labels when several apply, in bold to draw attention
+- Recompute the **Uplift** column for every row including the Total: `With / Without`, rounded to 2 decimal places and suffixed with `×` (e.g. `1.64×`)
 
 ## Workflows
 
@@ -720,16 +741,17 @@ After making changes, suggest the following as next steps for the developer to r
 
 1. ~~Validate against the spec: `skills-ref validate ./skills/{name}`~~ (disabled — [skills-ref doesn't support `user-invocable` yet](https://github.com/agentskills/agentskills/issues/105))
 2. Run the portability grep from "Tool names belong in frontmatter, not in the body" (under Allowed Tools) against the changed skill(s). Fix any hit that isn't an `allowed-tools:` line or a labeled generated-artifact block.
-3. Reformat markdowns with `npx prettier --write *.md "**/*.md"` then lint with `markdownlint-cli2 --config .markdownlint-cli2.jsonc ./` — run before measuring tokens, as formatting changes token counts
-4. Run `SNYK_TOKEN=<token> uvx snyk-agent-scan@latest skills/<name>/` and fix any W011/W012/W001 warnings before proceeding (see [Snyk agent scanner compliance](#snyk-agent-scanner-compliance))
-5. Measure token counts:
+3. Check prose density with `python3 scripts/check_prose_density.py "skills/<name>/SKILL.md" "skills/<name>/references/"*.md` — rewrite every flagged paragraph as a bullet list, numbered steps or a table, keeping the "why" as a short clause (→ See [Token budgets](#token-budgets))
+4. Reformat markdowns with `npx prettier --write *.md "**/*.md"` then lint with `markdownlint-cli2 --config .markdownlint-cli2.jsonc ./` — run before measuring tokens, as formatting changes token counts
+5. Run `SNYK_TOKEN=<token> uvx snyk-agent-scan@latest skills/<name>/` and fix any W011/W012/W001 warnings before proceeding (see [Snyk agent scanner compliance](#snyk-agent-scanner-compliance))
+6. Measure token counts:
    - **Description (tok)**: `awk 'NR==1 && /^---$/{found=1; next} found && /^---$/{exit} found && /^description:/{print}' skills/{name}/SKILL.md | tiktoken-cli`
    - **SKILL.md (tok)**: `tiktoken-cli skills/{name}/SKILL.md`
    - **Directory (tok)**: `tiktoken-cli --exclude "evals" skills/{name}/` (exclude `evals/` subdirectory)
-6. Update the README.md table with the measured token counts, update the total rows, and update the **Error rate gap** column (`Without - With`, expressed as a negative percentage, e.g. `-39%`)
-7. Increment `metadata.version` in the changed SKILL.md and the plugin version in `.claude-plugin/plugin.json`, `.cursor-plugin/plugin.json` and `gemini-extension.json` — all three plugin files MUST have the same version
-8. Run skill evaluation via `/skill-creator`: 10+ evals, run them with and without the skill via parallel subagents, grade with LLM-as-judge (no human in the loop), print results, suggest improvements if needed, and append/update the report to `EVALUATIONS.md` following the format in [Evaluation Reporting](#evaluation-reporting)
-9. Depending on evaluation final report, suggest improvements and loop
+7. Update the README.md table with the measured token counts, update the total rows, and update the **Error rate gap** column (`Without - With`, expressed as a negative percentage, e.g. `-39%`)
+8. Increment `metadata.version` in the changed SKILL.md and the plugin version in `.claude-plugin/plugin.json`, `.cursor-plugin/plugin.json` and `gemini-extension.json` — all three plugin files MUST have the same version
+9. Run skill evaluation via `/skill-creator`: 10+ evals, run them with and without the skill via parallel subagents, grade with LLM-as-judge (no human in the loop), print results, suggest improvements if needed, and append/update the report to `EVALUATIONS.md` following the format in [Evaluation Reporting](#evaluation-reporting)
+10. Depending on evaluation final report, suggest improvements and loop
 
 For initial evaluation of skills, use Human-as-Judge.
 
@@ -820,15 +842,7 @@ Testing:
 
 ## Formats
 
-Write short sentences.
-
-### Format 5: Imperative Prose (recommended by skill-creator)
-
-```md
-## Writing Rules
-
-Cut ruthlessly — every word must work. Remove filler words like "very", "really", "incredibly". Use active voice. Vary sentence length: 3-5 words for impact, then medium length for explanation.
-```
+Write short sentences. Prose is for standalone rules only — anything enumerable belongs in a table, bullet list or checklist, per **Prefer tables and checklists over prose** in [Body writing style](#body-writing-style).
 
 ### Format 1: Categorized examples (Good / Bad)
 
@@ -879,4 +893,12 @@ ALWAYS use this exact template:
 2. The type `feat` MUST be used for new features
 3. A scope MAY be provided after a type, in parentheses
 4. A description MUST immediately follow the colon and space
+```
+
+### Format 5: Imperative Prose
+
+```md
+## Writing Rules
+
+Cut ruthlessly — every word must work. Remove filler words like "very", "really", "incredibly". Use active voice. Vary sentence length: 3-5 words for impact, then medium length for explanation.
 ```
