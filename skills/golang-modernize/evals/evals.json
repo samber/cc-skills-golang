@@ -176,57 +176,138 @@
       "trap": "Go 1.26 introduced errors.AsType[T]() which replaces the verbose var+errors.As pattern with a single-line if. Go 1.26 also enhanced new() to accept an initial value, replacing the ptr[T] helper. Without the skill, the model likely won't know either feature exists.",
       "assertions": [
         { "id": "13.1", "text": "Uses errors.AsType[*os.PathError](err) or similar generic form instead of var+errors.As" },
-        { "id": "13.2", "text": "Replaces the ptr[T] helper function with new() that accepts an initial value (e.g., new(30 * time.Second))" }
+        { "id": "13.2", "text": "Replaces the ptr[T] helper function with new() that accepts an initial value (e.g., new(30 * time.Second))" },
+        { "id": "13.3", "text": "Applies the same errors.AsType rewrite consistently to the net.OpError and net.DNSError branches, not just the first one" },
+        { "id": "13.4", "text": "Attributes errors.AsType and the enhanced new() correctly to Go 1.26, not to a newer or older release" }
       ]
     },
     {
       "id": 14,
-      "name": "go127-stdlib-uuid",
-      "prompt": "Modernize this Go 1.27 code. We'd like to reduce third-party dependencies where the standard library is sufficient.\n\n```go\n// go.mod\nmodule example.com/orders\ngo 1.27\n\nrequire github.com/google/uuid v1.6.0\n\n// ids.go\npackage orders\n\nimport \"github.com/google/uuid\"\n\nfunc NewOrderID() string {\n    return uuid.NewString()\n}\n\nfunc NewSortableOrderID() (string, error) {\n    // we want roughly time-ordered IDs for our database primary keys\n    id, err := uuid.NewV7()\n    if err != nil {\n        return \"\", err\n    }\n    return id.String(), nil\n}\n\nfunc ParseOrderID(s string) (uuid.UUID, error) {\n    return uuid.Parse(s)\n}\n```\n\nProvide the updated code and go.mod changes.",
-      "trap": "Training data is saturated with github.com/google/uuid, so the model defaults to keeping it. Go 1.27 added a stdlib uuid package whose API differs: generators return values without errors, there is no NewString() (use uuid.New().String()), and the import path is just \"uuid\". Without the skill the model either keeps google/uuid or hallucinates uuid.NewString() on the stdlib package.",
+      "name": "json-v2-duplicate-key-strictness",
+      "prompt": "We upgraded this service to Go 1.27 last week. Since then, ingestion of webhook payloads from one partner started failing intermittently with decode errors. Review the code and explain what changed.\n\n```go\npackage webhook\n\nimport (\n    \"encoding/json\"\n    \"net/http\"\n)\n\ntype Event struct {\n    ID     string `json:\"id\"`\n    Type   string `json:\"type\"`\n    Amount int    `json:\"amount\"`\n}\n\nfunc HandlePartnerWebhook(w http.ResponseWriter, r *http.Request) {\n    var ev Event\n    if err := json.NewDecoder(r.Body).Decode(&ev); err != nil {\n        http.Error(w, \"invalid payload\", http.StatusBadRequest)\n        return\n    }\n    process(ev)\n}\n\nfunc process(ev Event) {}\n```\n\nThe partner's webhook payloads are known to occasionally repeat a JSON key (e.g. `{\"id\":\"1\",\"id\":\"1-dup\",\"type\":\"charge\",\"amount\":500}`), which used to decode fine, keeping the last value. Diagnose the regression and fix it.",
+      "trap": "encoding/json now runs on top of encoding/json/v2 by default since Go 1.27, and v2 rejects duplicate object member names instead of silently keeping the last one like v1 did. Without the skill, the model may not connect the Go 1.27 bump to this specific new decode-time failure and may guess at unrelated causes (malformed JSON, network issues).",
       "assertions": [
-        { "id": "14.1", "text": "Replaces github.com/google/uuid with the stdlib uuid package (import \"uuid\")" },
-        { "id": "14.2", "text": "Uses uuid.New().String() — does NOT call uuid.NewString() (does not exist in stdlib)" },
-        { "id": "14.3", "text": "Knows stdlib generators return values without errors (no id, err := uuid.NewV7() error handling)" },
-        { "id": "14.4", "text": "Uses uuid.NewV7() for the time-ordered database ID case" },
-        { "id": "14.5", "text": "Removes github.com/google/uuid from go.mod (e.g. via go mod tidy)" }
+        { "id": "14.1", "text": "Identifies that Go 1.27 made encoding/json/v2 the default JSON implementation underneath encoding/json" },
+        { "id": "14.2", "text": "Explains that duplicate JSON object keys are now rejected by default, whereas v1 silently kept the last value" },
+        { "id": "14.3", "text": "Connects the partner payload's duplicate id key directly to the reported decode failures" },
+        { "id": "14.4", "text": "Proposes a concrete fix: either normalize/dedupe the payload before decoding, or explicitly opts back into v1 behavior only as a temporary bridge" },
+        { "id": "14.5", "text": "Names GOEXPERIMENT=nojsonv2 as an escape hatch, not as the recommended long-term fix" },
+        { "id": "14.6", "text": "Does NOT claim encoding/json's decode behavior is unaffected by upgrading to Go 1.27" }
       ]
     },
     {
       "id": 15,
-      "name": "go127-generic-methods",
-      "prompt": "We're on Go 1.27. This generic container library grew organically and the package-level helper functions are awkward to discover. Improve the API ergonomics.\n\n```go\npackage set\n\ntype Set[T comparable] struct {\n    items map[T]struct{}\n}\n\nfunc New[T comparable](items ...T) *Set[T] {\n    s := &Set[T]{items: make(map[T]struct{}, len(items))}\n    for _, it := range items {\n        s.items[it] = struct{}{}\n    }\n    return s\n}\n\nfunc (s *Set[T]) Add(v T) { s.items[v] = struct{}{} }\n\nfunc (s *Set[T]) Contains(v T) bool { _, ok := s.items[v]; return ok }\n\nfunc (s *Set[T]) ForEach(f func(T)) {\n    for v := range s.items {\n        f(v)\n    }\n}\n\n// MapSet applies f to every element and returns a new set.\nfunc MapSet[T comparable, U comparable](s *Set[T], f func(T) U) *Set[U] {\n    out := New[U]()\n    s.ForEach(func(v T) { out.Add(f(v)) })\n    return out\n}\n\n// FilterSet returns the elements of s for which keep returns true.\nfunc FilterSet[T comparable](s *Set[T], keep func(T) bool) *Set[T] {\n    out := New[T]()\n    s.ForEach(func(v T) {\n        if keep(v) {\n            out.Add(v)\n        }\n    })\n    return out\n}\n\ntype Iteratable[T comparable] interface {\n    ForEach(f func(T))\n}\n\nvar _ Iteratable[int] = (*Set[int])(nil)\n```\n\nProvide the improved code.",
-      "trap": "For 15+ years Go did not support generic methods, so the model's strong prior is that methods cannot have their own type parameters. Go 1.27 allows them. Without the skill, the model keeps the package-level functions or wrongly claims the conversion is impossible. The interface member ForEach must stay a non-generic method because generic methods cannot satisfy interfaces.",
+      "name": "generic-method-scoped-transform",
+      "prompt": "This project targets Go 1.27. Add a way to transform every element of a generic Set into a Set of a different element type, keeping the transform function type-safe.\n\n```go\npackage collections\n\ntype Set[T comparable] map[T]struct{}\n\nfunc NewSet[T comparable](items ...T) Set[T] {\n    s := make(Set[T], len(items))\n    for _, item := range items {\n        s[item] = struct{}{}\n    }\n    return s\n}\n\nfunc (s Set[T]) Contains(item T) bool {\n    _, ok := s[item]\n    return ok\n}\n```\n\nAdd the transform capability and show how it's called from `main`.",
+      "trap": "Go 1.27 lets methods declare their own type parameters, so a transform from Set[T] to Set[U] can be a method on Set[T] with U scoped to the method. Without the skill, the natural default is a package-level generic function `func MapSet[T, U comparable](s Set[T], f func(T) U) Set[U]` because pre-1.27 Go had no way to add a type parameter to a method.",
       "assertions": [
-        { "id": "15.1", "text": "Converts MapSet to a generic method with its own type parameter (e.g. func (s *Set[T]) Map[U comparable](f func(T) U) *Set[U])" },
-        { "id": "15.2", "text": "Converts FilterSet to a method on *Set[T]" },
-        { "id": "15.3", "text": "Does NOT claim generic methods are impossible or unsupported in Go" },
-        { "id": "15.4", "text": "Keeps ForEach as a non-generic method so Set still satisfies the Iteratable interface (or explicitly notes generic methods cannot satisfy interfaces)" }
+        { "id": "15.1", "text": "Declares the transform as a method on Set[T] (e.g. func (s Set[T]) Map[U comparable](f func(T) U) Set[U]) rather than a standalone package-level generic function" },
+        { "id": "15.2", "text": "The new type parameter (U) is declared on the method itself, not added to the Set[T] type definition" },
+        { "id": "15.3", "text": "Notes that generic methods declaring their own type parameters are a Go 1.27 addition" },
+        { "id": "15.4", "text": "Calls out that this method could not satisfy an interface method and that interface methods themselves cannot declare type parameters" },
+        { "id": "15.5", "text": "The example call site compiles conceptually (correct method call syntax with explicit or inferred U)" }
       ]
     },
     {
       "id": 16,
-      "name": "go127-cutlast",
-      "prompt": "Modernize this Go 1.27 code that splits strings around their last separator.\n\n```go\npackage paths\n\nimport \"strings\"\n\n// SplitPath splits a slash-separated path into directory and file name.\nfunc SplitPath(path string) (dir, file string) {\n    if i := strings.LastIndex(path, \"/\"); i >= 0 {\n        return path[:i], path[i+1:]\n    }\n    return \"\", path\n}\n\n// StripExt removes the extension from a file name.\nfunc StripExt(name string) string {\n    if i := strings.LastIndex(name, \".\"); i > 0 {\n        return name[:i]\n    }\n    return name\n}\n\n// EnvValue splits a KEY=value assignment.\nfunc EnvValue(assignment string) (key, value string, ok bool) {\n    i := strings.LastIndex(assignment, \"=\")\n    if i < 0 {\n        return \"\", \"\", false\n    }\n    return assignment[:i], assignment[i+1:], true\n}\n```\n\nProvide the modernized code.",
-      "trap": "Go 1.27 added strings.CutLast/bytes.CutLast which slice around the LAST occurrence of a separator, mirroring the widely-known strings.Cut. The model knows Cut but is very unlikely to know CutLast exists, so without the skill it keeps manual LastIndex arithmetic.",
+      "name": "cutlast-final-separator-split",
+      "prompt": "This Go 1.27 log processor needs a helper that splits a structured log line into everything before and everything after the LAST colon, since fields before the last colon may themselves contain colons (e.g. `\"svc:sub:handler:the message: with a colon\"` should split into `\"svc:sub:handler:the message\"` and `\" with a colon\"`).\n\n```go\npackage logs\n\nfunc SplitAtLastColon(line string) (head, tail string, ok bool) {\n    // TODO: implement\n    return \"\", \"\", false\n}\n```\n\nImplement `SplitAtLastColon`.",
+      "trap": "strings.CutLast(s, sep) is the direct fit here, added in Go 1.27. Without the skill, the natural implementation is strings.LastIndex plus manual index slicing (i, i+len(sep)), which is easy to get off-by-one on, or strings.Split, which is wrong here because it splits on every colon rather than just the last one.",
       "assertions": [
-        { "id": "16.1", "text": "Uses strings.CutLast for at least one of the functions" },
-        { "id": "16.2", "text": "Uses the 3-result form (before, after, found) of CutLast correctly" },
-        { "id": "16.3", "text": "Uses CutLast in EnvValue to simplify the ok-returning split" },
-        { "id": "16.4", "text": "Does NOT keep manual strings.LastIndex slicing arithmetic where CutLast applies" }
+        { "id": "16.1", "text": "Uses strings.CutLast(line, \":\") to implement the function" },
+        { "id": "16.2", "text": "Returns the CutLast found boolean directly as ok, rather than deriving it from an index comparison" },
+        { "id": "16.3", "text": "Does NOT use strings.LastIndex with manual slice arithmetic" },
+        { "id": "16.4", "text": "Does NOT use strings.Split or strings.SplitN, which would split on every colon instead of only the last one" },
+        { "id": "16.5", "text": "Notes that CutLast requires Go 1.27 or later" }
       ]
     },
     {
       "id": 17,
+      "name": "godebug-removed-key-build-break",
+      "prompt": "Upgrade this project to the latest stable Go toolchain and update `go.mod` accordingly.\n\n```\nmodule example.com/svc\n\ngo 1.24\n\ngodebug (\n    asynctimerchan=0\n)\n\nrequire (\n    github.com/lib/pq v1.10.9\n)\n```\n\nThe `asynctimerchan=0` line was added a while ago to keep `time.Timer`/`time.Ticker` channels buffered like they were before Go 1.23, because some code relied on a stale timer value still sitting in the channel. Provide the updated `go.mod`.",
+      "trap": "Go 1.27 removed the asynctimerchan GODEBUG setting entirely; a go.mod godebug entry still pinning it to its old (pre-1.23) value now fails the build, not just prints a warning. The natural default without the skill is to bump only the go directive and leave the godebug block untouched, assuming an old GODEBUG pin is harmless leftover config.",
+      "assertions": [
+        { "id": "17.1", "text": "Removes or updates the asynctimerchan=0 godebug entry rather than leaving it as-is" },
+        { "id": "17.2", "text": "Explains that Go 1.27 removed this GODEBUG setting and that a go.mod entry pinned to the old value now fails the build (not just a warning)" },
+        { "id": "17.3", "text": "Bumps the go directive to a current Go 1.27-era version" },
+        { "id": "17.4", "text": "Recommends actually fixing the underlying code that relied on buffered timer channels rather than just deleting the compatibility shim silently" },
+        { "id": "17.5", "text": "Mentions checking for other Go 1.27-removed GODEBUG keys (e.g. tls3des, gotypesalias, tlsrsakex) as part of the same upgrade, not just asynctimerchan" }
+      ]
+    },
+    {
+      "id": 18,
+      "name": "uuid-stdlib-vs-dependency",
+      "prompt": "Add a function to this Go 1.27 order service that generates a unique identifier for each new order. There is currently no UUID library in `go.mod`.\n\n```go\npackage orders\n\ntype Order struct {\n    ID     string\n    Amount int\n}\n\nfunc NewOrder(amount int) Order {\n    return Order{\n        // TODO: generate a unique ID\n        Amount: amount,\n    }\n}\n```\n\nImplement ID generation.",
+      "trap": "Go 1.27 added a uuid package to the standard library. Without the skill, the natural default is to run `go get github.com/google/uuid` and call uuid.New(), which is the long-standing community convention and still works, but now adds an unnecessary dependency to a Go 1.27 project.",
+      "assertions": [
+        { "id": "18.1", "text": "Uses the standard library uuid package (import \"uuid\") rather than github.com/google/uuid or gofrs/uuid" },
+        { "id": "18.2", "text": "Does NOT add a new external module dependency to go.mod for UUID generation" },
+        { "id": "18.3", "text": "Notes that the stdlib uuid package is new in Go 1.27" },
+        { "id": "18.4", "text": "Generated ID is stored via UUID.String() (or equivalent) to fit the existing string-typed Order.ID field" },
+        { "id": "18.5", "text": "Does NOT claim the stdlib uuid package existed before Go 1.27" }
+      ]
+    },
+    {
+      "id": 19,
+      "name": "json-v2-streaming-migration",
+      "prompt": "Add a `LoadFromReader(r io.Reader, v any) error` helper to this Go 1.27 config package, so callers can decode JSON directly from a stream (an HTTP response body, an open file) without buffering the whole payload into a byte slice first.\n\n```go\npackage config\n\nimport (\n    \"encoding/json\"\n    \"io\"\n)\n\nfunc LoadFromBytes(data []byte, v any) error {\n    return json.Unmarshal(data, v)\n}\n\n// TODO: add LoadFromReader\n```\n\nImplement `LoadFromReader`.",
+      "trap": "encoding/json/v2 is the default JSON implementation since Go 1.27 and exposes UnmarshalRead(r, v) for exactly this streaming case. Without the skill, the natural default is json.NewDecoder(r).Decode(v) from the v1-era API, which still works but isn't the migration path the skill should point toward for new Go 1.27 code.",
+      "assertions": [
+        { "id": "19.1", "text": "Uses encoding/json/v2's UnmarshalRead(r, v) (or explicitly imports encoding/json/v2 and calls it) rather than only the v1-era json.NewDecoder(r).Decode(v) pattern" },
+        { "id": "19.2", "text": "Notes that encoding/json/v2 is the new default JSON implementation as of Go 1.27" },
+        { "id": "19.3", "text": "Does NOT introduce a manual io.ReadAll followed by json.Unmarshal, which would defeat the point of streaming from the reader" },
+        { "id": "19.4", "text": "Keeps LoadFromBytes working as-is rather than rewriting unrelated code" },
+        { "id": "19.5", "text": "The new function's signature matches the requested LoadFromReader(r io.Reader, v any) error" }
+      ]
+    },
+    {
+      "id": 20,
+      "name": "go127-stdlib-uuid",
+      "prompt": "Modernize this Go 1.27 code. We'd like to reduce third-party dependencies where the standard library is sufficient.\n\n```go\n// go.mod\nmodule example.com/orders\ngo 1.27\n\nrequire github.com/google/uuid v1.6.0\n\n// ids.go\npackage orders\n\nimport \"github.com/google/uuid\"\n\nfunc NewOrderID() string {\n    return uuid.NewString()\n}\n\nfunc NewSortableOrderID() (string, error) {\n    // we want roughly time-ordered IDs for our database primary keys\n    id, err := uuid.NewV7()\n    if err != nil {\n        return \"\", err\n    }\n    return id.String(), nil\n}\n\nfunc ParseOrderID(s string) (uuid.UUID, error) {\n    return uuid.Parse(s)\n}\n```\n\nProvide the updated code and go.mod changes.",
+      "trap": "Training data is saturated with github.com/google/uuid, so the model defaults to keeping it. Go 1.27 added a stdlib uuid package whose API differs: generators return values without errors, there is no NewString() (use uuid.New().String()), and the import path is just \"uuid\". Without the skill the model either keeps google/uuid or hallucinates uuid.NewString() on the stdlib package.",
+      "assertions": [
+        { "id": "20.1", "text": "Replaces github.com/google/uuid with the stdlib uuid package (import \"uuid\")" },
+        { "id": "20.2", "text": "Uses uuid.New().String() — does NOT call uuid.NewString() (does not exist in stdlib)" },
+        { "id": "20.3", "text": "Knows stdlib generators return values without errors (no id, err := uuid.NewV7() error handling)" },
+        { "id": "20.4", "text": "Uses uuid.NewV7() for the time-ordered database ID case" },
+        { "id": "20.5", "text": "Removes github.com/google/uuid from go.mod (e.g. via go mod tidy)" }
+      ]
+    },
+    {
+      "id": 21,
+      "name": "go127-generic-methods",
+      "prompt": "We're on Go 1.27. This generic container library grew organically and the package-level helper functions are awkward to discover. Improve the API ergonomics.\n\n```go\npackage set\n\ntype Set[T comparable] struct {\n    items map[T]struct{}\n}\n\nfunc New[T comparable](items ...T) *Set[T] {\n    s := &Set[T]{items: make(map[T]struct{}, len(items))}\n    for _, it := range items {\n        s.items[it] = struct{}{}\n    }\n    return s\n}\n\nfunc (s *Set[T]) Add(v T) { s.items[v] = struct{}{} }\n\nfunc (s *Set[T]) Contains(v T) bool { _, ok := s.items[v]; return ok }\n\nfunc (s *Set[T]) ForEach(f func(T)) {\n    for v := range s.items {\n        f(v)\n    }\n}\n\n// MapSet applies f to every element and returns a new set.\nfunc MapSet[T comparable, U comparable](s *Set[T], f func(T) U) *Set[U] {\n    out := New[U]()\n    s.ForEach(func(v T) { out.Add(f(v)) })\n    return out\n}\n\n// FilterSet returns the elements of s for which keep returns true.\nfunc FilterSet[T comparable](s *Set[T], keep func(T) bool) *Set[T] {\n    out := New[T]()\n    s.ForEach(func(v T) {\n        if keep(v) {\n            out.Add(v)\n        }\n    })\n    return out\n}\n\ntype Iteratable[T comparable] interface {\n    ForEach(f func(T))\n}\n\nvar _ Iteratable[int] = (*Set[int])(nil)\n```\n\nProvide the improved code.",
+      "trap": "For 15+ years Go did not support generic methods, so the model's strong prior is that methods cannot have their own type parameters. Go 1.27 allows them. Without the skill, the model keeps the package-level functions or wrongly claims the conversion is impossible. The interface member ForEach must stay a non-generic method because generic methods cannot satisfy interfaces.",
+      "assertions": [
+        { "id": "21.1", "text": "Converts MapSet to a generic method with its own type parameter (e.g. func (s *Set[T]) Map[U comparable](f func(T) U) *Set[U])" },
+        { "id": "21.2", "text": "Converts FilterSet to a method on *Set[T]" },
+        { "id": "21.3", "text": "Does NOT claim generic methods are impossible or unsupported in Go" },
+        { "id": "21.4", "text": "Keeps ForEach as a non-generic method so Set still satisfies the Iteratable interface (or explicitly notes generic methods cannot satisfy interfaces)" }
+      ]
+    },
+    {
+      "id": 22,
+      "name": "go127-cutlast",
+      "prompt": "Modernize this Go 1.27 code that splits strings around their last separator.\n\n```go\npackage paths\n\nimport \"strings\"\n\n// SplitPath splits a slash-separated path into directory and file name.\nfunc SplitPath(path string) (dir, file string) {\n    if i := strings.LastIndex(path, \"/\"); i >= 0 {\n        return path[:i], path[i+1:]\n    }\n    return \"\", path\n}\n\n// StripExt removes the extension from a file name.\nfunc StripExt(name string) string {\n    if i := strings.LastIndex(name, \".\"); i > 0 {\n        return name[:i]\n    }\n    return name\n}\n\n// EnvValue splits a KEY=value assignment.\nfunc EnvValue(assignment string) (key, value string, ok bool) {\n    i := strings.LastIndex(assignment, \"=\")\n    if i < 0 {\n        return \"\", \"\", false\n    }\n    return assignment[:i], assignment[i+1:], true\n}\n```\n\nProvide the modernized code.",
+      "trap": "Go 1.27 added strings.CutLast/bytes.CutLast which slice around the LAST occurrence of a separator, mirroring the widely-known strings.Cut. The model knows Cut but is very unlikely to know CutLast exists, so without the skill it keeps manual LastIndex arithmetic.",
+      "assertions": [
+        { "id": "22.1", "text": "Uses strings.CutLast for at least one of the functions" },
+        { "id": "22.2", "text": "Uses the 3-result form (before, after, found) of CutLast correctly" },
+        { "id": "22.3", "text": "Uses CutLast in EnvValue to simplify the ok-returning split" },
+        { "id": "22.4", "text": "Does NOT keep manual strings.LastIndex slicing arithmetic where CutLast applies" }
+      ]
+    },
+    {
+      "id": 23,
       "name": "go127-synctest-http",
       "prompt": "This Go 1.27 HTTP handler test is flaky in CI because of real timeouts. Make it deterministic and fast.\n\n```go\npackage api\n\nimport (\n    \"io\"\n    \"net/http\"\n    \"net/http/httptest\"\n    \"testing\"\n    \"time\"\n)\n\nfunc Handler(w http.ResponseWriter, r *http.Request) {\n    time.Sleep(100 * time.Millisecond) // simulates slow backend\n    w.Write([]byte(\"ok\"))\n}\n\nfunc TestHandlerResponds(t *testing.T) {\n    srv := httptest.NewServer(http.HandlerFunc(Handler))\n    defer srv.Close()\n\n    client := &http.Client{Timeout: 5 * time.Second}\n    resp, err := client.Get(srv.URL)\n    if err != nil {\n        t.Fatal(err)\n    }\n    defer resp.Body.Close()\n    body, _ := io.ReadAll(resp.Body)\n    if string(body) != \"ok\" {\n        t.Fatalf(\"got %q\", body)\n    }\n}\n\nfunc TestHandlerClientTimeout(t *testing.T) {\n    srv := httptest.NewServer(http.HandlerFunc(Handler))\n    defer srv.Close()\n\n    client := &http.Client{Timeout: 50 * time.Millisecond} // shorter than handler sleep\n    _, err := client.Get(srv.URL)\n    if err == nil {\n        t.Fatal(\"expected timeout error\")\n    }\n}\n```\n\nProvide the fixed tests. Do not just increase timeouts.",
       "trap": "testing/synctest makes time-based tests deterministic, but a plain httptest.NewServer uses the real network, which stalls inside a synctest bubble (the bubble's fake clock waits forever on real I/O). Go 1.27 added httptest.NewTestServer, which runs on an in-memory fake network designed for synctest. Without the skill, the model either avoids synctest (retries/channels) or combines synctest with httptest.NewServer, producing a hanging test.",
       "assertions": [
-        { "id": "17.1", "text": "Wraps tests in synctest.Test" },
-        { "id": "17.2", "text": "Uses httptest.NewTestServer instead of httptest.NewServer" },
-        { "id": "17.3", "text": "Explains that real-network servers do not work inside a synctest bubble (in-memory/fake network rationale)" },
-        { "id": "17.4", "text": "Does NOT leave a plain httptest.NewServer inside a synctest bubble" },
-        { "id": "17.5", "text": "Keeps both tests working (response test and client-timeout test) with deterministic time" }
+        { "id": "23.1", "text": "Wraps tests in synctest.Test" },
+        { "id": "23.2", "text": "Uses httptest.NewTestServer instead of httptest.NewServer" },
+        { "id": "23.3", "text": "Explains that real-network servers do not work inside a synctest bubble (in-memory/fake network rationale)" },
+        { "id": "23.4", "text": "Does NOT leave a plain httptest.NewServer inside a synctest bubble" },
+        { "id": "23.5", "text": "Keeps both tests working (response test and client-timeout test) with deterministic time" }
       ]
     }
   ]

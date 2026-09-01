@@ -18,7 +18,7 @@
 
 ### Go documentation command
 
-Use `go doc`, not `go tool doc`. Go 1.26 removed the old `cmd/doc` / `go tool doc` path.
+Use `go doc`, not `go tool doc`. Go 1.26 removed the old `cmd/doc` / `go tool doc` path. Go 1.27 added `package@version` lookups (`go doc golang.org/x/tools/cmd/stringer@v0.30.0`) and an `-ex` flag that lists executable examples.
 
 ### GC Tracing
 

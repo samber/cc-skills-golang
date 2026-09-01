@@ -12,6 +12,8 @@ pprof endpoints MUST be protected with basic auth — NEVER expose them publicly
 
 → See `samber/cc-skills-golang@golang-troubleshooting` pprof.md for the full pprof CLI reference (profile types, capturing, analyzing, commands).
 
+The `goroutineleak` profile (`/debug/pprof/goroutineleak`, generally available since Go 1.27) is worth exposing alongside the standard profiles — it reports goroutines blocked on unreachable concurrency primitives, a signal the standard `goroutine` profile doesn't surface directly. Since Go 1.27, tracebacks for `go 1.27+` modules also carry `runtime/pprof` goroutine labels by default; if labels could leak sensitive request data into crash logs, disable with `GODEBUG=tracebacklabels=0`.
+
 ## Continuous Profiling with Pyroscope
 
 On-demand profiling requires you to be there when the problem happens. Continuous profiling runs always-on in the background with low overhead (~2-5% CPU), so you can look at profiles after the fact. Toggle it with an environment variable.

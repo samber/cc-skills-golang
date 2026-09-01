@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code, Codex or similar harness, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.3.1"
+  version: "1.4.0"
   openclaw:
     emoji: "🧪"
     homepage: https://github.com/samber/cc-skills-golang
@@ -252,7 +252,7 @@ func TestContextTimeout(t *testing.T) {
 }
 ```
 
-Use `synctest.Test` in Go 1.25+ and Go 1.26+. Do not use the old Go 1.24 experimental `synctest.Run` API in Go 1.25+ or Go 1.26+ code. If a module explicitly targets Go 1.24 and opts into `GOEXPERIMENT=synctest`, use the old API only as a compatibility fallback.
+Use `synctest.Test` in Go 1.25+ and later. Do not use the old Go 1.24 experimental `synctest.Run` API in Go 1.25+ code. If a module explicitly targets Go 1.24 and opts into `GOEXPERIMENT=synctest`, use the old API only as a compatibility fallback.
 
 Key differences in `synctest`:
 
@@ -260,6 +260,9 @@ Key differences in `synctest`:
 - `time.After` fires when synthetic time reaches the duration
 - All goroutines run to blocking points before time advances
 - Test execution is deterministic and repeatable
+- Go 1.27+ adds `synctest.Sleep(d)` as a direct helper to advance the bubble's fake clock, equivalent to `time.Sleep(d)` followed by `synctest.Wait()` but without needing a real goroutine to block on
+
+Go 1.27+ also adds `httptest.NewTestServer()`, an in-memory fake-network variant of `httptest.NewServer` that composes with `synctest` — no real socket, so server tests can run inside a `synctest.Test` bubble instead of needing `httptest.NewServer` plus real timers.
 
 ## Test Timeouts
 
@@ -291,6 +294,10 @@ func TestRenderGoldenArtifact(t *testing.T) {
 ```
 
 Available on `*testing.T`, `*testing.B`, and `*testing.F` in Go 1.26+.
+
+### Go 1.27+: `stdversion` runs automatically
+
+`go test` now invokes the `stdversion` vet check by default, flagging any use of an API newer than the module's `go` directive. A CI failure from this check means either the `go` directive needs bumping or the code needs to stop using the newer API — it is not a check to silence.
 
 ## Parallel Tests
 

@@ -60,6 +60,8 @@ func BenchmarkParse(b *testing.B) {
 
 Legacy `b.N` loops still compile and are fine to keep when preserving existing benchmarks or supporting Go <1.24. They are easier to get wrong: setup may need `b.ResetTimer()`, and results may need a sink if the compiler can eliminate the work. Go 1.26 fixed an earlier `b.Loop()` inlining limitation — benchmarks on 1.24–1.25 already benefit from `b.Loop()` but may miss inlining optimizations that 1.26 delivers.
 
+Go 1.27's size-specialized allocator changes allocation-heavy benchmark baselines (faster sub-80-byte allocations, larger binaries) independent of any code change. Treat a `benchstat` comparison that straddles the Go 1.26→1.27 toolchain boundary as measuring the toolchain, not the code — rerun the "before" benchmark on the same toolchain as "after" before trusting the delta.
+
 ### Memory tracking
 
 ```go

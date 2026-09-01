@@ -160,7 +160,7 @@
 
 **Carbon** (<https://github.com/uniplaces/carbon>) Simple, semantic time library for Go. Time parsing, formatting, manipulation.
 
-**google/uuid** (<https://github.com/google/uuid>) Generate and parse UUIDs. Official Google library, RFC 4122 compliant.
+**google/uuid** (<https://github.com/google/uuid>) Generate and parse UUIDs. Official Google library, RFC 4122 compliant. For new Go 1.27+ code, check the standard library `uuid` package first — this library still has broader RFC-variant coverage (v3/v5 namespaced UUIDs).
 
 ## Database Schema Migration
 

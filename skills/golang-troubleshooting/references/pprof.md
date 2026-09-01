@@ -99,7 +99,7 @@ curl http://localhost:6060/debug/pprof/goroutine?debug=2 > goroutines.txt
 # Goroutine profile (for pprof analysis)
 curl http://localhost:6060/debug/pprof/goroutine > goroutine.prof
 
-# Go 1.26 experimental goroutine leak profile, only with GOEXPERIMENT=goroutineleakprofile
+# Goroutine leak profile — generally available since Go 1.27 (no GOEXPERIMENT needed)
 curl http://localhost:6060/debug/pprof/goroutineleak?debug=2
 go tool pprof http://localhost:6060/debug/pprof/goroutineleak
 

@@ -11,7 +11,7 @@ Compare the project's `go` directive in `go.mod` against the latest stable relea
 go version
 
 # Update go.mod to target a newer version
-go mod edit -go=1.26
+go mod edit -go=1.27
 
 # Update toolchain
 go get toolchain@latest
@@ -52,6 +52,32 @@ go build ./...
 ```
 
 Go 1.22+ expanded PGO to devirtualize more interface calls. Go 1.23+ reduced PGO build time overhead to single digits.
+
+## `go fix` and `go doc` changes _(Go 1.27+)_
+
+`go fix` now applies more of the `modernize` fixer suite automatically. Coverage shifted between Go 1.26 and 1.27:
+
+- **Added**: `atomictypes`, `embedlit`, `slicesbackward`, `unsafefuncs`
+- **Removed**: `fmtappendf` (superseded by other fixers)
+- **Renamed**: `waitgroup` → `waitgroupgo`
+
+```bash
+go fix ./...          # applies the enabled safe transformations
+go tool fix help      # check exact fixer coverage for the installed toolchain
+```
+
+`go doc` accepts `package@version` to look up a specific module version without changing `go.mod`, and `-ex` lists executable examples:
+
+```bash
+go doc golang.org/x/tools/cmd/stringer@v0.30.0
+go doc -ex net/http.Client
+```
+
+`go mod tidy` for modules with `go 1.27` or newer auto-merges duplicate `require` blocks and enforces a two-block layout (direct dependencies, then indirect), preserving existing comments.
+
+`go test -json` output gained an optional `OutputType` field (`"error"`, `"error-continue"`, `"frame"`) for consumers that need to distinguish test-output kinds programmatically.
+
+`go tool trace -http` now binds to localhost by default; pass `-http=0.0.0.0:6060` explicitly to expose the trace viewer beyond the local machine (relevant when tracing inside a container or remote dev environment).
 
 ## AI-Driven Code Review in CI
 

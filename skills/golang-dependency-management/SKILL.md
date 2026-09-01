@@ -130,12 +130,12 @@ go get -u tool
 go mod tidy
 ```
 
-`go.mod` shape for a module targeting Go 1.26 or newer. This is an example target, not a cap; keep the project's actual `go` directive and do not change it just to add tools.
+`go.mod` shape for a module targeting Go 1.27 or newer. This is an example target, not a cap; keep the project's actual `go` directive and do not change it just to add tools.
 
 ```go.mod
 module example.com/project
 
-go 1.26
+go 1.27
 
 tool (
     github.com/golangci/golangci-lint/v2/cmd/golangci-lint
@@ -143,6 +143,8 @@ tool (
     golang.org/x/perf/cmd/benchstat
 )
 ```
+
+For `go 1.27` or newer, `go mod tidy` auto-merges duplicate `require` blocks and enforces a two-block layout (direct dependencies, then indirect), preserving existing comments — no manual cleanup needed after a merge that introduces a second `require` block.
 
 For Go <1.24 only, use the legacy `tools.go` blank-import workaround:
 
@@ -159,12 +161,12 @@ import (
 
 Rule: Go 1.24+ = `tool` directives. Go <1.24 = `tools.go` fallback.
 
-### Go 1.26+ module target note
+### Module target note
 
-When using a Go 1.26 or newer toolchain, `go mod init` may create a module with an older default `go` directive. If the project intentionally targets Go 1.26+ APIs, update the directive deliberately:
+When using a newer toolchain, `go mod init` may create a module with an older default `go` directive. If the project intentionally targets the newer toolchain's APIs, update the directive deliberately:
 
 ```bash
-go mod edit -go=1.26
+go mod edit -go=1.27
 go mod tidy
 ```
 

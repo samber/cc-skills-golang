@@ -183,11 +183,11 @@ Expect 2-4x improvement for tight arithmetic loops. Only use when profiling show
 
 **Diagnose:** 1- `go tool pprof` (CPU profile) — confirm a numeric inner loop consumes >20% of CPU; SIMD only helps CPU-bound numeric work, not allocation or I/O bottlenecks 2- `go test -bench` — measure the loop's baseline ns/op; provides the reference point to validate SIMD gains 3- `go build -gcflags="-d=ssa/prove/debug=2"` — check if the compiler already auto-vectorized the loop; look for `"Proved"` bounds-check eliminations that enable vectorization 4- `GOSSAFUNC=MyFunc go build` — generate SSA dump (`ssa.html`) to inspect whether the compiler produces vector instructions for the hot loop 5- `go tool objdump -s MyFunc ./binary` — verify the final assembly contains SIMD instructions (e.g., `VMOVAPD`, `VADDPD` on amd64) rather than scalar equivalents
 
-Go 1.26+ includes an experimental `simd/archsimd` package (requires `GOEXPERIMENT=simd` flag) providing low-level SIMD intrinsics for amd64 with 128/256/512-bit vectors. For broader portability, the compiler auto-vectorizes simple loops, and several strategies exist.
+Go 1.26+ includes an experimental `simd/archsimd` package (requires `GOEXPERIMENT=simd` flag) providing low-level, architecture-specific SIMD intrinsics — amd64 with 128/256/512-bit vectors, and arm64/wasm at 128-bit as of Go 1.27. Go 1.27 also adds a portable `simd` package (vector types like `Int8s`, `Float32s`) that works across architectures and falls back to scalar code without hardware support. For broader portability, the compiler auto-vectorizes simple loops, and several strategies exist.
 
 **Options for explicit SIMD in Go:**
 
-- **Experimental `simd/archsimd` (Go 1.26+, speculative)** — Direct SIMD intrinsics via vector types with CPU feature detection. Limited to AMD64. Use with caution: this is an experimental, in-progress API (`GOEXPERIMENT=simd`) whose package path and type names are subject to change before stabilization. Not covered by Go 1 compatibility guarantees, and should never be exposed in public APIs. Verify the actual import path and API against the Go toolchain you are using.
+- **Experimental `simd`/`simd/archsimd` (Go 1.26+, speculative)** — Direct SIMD intrinsics via vector types with CPU feature detection. `simd` (Go 1.27+) is portable across architectures; `simd/archsimd` is architecture-specific (amd64, plus arm64/wasm as of Go 1.27). Use with caution: both are experimental, in-progress APIs (`GOEXPERIMENT=simd`) whose package paths and type names are subject to change before stabilization. Not covered by Go 1 compatibility guarantees, and should never be exposed in public APIs. Verify the actual import path and API against the Go toolchain you are using.
 
   ```go
   // Requires: GOEXPERIMENT=simd go build
@@ -297,7 +297,7 @@ go build -tags=nosimd -o app-safe .                # Fallback everywhere
 - Auto-vectorization covers the most common cases (simple numeric loops)
 - If your bottleneck is allocations or I/O, SIMD won't help
 
-**Recommendation:** Start with auto-vectorization. For Go 1.26+, evaluate `simd/archsimd` for AMD64-only workloads (remembering it's experimental). Move to runtime detection (option 2 above) if profiling shows a bottleneck and the code needs to run on heterogeneous hardware. Only use compile-time selection (option 3) if you control the deployment environment and can test each per-binary variant.
+**Recommendation:** Start with auto-vectorization. For Go 1.27+, evaluate the portable `simd` package for cross-architecture code, or `simd/archsimd` for architecture-specific tuning (amd64, arm64, wasm) — remembering both are experimental. Move to runtime detection (option 2 above) if profiling shows a bottleneck and the code needs to run on heterogeneous hardware. Only use compile-time selection (option 3) if you control the deployment environment and can test each per-binary variant.
 
 Only invest in hand-written SIMD when profiling shows a numeric inner loop consuming >20% of CPU and the compiler isn't auto-vectorizing it.
 

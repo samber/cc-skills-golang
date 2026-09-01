@@ -14,7 +14,7 @@
 
 Use pprof goroutine profile (see [pprof.md](./pprof.md)) with `?debug=2` for human-readable output, then look for goroutines stuck in `chan receive`.
 
-For Go 1.26 diagnostics, there is also an experimental goroutine leak profile. It is useful for production-oriented leak investigation, but is gated by `GOEXPERIMENT=goroutineleakprofile`; do not rely on it as default stable behavior.
+The goroutine leak profile (experimental behind `GOEXPERIMENT=goroutineleakprofile` in Go 1.26) is generally available since Go 1.27 — no build flag needed, and it is served at `/debug/pprof/goroutineleak` like any other standard profile.
 
 ```bash
 curl http://localhost:6060/debug/pprof/goroutineleak?debug=2

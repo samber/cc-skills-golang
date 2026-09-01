@@ -72,13 +72,16 @@ The versions in the examples below are reference versions that may be outdated. 
 Adapt the Go version matrix to match `go.mod`:
 
 ```
-go 1.23   → matrix: ["1.23", "1.24", "1.25", "1.26", "stable"]
-go 1.24   → matrix: ["1.24", "1.25", "1.26", "stable"]
-go 1.25   → matrix: ["1.25", "1.26", "stable"]
-go 1.26   → matrix: ["1.26", "stable"]
+go 1.23   → matrix: ["1.23", "1.24", "1.25", "1.26", "1.27", "stable"]
+go 1.24   → matrix: ["1.24", "1.25", "1.26", "1.27", "stable"]
+go 1.25   → matrix: ["1.25", "1.26", "1.27", "stable"]
+go 1.26   → matrix: ["1.26", "1.27", "stable"]
+go 1.27   → matrix: ["1.27", "stable"]
 ```
 
 Use `fail-fast: false` so a failure on one Go version doesn't cancel the others.
+
+Go 1.27 raises the Darwin floor to macOS 13 (Ventura). `macos-latest`/`macos-14`+ runners are unaffected; only pin an older `macos-12` runner if a project still needs it, and note it can no longer build with a Go 1.27 toolchain.
 
 Test flags:
 

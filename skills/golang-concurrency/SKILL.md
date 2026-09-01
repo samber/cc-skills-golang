@@ -132,11 +132,9 @@ When auditing concurrency across a large codebase, use up to 5 parallel sub-agen
 - → See `samber/cc-skills-golang@golang-design-patterns` skill for graceful shutdown patterns
 - → See `samber/cc-skills-golang@golang-continuous-integration` skill for automated AI-driven code review in CI using these guidelines
 
-### Go 1.26 experimental goroutine leak profile
+### Goroutine leak profile
 
-For Go 1.26 diagnostics, there is an experimental goroutine leak profile. It is useful for production-oriented leak investigation, but is gated by `GOEXPERIMENT=goroutineleakprofile`; do not rely on it as default stable behavior.
-
-Typical usage when the experiment is enabled:
+The goroutine leak profile (experimental behind `GOEXPERIMENT=goroutineleakprofile` in Go 1.26) is generally available in `runtime/pprof` since Go 1.27 — no build flag required. It is a useful production-oriented leak signal alongside the existing tools below.
 
 ```bash
 curl http://localhost:6060/debug/pprof/goroutineleak?debug=2
