@@ -267,7 +267,6 @@ Budgets measure three different units — **one paragraph**, **one file**, and *
 | ~20-50 skills | total installed | Discovery degrades past it: every description loads at startup, diluting triggering for all skills, not just the newest |
 
 - **Cap standalone prose at 3 sentences, and carry the "why" as a clause inside the rule's own sentence** rather than a second sentence explaining the first (→ See [Teach reasoning, not only rules](#teach-reasoning-not-only-rules)). Long paragraphs quietly reintroduce the verbosity the per-file budgets exist to prevent, and nothing flags them — line and token counts only trip once the whole file is already bloated. Enumerable content belongs in a table, bullet list or checklist, never in longer prose (→ See [Formats](#formats)).
-- **Check density mechanically** — `python3 scripts/check_prose_density.py skills/<name>/SKILL.md` flags every paragraph over the cap.
 - **Use secondary markdown files for depth** — Claude reads these on demand, so they don't count against context until needed.
 - **Prune installed skills rather than only shrinking each one** — the startup listing is a shared budget too.
 
@@ -741,17 +740,16 @@ After making changes, suggest the following as next steps for the developer to r
 
 1. ~~Validate against the spec: `skills-ref validate ./skills/{name}`~~ (disabled — [skills-ref doesn't support `user-invocable` yet](https://github.com/agentskills/agentskills/issues/105))
 2. Run the portability grep from "Tool names belong in frontmatter, not in the body" (under Allowed Tools) against the changed skill(s). Fix any hit that isn't an `allowed-tools:` line or a labeled generated-artifact block.
-3. Check prose density with `python3 scripts/check_prose_density.py "skills/<name>/SKILL.md" "skills/<name>/references/"*.md` — rewrite every flagged paragraph as a bullet list, numbered steps or a table, keeping the "why" as a short clause (→ See [Token budgets](#token-budgets))
-4. Reformat markdowns with `npx prettier --write *.md "**/*.md"` then lint with `markdownlint-cli2 --config .markdownlint-cli2.jsonc ./` — run before measuring tokens, as formatting changes token counts
-5. Run `SNYK_TOKEN=<token> uvx snyk-agent-scan@latest skills/<name>/` and fix any W011/W012/W001 warnings before proceeding (see [Snyk agent scanner compliance](#snyk-agent-scanner-compliance))
-6. Measure token counts:
+3. Reformat markdowns with `npx prettier --write *.md "**/*.md"` then lint with `markdownlint-cli2 --config .markdownlint-cli2.jsonc ./` — run before measuring tokens, as formatting changes token counts
+4. Run `SNYK_TOKEN=<token> uvx snyk-agent-scan@latest skills/<name>/` and fix any W011/W012/W001 warnings before proceeding (see [Snyk agent scanner compliance](#snyk-agent-scanner-compliance))
+5. Measure token counts:
    - **Description (tok)**: `awk 'NR==1 && /^---$/{found=1; next} found && /^---$/{exit} found && /^description:/{print}' skills/{name}/SKILL.md | tiktoken-cli`
    - **SKILL.md (tok)**: `tiktoken-cli skills/{name}/SKILL.md`
    - **Directory (tok)**: `tiktoken-cli --exclude "evals" skills/{name}/` (exclude `evals/` subdirectory)
-7. Update the README.md table with the measured token counts, update the total rows, and update the **Error rate gap** column (`Without - With`, expressed as a negative percentage, e.g. `-39%`)
-8. Increment `metadata.version` in the changed SKILL.md and the plugin version in `.claude-plugin/plugin.json`, `.cursor-plugin/plugin.json` and `gemini-extension.json` — all three plugin files MUST have the same version
-9. Run skill evaluation via `/skill-creator`: 10+ evals, run them with and without the skill via parallel subagents, grade with LLM-as-judge (no human in the loop), print results, suggest improvements if needed, and append/update the report to `EVALUATIONS.md` following the format in [Evaluation Reporting](#evaluation-reporting)
-10. Depending on evaluation final report, suggest improvements and loop
+6. Update the README.md table with the measured token counts, update the total rows, and update the **Error rate gap** column (`Without - With`, expressed as a negative percentage, e.g. `-39%`)
+7. Increment `metadata.version` in the changed SKILL.md and the plugin version in `.claude-plugin/plugin.json`, `.cursor-plugin/plugin.json` and `gemini-extension.json` — all three plugin files MUST have the same version
+8. Run skill evaluation via `/skill-creator`: 10+ evals, run them with and without the skill via parallel subagents, grade with LLM-as-judge (no human in the loop), print results, suggest improvements if needed, and append/update the report to `EVALUATIONS.md` following the format in [Evaluation Reporting](#evaluation-reporting)
+9. Depending on evaluation final report, suggest improvements and loop
 
 For initial evaluation of skills, use Human-as-Judge.
 
