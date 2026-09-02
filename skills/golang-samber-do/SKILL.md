@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code, Codex or similar harness, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.3.0"
+  version: "1.3.1"
   openclaw:
     emoji: "💉"
     homepage: https://github.com/samber/cc-skills-golang
@@ -34,7 +34,7 @@ Type-safe dependency injection toolkit for Go based on Go 1.18+ generics.
 
 This skill is not exhaustive. Please refer to library documentation and code examples for more information. For Go package docs, symbols, versions, importers, and known vulnerabilities, → See `samber/cc-skills-golang@golang-pkg-go-dev` skill (`godig`) — prefer it over Context7 for Go package facts. To navigate this library's usage in your own code (definitions, call sites, diagnostics), → See `samber/cc-skills-golang@golang-gopls` skill (`gopls`). Context7 remains a fallback for docs not indexed on pkg.go.dev.
 
-DO NOT USE v1 OF THIS LIBRARY. INSTALL v2 INSTEAD:
+Install v2 — v1 is superseded and lacks the generics-based container, scopes, and lifecycle hooks documented below, so v1-era guidance misleads on every API in this skill:
 
 ```bash
 go get -u github.com/samber/do/v2

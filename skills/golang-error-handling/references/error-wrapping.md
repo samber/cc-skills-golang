@@ -1,5 +1,17 @@
 # Error Wrapping and Inspection
 
+## Table of Contents
+
+- [Error Wrapping with `%w`](#error-wrapping-with-w)
+  - [`%w` vs `%v`: controlling exposure](#w-vs-v-controlling-exposure)
+- [Inspecting Errors: `errors.Is` and `errors.As`](#inspecting-errors-errorsis-and-errorsas)
+  - [`errors.Is` — match against a sentinel value](#errorsis--match-against-a-sentinel-value)
+  - [`errors.As / errors.AsType` — extract a typed error from the chain](#errorsas--errorsastype--extract-a-typed-error-from-the-chain)
+- [Combining Errors with `errors.Join`](#combining-errors-with-errorsjoin)
+  - [Use case: validating multiple fields](#use-case-validating-multiple-fields)
+  - [Use case: parallel operations with independent failures](#use-case-parallel-operations-with-independent-failures)
+  - [`errors.Is` works through joined errors](#errorsis-works-through-joined-errors)
+
 ## Error Wrapping with `%w`
 
 Wrapping preserves the original error in a chain that callers can inspect with `errors.Is` and `errors.As`. Errors SHOULD be wrapped at each layer to build a readable chain.

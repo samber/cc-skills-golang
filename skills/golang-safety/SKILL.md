@@ -1,12 +1,12 @@
 ---
 name: golang-safety
-description: "Defensive Golang coding to prevent panics, silent data corruption, and subtle runtime bugs. Use when encountering nil panics, append aliasing, map concurrent access, float comparison pitfalls, or zero-value design questions. Also use when reviewing code for nil-safety, numeric conversion overflow, resource lifecycle issues (defer in loops), or defensive copying of slices and maps."
+description: "Defensive Golang coding against accidental bugs — nil panics, typed-nil interfaces, `append` backing-array aliasing, silent int64-to-int32 truncation, float `==` comparison, `defer` inside loops, defensive copies of slices and maps, and usable zero values. Use when a Go program panics on a nil map write or nil pointer dereference, when reviewing code for nil-safety, numeric conversion overflow, or resource lifecycle, or when designing a type whose zero value must be safe. Not for designing concurrent access with goroutines, channels, or sync primitives (→ See `samber/cc-skills-golang@golang-concurrency` skill), not for exploitable vulnerabilities such as injection, weak crypto, or leaked secrets (→ See `samber/cc-skills-golang@golang-security` skill), and not for debugging an already-failing program (→ See `samber/cc-skills-golang@golang-troubleshooting` skill)."
 user-invocable: true
 license: MIT
 compatibility: Designed for Claude Code, Codex or similar harness, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.3.0"
+  version: "1.3.1"
   openclaw:
     emoji: "🛡"
     homepage: https://github.com/samber/cc-skills-golang
@@ -256,14 +256,6 @@ if s, ok := reflect.TypeAssert[string](v); ok {
 }
 ```
 
-## Cross-References
-
-- → See `samber/cc-skills-golang@golang-concurrency` skill for concurrent access patterns and sync primitives
-- → See `samber/cc-skills-golang@golang-data-structures` skill for slice/map internals, capacity growth, and container/ packages
-- → See `samber/cc-skills-golang@golang-error-handling` skill for nil error interface trap
-- → See `samber/cc-skills-golang@golang-security` skill for security-relevant safety issues (memory safety, integer overflow)
-- → See `samber/cc-skills-golang@golang-troubleshooting` skill for debugging panics and race conditions
-
 ## Common Mistakes
 
 | Mistake | Fix |
@@ -282,4 +274,9 @@ if s, ok := reflect.TypeAssert[string](v); ok {
 
 ## Cross-References
 
+- → See `samber/cc-skills-golang@golang-concurrency` skill for concurrent access patterns and sync primitives
+- → See `samber/cc-skills-golang@golang-data-structures` skill for slice/map internals, capacity growth, and container/ packages
+- → See `samber/cc-skills-golang@golang-error-handling` skill for nil error interface trap
+- → See `samber/cc-skills-golang@golang-security` skill for security-relevant safety issues (memory safety, integer overflow)
+- → See `samber/cc-skills-golang@golang-troubleshooting` skill for debugging panics and race conditions
 - → See `samber/cc-skills-golang@golang-continuous-integration` skill for automated AI-driven code review in CI using these guidelines

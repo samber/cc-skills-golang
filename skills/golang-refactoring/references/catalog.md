@@ -2,6 +2,24 @@
 
 Each entry below follows the same structure: **Motivation** (why the refactoring earns its keep), **Smell trigger** (the code shape that signals it's time), **Go mechanics** (what the transform actually looks like in Go), **Tool** (what performs it), and **Risk** (matching the Risk Stratification table in [SKILL.md](../SKILL.md)). Entries are grouped by family, following the shape of Fowler's _Refactoring_ catalog.
 
+## Table of Contents
+
+- [Extract Function / Extract Method](#extract-function--extract-method)
+- [Inline Function / Inline Call](#inline-function--inline-call)
+- [Extract Variable / Inline Variable, Extract Constant](#extract-variable--inline-variable-extract-constant)
+- [Rename](#rename)
+- [Change Function Declaration (Signature)](#change-function-declaration-signature)
+- [Move Function / Move Field / Move Type](#move-function--move-field--move-type)
+- [Split Package / Merge Package](#split-package--merge-package)
+- [Replace Nested Conditional with Guard Clauses](#replace-nested-conditional-with-guard-clauses)
+- [Introduce Parameter Object](#introduce-parameter-object)
+- [Replace Conditional with Polymorphism](#replace-conditional-with-polymorphism)
+- [Hide Delegate / Remove Middle Man](#hide-delegate--remove-middle-man)
+- [Sprout Method / Wrap Method](#sprout-method--wrap-method)
+- [Replace Temp with Query](#replace-temp-with-query)
+- [Smell → Refactoring Quick Reference](#smell--refactoring-quick-reference)
+- [Cross-References](#cross-references)
+
 ## Extract Function / Extract Method
 
 - **Motivation:** A function doing more than one job is harder to name, test, and reuse than two functions each doing one job — splitting it restores a name for the piece that was previously anonymous.

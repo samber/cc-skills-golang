@@ -1,12 +1,12 @@
 ---
 name: golang-dependency-management
-description: "Dependency management strategies for Golang projects — go.mod management, installing/upgrading packages, Minimal Version Selection, vulnerability scanning, outdated dependency tracking, binary size analysis, Dependabot/Renovate setup, conflict resolution, and go.work workspaces. Use when adding, removing, or upgrading Go dependencies, auditing vulnerabilities, resolving version conflicts, or setting up automated dependency updates."
+description: "Dependency management for Golang projects — go.mod and go.sum, `go get` install and upgrade flows, Minimal Version Selection, conflict resolution with replace/exclude/retract, `govulncheck` scanning of the module tree, outdated dependency and binary size auditing, vendoring, `tool` directives, and go.work workspaces. Use when adding, removing, or upgrading Go dependencies, deciding whether to take on a package, resolving version conflicts, or auditing what a module pulls in. Covers choosing and upgrading dependency versions, not the surrounding tooling: do NOT use for fixing an exploitable vulnerability in code (→ See `samber/cc-skills-golang@golang-security` skill) or for wiring Dependabot/Renovate update bots into CI workflows (→ See `samber/cc-skills-golang@golang-continuous-integration` skill)."
 user-invocable: true
 license: MIT
 compatibility: Designed for Claude Code, Codex or similar harness, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.3.0"
+  version: "1.3.1"
   openclaw:
     emoji: "📦"
     homepage: https://github.com/samber/cc-skills-golang

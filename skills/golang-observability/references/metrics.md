@@ -4,6 +4,22 @@
 
 When using the Prometheus client library, refer to the library's official documentation for up-to-date API signatures and examples.
 
+## Table of Contents
+
+- [Metric Types](#metric-types)
+- [Histogram vs Summary](#histogram-vs-summary)
+- [Tracking Percentiles (P50, P90, P99, P99.9)](#tracking-percentiles-p50-p90-p99-p999)
+- [Naming Conventions](#naming-conventions)
+- [Exposing Metrics](#exposing-metrics)
+- [Document Metrics with PromQL Comments](#document-metrics-with-promql-comments)
+- [Metric Examples and PromQL Queries](#metric-examples-and-promql-queries)
+  - [Counters — tracking events](#counters--tracking-events)
+  - [Gauges — tracking current state](#gauges--tracking-current-state)
+  - [Histograms — tracking distributions (recommended for latency)](#histograms--tracking-distributions-recommended-for-latency)
+  - [Summary — client-side quantiles (use sparingly)](#summary--client-side-quantiles-use-sparingly)
+- [Multi-Window Burn-Rate SLO Alerting](#multi-window-burn-rate-slo-alerting)
+- [High-Cardinality Labels](#high-cardinality-labels)
+
 ## Metric Types
 
 | Type | What it measures | Example | When to use |

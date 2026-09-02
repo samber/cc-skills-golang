@@ -2,6 +2,27 @@
 
 Allocation reduction is the single highest-ROI optimization in most Go programs. Every allocation eventually requires garbage collection — reducing allocation count and size directly reduces GC pauses and CPU overhead.
 
+## Table of Contents
+
+- [Allocation Patterns](#allocation-patterns)
+  - [Reuse slices via append(s[:0], ...)](#reuse-slices-via-appends0-)
+  - [Direct indexing vs append](#direct-indexing-vs-append)
+  - [Eliminate redundant map lookups](#eliminate-redundant-map-lookups)
+  - [Map size hints](#map-size-hints)
+  - [Sentinel errors vs fmt.Errorf](#sentinel-errors-vs-fmterrorf)
+  - [Interface boxing](#interface-boxing)
+- [Backing Array Leaks](#backing-array-leaks)
+  - [Slice reslicing retains the entire backing array](#slice-reslicing-retains-the-entire-backing-array)
+  - [Substring memory leaks](#substring-memory-leaks)
+  - [Map never shrinks](#map-never-shrinks)
+- [String and Byte Optimization](#string-and-byte-optimization)
+- [sync.Pool Hot-Path Patterns](#syncpool-hot-path-patterns)
+- [Memory Layout](#memory-layout)
+  - [Struct field alignment](#struct-field-alignment)
+  - [Zero-size field at end of struct](#zero-size-field-at-end-of-struct)
+  - [Pointer receivers for large structs](#pointer-receivers-for-large-structs)
+  - [Map of pointers for large, frequently updated structs](#map-of-pointers-for-large-frequently-updated-structs)
+
 ## Allocation Patterns
 
 **Diagnose:** 1- `go tool pprof -alloc_objects` — rank functions by number of heap allocations; expect hot-path functions (request handlers, serializers) near the top with thousands of alloc/op 2- `go build -gcflags="-m -m"` — verbose escape analysis showing _why_ variables escape; look for `"leaking param"`, `"too large for stack"`, or `"captured by closure"` on variables you expect to stay on the stack 3- `go test -bench -benchmem` — measure allocs/op and B/op per benchmark; expect the target function to show >0 allocs/op that can be eliminated

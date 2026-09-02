@@ -1,5 +1,22 @@
 # Algorithm Selection Guide
 
+## Table of Contents
+
+- [Decision Tree](#decision-tree)
+- [Algorithm Deep Dives](#algorithm-deep-dives)
+  - [LRU (Least Recently Used)](#lru-least-recently-used)
+  - [LFU (Least Frequently Used)](#lfu-least-frequently-used)
+  - [TinyLFU](#tinylfu)
+  - [W-TinyLFU (Weighted TinyLFU)](#w-tinylfu-weighted-tinylfu)
+  - [S3FIFO (Segmented Small-Size FIFO)](#s3fifo-segmented-small-size-fifo)
+  - [ARC (Adaptive Replacement Cache)](#arc-adaptive-replacement-cache)
+  - [TwoQueue](#twoqueue)
+  - [SIEVE](#sieve)
+  - [FIFO (First In, First Out)](#fifo-first-in-first-out)
+- [Comparison Matrix](#comparison-matrix)
+- [Measuring Hit Rate](#measuring-hit-rate)
+- [Switching Algorithms](#switching-algorithms)
+
 ## Decision Tree
 
 ```

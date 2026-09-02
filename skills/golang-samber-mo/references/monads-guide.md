@@ -1,5 +1,20 @@
 # Functional Programming and Monads in Go
 
+## Table of Contents
+
+- [What is Functional Programming?](#what-is-functional-programming)
+- [What is a Monad?](#what-is-a-monad)
+  - [The Railway Metaphor](#the-railway-metaphor)
+- [Why Monads Are Valuable in Go](#why-monads-are-valuable-in-go)
+  - [1. Compile-Time Nil Safety (Option)](#1-compile-time-nil-safety-option)
+  - [2. Railway-Oriented Error Handling (Result)](#2-railway-oriented-error-handling-result)
+  - [3. Composable Pipelines](#3-composable-pipelines)
+- [The Three Core Monads](#the-three-core-monads)
+  - [Option — Represents Absence](#option--represents-absence)
+  - [Result — Represents Fallibility](#result--represents-fallibility)
+  - [Either — Represents Alternatives](#either--represents-alternatives)
+- [When to Use mo vs Plain Go](#when-to-use-mo-vs-plain-go)
+
 ## What is Functional Programming?
 
 Functional programming (FP) treats computation as evaluation of mathematical functions. Core principles:

@@ -1,12 +1,12 @@
 ---
 name: golang-security
-description: "Security best practices and vulnerability prevention for Golang. Covers injection (SQL, command, XSS), cryptography, filesystem safety, network security, cookies, secrets management, memory safety, and logging. Apply when writing, reviewing, or auditing Go code for security, or when working on any risky code involving crypto, I/O, secrets management, user input handling, or authentication. Includes configuration of security tools."
+description: "Security best practices and vulnerability prevention for Golang — injection (SQL, command, XSS), cryptography, path traversal, SSRF and HTTP security headers, cookies, secrets management, memory safety, PII in logs, STRIDE/DREAD threat modeling, plus `gosec` SAST, race detection, and fuzz testing. Apply when writing, reviewing, or auditing Go code for security, or when touching crypto, file or network I/O, secrets, user input, or authentication. Not for non-exploitable defensive bugs such as nil panics or slice aliasing (→ See `samber/cc-skills-golang@golang-safety` skill), dependency vulnerability scanning with govulncheck (→ See `samber/cc-skills-golang@golang-dependency-management` skill), or wiring security scanners into CI pipelines (→ See `samber/cc-skills-golang@golang-continuous-integration` skill)."
 user-invocable: true
 license: MIT
 compatibility: Designed for Claude Code, Codex or similar harness, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.2.0"
+  version: "1.2.1"
   openclaw:
     emoji: "🔒"
     homepage: https://github.com/samber/cc-skills-golang

@@ -11,6 +11,18 @@ Network and web security vulnerabilities can lead to data leakage and unauthoriz
 
 ---
 
+## Table of Contents
+
+- [Open Redirect Vulnerability — Medium](#open-redirect-vulnerability--medium)
+- [Bind to All Interfaces — Medium](#bind-to-all-interfaces--medium)
+- [Slowloris Attack Vulnerability — Medium](#slowloris-attack-vulnerability--medium)
+- [Insecure HTTP Server Configuration — Medium](#insecure-http-server-configuration--medium)
+- [Observable Timing (Timing Attacks) — Medium](#observable-timing-timing-attacks--medium)
+- [Exposed pprof Profiling Endpoints — High](#exposed-pprof-profiling-endpoints--high)
+- [XXE Vulnerability — High](#xxe-vulnerability--high)
+- [Permissive Regex Validation — Low](#permissive-regex-validation--low)
+- [CWE References](#cwe-references)
+
 ## Open Redirect Vulnerability — Medium
 
 Redirects to unvalidated URLs can be used for phishing.

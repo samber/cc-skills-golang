@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code, Codex or similar harness, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.3.0"
+  version: "1.3.1"
   openclaw:
     emoji: "🔌"
     homepage: https://github.com/samber/cc-skills-golang
@@ -139,55 +139,32 @@ Go has three main approaches to DI libraries:
 | **Go version** | Any | Any | Any | 1.18+ (generics) |
 | **Learning curve** | None | Medium | High | Low |
 
-### Quick Comparison: Same App, Four Ways
+### Quick Comparison: Wiring Style
 
-The dependency graph: `Config -> Database -> UserStore -> UserService -> API`
-
-**Manual**:
+The same graph — `Config -> Database -> UserStore -> UserService -> API` — wired by hand and by a container. The contrast is what the wiring code encodes: an ordered call sequence you maintain, versus a set of providers the container orders for you.
 
 ```go
+// Manual — you own the order; adding a dependency means editing every call site downstream
 cfg := NewConfig()
 db := NewDatabase(cfg)
 store := NewUserStore(db)
 svc := NewUserService(store)
 api := NewAPI(svc)
 api.Run()
-// No automatic shutdown, health checks, or lazy loading
-```
+// No shutdown hooks, health checks, or lazy loading — add them yourself
 
-**google/wire**:
-
-```go
-// wire.go — then run: wire ./...
-func InitializeAPI() (*API, error) {
-    wire.Build(NewConfig, NewDatabase, NewUserStore, NewUserService, NewAPI)
-    return nil, nil
-}
-// No lifecycle hooks (OnStart/OnStop) or health checks; cleanup via returned func() from providers
-```
-
-**uber-go/fx**:
-
-```go
-app := fx.New(
-    fx.Provide(NewConfig, NewDatabase, NewUserStore, NewUserService),
-    fx.Invoke(func(api *API) { api.Run() }),
-)
-app.Run() // manages lifecycle, but reflection-based
-```
-
-**samber/do**:
-
-```go
+// Container (samber/do) — order is derived from the constructor signatures
 i := do.New()
 do.Provide(i, NewConfig)
-do.Provide(i, NewDatabase)    // auto shutdown + health check
+do.Provide(i, NewDatabase)
 do.Provide(i, NewUserStore)
 do.Provide(i, NewUserService)
 api := do.MustInvoke[*API](i)
 api.Run()
-// defer i.Shutdown() — handles all cleanup automatically
+defer i.Shutdown() // shutdown and health checks come from the container
 ```
+
+google/wire and uber-go/fx express the same graph differently: wire generates the manual sequence above at build time from a `wire.Build` provider list (cleanup via `func()` returned by providers, no lifecycle hooks), while fx registers providers with `fx.Provide` and resolves them by reflection at runtime with `OnStart`/`OnStop` hooks. Full wiring examples for each: [google/wire](./references/google-wire.md), [uber-go/dig + fx](./references/uber-dig-fx.md), [samber/do](./references/samber-do.md).
 
 ## Testing with DI
 

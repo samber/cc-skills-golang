@@ -2,6 +2,22 @@
 
 Schema-first, reflection-based — no codegen. Write SDL, bind Go resolver structs. Parse-time validation gives a fail-fast contract.
 
+## Table of Contents
+
+- [Setup](#setup)
+- [Resolver Structure](#resolver-structure)
+- [Type Mapping](#type-mapping)
+- [Nullable vs Non-null Arguments](#nullable-vs-non-null-arguments)
+- [Custom Scalar](#custom-scalar)
+- [Interfaces and Unions](#interfaces-and-unions)
+- [DataLoaders](#dataloaders)
+- [Error Handling](#error-handling)
+- [OpenTelemetry Tracing](#opentelemetry-tracing)
+- [Subscriptions](#subscriptions)
+- [Disabling Introspection](#disabling-introspection)
+- [Testing](#testing)
+- [graph-gophers vs gqlgen Summary](#graph-gophers-vs-gqlgen-summary)
+
 ## Setup
 
 ```go

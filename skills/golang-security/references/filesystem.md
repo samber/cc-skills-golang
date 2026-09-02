@@ -12,6 +12,18 @@ Filesystem vulnerabilities can lead to unauthorized file access, data leakage, a
 
 ---
 
+## Table of Contents
+
+- [Directory Traversal — High](#directory-traversal--high)
+- [Zip Archive Path Traversal — High](#zip-archive-path-traversal--high)
+- [Decompression Bomb — Medium](#decompression-bomb--medium)
+- [Insecure Temporary File Creation — Medium](#insecure-temporary-file-creation--medium)
+- [Insecure File Permissions — Medium](#insecure-file-permissions--medium)
+- [Insecure mkdir — Low](#insecure-mkdir--low)
+- [Insecure File Write Permissions — Medium](#insecure-file-write-permissions--medium)
+- [Tainted File Read — High](#tainted-file-read--high)
+- [CWE References](#cwe-references)
+
 ## Directory Traversal — High
 
 Paths like `../../etc/passwd` access files outside intended directory.

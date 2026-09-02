@@ -2,6 +2,20 @@
 
 For any bug, follow this systematic process:
 
+## Table of Contents
+
+- [Step 1: Understand Expected vs Actual](#step-1-understand-expected-vs-actual)
+- [Step 2: Get the Full Error](#step-2-get-the-full-error)
+- [Step 3: Isolate the Problem](#step-3-isolate-the-problem)
+- [Step 4: Check External Dependencies](#step-4-check-external-dependencies)
+- [Step 5: Check Observability Tools](#step-5-check-observability-tools)
+- [Step 6: Compare with Working Code](#step-6-compare-with-working-code)
+- [Step 7: Form a Hypothesis and Test It](#step-7-form-a-hypothesis-and-test-it)
+- [Step 8: Trace to Root Cause](#step-8-trace-to-root-cause)
+- [Step 9: Fix and Verify](#step-9-fix-and-verify)
+- [Step 10: Defense-in-Depth](#step-10-defense-in-depth)
+- [When You're Stuck: Escalation Protocol](#when-youre-stuck-escalation-protocol)
+
 ## Step 1: Understand Expected vs Actual
 
 Before touching code, articulate clearly:

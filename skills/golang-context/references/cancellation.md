@@ -1,5 +1,19 @@
 # Cancellation, Timeouts & Deadlines
 
+## Table of Contents
+
+- [Cancellation](#cancellation)
+  - [Why `defer cancel()` matters](#why-defer-cancel-matters)
+- [Timeouts and Deadlines](#timeouts-and-deadlines)
+  - [`context.WithTimeout` — relative duration](#contextwithtimeout--relative-duration)
+  - [`context.WithDeadline` — absolute point in time](#contextwithdeadline--absolute-point-in-time)
+  - [Nested timeouts take the shorter deadline](#nested-timeouts-take-the-shorter-deadline)
+- [Listening for Cancellation](#listening-for-cancellation)
+  - [The `select` pattern](#the-select-pattern)
+  - [Checking cancellation in loops](#checking-cancellation-in-loops)
+- [`context.AfterFunc` (Go 1.21+)](#contextafterfunc-go-121)
+- [`context.WithoutCancel` (Go 1.21+)](#contextwithoutcancel-go-121)
+
 ## Cancellation
 
 `context.WithCancel` returns a derived context and a `cancel` function. When `cancel()` is called, the context's `Done()` channel is closed, signaling all listeners to stop.

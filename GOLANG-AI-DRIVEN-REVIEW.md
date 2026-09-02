@@ -76,7 +76,6 @@ jobs:
           claude_args: >-
             --allowedTools "mcp__github_inline_comment__create_inline_comment,mcp__context7__resolve-library-id,mcp__context7__query-docs,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"
 
-
           prompt: |
             REPO: ${{ github.repository }}
             PR NUMBER: ${{ github.event.pull_request.number }}
@@ -154,7 +153,6 @@ jobs:
             actions: read
           claude_args: >-
             --allowedTools "mcp__github_inline_comment__create_inline_comment,mcp__context7__resolve-library-id,mcp__context7__query-docs,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"
-
 
           prompt: |
             REPO: ${{ github.repository }}
@@ -235,7 +233,6 @@ jobs:
           claude_args: >-
             --allowedTools "mcp__github_inline_comment__create_inline_comment,mcp__context7__resolve-library-id,mcp__context7__query-docs,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"
 
-
           prompt: |
             REPO: ${{ github.repository }}
             PR NUMBER: ${{ github.event.pull_request.number }}
@@ -314,7 +311,6 @@ jobs:
           claude_args: >-
             --allowedTools "mcp__github_inline_comment__create_inline_comment,mcp__context7__resolve-library-id,mcp__context7__query-docs,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"
 
-
           prompt: |
             REPO: ${{ github.repository }}
             PR NUMBER: ${{ github.event.pull_request.number }}
@@ -391,7 +387,6 @@ jobs:
           claude_args: >-
             --allowedTools "Bash(gh pr comment:*),Bash(gh pr view:*),Bash(gh run view:*),Bash(gh run list:*)"
 
-
           prompt: |
             REPO: ${{ github.repository }}
             PR NUMBER: ${{ github.event.pull_request.number }}
@@ -429,7 +424,6 @@ jobs:
           track_progress: false
           claude_args: >-
             --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr view:*),Bash(gh pr diff:*)"
-
 
           prompt: |
             REPO: ${{ github.repository }}

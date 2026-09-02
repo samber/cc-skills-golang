@@ -2,6 +2,18 @@
 
 Detail topics referenced from `SKILL.md`. Each section is self-contained.
 
+## Table of Contents
+
+- [Cleanup Chains](#cleanup-chains)
+- [Multiple Injectors in One Package](#multiple-injectors-in-one-package)
+- [wire.NewSet Nesting Strategies](#wirenewset-nesting-strategies)
+- [`wire:"-"` Exclusion Tag](#wire--exclusion-tag)
+- [Common Codegen Errors](#common-codegen-errors)
+- [Codegen Flags](#codegen-flags)
+- [`panic(wire.Build(...))` Alternate Syntax](#panicwirebuild-alternate-syntax)
+- [Accepting External Values as Injector Arguments](#accepting-external-values-as-injector-arguments)
+- [Quick Reference](#quick-reference)
+
 ## Cleanup Chains
 
 When a provider returns `(T, func(), error)`, Wire adds the cleanup to a chain. The generated injector runs cleanups in **reverse construction order**: the last-built dependant is cleaned up first, ensuring dependants are torn down before their dependencies.

@@ -2,6 +2,16 @@
 
 `go.uber.org/fx/fxtest` integrates fx applications with `*testing.T`: errors fail the test instead of crashing the process, and lifecycle teardown is registered automatically.
 
+## Table of Contents
+
+- [Pulling a value out of the graph with `fx.Populate`](#pulling-a-value-out-of-the-graph-with-fxpopulate)
+- [`fx.Replace` to swap a real dependency for a fake](#fxreplace-to-swap-a-real-dependency-for-a-fake)
+- [Standalone lifecycle for a unit test](#standalone-lifecycle-for-a-unit-test)
+- [Asserting wire-time errors](#asserting-wire-time-errors)
+- [Validating the production graph in CI](#validating-the-production-graph-in-ci)
+- [Test logger that captures fx events](#test-logger-that-captures-fx-events)
+- [Testing a lifecycle hook in isolation](#testing-a-lifecycle-hook-in-isolation)
+
 ## Pulling a value out of the graph with `fx.Populate`
 
 ```go

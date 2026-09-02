@@ -1,5 +1,18 @@
 # Pointer Types Deep Dive
 
+## Table of Contents
+
+- [Regular Pointers (`*T`)](#regular-pointers-t)
+  - [Stack vs Heap (Escape Analysis)](#stack-vs-heap-escape-analysis)
+  - [`new(T)` vs `&T{}`](#newt-vs-t)
+- [`unsafe.Pointer`](#unsafepointer)
+  - [The 6 Valid Patterns (from the Go spec)](#the-6-valid-patterns-from-the-go-spec)
+  - [Critical Rule: NEVER Store `uintptr` Across Statements](#critical-rule-never-store-uintptr-across-statements)
+  - [Modern Alternatives (prefer these)](#modern-alternatives-prefer-these)
+- [`weak.Pointer[T]` (Go 1.24+)](#weakpointert-go-124)
+  - [Use Cases](#use-cases)
+  - [`runtime.AddCleanup` vs `runtime.SetFinalizer`](#runtimeaddcleanup-vs-runtimesetfinalizer)
+
 ## Regular Pointers (`*T`)
 
 ### Stack vs Heap (Escape Analysis)

@@ -2,6 +2,23 @@
 
 CPU-bound bottlenecks show up as functions dominating the CPU profile. The patterns below target the most common causes: missed inlining opportunities, poor cache utilization, and unnecessary computation.
 
+## Table of Contents
+
+- [Function Inlining](#function-inlining)
+  - [Value receivers enable inlining](#value-receivers-enable-inlining)
+- [Cache Locality](#cache-locality)
+  - [Row-major traversal](#row-major-traversal)
+  - [Contiguous 2D allocation](#contiguous-2d-allocation)
+  - [Struct of Arrays (SoA) vs Array of Structs (AoS)](#struct-of-arrays-soa-vs-array-of-structs-aos)
+  - [Pointer-heavy vs value-heavy data](#pointer-heavy-vs-value-heavy-data)
+- [False Sharing](#false-sharing)
+- [Instruction-Level Parallelism](#instruction-level-parallelism)
+- [SIMD (Single Instruction, Multiple Data)](#simd-single-instruction-multiple-data)
+  - [Handling CPU-specific instruction sets](#handling-cpu-specific-instruction-sets)
+- [Tight Loops and the Scheduler](#tight-loops-and-the-scheduler)
+- [Reflection and Type Assertions](#reflection-and-type-assertions)
+- [Monotonic Time](#monotonic-time)
+
 ## Function Inlining
 
 **Diagnose:** 1- `go tool pprof` (CPU profile) — look for hot functions with high cumulative CPU time; if a small helper dominates the profile, it's likely not being inlined 2- `go build -gcflags="-m"` — grep for `"cannot inline"` on your hot-path functions; the reason (e.g., `"function too complex"`, `"unhandled op"`) tells you what to simplify

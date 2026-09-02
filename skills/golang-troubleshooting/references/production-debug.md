@@ -1,5 +1,18 @@
 # Production Debugging
 
+## Table of Contents
+
+- [Production Debugging Checklist](#production-debugging-checklist)
+  - [Step 1: Capture Immediately (don't restart!)](#step-1-capture-immediately-dont-restart)
+  - [Step 2: System Metrics](#step-2-system-metrics)
+  - [Step 3: Analyze Locally](#step-3-analyze-locally)
+- [Logging & Observability](#logging--observability)
+  - [Strategic Log Placement](#strategic-log-placement)
+  - [Structured Logging (Go 1.21+)](#structured-logging-go-121)
+  - [Request ID Tracing](#request-id-tracing)
+- [Network & HTTP Debugging](#network--http-debugging)
+  - [HTTP Client Issues](#http-client-issues)
+
 ## Production Debugging Checklist
 
 When paged for a production issue:

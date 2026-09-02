@@ -2,6 +2,18 @@
 
 All samber/slog HTTP middlewares share a consistent pattern and configuration structure.
 
+## Table of Contents
+
+- [Shared Config Fields](#shared-config-fields)
+- [Default Log Fields](#default-log-fields)
+- [Gin — `slog-gin`](#gin--slog-gin)
+- [Echo — `slog-echo`](#echo--slog-echo)
+- [Fiber — `slog-fiber`](#fiber--slog-fiber)
+- [Chi — `slog-chi`](#chi--slog-chi)
+- [net/http — `slog-http`](#nethttp--slog-http)
+- [Filters](#filters)
+- [Logger Grouping](#logger-grouping)
+
 ## Shared Config Fields
 
 Every middleware provides a `Config` struct with these common fields:

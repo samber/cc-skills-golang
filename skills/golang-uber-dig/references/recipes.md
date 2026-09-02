@@ -2,6 +2,17 @@
 
 End-to-end examples that go beyond the SKILL.md basics. Each recipe is self-contained and shows a real wiring problem.
 
+## Table of Contents
+
+- [HTTP server with route group](#http-server-with-route-group)
+- [Two databases (read-write + read-only)](#two-databases-read-write--read-only)
+- [Provide as interface (`dig.As`) to hide concrete types](#provide-as-interface-digas-to-hide-concrete-types)
+- [Request-scoped dependencies](#request-scoped-dependencies)
+- [Optional dependency for graceful degradation](#optional-dependency-for-graceful-degradation)
+- [Decorate to add cross-cutting behavior](#decorate-to-add-cross-cutting-behavior)
+- [DryRun for graph validation in tests](#dryrun-for-graph-validation-in-tests)
+- [Visualizing a failed graph](#visualizing-a-failed-graph)
+
 ## HTTP server with route group
 
 ```go

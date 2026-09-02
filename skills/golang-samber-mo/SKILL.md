@@ -1,12 +1,12 @@
 ---
 name: golang-samber-mo
-description: "Monadic types for Golang using samber/mo — Option, Result, Either, Future, IO, Task, and State types for type-safe nullable values, error handling, and functional composition with pipeline sub-packages. Apply when using or adopting samber/mo, when the codebase imports `github.com/samber/mo`, or when considering functional programming patterns as a safety design for Golang."
+description: "Monadic types for Golang using samber/mo — Option, Result, Either, Future, IO, Task, and State types for type-safe nullable values, error handling, and functional composition with pipeline sub-packages. Apply when using or adopting samber/mo, when the codebase imports `github.com/samber/mo`, or when considering functional programming patterns as a safety design for Golang. Not for nil-safety and zero-value design without this library (→ See `samber/cc-skills-golang@golang-safety` skill), nor for native error wrapping with fmt.Errorf, errors.Is and errors.As (→ See `samber/cc-skills-golang@golang-error-handling` skill)."
 user-invocable: true
 license: MIT
 compatibility: Designed for Claude Code, Codex or similar harness, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.1.0"
+  version: "1.1.1"
   openclaw:
     emoji: "🎭"
     homepage: https://github.com/samber/cc-skills-golang
@@ -270,8 +270,8 @@ If you encounter a bug or unexpected behavior in samber/mo, open an issue at <ht
 
 ## Cross-References
 
-- -> See `samber/cc-skills-golang@golang-samber-lo` skill for functional collection transforms (Map, Filter, Reduce on slices) that compose with mo types
-- -> See `samber/cc-skills-golang@golang-error-handling` skill for idiomatic Go error handling patterns
-- -> See `samber/cc-skills-golang@golang-safety` skill for nil-safety and defensive Go coding
-- -> See `samber/cc-skills-golang@golang-database` skill for database access patterns
-- -> See `samber/cc-skills-golang@golang-design-patterns` skill for functional options and other Go patterns
+- → See `samber/cc-skills-golang@golang-samber-lo` skill for functional collection transforms (Map, Filter, Reduce on slices) that compose with mo types
+- → See `samber/cc-skills-golang@golang-error-handling` skill for idiomatic Go error handling patterns
+- → See `samber/cc-skills-golang@golang-safety` skill for nil-safety and defensive Go coding
+- → See `samber/cc-skills-golang@golang-database` skill for database access patterns
+- → See `samber/cc-skills-golang@golang-design-patterns` skill for functional options and other Go patterns

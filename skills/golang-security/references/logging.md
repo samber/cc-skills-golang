@@ -10,6 +10,15 @@ Logging sensitive information can lead to data exposure and compliance violation
 
 ---
 
+## Table of Contents
+
+- [Sensitive Data in Logs — Medium](#sensitive-data-in-logs--medium)
+- [Log Injection — Low](#log-injection--low)
+- [Information Leakage in Error Messages — Medium](#information-leakage-in-error-messages--medium)
+- [General Logger Security — Low](#general-logger-security--low)
+- [Log Security Checklist](#log-security-checklist)
+- [CWE References](#cwe-references)
+
 ## Sensitive Data in Logs — Medium
 
 **Bad:**

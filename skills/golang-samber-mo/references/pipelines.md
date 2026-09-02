@@ -2,6 +2,22 @@
 
 samber/mo provides sub-packages (`option`, `result`, `either`, `either3`, `either4`, `either5`) with standalone functions for type-changing transformations and composable pipelines.
 
+## Table of Contents
+
+- [Why Sub-Packages Exist](#why-sub-packages-exist)
+- [option/ Package](#option-package)
+  - [Transformation Functions](#transformation-functions)
+  - [Pipe Functions](#pipe-functions)
+- [result/ Package](#result-package)
+  - [Transformation Functions](#transformation-functions-1)
+  - [Pipe Functions](#pipe-functions-1)
+- [either/ Package](#either-package)
+  - [Transformation Functions](#transformation-functions-2)
+  - [Pipe Functions](#pipe-functions-2)
+- [either3/, either4/, either5/ Packages](#either3-either4-either5-packages)
+- [When to Use Pipes vs Direct Methods](#when-to-use-pipes-vs-direct-methods)
+  - [Example: Combined Usage](#example-combined-usage)
+
 ## Why Sub-Packages Exist
 
 Direct methods on Option/Result/Either (`.Map`, `.FlatMap`) cannot change the type parameter because Go methods cannot introduce new type parameters. For example:

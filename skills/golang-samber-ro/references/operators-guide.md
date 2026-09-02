@@ -2,6 +2,25 @@
 
 samber/ro provides 150+ operators organized by category. All operators are generic functions that take and return `Observable[T]`, designed for chaining via `Pipe`.
 
+## Table of Contents
+
+- [Pipeline Construction](#pipeline-construction)
+- [Creation Operators](#creation-operators)
+- [Transformation Operators](#transformation-operators)
+- [Filtering Operators](#filtering-operators)
+- [Combining Operators](#combining-operators)
+- [Math and Aggregation](#math-and-aggregation)
+- [Error Handling](#error-handling)
+- [Timing and Buffering](#timing-and-buffering)
+- [Side Effects (Tap / Do)](#side-effects-tap--do)
+- [Connectable and Sharing](#connectable-and-sharing)
+- [Context Operators](#context-operators)
+- [Conditional Operators](#conditional-operators)
+- [Terminal Operators](#terminal-operators)
+- [Observer and Subscription](#observer-and-subscription)
+- [Scheduling](#scheduling)
+- [Concurrency Modes](#concurrency-modes)
+
 ## Pipeline Construction
 
 ```go

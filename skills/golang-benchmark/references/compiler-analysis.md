@@ -4,6 +4,24 @@ The Go compiler provides diagnostic flags that reveal optimization decisions —
 
 Use compiler diagnostics when pprof shows a hot function and you need to understand the compiler's decisions about that function. These tools are free (no runtime overhead) — they analyze at compile time.
 
+## Table of Contents
+
+- [Escape Analysis](#escape-analysis)
+  - [Commands](#commands)
+  - [Reading the output](#reading-the-output)
+  - [Common escape causes](#common-escape-causes)
+- [Inlining Decisions](#inlining-decisions)
+  - [Commands](#commands-1)
+  - [Reading the output](#reading-the-output-1)
+  - [Common inlining blockers](#common-inlining-blockers)
+- [SSA Dump](#ssa-dump)
+  - [Commands](#commands-2)
+  - [Reading ssa.html](#reading-ssahtml)
+- [Assembly Output](#assembly-output)
+  - [Commands](#commands-3)
+  - [Reading assembly output](#reading-assembly-output)
+  - [Comparing assembly before/after optimization](#comparing-assembly-beforeafter-optimization)
+
 ## Escape Analysis
 
 Escape analysis determines whether a variable can live on the stack (cheap — freed when the function returns) or must be allocated on the heap (expensive — requires GC). "Moved to heap" means the compiler decided the variable might outlive the function.

@@ -1,5 +1,14 @@
 # Viper Config Sources and File Formats
 
+## Table of Contents
+
+- [Supported file formats](#supported-file-formats)
+- [Config file search](#config-file-search)
+- [Merging multiple config files](#merging-multiple-config-files)
+- [Multiple config files via SetConfigFile](#multiple-config-files-via-setconfigfile)
+- [Remote KV stores (etcd, Consul)](#remote-kv-stores-etcd-consul)
+- [Embedding config with go:embed](#embedding-config-with-goembed)
+
 ## Supported file formats
 
 Viper detects format from file extension. Supported extensions:

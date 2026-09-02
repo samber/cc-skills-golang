@@ -1,5 +1,17 @@
 # Directory Layouts
 
+## Table of Contents
+
+- [Universal Layout (Most Projects)](#universal-layout-most-projects)
+- [Small Projects (Single Binary)](#small-projects-single-binary)
+- [Libraries (Reusable Code)](#libraries-reusable-code)
+- [The cmd/ Directory Convention](#the-cmd-directory-convention)
+  - [Single Application](#single-application)
+  - [Multiple Applications](#multiple-applications)
+- [Common Mistakes to Avoid](#common-mistakes-to-avoid)
+  - [Don't Do This](#dont-do-this)
+  - [Do This Instead](#do-this-instead)
+
 ## Universal Layout (Most Projects)
 
 ```

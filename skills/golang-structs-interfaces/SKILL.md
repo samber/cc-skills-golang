@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code, Codex or similar harness, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.2.0"
+  version: "1.2.1"
   openclaw:
     emoji: "🧩"
     homepage: https://github.com/samber/cc-skills-golang
@@ -88,7 +88,7 @@ Functions SHOULD accept interface parameters for flexibility and return concrete
 // Good — accepts interface, returns concrete
 func NewService(store UserStore) *Service { ... }
 
-// BAD — NEVER return interfaces from constructors
+// Bad — an interface return hides every other method of the concrete type from callers
 func NewService(store UserStore) ServiceInterface { ... }
 ```
 
@@ -96,7 +96,7 @@ func NewService(store UserStore) ServiceInterface { ... }
 
 > "Don't design with interfaces, discover them."
 
-NEVER create interfaces prematurely — wait for 2+ implementations or a testability requirement. Premature interfaces add indirection without value. Start with concrete types; extract an interface when a second consumer or a test mock demands it.
+An interface written before a second implementation exists is a guess about which methods will vary — and the guess is usually wrong, so the abstraction has to be reshaped anyway. Meanwhile it costs a layer of indirection that hides the concrete type from readers and tooling. Start with concrete types; extract an interface once a second consumer, a second implementation, or a test mock demands it.
 
 ```go
 // Bad — premature interface with a single implementation
@@ -174,60 +174,9 @@ This costs nothing at runtime. If `MyBuffer` ever stops satisfying `io.ReadWrite
 
 ## Type Assertions & Type Switches
 
-### Safe Type Assertion
+Type assertions MUST use the comma-ok form (`s, ok := val.(string)`) — the single-value form panics on a type mismatch instead of branching. Use a type switch to dispatch on the dynamic type, and an assertion to a small optional interface (`if f, ok := w.(Flusher); ok`) to exploit richer implementations without widening the declared parameter type.
 
-Type assertions MUST use the comma-ok form to avoid panics:
-
-```go
-// Good — safe
-s, ok := val.(string)
-if !ok {
-    // handle
-}
-
-// Bad — panics if val is not a string
-s := val.(string)
-```
-
-### Type Switch
-
-Discover the dynamic type of an interface value:
-
-```go
-switch v := val.(type) {
-case string:
-    fmt.Println(v)
-case int:
-    fmt.Println(v * 2)
-case io.Reader:
-    io.Copy(os.Stdout, v)
-default:
-    fmt.Printf("unexpected type %T\n", v)
-}
-```
-
-### Optional Behavior with Type Assertions
-
-Check if a value supports additional capabilities without requiring them upfront:
-
-```go
-type Flusher interface {
-    Flush() error
-}
-
-func writeData(w io.Writer, data []byte) error {
-    if _, err := w.Write(data); err != nil {
-        return err
-    }
-    // Flush only if the writer supports it
-    if f, ok := w.(Flusher); ok {
-        return f.Flush()
-    }
-    return nil
-}
-```
-
-This pattern is used extensively in the standard library (e.g., `http.Flusher`, `io.ReaderFrom`).
+→ See [Type Assertions & Type Switches](references/type-assertions.md) for type switch ordering, nil cases, and the optional-behavior pattern.
 
 ## Struct & Interface Embedding
 
@@ -293,30 +242,18 @@ In tests, pass a mock or stub that satisfies `UserStore` — no real database ne
 
 ## Struct Field Tags
 
-Use field tags for serialization control. Exported fields in serialized structs MUST have field tags:
+Exported fields in serialized structs MUST have field tags — without one, the encoder falls back to the Go field name, so renaming a field silently changes the wire format:
 
 ```go
 type Order struct {
     ID        string    `json:"id"         db:"id"`
-    UserID    string    `json:"user_id"    db:"user_id"`
     Total     float64   `json:"total"      db:"total"`
-    Items     []Item    `json:"items"      db:"-"`
     CreatedAt time.Time `json:"created_at" db:"created_at"`
-    DeletedAt time.Time `json:"-"          db:"deleted_at"`
     Internal  string    `json:"-"          db:"-"`
 }
 ```
 
-| Directive               | Meaning                                     |
-| ----------------------- | ------------------------------------------- |
-| `json:"name"`           | Field name in JSON output                   |
-| `json:"name,omitempty"` | Omit field if zero value                    |
-| `json:"-"`              | Always exclude from JSON                    |
-| `json:",string"`        | Encode number/bool as JSON string           |
-| `db:"column"`           | Database column mapping (sqlx, etc.)        |
-| `yaml:"name"`           | YAML field name                             |
-| `xml:"name,attr"`       | XML attribute                               |
-| `validate:"required"`   | Struct validation (go-playground/validator) |
+→ See [Struct Fields: Tags and Copy Safety](references/struct-fields.md) for the full tag directive table, the `omitempty` vs `omitzero` trap, and `go vet` diagnostics.
 
 ## Pointer vs Value Receivers
 
@@ -331,34 +268,11 @@ Receiver type MUST be consistent across all methods of a type — if one method 
 
 ## Preventing Struct Copies with `noCopy`
 
-Some structs must never be copied after first use (e.g., those containing a mutex, a channel, or internal pointers). Embed a `noCopy` sentinel to make `go vet` catch accidental copies:
+A struct holding a mutex, a channel, or internal pointers breaks when copied: the copy duplicates the lock state, so two goroutines guard two different mutexes and the invariant disappears silently. Embed a `noCopy` sentinel so `go vet` reports every value copy, and pass such structs by pointer.
 
-```go
-// noCopy may be added to structs which must not be copied after first use.
-// See https://pkg.go.dev/sync#noCopy
-type noCopy struct{}
+**Diagnose:** 1- `go vet ./...` — `copylocks` reports value copies of lock-bearing structs
 
-func (*noCopy) Lock()   {}
-func (*noCopy) Unlock() {}
-
-type ConnPool struct {
-    noCopy noCopy
-    mu     sync.Mutex
-    conns  []*Conn
-}
-```
-
-`go vet` reports an error if a `ConnPool` value is copied (passed by value, assigned, etc.). This is the same technique the standard library uses for `sync.WaitGroup`, `sync.Mutex`, `strings.Builder`, and others.
-
-Always pass these structs by pointer:
-
-```go
-// Good
-func process(pool *ConnPool) { ... }
-
-// Bad — go vet will flag this
-func process(pool ConnPool) { ... }
-```
+→ See [Struct Fields: Tags and Copy Safety](references/struct-fields.md) for the `noCopy` implementation and how `vet` detects it.
 
 ## Cross-References
 

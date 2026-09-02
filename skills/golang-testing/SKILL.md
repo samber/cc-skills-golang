@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code, Codex or similar harness, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.3.0"
+  version: "1.3.1"
   openclaw:
     emoji: "🧪"
     homepage: https://github.com/samber/cc-skills-golang
@@ -52,7 +52,7 @@ This skill guides the creation of production-ready tests for Go applications. Fo
 2. Integration tests MUST use build tags (`//go:build integration`) to separate from unit tests
 3. Tests MUST NOT depend on execution order -- each test MUST be independently runnable
 4. Independent tests SHOULD use `t.Parallel()` when possible
-5. NEVER test implementation details -- test observable behavior and public API contracts
+5. Tests MUST assert observable behavior and public API contracts, not implementation details -- a test coupled to internals turns every refactor into a test rewrite while proving nothing about the contract
 6. Packages with goroutines SHOULD use `goleak.VerifyTestMain` in `TestMain` to detect goroutine leaks
 7. Use testify as helpers, not a replacement for standard library
 8. Mock interfaces, not concrete types
@@ -267,50 +267,13 @@ For tests that may hang, use a timeout helper that panics with caller location. 
 
 ## Benchmarks
 
-→ See `samber/cc-skills-golang@golang-benchmark` skill for advanced benchmarking: `b.Loop()` (Go 1.24+), `benchstat`, profiling from benchmarks, and CI regression detection.
+Write benchmarks as sub-benchmarks (`b.Run` per variant) so each variant gets its own name in the output — that name is what comparison tooling diffs. For Go 1.24+, use `b.Loop()` rather than a `b.N` loop.
 
-Write benchmarks to measure performance and detect regressions:
+→ See [Benchmarks in a Test Suite](./references/benchmarks.md) for the code shape and size-parameterized examples.
 
-```go
-func BenchmarkStringConcatenation(b *testing.B) {
-    b.Run("plus-operator", func(b *testing.B) {
-        for b.Loop() {
-            result := "a" + "b" + "c"
-            _ = result
-        }
-    })
+→ See `samber/cc-skills-golang@golang-benchmark` skill for measurement methodology: `benchstat`, profiling from benchmarks, and CI regression detection.
 
-    b.Run("strings.Builder", func(b *testing.B) {
-        for b.Loop() {
-            var builder strings.Builder
-            builder.WriteString("a")
-            builder.WriteString("b")
-            builder.WriteString("c")
-            _ = builder.String()
-        }
-    })
-}
-```
-
-Benchmarks with different input sizes:
-
-```go
-func BenchmarkFibonacci(b *testing.B) {
-    sizes := []int{10, 20, 30}
-    for _, size := range sizes {
-        b.Run(fmt.Sprintf("n=%d", size), func(b *testing.B) {
-            b.ReportAllocs()
-            for b.Loop() {
-                Fibonacci(size)
-            }
-        })
-    }
-}
-```
-
-For Go 1.24+, new benchmarks should use `b.Loop()`. Use legacy `b.N` loops only when the module targets Go <1.24 or when preserving old benchmark code intentionally.
-
-### Go 1.26+: test artifacts
+## Go 1.26+: test artifacts
 
 When a test, benchmark, or fuzz target needs to persist files for inspection, use `ArtifactDir()` instead of ad-hoc paths or repo-local output.
 
@@ -377,37 +340,15 @@ func FuzzReverse(f *testing.F) {
 
 ## Examples as Documentation
 
-Examples are executable documentation verified by `go test`:
+`ExampleXxx` functions are executable documentation: `go test` compares their stdout to the `// Output:` comment, so a drifting example fails the build instead of misleading readers.
 
-```go
-func ExampleCalculatePrice() {
-    price := CalculatePrice(100, 10.0)
-    fmt.Printf("Price: %.2f\n", price)
-    // Output: Price: 900.00
-}
-
-func ExampleCalculatePrice_singleItem() {
-    price := CalculatePrice(1, 25.50)
-    fmt.Printf("Price: %.2f\n", price)
-    // Output: Price: 25.50
-}
-```
+→ See [Examples as Documentation](./references/examples.md) for naming rules, `Unordered output`, and placement.
 
 ## Code Coverage
 
-```bash
-# Generate coverage file
-go test -coverprofile=coverage.out ./...
+Generate a profile with `go test -coverprofile=coverage.out ./...`, then read the uncovered lines with `go tool cover -html=coverage.out`. Coverage locates untested paths; it does not measure assertion quality, so treat a percentage as a gap finder rather than a target.
 
-# View coverage in HTML
-go tool cover -html=coverage.out
-
-# Coverage by function
-go tool cover -func=coverage.out
-
-# Total coverage percentage
-go tool cover -func=coverage.out | grep total
-```
+→ See [Code Coverage](./references/coverage.md) for coverage modes, `-coverpkg`, and reporting pitfalls.
 
 ## Integration Tests
 
@@ -449,12 +390,12 @@ Many test best practices are enforced automatically by linters: `thelper`, `para
 
 ## Cross-References
 
-- -> See `samber/cc-skills-golang@golang-stretchr-testify` skill for detailed testify API (assert, require, mock, suite)
-- -> See `samber/cc-skills-golang@golang-database` skill (testing.md) for database integration test patterns
-- -> See `samber/cc-skills-golang@golang-concurrency` skill for goroutine leak detection with goleak
-- -> See `samber/cc-skills-golang@golang-continuous-integration` skill for CI test configuration and GitHub Actions workflows
-- -> See `samber/cc-skills-golang@golang-lint` skill for testifylint and paralleltest configuration
-- -> See `samber/cc-skills-golang@golang-continuous-integration` skill for automated AI-driven code review in CI using these guidelines
+- → See `samber/cc-skills-golang@golang-stretchr-testify` skill for detailed testify API (assert, require, mock, suite)
+- → See `samber/cc-skills-golang@golang-database` skill (testing.md) for database integration test patterns
+- → See `samber/cc-skills-golang@golang-concurrency` skill for goroutine leak detection with goleak
+- → See `samber/cc-skills-golang@golang-continuous-integration` skill for CI test configuration and GitHub Actions workflows
+- → See `samber/cc-skills-golang@golang-lint` skill for testifylint and paralleltest configuration
+- → See `samber/cc-skills-golang@golang-continuous-integration` skill for automated AI-driven code review in CI using these guidelines
 
 ## Quick Reference
 

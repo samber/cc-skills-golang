@@ -6,7 +6,7 @@ license: MIT
 compatibility: Designed for Claude Code, Codex or similar harness, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.3.0"
+  version: "1.3.1"
   openclaw:
     emoji: "🔗"
     homepage: https://github.com/samber/cc-skills-golang
@@ -27,17 +27,16 @@ paths:
 
 ## Best Practices Summary
 
-1. The same context MUST be propagated through the entire request lifecycle: HTTP handler → service → DB → external APIs
-2. `ctx` MUST be the first parameter, named `ctx context.Context`
-3. NEVER store context in a struct — pass explicitly through function parameters
-4. NEVER pass `nil` context — use `context.TODO()` if unsure
-5. `cancel()` MUST be called on all control-flow paths for `WithCancel`/`WithTimeout`/`WithDeadline`, unless ownership of the context and cancel function is explicitly returned or transferred
-6. `context.Background()` MUST only be used at the top level (main, init, tests)
-7. **Use `context.TODO()`** as a placeholder when you know a context is needed but don't have one yet
-8. NEVER create a new `context.Background()` in the middle of a request path
-9. Context value keys MUST be unexported types to prevent collisions
-10. Context values MUST only carry request-scoped metadata — NEVER function parameters
-11. **Use `context.WithoutCancel`** (Go 1.21+) when spawning background work that must outlive the parent request
+1. Propagate the same context through the entire request lifecycle: HTTP handler → service → DB → external APIs — any link that starts a fresh context keeps working after the client is gone.
+2. Take `ctx` as the first parameter, named `ctx context.Context` — the fixed position is what makes context-aware APIs recognizable at a glance and what linters check.
+3. Pass context through function parameters instead of storing it in a struct — the struct outlives the request that filled it, so later calls reuse a context that is already cancelled or belongs to someone else.
+4. Pass `context.TODO()` rather than a `nil` context — `nil` panics on the first `Done()` or `Value()` call, far from the caller that passed it.
+5. Call `cancel()` on all control-flow paths for `WithCancel`/`WithTimeout`/`WithDeadline`, unless ownership of the context and cancel function is explicitly returned or transferred — an uncalled `cancel()` keeps the child attached to its parent and leaks its timer until the parent finishes.
+6. Create `context.Background()` only at top-level entry points (main, init, tests). Deeper in the call chain — especially mid-request — it detaches the work from the caller's deadline and cancellation, the propagation break shown below.
+7. Use `context.TODO()` as a placeholder when a context is needed but none exists yet — it marks the gap for a later fix instead of hiding it behind a `Background()` that looks deliberate.
+8. Declare context value keys as unexported types — with a plain `string` key, two packages using `"user"` silently overwrite each other.
+9. Carry only request-scoped metadata in context values, never function parameters — values retrieved through `Value()` lose compile-time typing and disappear from the function signature.
+10. Use `context.WithoutCancel` (Go 1.21+) when spawning background work that must outlive the parent request — otherwise the handler returning cancels the audit log or cleanup just started.
 
 ## Creating Contexts
 

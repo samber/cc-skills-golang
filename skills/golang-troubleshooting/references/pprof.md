@@ -1,5 +1,15 @@
 # pprof Reference
 
+## Table of Contents
+
+- [Enable pprof HTTP Server](#enable-pprof-http-server)
+  - [Quick Setup (Development)](#quick-setup-development)
+  - [Secure Setup (Production)](#secure-setup-production)
+- [Profile Types](#profile-types)
+- [Capturing Profiles](#capturing-profiles)
+- [Analyzing and Interpreting Profiles](#analyzing-and-interpreting-profiles)
+- [Remote Profiling (Production)](#remote-profiling-production)
+
 ## Enable pprof HTTP Server
 
 Pprof endpoints MUST be protected with basic auth — NEVER expose them publicly. They leak sensitive runtime information (goroutine stacks, memory contents) and can be abused to DoS your service (CPU profiling is expensive). Pprof SHOULD be toggled via a `PPROF_ENABLED` environment variable.

@@ -1,12 +1,12 @@
 ---
 name: golang-concurrency
-description: "Golang concurrency patterns. Use when writing or reviewing concurrent Go code involving goroutines, channels, select, locks, sync primitives, errgroup, singleflight, worker pools, or fan-out/fan-in pipelines. Also triggers when you detect goroutine leaks, race conditions, channel ownership issues, or need to choose between channels and mutexes."
+description: "Golang concurrency design — goroutine lifecycle and leak prevention, channels and `select`, channel ownership and direction, `sync.Mutex`/`RWMutex`/`sync.Map`/`sync.Once`/atomics, `errgroup`, `singleflight`, worker pools, and fan-out/fan-in pipelines. Use when writing or reviewing concurrent Go code, when choosing between channels and mutexes, when protecting a shared map or counter, or when a goroutine has no clear exit. Not for defensive coding unrelated to concurrency such as nil panics, slice aliasing, or numeric overflow (→ See `samber/cc-skills-golang@golang-safety` skill), and not for debugging a specific hung, crashing, or racing program after the fact (→ See `samber/cc-skills-golang@golang-troubleshooting` skill)."
 user-invocable: true
 license: MIT
 compatibility: Designed for Claude Code, Codex or similar harness, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.2.0"
+  version: "1.2.1"
   openclaw:
     emoji: "⚡"
     homepage: https://github.com/samber/cc-skills-golang
@@ -125,12 +125,12 @@ When auditing concurrency across a large codebase, use up to 5 parallel sub-agen
 
 ## Cross-References
 
-- -> See `samber/cc-skills-golang@golang-performance` skill for false sharing, cache-line padding, `sync.Pool` hot-path patterns
-- -> See `samber/cc-skills-golang@golang-context` skill for cancellation propagation and timeout patterns
-- -> See `samber/cc-skills-golang@golang-safety` skill for concurrent map access and race condition prevention
-- -> See `samber/cc-skills-golang@golang-troubleshooting` skill for debugging goroutine leaks and deadlocks
-- -> See `samber/cc-skills-golang@golang-design-patterns` skill for graceful shutdown patterns
-- -> See `samber/cc-skills-golang@golang-continuous-integration` skill for automated AI-driven code review in CI using these guidelines
+- → See `samber/cc-skills-golang@golang-performance` skill for false sharing, cache-line padding, `sync.Pool` hot-path patterns
+- → See `samber/cc-skills-golang@golang-context` skill for cancellation propagation and timeout patterns
+- → See `samber/cc-skills-golang@golang-safety` skill for concurrent map access and race condition prevention
+- → See `samber/cc-skills-golang@golang-troubleshooting` skill for debugging goroutine leaks and deadlocks
+- → See `samber/cc-skills-golang@golang-design-patterns` skill for graceful shutdown patterns
+- → See `samber/cc-skills-golang@golang-continuous-integration` skill for automated AI-driven code review in CI using these guidelines
 
 ### Go 1.26 experimental goroutine leak profile
 

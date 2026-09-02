@@ -1,5 +1,20 @@
 # Cobra Commands, Hooks, and Args Validators
 
+## Table of Contents
+
+- [The Run\* lifecycle](#the-run-lifecycle)
+  - [Which hook to use](#which-hook-to-use)
+  - [Inheritance rules](#inheritance-rules)
+  - [Execution stops on first error](#execution-stops-on-first-error)
+- [Args validators](#args-validators)
+  - [Built-in validators](#built-in-validators)
+  - [Composing validators with MatchAll](#composing-validators-with-matchall)
+  - [Custom validators](#custom-validators)
+- [Command registration and ordering](#command-registration-and-ordering)
+- [Annotations](#annotations)
+- [Hidden and deprecated commands](#hidden-and-deprecated-commands)
+- [cobra.CheckErr](#cobracheckerr)
+
 ## The Run\* lifecycle
 
 Cobra commands have five run hooks. Cobra executes them in this fixed order:

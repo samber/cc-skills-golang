@@ -1,5 +1,18 @@
 # Domain-Driven Design (DDD) in Go
 
+## Table of Contents
+
+- [When to Use](#when-to-use)
+- [Building Blocks](#building-blocks)
+- [Project Structure](#project-structure)
+- [Code Examples](#code-examples)
+  - [Value Object — Money](#value-object--money)
+  - [Aggregate Root — Order](#aggregate-root--order)
+  - [Repository Interface — defined in domain](#repository-interface--defined-in-domain)
+  - [Application Service — orchestrates a use case](#application-service--orchestrates-a-use-case)
+- [Bounded Contexts](#bounded-contexts)
+- [Wiring](#wiring)
+
 ## When to Use
 
 Apply DDD when the business domain is complex enough that the code structure should mirror the business model — typically services with 5K+ lines, multiple bounded contexts, or rich business rules. Do NOT use for simple CRUD apps or CLI tools.

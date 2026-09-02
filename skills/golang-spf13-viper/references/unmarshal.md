@@ -1,5 +1,16 @@
 # Viper Unmarshal and Struct Mapping
 
+## Table of Contents
+
+- [Basic Unmarshal](#basic-unmarshal)
+- [mapstructure tags](#mapstructure-tags)
+- [UnmarshalKey — extracting a sub-tree](#unmarshalkey--extracting-a-sub-tree)
+- [time.Duration](#timeduration)
+- [net.IP and custom types](#netip-and-custom-types)
+- [Squash for embedded structs](#squash-for-embedded-structs)
+- [Remain for unknown keys](#remain-for-unknown-keys)
+- [Weak decoding](#weak-decoding)
+
 ## Basic Unmarshal
 
 ```go

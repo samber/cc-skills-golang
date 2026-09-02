@@ -1,5 +1,21 @@
 # Production Patterns
 
+## Table of Contents
+
+- [Stale-While-Revalidate](#stale-while-revalidate)
+- [Sharding](#sharding)
+- [Missing Key Caching (Negative Caching)](#missing-key-caching-negative-caching)
+  - [Dedicated missing cache (recommended)](#dedicated-missing-cache-recommended)
+  - [Shared missing cache](#shared-missing-cache)
+  - [Manual missing key marking](#manual-missing-key-marking)
+- [Loader Chains](#loader-chains)
+- [Copy-on-Read / Copy-on-Write](#copy-on-read--copy-on-write)
+- [Prometheus Monitoring](#prometheus-monitoring)
+  - [Setup](#setup)
+  - [Key PromQL Queries](#key-promql-queries)
+- [Warm-Up on Startup](#warm-up-on-startup)
+- [Graceful Shutdown](#graceful-shutdown)
+
 ## Stale-While-Revalidate
 
 Return stale data immediately while refreshing in the background. Two time thresholds:

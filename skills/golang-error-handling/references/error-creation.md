@@ -1,5 +1,17 @@
 # Error Creation
 
+## Table of Contents
+
+- [Errors as Values](#errors-as-values)
+- [Error String Conventions](#error-string-conventions)
+- [Creating Errors](#creating-errors)
+  - [`errors.New` — static error messages](#errorsnew--static-error-messages)
+  - [`fmt.Errorf` — dynamic error messages](#fmterrorf--dynamic-error-messages)
+  - [Decision table: which error strategy to use](#decision-table-which-error-strategy-to-use)
+- [Low-Cardinality Error Messages](#low-cardinality-error-messages)
+- [Custom Error Types](#custom-error-types)
+  - [Custom types that wrap other errors](#custom-types-that-wrap-other-errors)
+
 ## Errors as Values
 
 Go treats errors as ordinary values implementing the `error` interface:

@@ -5,6 +5,17 @@ Cobra delegates all flag parsing to `github.com/spf13/pflag`. `cobra.Command` ex
 - `cmd.Flags()` — local flags, only available on this command.
 - `cmd.PersistentFlags()` — inherited by all subcommands.
 
+## Table of Contents
+
+- [Common flag types](#common-flag-types)
+- [StringSlice vs StringArray](#stringslice-vs-stringarray)
+- [Flag constraints](#flag-constraints)
+- [Persistent flag patterns](#persistent-flag-patterns)
+- [Custom flag value types](#custom-flag-value-types)
+- [Flag groups (required together)](#flag-groups-required-together)
+- [Accessing flag values](#accessing-flag-values)
+- [Flag changed vs default](#flag-changed-vs-default)
+
 ## Common flag types
 
 ```go

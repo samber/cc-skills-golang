@@ -1,5 +1,21 @@
 # Nil Safety Deep Dive
 
+## Table of Contents
+
+- [Nil Pointer Receivers](#nil-pointer-receivers)
+  - [Designing nil-safe receivers](#designing-nil-safe-receivers)
+- [Nil Function Values](#nil-function-values)
+  - [Default function pattern](#default-function-pattern)
+- [Nil and Error Comparisons](#nil-and-error-comparisons)
+  - [Returning nil error correctly](#returning-nil-error-correctly)
+  - [Checking error chains with nil](#checking-error-chains-with-nil)
+- [Nil in Generic Code](#nil-in-generic-code)
+  - [The `comparable` constraint and nil](#the-comparable-constraint-and-nil)
+  - [Nil checks with unconstrained type parameters](#nil-checks-with-unconstrained-type-parameters)
+- [Patterns for Nil-Safe APIs](#patterns-for-nil-safe-apis)
+  - [Constructor with defaults](#constructor-with-defaults)
+  - [Lazy initialization for zero-value usability](#lazy-initialization-for-zero-value-usability)
+
 ## Nil Pointer Receivers
 
 MUST check for nil before calling methods on pointer receivers from external sources. A method call on a nil pointer does not always panic — it depends on whether the method dereferences the receiver:

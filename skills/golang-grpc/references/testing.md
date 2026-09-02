@@ -1,5 +1,19 @@
 # gRPC Testing Reference
 
+## Table of Contents
+
+- [Testing with `bufconn`](#testing-with-bufconn)
+  - [Basic Setup](#basic-setup)
+  - [Setup with Interceptors](#setup-with-interceptors)
+- [Testing Error Codes](#testing-error-codes)
+  - [Table-Driven Error Code Tests](#table-driven-error-code-tests)
+- [Testing Streaming RPCs](#testing-streaming-rpcs)
+  - [Server Streaming](#server-streaming)
+  - [Client Streaming](#client-streaming)
+- [Testing Metadata](#testing-metadata)
+- [Testing Deadlines](#testing-deadlines)
+- [Integration Test Patterns](#integration-test-patterns)
+
 ## Testing with `bufconn`
 
 `bufconn` creates in-memory connections that exercise the full gRPC stack (serialization, interceptors, metadata) without network overhead. This is the standard approach for gRPC unit and integration tests.

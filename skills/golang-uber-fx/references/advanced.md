@@ -2,6 +2,19 @@
 
 Detail topics referenced from `SKILL.md`. Each section is self-contained.
 
+## Table of Contents
+
+- [fx.Supply, fx.Replace, fx.Decorate](#fxsupply-fxreplace-fxdecorate)
+- [Optional Dependencies](#optional-dependencies)
+- [Logging fx Events](#logging-fx-events)
+- [Manual Lifecycle Control](#manual-lifecycle-control)
+- [Quick Reference](#quick-reference)
+  - [Application](#application)
+  - [Wiring](#wiring)
+  - [Annotations](#annotations)
+  - [Lifecycle](#lifecycle)
+  - [Logging & Testing](#logging--testing)
+
 ## fx.Supply, fx.Replace, fx.Decorate
 
 | Option | Purpose |

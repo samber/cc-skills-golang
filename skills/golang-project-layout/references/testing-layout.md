@@ -1,5 +1,17 @@
 # Tests, Benchmarks, and Examples
 
+## Table of Contents
+
+- [File Naming Conventions](#file-naming-conventions)
+- [Where to Place Tests](#where-to-place-tests)
+- [Test Package Options](#test-package-options)
+- [Benchmarks](#benchmarks)
+- [Examples](#examples)
+- [Test Utilities](#test-utilities)
+- [Test Fixtures](#test-fixtures)
+- [Running Tests](#running-tests)
+- [Test File Summary](#test-file-summary)
+
 ## File Naming Conventions
 
 Go uses suffix-based naming for test-related files:

@@ -2,6 +2,26 @@
 
 Network and I/O bottlenecks show up as goroutines blocked on syscalls or waiting for responses. The key levers are connection reuse, proper timeouts, and streaming instead of buffering.
 
+## Table of Contents
+
+- [HTTP Transport Configuration](#http-transport-configuration)
+  - [Connection pooling](#connection-pooling)
+  - [Timeouts](#timeouts)
+  - [Drain response body for connection reuse](#drain-response-body-for-connection-reuse)
+- [Streaming vs Buffering](#streaming-vs-buffering)
+  - [Avoid io.ReadAll for large payloads](#avoid-ioreadall-for-large-payloads)
+  - [Streaming JSON](#streaming-json)
+- [JSON Performance](#json-performance)
+- [Cgo Overhead](#cgo-overhead)
+- [Buffered I/O](#buffered-io)
+- [Concurrent Multi-Stage Pipelines](#concurrent-multi-stage-pipelines)
+  - [The unusual scenario](#the-unusual-scenario)
+  - [When to use this (and when NOT to)](#when-to-use-this-and-when-not-to)
+- [Batch Operations](#batch-operations)
+  - [Database: batch inserts over row-by-row](#database-batch-inserts-over-row-by-row)
+  - [HTTP: batch API calls](#http-batch-api-calls)
+  - [Channel: batch processing from a stream](#channel-batch-processing-from-a-stream)
+
 ## HTTP Transport Configuration
 
 **Diagnose:** 1- `go tool pprof` (goroutine + block profile) — look for goroutines blocked on `net/http.(*Transport).dialConn` or `net/http.(*persistConn).readLoop`; many goroutines waiting here means connection pool exhaustion 2- `fgprof` — captures both on-CPU and off-CPU wait time; look for HTTP calls dominating wall-clock time even when CPU profile shows them as cheap 3- `go tool trace` — visualize goroutine lifecycles; look for long gaps where goroutines wait for network I/O instead of processing 4- Prometheus `go_goroutines` — monitor goroutine count in production; steadily rising under stable load suggests connection or goroutine leaks from misconfigured HTTP clients

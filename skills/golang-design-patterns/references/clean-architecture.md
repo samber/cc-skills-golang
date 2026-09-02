@@ -1,5 +1,18 @@
 # Clean Architecture in Go
 
+## Table of Contents
+
+- [When to Use](#when-to-use)
+- [The Dependency Rule](#the-dependency-rule)
+- [Project Structure](#project-structure)
+- [Code Examples](#code-examples)
+  - [Entity — pure domain logic, zero dependencies](#entity--pure-domain-logic-zero-dependencies)
+  - [Use Case — orchestrates business operations](#use-case--orchestrates-business-operations)
+  - [Adapter — implements a port](#adapter--implements-a-port)
+  - [Handler — translates HTTP to use case calls](#handler--translates-http-to-use-case-calls)
+- [Key Principle](#key-principle)
+- [Wiring](#wiring)
+
 ## When to Use
 
 Apply clean architecture when you need strong separation between business logic and infrastructure — typically medium-to-large services (2K+ lines) where testability, framework independence, and clear dependency direction matter. Do NOT use for small CLI tools or scripts.

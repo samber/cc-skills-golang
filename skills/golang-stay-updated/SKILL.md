@@ -1,12 +1,12 @@
 ---
 name: golang-stay-updated
-description: "Provides resources to stay updated with Golang news, communities and people to follow. Use when seeking Go learning resources, discovering new libraries, finding community channels, or keeping up with Go language changes and releases."
+description: "Golang ecosystem watch list — official sources (go.dev/blog, pkg.go.dev, tour.golang.org, golang-nuts), newsletters (Golang Weekly, Awesome Go Newsletter), communities (r/golang, gophers.slack.com, Go Forum, go.dev/wiki), blogs (Dave Cheney, Ardan Labs, Rob Pike), YouTube channels (Gopher Academy, GopherCon EU/UK), conferences, and Go contributors to follow on GitHub, X and Bluesky. Use when seeking Golang learning resources, discovering new libraries or tools, finding community channels or meetups, picking Go people to follow, or keeping up with Go language changes and releases. Not for querying a specific module's versions, docs, or vulnerabilities from the CLI (→ See `samber/cc-skills-golang@golang-pkg-go-dev` skill)."
 user-invocable: true
 license: MIT
 compatibility: Designed for Claude Code, Codex or similar harness, and for projects using Golang.
 metadata:
   author: samber
-  version: "1.3.0"
+  version: "1.3.1"
   openclaw:
     emoji: "📰"
     homepage: https://github.com/samber/cc-skills-golang

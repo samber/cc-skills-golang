@@ -10,6 +10,16 @@ Memory safety vulnerabilities can lead to crashes, data corruption, and security
 
 ---
 
+## Table of Contents
+
+- [Integer Overflow — High](#integer-overflow--high)
+- [math/big.Rat Issues — Low](#mathbigrat-issues--low)
+- [Memory Aliasing Vulnerability — Medium](#memory-aliasing-vulnerability--medium)
+- [Use of unsafe Package — High](#use-of-unsafe-package--high)
+- [Data Races — High](#data-races--high)
+- [Always Run Race Detector](#always-run-race-detector)
+- [CWE References](#cwe-references)
+
 ## Integer Overflow — High
 
 Integer overflows can cause unexpected behavior and crashes.

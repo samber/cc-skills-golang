@@ -1,5 +1,16 @@
 # API Reference
 
+## Table of Contents
+
+- [Constructor](#constructor)
+- [Builder Methods](#builder-methods)
+- [Read Operations](#read-operations)
+- [Write Operations](#write-operations)
+- [Maintenance Operations](#maintenance-operations)
+- [Loader Type](#loader-type)
+- [Hasher Type (for Sharding)](#hasher-type-for-sharding)
+- [Prometheus Integration](#prometheus-integration)
+
 ## Constructor
 
 ```go

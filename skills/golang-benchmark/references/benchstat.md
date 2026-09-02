@@ -2,6 +2,47 @@
 
 `benchstat` computes statistical summaries and A/B comparisons of Go benchmark results. A single benchmark run tells you nothing about variance — `benchstat` tells you whether the difference between two runs is real or noise.
 
+## Table of Contents
+
+- [Installation](#installation)
+- [Usage](#usage)
+- [Basic Workflow](#basic-workflow)
+  - [Step 0: Write benchmarks](#step-0-write-benchmarks)
+  - [Step 1: Measure baseline](#step-1-measure-baseline)
+  - [Step 2: Make your change](#step-2-make-your-change)
+  - [Step 3: Measure again](#step-3-measure-again)
+  - [Step 4: Compare](#step-4-compare)
+- [Reading the Output](#reading-the-output)
+  - [Unit normalization](#unit-normalization)
+  - [When the `~` symbol appears](#when-the--symbol-appears)
+- [Flags Reference](#flags-reference)
+  - [Projection flags](#projection-flags)
+  - [Filter flag](#filter-flag)
+  - [Input labeling](#input-labeling)
+- [Filter Expression Syntax](#filter-expression-syntax)
+  - [Matching operators](#matching-operators)
+  - [Logical operators](#logical-operators)
+  - [Filter key types](#filter-key-types)
+  - [Filter examples](#filter-examples)
+- [Projection Examples](#projection-examples)
+  - [Default: before/after file comparison](#default-beforeafter-file-comparison)
+  - [Compare sub-benchmark parameters within a single file](#compare-sub-benchmark-parameters-within-a-single-file)
+  - [Simplify rows to base name only](#simplify-rows-to-base-name-only)
+  - [Control column order](#control-column-order)
+  - [Group by GOMAXPROCS](#group-by-gomaxprocs)
+  - [Separate tables per package](#separate-tables-per-package)
+  - [Ignore a dimension](#ignore-a-dimension)
+  - [Compare three versions](#compare-three-versions)
+  - [Cross-dimensional comparison](#cross-dimensional-comparison)
+- [Unit Metadata](#unit-metadata)
+  - [`assume=exact`](#assumeexact)
+  - [`assume=nothing` (default)](#assumenothing-default)
+- [Interleaving Runs](#interleaving-runs)
+- [How Many Runs?](#how-many-runs)
+- [Single-File Summary](#single-file-summary)
+- [Common Pitfalls](#common-pitfalls)
+- [benchstat in CI](#benchstat-in-ci)
+
 ## Installation
 
 ```bash

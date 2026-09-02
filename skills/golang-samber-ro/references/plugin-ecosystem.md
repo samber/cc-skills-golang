@@ -6,6 +6,21 @@ samber/ro ships 40+ plugins that extend the core library with domain-specific op
 go get github.com/samber/ro/plugins/<category>/<name>
 ```
 
+## Table of Contents
+
+- [Data Manipulation](#data-manipulation)
+- [Encoding and Serialization](#encoding-and-serialization)
+- [Scheduling](#scheduling)
+- [Network and I/O](#network-and-io)
+- [Observability and Logging](#observability-and-logging)
+- [Rate Limiting](#rate-limiting)
+- [Text Processing](#text-processing)
+- [System Integration](#system-integration)
+- [Validation](#validation)
+- [Testing](#testing)
+- [Utilities](#utilities)
+- [Plugin Design Convention](#plugin-design-convention)
+
 ## Data Manipulation
 
 | Plugin | Import | Purpose |

@@ -1,5 +1,13 @@
 # Integration Testing
 
+## Table of Contents
+
+- [Docker Compose Fixture](#docker-compose-fixture)
+- [SQL Schema Fixture](#sql-schema-fixture)
+- [Test Data Fixture](#test-data-fixture)
+- [Using Fixtures in Tests](#using-fixtures-in-tests)
+- [Test Helper with Embedded Fixtures](#test-helper-with-embedded-fixtures)
+
 ## Docker Compose Fixture
 
 Create `pkg/myfeature/testdata/docker-compose.yml` for test services:

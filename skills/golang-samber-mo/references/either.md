@@ -2,6 +2,24 @@
 
 A discriminated union representing a value of one of two possible types. By convention, Left is the "alternative" path and Right is the "primary" path, but neither implies success or failure.
 
+## Table of Contents
+
+- [Constructors](#constructors)
+- [Type Checking](#type-checking)
+- [Value Extraction](#value-extraction)
+- [Transformations](#transformations)
+  - [Swap — exchange left and right](#swap--exchange-left-and-right)
+  - [MapLeft / MapRight — transform one side](#mapleft--mapright--transform-one-side)
+  - [Match — pattern matching](#match--pattern-matching)
+  - [ForEach — side effects](#foreach--side-effects)
+- [Either vs Result](#either-vs-result)
+- [Either3[T1, T2, T3] — Three-Type Union](#either3t1-t2-t3--three-type-union)
+  - [Constructors](#constructors-1)
+  - [Type Checking and Extraction](#type-checking-and-extraction)
+  - [Pattern Matching](#pattern-matching)
+  - [Transformations](#transformations-1)
+- [Either4 and Either5](#either4-and-either5)
+
 ## Constructors
 
 | Function                  | Description                 |

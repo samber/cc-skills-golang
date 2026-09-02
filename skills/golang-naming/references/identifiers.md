@@ -1,5 +1,16 @@
 # Variables, Booleans, Receivers & Acronyms
 
+## Table of Contents
+
+- [Variables](#variables)
+  - [Avoid Type in the Name](#avoid-type-in-the-name)
+  - [Avoid Repetition with Context](#avoid-repetition-with-context)
+  - [Use Predictable Names](#use-predictable-names)
+  - [Parameters](#parameters)
+- [Booleans](#booleans)
+- [Receivers](#receivers)
+- [Acronyms and Initialisms](#acronyms-and-initialisms)
+
 ## Variables
 
 Name length SHOULD be **proportional to scope size**. Short names for small scopes, descriptive names for large scopes.

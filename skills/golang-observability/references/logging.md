@@ -2,6 +2,18 @@
 
 → See `samber/cc-skills-golang@golang-error-handling` skill for the single handling rule.
 
+## Table of Contents
+
+- [Why Structured Logging](#why-structured-logging)
+- [Handler Setup](#handler-setup)
+- [Log Levels](#log-levels)
+- [Cost of Logging](#cost-of-logging)
+- [Logging with Context](#logging-with-context)
+- [Adding Request-Scoped Attributes](#adding-request-scoped-attributes)
+- [Log Sinks and the `slog` Ecosystem](#log-sinks-and-the-slog-ecosystem)
+- [Migrating from zap / logrus / zerolog](#migrating-from-zap--logrus--zerolog)
+- [Common Logging Mistakes](#common-logging-mistakes)
+
 ## Why Structured Logging
 
 Structured logs emit key-value pairs instead of freeform strings. Log management systems (Datadog, Grafana Loki, CloudWatch) can index, filter, and aggregate structured fields — something impossible with `log.Printf` output.

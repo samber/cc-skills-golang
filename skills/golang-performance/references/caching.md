@@ -2,6 +2,22 @@
 
 The fastest code is code that doesn't run. Caching pre-computed results, deduplicating concurrent requests, and avoiding unnecessary work are often the highest-leverage performance improvements.
 
+## Table of Contents
+
+- [Compiled Pattern Caching](#compiled-pattern-caching)
+  - [Regexp at package level](#regexp-at-package-level)
+  - [Template caching](#template-caching)
+  - [Precomputed lookup tables](#precomputed-lookup-tables)
+- [Request-Level Caching](#request-level-caching)
+  - [singleflight for cache stampede prevention](#singleflight-for-cache-stampede-prevention)
+  - [LRU caches](#lru-caches)
+- [Algorithmic Complexity](#algorithmic-complexity)
+- [Work Avoidance](#work-avoidance)
+  - [Map lookups over slice scanning](#map-lookups-over-slice-scanning)
+  - [Early returns and short-circuit loops](#early-returns-and-short-circuit-loops)
+  - [Avoid iterator chains](#avoid-iterator-chains)
+  - [Replace indirect function calls with direct loops](#replace-indirect-function-calls-with-direct-loops)
+
 ## Compiled Pattern Caching
 
 **Diagnose:** 1- `go tool pprof` (CPU profile) — look for `regexp.Compile`, `regexp.MustCompile`, or `template.Parse` appearing in hot paths; their presence means patterns are being recompiled per call instead of once 2- `go test -bench -benchmem` — benchmark per-call compilation vs cached version; expect 10-12x improvement and allocs/op dropping to zero for the compilation step

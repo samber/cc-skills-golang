@@ -1,5 +1,35 @@
 # Top Go Libraries by Category
 
+## Table of Contents
+
+- [Web Frameworks](#web-frameworks)
+- [HTTP Clients](#http-clients)
+- [ORM & Database](#orm--database)
+- [Database Drivers](#database-drivers)
+- [Testing](#testing)
+- [Command Line and Configuration](#command-line-and-configuration)
+- [Logging](#logging)
+- [Validation](#validation)
+- [JSON Processing](#json-processing)
+- [Authentication & Authorization](#authentication--authorization)
+- [Caching](#caching)
+- [Rate Limiting](#rate-limiting)
+- [Concurrency & Goroutines](#concurrency--goroutines)
+- [Messaging](#messaging)
+- [Types and Data Structures](#types-and-data-structures)
+- [Database Schema Migration](#database-schema-migration)
+- [WebSockets](#websockets)
+- [gRPC](#grpc)
+- [GraphQL](#graphql)
+- [File Watching](#file-watching)
+- [Retry Logic](#retry-logic)
+- [Error Handling](#error-handling)
+- [Metrics & Monitoring](#metrics--monitoring)
+- [API Documentation](#api-documentation)
+- [Dependency Injection](#dependency-injection)
+- [Functional Programming & Utilities](#functional-programming--utilities)
+- [Excel & Spreadsheet](#excel--spreadsheet)
+
 ## Web Frameworks
 
 **Gin** (<https://github.com/gin-gonic/gin>) High-performance HTTP web framework with minimalist API. Up to 40x faster than some alternatives. Great for building REST APIs and microservices.

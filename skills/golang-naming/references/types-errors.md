@@ -1,5 +1,19 @@
 # Types, Constants & Errors
 
+## Table of Contents
+
+- [Interfaces](#interfaces)
+  - [Single-Method Interfaces](#single-method-interfaces)
+  - [Multi-Method Interfaces](#multi-method-interfaces)
+  - [Canonical Method Names](#canonical-method-names)
+- [Structs](#structs)
+- [Constants](#constants)
+  - [Enums (iota)](#enums-iota)
+- [Errors](#errors)
+  - [Sentinel Errors](#sentinel-errors)
+  - [Error Types](#error-types)
+  - [Error Strings](#error-strings)
+
 ## Interfaces
 
 ### Single-Method Interfaces

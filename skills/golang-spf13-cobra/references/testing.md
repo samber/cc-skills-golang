@@ -1,5 +1,17 @@
 # Testing Cobra Commands
 
+## Table of Contents
+
+- [Basic test pattern](#basic-test-pattern)
+- [Isolation between tests](#isolation-between-tests)
+  - [Option 1: Re-create the command tree per test (recommended for unit tests)](#option-1-re-create-the-command-tree-per-test-recommended-for-unit-tests)
+  - [Option 2: Reset flags between tests](#option-2-reset-flags-between-tests)
+- [Testing commands that write output](#testing-commands-that-write-output)
+- [Golden file tests](#golden-file-tests)
+- [Testing error paths](#testing-error-paths)
+- [Table-driven command tests](#table-driven-command-tests)
+- [Testing completions](#testing-completions)
+
 ## Basic test pattern
 
 ```go

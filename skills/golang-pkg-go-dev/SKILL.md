@@ -1,12 +1,12 @@
 ---
 name: golang-pkg-go-dev
-description: "Golang package and module documentation and exploration via `godig`, a pkg.go.dev API client (CLI + MCP server) — package docs, API references, symbols, code examples, available versions, importers (who imports a package), licenses, and known vulnerabilities. Read-only, no auth. Use for looking up any Go/Golang library's documentation, API signatures, usage examples, which versions exist, whether a dependency has CVEs, or who imports a package — prefer this over Context7 for any Go package or module. Triggers on: how to use a Go library, Go API docs, import usage, code examples, pkg.go.dev. Not for upgrading dependencies (→ See `samber/cc-skills-golang@golang-dependency-management` skill) or choosing a library (→ See `samber/cc-skills-golang@golang-popular-libraries` skill). Not for local symbols, or for navigating an already-used dependency's resolved source, call sites, or generic instantiations — → See `samber/cc-skills-golang@golang-gopls` skill for those."
+description: "Golang package and module lookup via `godig`, a pkg.go.dev API client (CLI + MCP server). Use for any Go/Golang library's documentation, API signatures, symbols, usage examples, which versions exist, licenses, whether a dependency has CVEs, or who imports a package — prefer this over Context7 for any Go package or module. Read-only, no auth. Not for upgrading dependencies (→ See `samber/cc-skills-golang@golang-dependency-management` skill), choosing a library (→ See `samber/cc-skills-golang@golang-popular-libraries` skill), or local symbols and an already-used dependency's resolved source, call sites, and generic instantiations (→ See `samber/cc-skills-golang@golang-gopls` skill)."
 user-invocable: true
 license: MIT
 compatibility: Designed for Claude Code, Codex or similar harness. Requires the godig CLI (go install github.com/samber/godig/cmd/godig@latest) or access to a godig MCP server, and internet access to reach the pkg.go.dev API.
 metadata:
   author: samber
-  version: "1.4.0"
+  version: "1.4.1"
   openclaw:
     emoji: "🔎"
     homepage: https://github.com/samber/cc-skills-golang

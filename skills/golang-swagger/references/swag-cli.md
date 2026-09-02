@@ -1,5 +1,17 @@
 # swag CLI Reference
 
+## Table of Contents
+
+- [swag init — Generate Documentation](#swag-init--generate-documentation)
+- [swag fmt — Format Annotations](#swag-fmt--format-annotations)
+- [Framework Integration Packages](#framework-integration-packages)
+- [Dynamic Configuration](#dynamic-configuration)
+- [Generics (swag v2)](#generics-swag-v2)
+- [Nested Composition](#nested-composition)
+- [Response Headers](#response-headers)
+- [Function-Scoped Structs](#function-scoped-structs)
+- [MIME Type Aliases](#mime-type-aliases)
+
 ## swag init — Generate Documentation
 
 ```bash

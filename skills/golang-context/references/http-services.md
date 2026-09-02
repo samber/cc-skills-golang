@@ -1,5 +1,11 @@
 # Context in HTTP Servers & Service Calls
 
+## Table of Contents
+
+- [Context in HTTP Servers](#context-in-http-servers)
+- [Middleware enriching context](#middleware-enriching-context)
+- [Context in Calls to Other Services](#context-in-calls-to-other-services)
+
 ## Context in HTTP Servers
 
 `http.Request` carries a context that is cancelled when the client disconnects or the request handler returns. MUST use `r.Context()` — NEVER create a new `context.Background()` inside a handler.

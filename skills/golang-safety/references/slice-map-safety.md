@@ -1,5 +1,20 @@
 # Slice and Map Safety Deep Dive
 
+## Table of Contents
+
+- [Range Loop Variable Capture](#range-loop-variable-capture)
+  - [Pre-Go 1.22: shared loop variable](#pre-go-122-shared-loop-variable)
+  - [Go 1.22+: per-iteration scoping](#go-122-per-iteration-scoping)
+- [Storing Pointer to Loop Variable](#storing-pointer-to-loop-variable)
+- [Slice Header vs Backing Array](#slice-header-vs-backing-array)
+- [Subslice Retains Full Backing Array](#subslice-retains-full-backing-array)
+- [Standard Library Clone Helpers (Go 1.21+)](#standard-library-clone-helpers-go-121)
+- [Map Iteration Order](#map-iteration-order)
+- [Deleting During Iteration](#deleting-during-iteration)
+  - [Maps — safe](#maps--safe)
+  - [Slices — needs care](#slices--needs-care)
+- [Comparing Slices and Maps](#comparing-slices-and-maps)
+
 ## Range Loop Variable Capture
 
 ### Pre-Go 1.22: shared loop variable

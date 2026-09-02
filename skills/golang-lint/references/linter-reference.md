@@ -14,6 +14,19 @@ To add a linter: add it to `linters.enable` and optionally configure it in `lint
 
 To disable a linter: move it to `linters.disable` with a comment explaining why.
 
+## Table of Contents
+
+- [Linter Categories](#linter-categories)
+  - [Correctness & Safety](#correctness--safety)
+  - [Style & Readability](#style--readability)
+  - [Complexity](#complexity)
+  - [Performance](#performance)
+  - [Security & Resources](#security--resources)
+  - [Logging](#logging)
+  - [Testing](#testing)
+  - [Modernization & Meta](#modernization--meta)
+  - [Formatting](#formatting)
+
 ## Linter Categories
 
 The recommended configuration enables linters across these domains:

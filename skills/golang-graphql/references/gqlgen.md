@@ -2,6 +2,20 @@
 
 gqlgen is a schema-first, code-generation library. Write SDL, run `go generate`, fill in resolver bodies.
 
+## Table of Contents
+
+- [Project Setup](#project-setup)
+- [gqlgen.yml](#gqlgenyml)
+- [Resolver Structure](#resolver-structure)
+- [DataLoaders (gqlgen)](#dataloaders-gqlgen)
+- [Authentication Directives](#authentication-directives)
+- [Middleware Hooks](#middleware-hooks)
+- [Error Presenter](#error-presenter)
+- [Subscriptions](#subscriptions)
+- [File Uploads](#file-uploads)
+- [Apollo Federation v2](#apollo-federation-v2)
+- [Production Handler Setup](#production-handler-setup)
+
 ## Project Setup
 
 ```bash
