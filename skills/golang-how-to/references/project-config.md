@@ -20,7 +20,7 @@ This workflow writes two independent things to the project's agent-config file(s
   - [Markdown targets (CLAUDE.md, AGENTS.md, GEMINI.md, copilot-instructions.md)](#markdown-targets-claudemd-agentsmd-geminimd-copilot-instructionsmd)
   - [Cursor target (`.cursor/rules/*.mdc`)](#cursor-target-cursorrulesmdc)
 - [Step 5 — Confirm to the user](#step-5--confirm-to-the-user)
-- [Notes on company overrides (⚙️ skills)](#notes-on-company-overrides--skills)
+- [Notes on company overrides (⚙️ skills)](#notes-on-company-overrides-%EF%B8%8F-skills)
 
 ## When to use
 
