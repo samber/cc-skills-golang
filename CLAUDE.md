@@ -238,7 +238,6 @@ Polanyi's paradox: most operational knowledge is tacit and resists explicit desc
 
 ### Body writing style
 
-- **Invoke `/writing-clearly-and-concisely` before writing or editing skill body prose** — Strunk's clarity rules (active voice, concrete language, omit needless words) catch what the checklist below doesn't.
 - **Write imperatively, verb first** — `Run`, `Reject`, `Validate`. (→ See [Format 5: Imperative Prose](#format-5-imperative-prose).)
 - **Explain why, not just what** — reasoning-based instructions let the model handle edge cases you did not foresee. (→ See [Teach reasoning, not only rules](#teach-reasoning-not-only-rules), which also rules on caps-lock imperatives.)
 - **Use one term per concept** — mixing "field"/"box"/"element" for the same thing costs accuracy.
