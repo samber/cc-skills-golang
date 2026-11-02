@@ -121,6 +121,8 @@ git clone https://github.com/samber/cc-skills.git ~/.agents/skills/cc-skills
 
 Codex auto-discovers skills from `~/.agents/skills/` and `.agents/skills/`.
 
+After registering this repository with `codex plugin marketplace add samber/cc-skills-golang`, you can install the plugin using `codex plugin add cc-skills-golang@cc-skills-golang` or `/plugins` in the Codex TUI.
+
 </details>
 
 <details>

@@ -1,0 +1,20 @@
+{
+  "name": "cc-skills-golang",
+  "owner": {
+    "name": "Samuel Berthe"
+  },
+  "interface": {
+    "displayName": "cc-skills-golang"
+  },
+  "plugins": [
+    {
+      "name": "cc-skills-golang",
+      "source": "./",
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer"
+    }
+  ]
+}
