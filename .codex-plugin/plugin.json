@@ -29,7 +29,7 @@
     "category": "Developer",
     "capabilities": ["Read"],
     "websiteURL": "https://github.com/samber/cc-skills-golang",
-    "logo": "./assets/logo.png",
-    "logoDark": "./assets/logo-dark.png"
+    "logo": "./assets/cc-skills-golang-logo-512.png",
+    "logoDark": "./assets/cc-skills-golang-logo-512.png"
   }
 }

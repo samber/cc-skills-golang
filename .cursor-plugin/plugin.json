@@ -10,6 +10,7 @@
     "homepage": "https://github.com/samber/cc-skills-golang",
     "repository": "https://github.com/samber/cc-skills-golang",
     "license": "MIT",
+    "logo": "assets/cc-skills-golang-logo-512.png",
     "keywords": [
         "plugin",
         "go",
