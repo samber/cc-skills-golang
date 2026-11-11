@@ -63,13 +63,19 @@ var buf bytes.Buffer       // zero value is ready to use
 
 ### Slice & Map Initialization
 
-Slices and maps MUST be initialized explicitly, never nil. Nil maps panic on write; nil slices serialize to `null` in JSON (vs `[]` for empty slices), surprising API consumers.
+Maps MUST be initialized before writing. Writing to a nil map panics.
+
+Prefer a nil slice (`var s []T`) when declaring an empty slice. Nil and non-nil empty slices both have zero length and capacity. Nil slices work with `append`, `len`, `cap`, and `range`.
+
+Use a non-nil empty slice (`[]T{}` or `make([]T, 0)`) when an API or JSON contract requires `[]` rather than `null`. Use `make` when you need capacity.
 
 ```go
-users := []User{}                       // always initialized
-m := map[string]int{}                   // always initialized
-users := make([]User, 0, len(ids))      // preallocate when capacity is known
-m := make(map[string]int, len(items))   // preallocate when size is known
+var users []User // nil empty slice is the idiomatic default
+users = append(users, User{})
+usersForJSON := []User{} // non-nil when JSON requires []
+m := map[string]int{} // initialize before writing
+usersWithCapacity := make([]User, 0, len(ids))
+mWithCapacity := make(map[string]int, len(items))
 ```
 
 Do not preallocate speculatively — `make([]T, 0, 1000)` wastes memory when the common case is 10 items.
